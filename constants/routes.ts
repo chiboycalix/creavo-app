@@ -11,7 +11,7 @@ export const ROUTES = {
   SCHEDULE: "/schedule",
   SCHEDULE_DETAILS: (id: string) => `/schedule/details/${id}`,
   UPLOADS: "/uploads",
-  PROFILE: (id: string) => `/socials/profile/${id}`,
+  PROFILE: (id: string) => `/socials/profile`,
   POSTS: (id: string) => `/posts/${id}`,
 
   COURSES: "/courses",

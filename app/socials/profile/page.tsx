@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ProfileHeader from "./_components/ProfileHeader";
 import ProfileTabs from "./_components/ProfileTabs";
 import Cookies from "js-cookie";
 import Loading from "@/components/Loading";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Error from "@/components/Error";
 import { useRouter } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
@@ -31,7 +32,7 @@ const Profile = () => {
     setState(prev => ({ ...prev, error: true }));
   };
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     if (!currentUser?.id) return;
 
     try {
@@ -45,10 +46,12 @@ const Profile = () => {
       setState(prev => ({ ...prev, userProfile: data, loading: false }));
     } catch (error) {
       handleApiError(error, "fetchUserProfile");
+    } finally {
+      setState(prev => ({ ...prev, loading: false }));
     }
-  };
+  }, [currentUser.id, router]);
 
-  const fetchResourceData = async (endpoint: string) => {
+  const fetchResourceData = useCallback(async (endpoint: string) => {
     if (!currentUser?.id) return null;
 
     try {
@@ -64,7 +67,7 @@ const Profile = () => {
       handleApiError(error, `fetch${endpoint}`);
       return null;
     }
-  };
+  }, [currentUser.id]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -88,7 +91,7 @@ const Profile = () => {
     };
 
     loadData();
-  }, [currentUser?.id]);
+  }, [currentUser?.id, fetchResourceData, isCurrentUser, fetchUserProfile]);
 
   const handleFollow = () => {
     if (!getAuth()) {
@@ -118,22 +121,28 @@ const Profile = () => {
   }
 
   return (
-    <div className="w-full flex flex-col bg-white my-px min-h-[83vh] p-3">
-      <ProfileHeader
-        userProfile={state.userProfile}
-        isCurrentUser={isCurrentUser}
-        onFollow={handleFollow}
-      />
-      <ProfileTabs
-        isCurrentUser={isCurrentUser}
-        courses={state.courses}
-        posts={state.posts}
-        myLearning={state.myLearning}
-        user={currentUser}
-        loadingCourses={false}
-        loadingPosts={false}
-      />
-    </div>
+    <ProtectedRoute
+      requireAuth={true}
+      requireVerification={true}
+      requireProfileSetup={false}
+    >
+      <div className="w-full flex flex-col bg-white my-px min-h-[83vh] p-3">
+        <ProfileHeader
+          userProfile={state.userProfile}
+          isCurrentUser={isCurrentUser}
+          onFollow={handleFollow}
+        />
+        <ProfileTabs
+          isCurrentUser={isCurrentUser}
+          courses={state.courses}
+          posts={state.posts}
+          myLearning={state.myLearning}
+          user={currentUser}
+          loadingCourses={false}
+          loadingPosts={false}
+        />
+      </div>
+    </ProtectedRoute>
   );
 };
 
