@@ -21,7 +21,7 @@ export const LAYOUT_PATHS = [
 
   "/socials",
   "/socials/analytics",
-  "/socials/profile/*",
+  "/socials/profile",
   "/socials/reports",
   "/socials/uploads",
   "/socials/schedule",

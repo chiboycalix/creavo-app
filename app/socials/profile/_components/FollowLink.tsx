@@ -16,11 +16,11 @@ const FollowLink: React.FC<FollowLinkProps> = ({ id, type, children, className }
 
   const openFollowModal = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    router.push(`/socials/profile-details/${type}?background=${window.location.pathname}&id=${id}`);
+    router.push(`/profile-details/${type}?background=${window.location.pathname}&id=${id}`);
   };
 
   return (
-    <Link href={`/socials/profile-details/${type}?id=${id}`} onClick={openFollowModal} className={className}>
+    <Link href={`/profile-details/${type}?id=${id}`} onClick={openFollowModal} className={className}>
       {children}
     </Link>
   );

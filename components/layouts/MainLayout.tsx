@@ -46,7 +46,7 @@ export default function MainLayout({
         { title: 'Reports', href: '/socials/reports', icon: FileText },
         { title: 'Calendar', href: '/socials/schedule', icon: Calendar },
         { title: 'Upload Video', href: '/socials/uploads', icon: UploadCloud },
-        { title: 'Profile', href: `/socials/profile/${currentUser ? currentUser?.id : ""}`, icon: User2 },
+        { title: 'Profile', href: `/socials/profile`, icon: User2 },
       ]
     },
     {
@@ -72,16 +72,12 @@ export default function MainLayout({
     }
   ];
 
-
   const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(headerButtons[0].navItems);
 
-  // Function to find the appropriate nav items based on the current path
   const findNavItemsForPath = (path: string) => {
     for (const button of headerButtons) {
-      // Check if the current path starts with any of the nav item paths
       const matchingNavItem = button.navItems.find(item =>
         path.startsWith(item.href) ||
-        // Special case for root paths like /studio, /socials, /market
         (item.href.split('/')[1] === path.split('/')[1])
       );
 
@@ -89,15 +85,13 @@ export default function MainLayout({
         return button.navItems;
       }
     }
-    // Default to socials if no match found
     return headerButtons[0].navItems;
   };
 
-  // Update sidebar nav items when pathname changes or on initial load
   useEffect(() => {
     const navItems = findNavItemsForPath(pathname);
     setCurrentNavItems(navItems);
-  }, [pathname]);
+  }, [pathname, currentUser]);
 
   if (loading) {
     return (
