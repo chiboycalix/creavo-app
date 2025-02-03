@@ -32,7 +32,7 @@ export default function Sidebar({ navItems }: SidebarProps) {
       >
         <nav className="p-4">
           <ul className="space-y-2">
-            <div className="px-4">
+            <div className="px-4 mb-14">
               <div className="mb-6 mt-4 flex justify-start">
                 <Link href="/" className="relative">
                   <Image

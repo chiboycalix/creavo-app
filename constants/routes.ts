@@ -3,7 +3,7 @@ export const ROUTES = {
   SIGN_IN: "/auth?tab=signin",
   SIGN_UP: "/auth?tab=signup",
   FORGOT_PASSWORD: "/auth/forgot-password",
-  SETUP_PROFILE: "/setup",
+  SETUP_PROFILE: "/socials/setup",
   SELECT_INTERESTS: "/select-interests",
   VALIDATE_OTP: (email: string) => `/auth/validate-otp?email=${email}`,
 
@@ -11,7 +11,7 @@ export const ROUTES = {
   SCHEDULE: "/schedule",
   SCHEDULE_DETAILS: (id: string) => `/schedule/details/${id}`,
   UPLOADS: "/uploads",
-  PROFILE: (id: string) => `/profile/${id}`,
+  PROFILE: (id: string) => `/socials/profile/${id}`,
   POSTS: (id: string) => `/posts/${id}`,
 
   COURSES: "/courses",

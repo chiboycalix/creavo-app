@@ -1,10 +1,9 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
-import { SidebarProvider } from '@/context/SidebarContext';
-import Sidebar from './includes/Sidebar';
 import Header from './includes/Header';
+import Sidebar from './includes/Sidebar';
 import { NavItem, HeaderButton } from '@/types/navigation';
+import { SidebarProvider } from '@/context/SidebarContext';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
 import {
@@ -19,44 +18,14 @@ import {
   Settings,
   User,
   Shield,
-  Sliders
+  Sliders,
+  UploadCloud,
+  User2,
+  Compass,
+  Calendar
 } from 'lucide-react';
 import { shouldUseMainLayout } from '@/utils/path-utils';
-
-// Define header buttons at the top level so it can be used in multiple places
-export const headerButtons: HeaderButton[] = [
-  {
-    id: 'socials',
-    label: 'Socials',
-    icon: LayoutDashboard,
-    navItems: [
-      { title: 'Overview', href: '/socials', icon: Home },
-      { title: 'Analytics', href: '/socials/analytics', icon: BarChart },
-      { title: 'Reports', href: '/socials/reports', icon: FileText }
-    ]
-  },
-  {
-    id: 'studio',
-    label: 'Studio',
-    icon: FolderKanban,
-    navItems: [
-      { title: 'All Projects', href: '/studio', icon: FolderOpen },
-      { title: 'Active', href: '/studio/active', icon: FolderOpen },
-      { title: 'Archived', href: '/studio/archived', icon: Archive },
-      { title: 'Video conferencing', href: '/studio/meeting', icon: Video }
-    ]
-  },
-  {
-    id: 'market',
-    label: 'Market Place',
-    icon: Settings,
-    navItems: [
-      { title: 'Profile', href: '/market', icon: User },
-      { title: 'Security', href: '/market/security', icon: Shield },
-      { title: 'Preferences', href: '/market/preferences', icon: Sliders }
-    ]
-  }
-];
+import ProfileCompletionManager from '../ProfileCompletionManager';
 
 export default function MainLayout({
   children,
@@ -64,7 +33,46 @@ export default function MainLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname();
-  const { loading } = useAuth();
+  const { loading, currentUser } = useAuth();
+
+  const headerButtons: HeaderButton[] = [
+    {
+      id: 'socials',
+      label: 'Socials',
+      icon: LayoutDashboard,
+      navItems: [
+        { title: 'Explore for You', href: '/socials', icon: Compass },
+        { title: 'Analytics', href: '/socials/analytics', icon: BarChart },
+        { title: 'Reports', href: '/socials/reports', icon: FileText },
+        { title: 'Calendar', href: '/socials/schedule', icon: Calendar },
+        { title: 'Upload Video', href: '/socials/uploads', icon: UploadCloud },
+        { title: 'Profile', href: `/socials/profile/${currentUser ? currentUser?.id : ""}`, icon: User2 },
+      ]
+    },
+    {
+      id: 'studio',
+      label: 'Studio',
+      icon: FolderKanban,
+      navItems: [
+        { title: 'All Projects', href: '/studio', icon: FolderOpen },
+        { title: 'Active', href: '/studio/active', icon: FolderOpen },
+        { title: 'Archived', href: '/studio/archived', icon: Archive },
+        { title: 'Video conferencing', href: '/studio/meeting', icon: Video }
+      ]
+    },
+    {
+      id: 'market',
+      label: 'Market Place',
+      icon: Settings,
+      navItems: [
+        { title: 'Profile', href: '/market', icon: User },
+        { title: 'Security', href: '/market/security', icon: Shield },
+        { title: 'Preferences', href: '/market/preferences', icon: Sliders }
+      ]
+    }
+  ];
+
+
   const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(headerButtons[0].navItems);
 
   // Function to find the appropriate nav items based on the current path
@@ -121,6 +129,7 @@ export default function MainLayout({
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
             <div className="p-6">
+              <ProfileCompletionManager />
               {children}
             </div>
           </main>

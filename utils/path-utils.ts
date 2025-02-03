@@ -13,21 +13,24 @@ const getAllRoutes = (obj: any): string[] => {
 
 export const LAYOUT_PATHS = [
   ...getAllRoutes(ROUTES),
-  "/schedule/details/*",
-  "/profile/*",
   "/posts/*",
   "/courses/*",
   "/course/*",
   "/streaming/*",
   "/classroom/*",
-  "/meeting",
+
   "/socials",
   "/socials/analytics",
+  "/socials/profile/*",
   "/socials/reports",
+  "/socials/uploads",
+  "/socials/schedule",
+
   "/studio",
   "/studio/active",
   "/studio/archived",
   "/studio/meeting/*",
+
   "/market",
   "/market/security",
   "/market/preferences",
