@@ -58,8 +58,8 @@ export default function VideoMedia({ postMedia, size }: VideoMediaProps) {
   }, []);
 
   useEffect(() => {
+    const video = videoRef.current
     return () => {
-      const video = videoRef.current;
       if (video) {
         video.pause();
         setIsPlaying(false);

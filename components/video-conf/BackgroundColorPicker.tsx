@@ -38,7 +38,7 @@ const BackgroundColorPicker = ({ isOpen, onClose, colorPickeranchorRect }: any) 
 
   useEffect(() => {
     setBackgroundColor(color)
-  }, [color])
+  }, [color, setBackgroundColor])
 
   const handleSetBlurValue = (e: any) => {
     setBlurValue(Number(e.target.value))
@@ -51,7 +51,7 @@ const BackgroundColorPicker = ({ isOpen, onClose, colorPickeranchorRect }: any) 
 
   useEffect(() => {
     setBackgroundBlurring(blurValue)
-  }, [blurValue])
+  }, [blurValue, setBackgroundBlurring])
 
   const handleSetImgSrcNone = () => {
     handleSetImgSrc(null)
@@ -60,7 +60,7 @@ const BackgroundColorPicker = ({ isOpen, onClose, colorPickeranchorRect }: any) 
 
   useEffect(() => {
     setBackgroundImage(imgSrc)
-  }, [imgSrc])
+  }, [imgSrc, setBackgroundImage])
 
   if (!colorPickeranchorRect) return null;
 

@@ -46,7 +46,7 @@ const ScheduleDetailsEdit: React.FC<ScheduleDetailsEditProps> = ({
     } catch (error) {
       console.log("Error fetching schedule details:", error);
     }
-  }, [baseUrl, scheduleDetails.id]);
+  }, [scheduleDetails.id]);
 
   useEffect(() => {
     fetchScheduleDetails();
@@ -71,7 +71,7 @@ const ScheduleDetailsEdit: React.FC<ScheduleDetailsEditProps> = ({
         console.log("Error fetching users:", error);
       }
     },
-    [baseUrl]
+    []
   );
 
   const handleGuestSelect = (username: string) => {

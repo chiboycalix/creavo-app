@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { PostProvider } from "@/context/PostContext";
 import { WebSocketProvider } from "@/context/WebSocket";
 import { VideoConferencingProvider } from "@/context/VideoConferencingContext";
+import ReactQueryProvider from "@/context/QueryContext";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -28,20 +29,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={manrope.className}>
-        <AuthProvider>
-          <WebSocketProvider>
-            <MainLayout>
-              <ToastProvider>
-                <PostProvider>
-                  <VideoConferencingProvider>
-                    <VideoPlaybackProvider>{children}</VideoPlaybackProvider>
-                    <Toaster richColors expand />
-                  </VideoConferencingProvider>
-                </PostProvider>
-              </ToastProvider>
-            </MainLayout>
-          </WebSocketProvider>
-        </AuthProvider>
+        <ReactQueryProvider>
+          <AuthProvider>
+            <WebSocketProvider>
+              <MainLayout>
+                <ToastProvider>
+                  <PostProvider>
+                    <VideoConferencingProvider>
+                      <VideoPlaybackProvider>{children}</VideoPlaybackProvider>
+                      <Toaster richColors expand />
+                    </VideoConferencingProvider>
+                  </PostProvider>
+                </ToastProvider>
+              </MainLayout>
+            </WebSocketProvider>
+          </AuthProvider>
+        </ReactQueryProvider>
+
       </body>
     </html>
   );

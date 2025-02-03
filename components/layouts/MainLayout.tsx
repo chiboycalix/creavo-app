@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import React, { useState, useEffect } from 'react';
 import Header from './includes/Header';
@@ -118,7 +119,7 @@ export default function MainLayout({
           <header className="fixed top-0 right-0 left-0 lg:left-64 z-30">
             <Header
               onButtonClick={setCurrentNavItems}
-              headerButtons={headerButtons}  // Pass headerButtons to Header
+              headerButtons={headerButtons}
             />
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
