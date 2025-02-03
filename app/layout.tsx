@@ -1,15 +1,18 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import MainLayout from "@/components/layouts/MainLayout";
+import { Manrope } from "next/font/google";
+import { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
+import { VideoPlaybackProvider } from "@/context/VideoPlaybackContext";
+import { Toaster } from "@/components/ui/sonner";
+import { PostProvider } from "@/context/PostContext";
+import { WebSocketProvider } from "@/context/WebSocket";
+import { VideoConferencingProvider } from "@/context/VideoConferencingContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const manrope = Manrope({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -24,10 +27,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={manrope.className}>
+        <AuthProvider>
+          <WebSocketProvider>
+            <MainLayout>
+              <ToastProvider>
+                <PostProvider>
+                  <VideoConferencingProvider>
+                    <VideoPlaybackProvider>{children}</VideoPlaybackProvider>
+                    <Toaster richColors expand />
+                  </VideoConferencingProvider>
+                </PostProvider>
+              </ToastProvider>
+            </MainLayout>
+          </WebSocketProvider>
+        </AuthProvider>
       </body>
     </html>
   );
