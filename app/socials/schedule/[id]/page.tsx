@@ -38,7 +38,7 @@ export default function ScheduleDetailsContainer() {
     } catch (error) {
       console.log("Error fetching schedule details:", error);
     }
-  }, [baseUrl, id]);
+  }, [id]);
 
   const handleDeleteClick = async () => {
     if (!scheduleDetails) {

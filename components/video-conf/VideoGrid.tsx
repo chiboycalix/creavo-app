@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import VideoMutedDisplay from './VideoMutedDisplay';
+import MobileView from './MobileView';
+import DesktopView from './DesktopView';
 import { Hand, Mic, MicOff } from 'lucide-react';
 import { useVideoConferencing } from "@/context/VideoConferencingContext";
 import { StreamPlayer } from './StreamPlayer';
-import MobileView from './MobileView';
-import DesktopView from './DesktopView';
+import { ScreenSharePlayer } from './ScreenSharePlayer';
 
 export function ParticipantVideo({ participant, customClasses = '' }: any) {
   const {
@@ -98,7 +99,7 @@ export function ScreenShareView({ remoteParticipants }: any) {
 
   if (!screenSharingUser) return null;
 
-  if (screenSharingUser.isLocal) {
+  if (screenSharingUser?.isLocal) {
     return (
       <div className="w-full lg:basis-9/12 min-h-[300px] sm:min-h-[400px] bg-black">
         <div className="relative h-full w-full">
@@ -118,13 +119,13 @@ export function ScreenShareView({ remoteParticipants }: any) {
   return (
     <div className="w-full lg:basis-9/12 min-h-[300px] sm:min-h-[400px] bg-black">
       <div className="relative h-full w-full">
-        <StreamPlayer
-          videoTrack={sharingParticipant.screenVideoTrack}
-          audioTrack={sharingParticipant.screenAudioTrack}
+        <ScreenSharePlayer
+          videoTrack={sharingParticipant?.videoTrack}
+          audioTrack={sharingParticipant?.screenAudioTrack}
           isScreenShare={true}
         />
         <div className="absolute top-2 left-2 bg-black/50 px-2 py-1 rounded text-white text-sm">
-          {sharingParticipant.isLocal ? 'Your' : `${sharingParticipant.name}'s`} screen
+          {sharingParticipant?.isLocal ? 'Your' : `${sharingParticipant?.name}'s`} screen
         </div>
       </div>
     </div>
