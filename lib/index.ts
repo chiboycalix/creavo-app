@@ -1,7 +1,6 @@
 import Cookies from "js-cookie";
 
 export const fetchToken = async (url: string) => {
-  console.log(Cookies.get("accessToken"), "Cookies.get");
   const response = await fetch(url, {
     method: "GET",
     headers: {

@@ -63,7 +63,7 @@ const CourseDetailsInputModal = ({
     } catch (error) {
       console.log("Error fetching folders:", error);
     }
-  }, [baseUrl, userId]);
+  }, [userId]);
 
   const handleToggleSwitch = () => {
     setIsFolder((prev) => !prev);

@@ -9,7 +9,6 @@ import EndCallScreen from "./EndCallScreen";
 import EmojiPopup from "./EmojiPopup";
 import { VideoGrid } from "./VideoGrid";
 import ChatAndParticipant from "./ChatAndParticipant";
-import InvitePeopleTab from "./InvitePeople";
 import { useToast } from "@/context/ToastContext";
 import {
   X,
@@ -36,6 +35,7 @@ import { generalHelpers } from "@/helpers";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import BackgroundColorPicker from "./BackgroundColorPicker";
+import InvitePeopleTab from "./InvitePeople/InvitePeopleTab";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 
@@ -78,6 +78,7 @@ const LiveStreamInterface = () => {
     channelName,
     toggleRaiseHand,
     raisedHands,
+    screenSharingUser
   } = useVideoConferencing();
   const router = useRouter();
   const totalParticipants = Object.keys(remoteParticipants || {}).length + 1;
@@ -85,7 +86,8 @@ const LiveStreamInterface = () => {
   const { getCurrentUser } = useAuth();
   const username = getCurrentUser()?.username;
   const isRaised = raisedHands[String(meetingConfig.uid)];
-  const { showToast } = useToast();
+
+  console.log(screenSharingUser?.isLocal, "ScreenShareView")
 
   const newRequest = {
     id: "unique-id",
@@ -299,7 +301,6 @@ const LiveStreamInterface = () => {
             />
           ))}
 
-        {/* Invite People Modal */}
         {showInvitePeople && !hasEndedCall && (
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg w-[90%] md:w-[560px] max-h-[80vh] overflow-y-auto">
             <div className="p-4 md:p-6">
@@ -378,7 +379,7 @@ const LiveStreamInterface = () => {
               <div className="flex items-center justify-center gap-1 md:gap-2">
                 <IconButton
                   leftIcon={
-                    isSharingScreen ? (
+                    isSharingScreen && screenSharingUser?.isLocal ? (
                       <Share
                         size={14}
                         className="md:w-4 md:h-4 lg:w-5 lg:h-5 rotate-180"

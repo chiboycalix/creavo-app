@@ -113,6 +113,7 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
   const [isSharingScreen, setIsSharingScreen] = useState<string | null>(null);
   const [screenSharingUser, setScreenSharingUser] = useState<{
     uid: string;
+    name: string;
     isLocal: boolean;
   } | null>(null);
   const [raisedHands, setRaisedHands] = useState<Record<string, boolean>>({});
@@ -164,11 +165,12 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
     certificate: "",
   });
 
-  const setScreenShare = useCallback((uid: string | null, isLocal: boolean) => {
+  const setScreenShare = useCallback((uid: string | null, name: string, isLocal: boolean) => {
     setIsSharingScreen(uid);
     if (uid) {
       setScreenSharingUser({
         uid,
+        name,
         isLocal
       });
     } else {
@@ -220,9 +222,9 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
 
         case 'screen-share-state':
           if (message.isSharing) {
-            setScreenShare(String(message.uid), false);
+            setScreenShare(String(message.uid), message.name, false);
           } else {
-            setScreenShare(null, false);
+            setScreenShare(null, "", false);
           }
           break;
 
@@ -357,13 +359,11 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
   }, [channelName, handleMeetingHostAndCohost]);
 
   useEffect(() => {
-    console.log("Error before meeting room data:", channelName, username);
     if (channelName) {
       const fetchAgoraData = async () => {
         try {
           console.log("Error before meeting room data:");
           const rtcData = await agoraGetAppData(channelName);
-          console.log("Error after meeting room data:");
 
           const { client } = rtcData;
 
@@ -444,6 +444,7 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
         setIsSharingScreen(String(meetingConfig.uid));
         setScreenSharingUser({
           uid: String(meetingConfig.uid),
+          name: username,
           isLocal: true
         });
 
@@ -459,6 +460,7 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
             text: JSON.stringify({
               type: 'screen-share-state',
               uid: rtcScreenShareOptions.uid,
+              name: username,
               isSharing: true
             })
           });
@@ -490,11 +492,12 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
         text: JSON.stringify({
           type: 'screen-share-state',
           uid: rtcScreenShareOptions.uid,
+          name: username,
           isSharing: false
         })
       });
     }
-  }, [rtcScreenShareOptions.uid, screenTrack?.screenAudioTrack, screenTrack?.screenVideoTrack]);
+  }, [rtcScreenShareOptions.uid, username, screenTrack?.screenAudioTrack, screenTrack?.screenVideoTrack]);
 
   const handleEndScreenShare = useCallback(async (action: string, uid: number) => {
     await handleScreenTrackEnd();
@@ -599,6 +602,7 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
         setIsSharingScreen(uid);
         setScreenSharingUser({
           uid: uid,
+          name: username,
           isLocal: false
         });
       }

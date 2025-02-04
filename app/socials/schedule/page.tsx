@@ -109,7 +109,7 @@ export default function SchedulePage() {
     }
     fetchSchedules();
     fetchMeetingHistory();
-  }, [fetchSchedules]);
+  }, [fetchSchedules, fetchMeetingHistory, isAuthenticated, router]);
 
   const formatTime = (timeString: string): string => {
     if (!timeString) return "N/A";

@@ -100,7 +100,7 @@ const MicSelect = ({ audioTrack, setHandleSelectMicrophone }: MicSelectProps) =>
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [setHandleSelectMicrophone]);
 
 
   return (
