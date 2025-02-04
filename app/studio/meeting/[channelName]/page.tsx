@@ -1,10 +1,10 @@
 'use client';
-import PermissionModal from "@/components/video-conf/PermissionModal";
+import PermissionModal from "@/components/meeting/PermissionModal";
 import { useEffect, useState } from "react";
 import { useVideoConferencing } from "@/context/VideoConferencingContext";
 import { useParams } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import VideoInterface from "@/components/video-conf/VideoInterface";
+import VideoInterface from "@/components/meeting/VideoInterface";
 import { useAuth } from "@/context/AuthContext";
 
 export default function WaitingRoom() {

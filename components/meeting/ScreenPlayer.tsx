@@ -25,7 +25,6 @@ export const ScreenPlayer: React.FC<ScreenPlayerProps> = ({
   isScreenShare = false
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { isCameraEnabled, meetingConfig } = useVideoConferencing();
 
   // Clean up previous video track
   useEffect(() => {
@@ -78,7 +77,7 @@ export const ScreenPlayer: React.FC<ScreenPlayerProps> = ({
     };
 
     initVideo();
-  }, [videoTrack]);
+  }, [videoTrack, isScreenShare, options]);
 
   // Log containerRef and videoTrack state
   console.log("ContainerRef:", containerRef.current);

@@ -53,7 +53,7 @@ export default function VideoInterface({
   useEffect(() => {
     setChannelName(channelName)
     setUsername(currentUser.usernam)
-  }, [channelName, setChannelName, username, setUsername])
+  }, [channelName, setChannelName, username, setUsername, currentUser.usernam])
 
   return (
     <div>

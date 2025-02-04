@@ -7,7 +7,6 @@ import {
   IRemoteVideoTrack,
 } from "agora-rtc-sdk-ng";
 import { useVideoConferencing } from "@/context/VideoConferencingContext";
-import VideoMutedDisplay from "./VideoMutedDisplay";
 
 type ScreenSharePlayerProps = {
   audioTrack: (ILocalAudioTrack & IMicrophoneAudioTrack) | null;
@@ -40,14 +39,10 @@ export const ScreenSharePlayer: React.FC<ScreenSharePlayerProps> = ({
   };
 
   useEffect(() => {
-    console.log("videoTrack updated:", videoTrack);
-    console.log("videoRef.current:", videoRef.current);
-
     if (videoTrack && videoRef.current) {
-      console.log("Attempting to play videoTrack...");
       setTimeout(() => {
         videoTrack.play(videoRef.current as HTMLVideoElement);
-      }, 100); // Small delay to avoid race conditions
+      }, 100);
     } else {
       console.log("videoTrack or videoRef.current is missing.");
     }
@@ -56,11 +51,11 @@ export const ScreenSharePlayer: React.FC<ScreenSharePlayerProps> = ({
   return (
     <div className="relative w-full h-full">
       <video
-        key={videoTrack?.getTrackId()} // Forces re-render when video track changes
+        key={videoTrack?.getTrackId()}
         playsInline
         autoPlay
         muted
-        ref={setVideoRef} // Uses callback ref to ensure video element is available
+        ref={setVideoRef}
         className={`w-full h-full transition-opacity duration-300 ${!isScreenShare ? "bg-black" : ""}`}
       />
     </div>

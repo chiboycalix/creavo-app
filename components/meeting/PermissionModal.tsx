@@ -1,4 +1,4 @@
-import Modal from "@/components/video-conf/Modal";
+import Modal from "@/components/meeting/Modal";
 import { Button } from "@/components/ui/button";
 
 interface PermissionModalProps {

@@ -14,6 +14,7 @@ export function ParticipantVideo({ participant, customClasses = '' }: any) {
     speakingParticipants,
     meetingConfig,
     raisedHands,
+    screenSharingUser
   } = useVideoConferencing();
 
   const hasRaisedHand = raisedHands[participant.uid];
@@ -25,7 +26,7 @@ export function ParticipantVideo({ participant, customClasses = '' }: any) {
     (isMicrophoneEnabled && !!participant.audioTrack) :
     (participant.audioEnabled !== false && !!participant.audioTrack);
 
-  const displayName = participant.isLocal ? 'You' : (participant.name || `User ${participant.uid}`);
+  const displayName = participant.isLocal ? 'You' : (participant?.name || `${screenSharingUser?.name}'s screen`);
   const audioEnabled = participant.isLocal ?
     isMicrophoneEnabled :
     participant.audioEnabled;
@@ -112,7 +113,7 @@ export function ScreenShareView({ remoteParticipants }: any) {
       </div>
     );
   }
-
+  console.log({ screenSharingUser })
   const sharingParticipant = remoteParticipants[screenSharingUser.uid];
   if (!sharingParticipant) return null;
 
@@ -125,7 +126,7 @@ export function ScreenShareView({ remoteParticipants }: any) {
           isScreenShare={true}
         />
         <div className="absolute top-2 left-2 bg-black/50 px-2 py-1 rounded text-white text-sm">
-          {sharingParticipant?.isLocal ? 'Your' : `${sharingParticipant?.name}'s`} screen
+          {sharingParticipant?.isLocal ? 'Your' : `${screenSharingUser?.name}'s`} screen
         </div>
       </div>
     </div>
@@ -148,7 +149,6 @@ export function ParticipantsColumn({ participants }: any) {
     </div>
   );
 }
-
 
 export function VideoGrid({
   localUser,
