@@ -4,7 +4,7 @@ export const ROUTES = {
   SIGN_UP: "/auth?tab=signup",
   FORGOT_PASSWORD: "/auth/forgot-password",
   SETUP_PROFILE: "/socials/setup",
-  SELECT_INTERESTS: "/select-interests",
+  SELECT_INTERESTS: "/socials/select-interests",
   VALIDATE_OTP: (email: string) => `/auth/validate-otp?email=${email}`,
 
   LIVE: "/live",

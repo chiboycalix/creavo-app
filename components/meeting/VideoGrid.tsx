@@ -14,7 +14,6 @@ export function ParticipantVideo({ participant, customClasses = '' }: any) {
     speakingParticipants,
     meetingConfig,
     raisedHands,
-    screenSharingUser
   } = useVideoConferencing();
 
   const hasRaisedHand = raisedHands[participant.uid];
@@ -26,7 +25,7 @@ export function ParticipantVideo({ participant, customClasses = '' }: any) {
     (isMicrophoneEnabled && !!participant.audioTrack) :
     (participant.audioEnabled !== false && !!participant.audioTrack);
 
-  const displayName = participant.isLocal ? 'You' : (participant?.name || `${screenSharingUser?.name}'s screen`);
+  const displayName = participant.isLocal ? 'You' : (participant.name || `User ${participant.uid}`);
   const audioEnabled = participant.isLocal ?
     isMicrophoneEnabled :
     participant.audioEnabled;
@@ -113,7 +112,7 @@ export function ScreenShareView({ remoteParticipants }: any) {
       </div>
     );
   }
-  console.log({ screenSharingUser })
+
   const sharingParticipant = remoteParticipants[screenSharingUser.uid];
   if (!sharingParticipant) return null;
 
