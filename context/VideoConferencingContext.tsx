@@ -492,7 +492,7 @@ export function VideoConferencingProvider({ children }: { children: ReactNode })
         text: JSON.stringify({
           type: 'screen-share-state',
           uid: rtcScreenShareOptions.uid,
-          name: username,
+          name: "",
           isSharing: false
         })
       });
