@@ -8,7 +8,6 @@ import { useVideoConferencing } from "@/context/VideoConferencingContext";
 import { TeamPeople } from "@/public/assets";
 import { Check, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 import { MEETINGS_API } from "@/lib/api";
 import { ROUTES } from "@/constants/routes";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ export default function VideoConferencing() {
   const [handleJoinMeeting, setHandleJoinMeeting] = useState(false);
   const [handleCreateMeeting, setHandleCreateMeeting] = useState(false);
   const { setChannelName, channelName } = useVideoConferencing();
-  const { currentUser } = useAuth();
   const { showToast } = useToast();
 
   const handleCreateInstantMeeting = async () => {

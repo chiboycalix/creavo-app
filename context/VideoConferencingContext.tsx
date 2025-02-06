@@ -64,7 +64,7 @@ interface VideoConferencingContextContextType {
   setLocalUserTrack: any;
   releaseMediaResources: () => void;
   publishLocalMediaTracks: () => void;
-  joinMeetingRoom: (meegtingId: string) => Promise<void>;
+  joinMeetingRoom: () => Promise<void>;
   setMeetingStage: (meetingStage: string) => void;
   setChannelName: (meetingStage: string) => void;
   channelName: string;
@@ -206,6 +206,7 @@ export function VideoConferencingProvider({
       setScreenSharingUser(null);
     }
   }, []);
+
   const updateRemoteParticipant = useCallback(
     (uid: string, updates: Partial<any>) => {
       setRemoteParticipants((prev) => {
@@ -246,78 +247,6 @@ export function VideoConferencingProvider({
       setUserIsCoHost(isCoHost);
     }
   }, [meetingRoomData, currentUser]);
-
-  // const handleRTMMessage = useCallback(async ({ text, peerId }: any) => {
-  //   console.log({ text })
-  //   if (!text) return;
-
-  //     try {
-  //       const message = JSON.parse(text);
-  //       const uid = String(message.uid).replace(/[^a-zA-Z0-9]/g, "");
-
-  //       switch (message.type) {
-  //         case "video-state":
-  //           updateRemoteParticipant(uid, {
-  //             videoEnabled: message.enabled,
-  //           });
-  //           break;
-
-  //         case "audio-state":
-  //           updateRemoteParticipant(uid, {
-  //             audioEnabled: message.enabled,
-  //           });
-  //           break;
-
-  //       case 'screen-share-state':
-  //         if (message.isSharing) {
-  //           setScreenShare(String(message.uid), false);
-  //         } else {
-  //           setScreenShare(null, false);
-  //         }
-  //         break;
-
-  //         case "user-info":
-  //           if (uid === String(meetingConfig.uid)) return;
-
-  //           updateRemoteParticipant(uid, {
-  //             name: message.name,
-  //             rtcUid: uid,
-  //           });
-  //           break;
-  //         case "hand-state":
-  //           setRaisedHands((prev: any) => ({
-  //             ...prev,
-  //             [uid]: message.isRaised,
-  //           }));
-  //           break;
-  //         case "chat":
-  //           setChatMessages((prev) => [
-  //             ...prev,
-  //             {
-  //               id: `${message.timestamp}-${uid}`,
-  //               sender: {
-  //                 uid: uid,
-  //                 name: message.senderName,
-  //               },
-  //               content: message.content,
-  //               timestamp: message.timestamp,
-  //               type: message.messageType,
-  //               isLocal: String(uid) === String(meetingConfig.uid),
-  //             },
-  //           ]);
-  //           break;
-  //         case "give-cohost":
-  //           console.log("co host granted to user");
-  //           handleMeetingHostAndCohost();
-  //           break;
-  //       }
-  //     } catch (error) {
-  //       console.error("Error processing RTM message:", error);
-  //     }
-  //     //removed setspeakingparticipants from the dependecy array
-  //   },
-  //   [meetingConfig.uid, updateRemoteParticipant, setScreenShare, handleMeetingHostAndCohost]
-  // );
 
   const handleRTMMessage = useCallback(async ({ text, peerId }: any) => {
     if (!text) return;
@@ -362,29 +291,41 @@ export function VideoConferencingProvider({
           }));
           break;
         case 'chat':
-          setChatMessages(prev => [...prev, {
-            id: `${message.timestamp}-${uid}`,
-            sender: {
-              uid: uid,
-              name: message.senderName
-            },
-            content: message.content,
-            timestamp: message.timestamp,
-            type: message.messageType,
-            isLocal: String(uid) === String(meetingConfig.uid)
-          }]);
+          setChatMessages(prev => {
+            const messageId = `${message.timestamp}-${uid}`;
+            const messageExists = prev.some(msg => msg.id === messageId);
+
+            if (messageExists) {
+              return prev;
+            }
+
+            return [
+              ...prev,
+              {
+                id: messageId,
+                sender: {
+                  uid: uid,
+                  name: message.senderName
+                },
+                content: message.content,
+                timestamp: message.timestamp,
+                type: message.messageType,
+                isLocal: String(uid) === String(meetingConfig.uid),
+              }
+            ];
+          });
           break;
-          case "give-cohost":
-            console.log("co host granted to user");
-            handleMeetingHostAndCohost();
-            break;
+
+        case "give-cohost":
+          console.log("co host granted to user");
+          handleMeetingHostAndCohost();
+          break;
       }
     } catch (error) {
       console.error("Error processing RTM message:", error);
     }
-    //removed setspeakingparticipants from the dependecy array
   }, [meetingConfig.uid, updateRemoteParticipant, setScreenShare, handleMeetingHostAndCohost]);
-  
+
   useEffect(() => {
     if (!rtmChannel) return;
 
@@ -437,27 +378,6 @@ export function VideoConferencingProvider({
       }
     });
   }, [meetingConfig.uid]);
-
-  const handleMediaTrackUpdate = useCallback(
-    async (
-      uid: string,
-      mediaType: "audio" | "video",
-      track: any,
-      enabled: boolean
-    ) => {
-      updateRemoteParticipant(uid, {
-        [`${mediaType}Track`]: track,
-        [`${mediaType}Enabled`]: enabled,
-        [`has${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)}`]: true,
-      });
-
-      if (mediaType === "audio" && track) {
-        track.setVolume(100);
-        await track.play();
-      }
-    },
-    [updateRemoteParticipant]
-  );
 
   useEffect(() => {
     remoteScreenShareParticipantsRef.current = remoteScreenShareParticipants;
@@ -613,7 +533,7 @@ export function VideoConferencingProvider({
         })
       });
     }
-  }, [rtcScreenShareOptions.uid, username, screenTrack?.screenAudioTrack, screenTrack?.screenVideoTrack]);
+  }, [rtcScreenShareOptions.uid, screenTrack?.screenAudioTrack, screenTrack?.screenVideoTrack]);
 
   const handleEndScreenShare = useCallback(
     async (action: string, uid: number) => {
@@ -644,7 +564,7 @@ export function VideoConferencingProvider({
       rtcScreenShareClient.on("user-unpublished", handleUserUnpublishedScreen);
       rtcScreenShareClient.on(
         "connection-state-change",
-        (curState, prevState) => {}
+        (curState, prevState) => { }
       );
 
       const mode = rtcScreenShareOptions?.proxyMode ?? 0;
@@ -775,15 +695,6 @@ export function VideoConferencingProvider({
 
   const initializeLocalMediaTracks = async () => {
     try {
-      if (localUserTrack?.videoTrack) {
-        localUserTrack.videoTrack.stop();
-        await localUserTrack.videoTrack.close();
-      }
-      if (localUserTrack?.audioTrack) {
-        localUserTrack.audioTrack.stop();
-        await localUserTrack.audioTrack.close();
-      }
-
       const [audioTrack, videoTrack] = await Promise.all([
         AgoraRTC.createMicrophoneAudioTrack({
           encoderConfig: "music_standard",
@@ -791,9 +702,10 @@ export function VideoConferencingProvider({
         AgoraRTC.createCameraVideoTrack(),
       ]);
 
-      await audioTrack.setEnabled(isMicrophoneEnabled);
-      await videoTrack.setEnabled(isCameraEnabled);
-
+      await Promise.all([
+        audioTrack.setEnabled(isMicrophoneEnabled),
+        videoTrack.setEnabled(isCameraEnabled)
+      ])
       setLocalUserTrack({
         audioTrack,
         videoTrack,
@@ -821,7 +733,7 @@ export function VideoConferencingProvider({
   };
 
   const setBackgroundColor = async (color: string) => {
-    if (localUserTrack.videoTrack) {
+    if (localUserTrack?.videoTrack) {
       const processor = await getProcessorInstance();
       try {
         if (color === "transparent") {
@@ -836,7 +748,7 @@ export function VideoConferencingProvider({
   };
 
   const setBackgroundBlurring = async (blurDegree: number) => {
-    if (localUserTrack.videoTrack) {
+    if (localUserTrack?.videoTrack) {
       const processor = await getProcessorInstance();
       try {
         if (blurDegree === 0) {
@@ -855,13 +767,13 @@ export function VideoConferencingProvider({
     imgElement.onload = async () => {
       const processor = await getProcessorInstance();
       try {
-        processor.setOptions({ type: "img", source: imgElement });
-        await processor.enable();
+        processor?.setOptions({ type: "img", source: imgElement });
+        await processor?.enable();
       } finally {
       }
     };
     if (imgSrc === undefined) {
-      await processor.disable();
+      await processor?.disable();
       return;
     }
     imgElement.src = imgSrc;
@@ -1019,22 +931,22 @@ export function VideoConferencingProvider({
           return;
         }
 
-      const attributes = await rtmClient.getUserAttributesByKeys(memberId, [
-        "name",
-        "userRtcUid",
-      ]);
+        const attributes = await rtmClient.getUserAttributesByKeys(memberId, [
+          "name",
+          "userRtcUid",
+        ]);
 
-      const participantData = {
-        name: attributes.name || "Anonymous",
-        rtcUid: attributes.userRtcUid,
-        audioEnabled: true,
-        videoEnabled: true,
-      };
+        const participantData = {
+          name: attributes.name || "Anonymous",
+          rtcUid: attributes.userRtcUid,
+          audioEnabled: true,
+          videoEnabled: true,
+        };
 
-      setRemoteParticipants(prevParticipants => ({
-        ...prevParticipants,
-        [memberId]: participantData,
-      }));
+        setRemoteParticipants(prevParticipants => ({
+          ...prevParticipants,
+          [memberId]: participantData,
+        }));
 
         remoteUsersRef.current = {
           ...remoteUsersRef.current,
@@ -1120,7 +1032,7 @@ export function VideoConferencingProvider({
     [meetingConfig.uid, isSharingScreen, fetchMeetingRoomData]
   );
 
-  const fetchActiveMeetingParticipants = async () => {
+  const fetchActiveMeetingParticipants = useCallback(async () => {
     try {
       const members = await rtmChannel.getMembers();
       const participantsData: Record<string, RemoteParticipant> = {};
@@ -1164,67 +1076,9 @@ export function VideoConferencingProvider({
     } catch (error) {
       console.log("Error fetching active participants:", error);
     }
-  };
+  }, [meetingConfig?.uid, remoteParticipants]);
 
-  const initializeRealtimeMessaging = useCallback(
-    async (name: string) => {
-      try {
-        if (
-          !meetingConfig.appid ||
-          !meetingConfig.rtmToken ||
-          !meetingConfig.channel
-        ) {
-          console.error("Missing required RTM configuration");
-          return;
-        }
 
-      rtmClient = AgoraRTM.createInstance(meetingConfig.appid);
-      const sanitizedUid = String(meetingConfig.uid).replace(/[^a-zA-Z0-9]/g, '');
-
-        await rtmClient.login({
-          uid: sanitizedUid,
-          token: meetingConfig.rtmToken,
-        });
-
-        const channel = rtmClient.createChannel(meetingConfig.channel);
-        rtmChannel = channel;
-        await channel.join();
-
-        await rtmClient.addOrUpdateLocalUserAttributes({
-          name: name.slice(0, 64),
-          userRtcUid: sanitizedUid,
-        });
-
-        // Initial user info broadcast
-        await channel.sendMessage({
-          text: JSON.stringify({
-            type: "user-info",
-            uid: sanitizedUid,
-            name: name,
-          }),
-        });
-
-        // Set up member join/leave handlers
-        channel.on("MemberJoined", onParticipantJoined);
-        channel.on("MemberLeft", onMemberDisconnected);
-        channel.on("ChannelMessage", handleRTMMessage);
-        window.addEventListener("beforeunload", disconnectFromMessaging);
-
-        await fetchActiveMeetingParticipants();
-      } catch (error) {
-        console.error("Error in initializeRealtimeMessaging:", error);
-        throw error;
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    },
-    [
-      meetingConfig.appid,
-      meetingConfig.rtmToken,
-      meetingConfig.channel,
-      meetingConfig.uid,
-      onMemberDisconnected,
-    ]
-  );
 
   const onMediaStreamPublished = useCallback(
     async (user: any, mediaType: "audio" | "video") => {
@@ -1358,96 +1212,6 @@ export function VideoConferencingProvider({
     remoteUsersRef.current = remoteParticipants;
   }, [remoteParticipants]);
 
-  const connectToMeetingRoom = async () => {
-    try {
-      rtcClient = AgoraRTC.createClient({
-        mode: "live",
-        codec: "vp8",
-      });
-
-      rtcClient.on("user-published", onMediaStreamPublished);
-      rtcClient.on("user-unpublished", onMediaStreamUnpublished);
-      rtcClient.on("user-left", onParticipantLeft);
-      rtcClient.on("user-joined", (user) => {});
-
-      await rtcClient.setClientRole("host");
-      setupVolumeIndicator();
-
-      const mode = meetingConfig?.proxyMode ?? 0;
-      if (mode !== 0 && !isNaN(parseInt(mode))) {
-        rtcClient.startProxyServer(parseInt(mode));
-      }
-
-      if (meetingConfig.role === "audience") {
-        rtcClient.setClientRole(meetingConfig.role, {
-          level: meetingConfig.audienceLatency,
-        });
-      } else if (meetingConfig.role === "host") {
-        rtcClient.setClientRole(meetingConfig.role);
-      }
-
-      if (!meetingConfig || meetingConfig.uid === "" || meetingConfig.uid == null) {
-        alert("Meeting config not populated")
-        router.push(`/studio/meeting/${channelName}`)
-        return
-      }
-      meetingConfig.uid = await rtcClient.join(
-        meetingConfig.appid || "",
-        meetingConfig.channel || "",
-        meetingConfig.rtcToken || null,
-        String(meetingConfig.uid) || null
-      );
-
-      await initializeRealtimeMessaging(username!);
-    } catch (error) {
-      console.error("Error in connectToMeetingRoom:", error);
-      throw error;
-    }
-  };
-
-  const joinMeetingRoom = async () => {
-    try {
-      if (!meetingConfig) return;
-      await connectToMeetingRoom();
-
-      if (rtmChannel) {
-        await rtmChannel.sendMessage({
-          text: JSON.stringify({
-            type: "user-info",
-            uid: meetingConfig.uid,
-            name: username,
-          }),
-        });
-      }
-
-      if (localUserTrack) {
-        const tracksToPublish = [];
-
-        // Only publish audio track if microphone is enabled
-        if (localUserTrack.audioTrack && isMicrophoneEnabled) {
-          await localUserTrack.audioTrack.setEnabled(true);
-          tracksToPublish.push(localUserTrack.audioTrack);
-        }
-        if (localUserTrack.videoTrack && isCameraEnabled) {
-          await localUserTrack.videoTrack.setEnabled(true);
-          tracksToPublish.push(localUserTrack.videoTrack);
-        }
-
-        if (tracksToPublish.length > 0) {
-          await rtcClient.publish(tracksToPublish);
-        }
-
-        await broadcastCurrentMediaStates();
-      }
-
-      AgoraRTC.setLogLevel(1);
-      setHasJoinedMeeting(true);
-      setMeetingStage("hasJoinedMeeting");
-      setMeetingConfig(meetingConfig);
-    } catch (error) {
-      console.log("Error joining meeting:", error);
-    }
-  };
 
   const checkAndRecoverSubscriptions = useCallback(async () => {
     if (!rtcClient) return;
@@ -1523,24 +1287,25 @@ export function VideoConferencingProvider({
         messageType: type,
       };
 
+      setChatMessages(prev => [
+        ...prev,
+        {
+          id: `${messageData.timestamp}-${messageData.uid}`,
+          sender: {
+            uid: messageData.uid,
+            name: messageData.senderName
+          },
+          content: messageData.content,
+          timestamp: messageData.timestamp,
+          type: messageData.messageType,
+          isLocal: true,
+        }
+      ]);
+
+      // Send the message
       await sendRateLimitedMessage({
         text: JSON.stringify(messageData),
       });
-
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          id: `${messageData.timestamp}-${meetingConfig.uid}`,
-          sender: {
-            uid: String(meetingConfig.uid),
-            name: username,
-          },
-          content: content,
-          timestamp: messageData.timestamp,
-          type: type,
-          isLocal: true,
-        },
-      ]);
     } catch (error) {
       console.error("Error sending chat message:", error);
     }
@@ -1569,7 +1334,7 @@ export function VideoConferencingProvider({
         rtcScreenShareClient.removeAllListeners();
       }
       setChatMessages([]);
-      setHasJoinedMeeting(false);
+      // setHasJoinedMeeting(false);
       setIsSharingScreen(null);
       setScreenSharingUser(null);
       setRemoteParticipants({});
@@ -1586,15 +1351,161 @@ export function VideoConferencingProvider({
     }
   }, [
     isSharingScreen,
-    rtcScreenShareOptions.uid,
     handleEndScreenShare,
     releaseMediaResources,
     localUserTrack?.videoTrack,
+    meetingConfig?.uid,
   ]);
 
   const disconnectFromMessaging = useCallback(async () => {
     await leaveCall();
   }, [leaveCall]);
+
+  const initializeRealtimeMessaging = useCallback(async (name: string) => {
+    try {
+      if (!meetingConfig.appid || !meetingConfig.rtmToken || !meetingConfig.channel) {
+        console.error("Missing required RTM configuration");
+        return;
+      }
+
+      if (!rtmClient) {
+        rtmClient = AgoraRTM.createInstance(meetingConfig.appid);
+      }
+
+      const sanitizedUid = String(meetingConfig.uid).replace(/[^a-zA-Z0-9]/g, "");
+
+      rtmChannel = rtmClient.createChannel(meetingConfig.channel);
+
+      await rtmClient.login({
+        uid: sanitizedUid,
+        token: meetingConfig.rtmToken,
+      });
+
+      await rtmChannel.join();
+
+      rtmChannel.on("MemberJoined", onParticipantJoined);
+      rtmChannel.on("MemberLeft", onMemberDisconnected);
+      rtmChannel.on("ChannelMessage", handleRTMMessage);
+
+      await rtmClient.addOrUpdateLocalUserAttributes({
+        name: name.slice(0, 64),
+        userRtcUid: sanitizedUid,
+      });
+
+      await rtmChannel.sendMessage({
+        text: JSON.stringify({ type: "user-info", uid: sanitizedUid, name }),
+      });
+
+      window.addEventListener("beforeunload", disconnectFromMessaging);
+
+      fetchActiveMeetingParticipants().catch(console.error);
+
+    } catch (error) {
+      console.error("Error in initializeRealtimeMessaging:", error);
+      throw error;
+    }
+  }, [
+    meetingConfig.appid,
+    meetingConfig.rtmToken,
+    meetingConfig.channel,
+    meetingConfig.uid,
+    onMemberDisconnected,
+    disconnectFromMessaging,
+    fetchActiveMeetingParticipants,
+    handleRTMMessage,
+    onParticipantJoined,
+  ]);
+
+
+  const connectToMeetingRoom = async () => {
+    try {
+      rtcClient = AgoraRTC.createClient({
+        mode: "live",
+        codec: "vp8",
+      });
+
+      rtcClient.on("user-published", onMediaStreamPublished);
+      rtcClient.on("user-unpublished", onMediaStreamUnpublished);
+      rtcClient.on("user-left", onParticipantLeft);
+      rtcClient.on("user-joined", (user) => { });
+
+      await rtcClient.setClientRole("host");
+      setupVolumeIndicator();
+
+      const mode = meetingConfig?.proxyMode ?? 0;
+      if (mode !== 0 && !isNaN(parseInt(mode))) {
+        rtcClient.startProxyServer(parseInt(mode));
+      }
+
+      if (meetingConfig.role === "audience") {
+        rtcClient.setClientRole(meetingConfig.role, {
+          level: meetingConfig.audienceLatency,
+        });
+      } else if (meetingConfig.role === "host") {
+        rtcClient.setClientRole(meetingConfig.role);
+      }
+
+      if (!meetingConfig || meetingConfig.uid === "" || meetingConfig.uid == null) {
+        alert("Meeting config not populated")
+        router.push(`/studio/meeting/${channelName}`)
+        return
+      }
+      meetingConfig.uid = await rtcClient.join(
+        meetingConfig.appid || "",
+        meetingConfig.channel || "",
+        meetingConfig.rtcToken || null,
+        String(meetingConfig.uid) || null
+      );
+
+      await initializeRealtimeMessaging(username!);
+    } catch (error) {
+      console.error("Error in connectToMeetingRoom:", error);
+      throw error;
+    }
+  };
+
+  const joinMeetingRoom = async () => {
+    try {
+      if (!meetingConfig) return;
+      await connectToMeetingRoom();
+
+      if (rtmChannel) {
+        await rtmChannel.sendMessage({
+          text: JSON.stringify({
+            type: "user-info",
+            uid: meetingConfig.uid,
+            name: username,
+          }),
+        });
+      }
+
+      if (localUserTrack) {
+        const tracksToPublish = [];
+
+        // Only publish audio track if microphone is enabled
+        if (localUserTrack.audioTrack && isMicrophoneEnabled) {
+          await localUserTrack.audioTrack.setEnabled(true);
+          tracksToPublish.push(localUserTrack.audioTrack);
+        }
+        if (localUserTrack.videoTrack && isCameraEnabled) {
+          await localUserTrack.videoTrack.setEnabled(true);
+          tracksToPublish.push(localUserTrack.videoTrack);
+        }
+
+        if (tracksToPublish.length > 0) {
+          await rtcClient.publish(tracksToPublish);
+        }
+
+        await broadcastCurrentMediaStates();
+      }
+
+      setHasJoinedMeeting(true);
+      setMeetingStage("hasJoinedMeeting");
+      setMeetingConfig(meetingConfig);
+    } catch (error) {
+      console.log("Error joining meeting:", error);
+    }
+  };
 
   const toggleRaiseHand = useCallback(async () => {
     if (!rtmChannel || !meetingConfig.uid) return;
@@ -1706,55 +1617,55 @@ export function VideoConferencingProvider({
 
   return (
 
-<VideoConferencingContext.Provider
-value={{
-  currentStep, setCurrentStep,
-  meetingRoomId, setMeetingRoomId,
-  isMicrophoneEnabled,
-  isCameraEnabled,
-  toggleMicrophone,
-  toggleCamera,
-  localUserTrack,
-  meetingConfig,
-  videoRef,
-  initializeLocalMediaTracks,
-  setLocalUserTrack,
-  releaseMediaResources,
-  joinMeetingRoom,
-  publishLocalMediaTracks,
-  setMeetingStage,
-  meetingStage,
-  setChannelName,
-  channelName,
-  remoteParticipants,
-  hasJoinedMeeting,
-  remoteUsersRef,
-  setUsername,
-  username,
-  setHasJoinedMeeting,
-  speakingParticipants,
-  handleShareScreen,
-  handleEndScreenShare,
-  userIsHost,
-  userIsCoHost,
-  meetingRoomData,
-  screenTrack,
-  isSharingScreen,
-  screenSharingUser,
-  leaveCall,
-  setBackgroundColor,
-  setBackgroundBlurring,
-  setBackgroundImage,
-  raisedHands,
-  toggleRaiseHand,
-  chatMessages,
-  sendChatMessage,
-  rtcScreenShareOptions,
-  handleMeetingHostAndCohost,
-  sendCoHostPermission,
-}}>
-{children}
-</VideoConferencingContext.Provider>
+    <VideoConferencingContext.Provider
+      value={{
+        currentStep, setCurrentStep,
+        meetingRoomId, setMeetingRoomId,
+        isMicrophoneEnabled,
+        isCameraEnabled,
+        toggleMicrophone,
+        toggleCamera,
+        localUserTrack,
+        meetingConfig,
+        videoRef,
+        initializeLocalMediaTracks,
+        setLocalUserTrack,
+        releaseMediaResources,
+        joinMeetingRoom,
+        publishLocalMediaTracks,
+        setMeetingStage,
+        meetingStage,
+        setChannelName,
+        channelName,
+        remoteParticipants,
+        hasJoinedMeeting,
+        remoteUsersRef,
+        setUsername,
+        username,
+        setHasJoinedMeeting,
+        speakingParticipants,
+        handleShareScreen,
+        handleEndScreenShare,
+        userIsHost,
+        userIsCoHost,
+        meetingRoomData,
+        screenTrack,
+        isSharingScreen,
+        screenSharingUser,
+        leaveCall,
+        setBackgroundColor,
+        setBackgroundBlurring,
+        setBackgroundImage,
+        raisedHands,
+        toggleRaiseHand,
+        chatMessages,
+        sendChatMessage,
+        rtcScreenShareOptions,
+        handleMeetingHostAndCohost,
+        sendCoHostPermission,
+      }}>
+      {children}
+    </VideoConferencingContext.Provider>
   );
 }
 

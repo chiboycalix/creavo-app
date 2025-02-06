@@ -15,7 +15,7 @@ const ChatAndParticipant = ({ onClose, localUser, remoteParticipants }: {
   localUser: any;
   remoteParticipants: any
 }) => {
-  const { chatMessages, sendChatMessage, username } = useVideoConferencing();
+  const { chatMessages, sendChatMessage } = useVideoConferencing();
   const [messageInput, setMessageInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
