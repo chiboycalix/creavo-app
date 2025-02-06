@@ -5,6 +5,7 @@ import {
   UserRoundX,
   UserRoundPlus,
   Hand,
+  MicOff,
 } from "lucide-react";
 import {
   Popover,
@@ -24,15 +25,18 @@ const ParticipantList = ({ allParticipants }: any) => {
     userIsCoHost,
     userIsHost,
     handleMeetingHostAndCohost,
+    handleMuteRemoteUserMicrophone,
   } = useVideoConferencing();
-  const { currentUser } = useAuth();
+  const { getCurrentUser } = useAuth();
 
   console.log("participants", allParticipants);
 
   console.log("host", userIsHost);
   console.log("cohost", userIsCoHost);
 
-  handleMeetingHostAndCohost();
+  useEffect(() => {
+    handleMeetingHostAndCohost();
+  }, [allParticipants, handleMeetingHostAndCohost]);
 
   return (
     <div className="space-y-4">
@@ -59,33 +63,36 @@ const ParticipantList = ({ allParticipants }: any) => {
             <div className="flex gap-1 items-center">
               {hasRaisedHand && <Hand className="text-white w-4 h-4" />}
 
-              {(applicant?.uid !== currentUser?.id) && (userIsCoHost || userIsHost) && (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
-                      <MoreVertical className="w-4 h-4 text-gray-400" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-44 p-0 bg-gray-800 border-gray-700 z-[200]"
-                    align="end"
-                    side="bottom"
-                    sideOffset={5}
-                  >
-                    <div className="py-1">
-                      {userIsHost && (
-                        <button
-                          className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
-                          onClick={() => {
-                            sendCoHostPermission("give-cohost", applicant?.uid);
-                          }}
-                        >
-                          <UserRoundPlus className="w-4 h-4" />
-                          <span>Make Co-host</span>
-                        </button>
-                      )}
+              {applicant.uid === getCurrentUser()?.id &&
+                (userIsCoHost || userIsHost) && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
+                        <MoreVertical className="w-4 h-4 text-gray-400" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-44 p-0 bg-gray-800 border-gray-700 z-[200]"
+                      align="end"
+                      side="bottom"
+                      sideOffset={5}
+                    >
+                      <div className="py-1">
+                        {userIsHost && (
+                          <button
+                            className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
+                            onClick={() => {
+                              sendCoHostPermission(
+                                "give-cohost",
+                                applicant?.uid
+                              );
+                            }}
+                          >
+                            <UserRoundPlus className="w-4 h-4" />
+                            <span>Make Co-host</span>
+                          </button>
+                        )}
 
-                      {(userIsHost || userIsCoHost) && (
                         <button
                           className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
                           onClick={() => {
@@ -95,11 +102,23 @@ const ParticipantList = ({ allParticipants }: any) => {
                           <UserRoundX className="w-4 h-4" />
                           <span>Remove</span>
                         </button>
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              )}
+
+                        <button
+                          className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
+                          onClick={() => {
+                            handleMuteRemoteUserMicrophone(
+                              "mute-microphone",
+                              applicant?.uid
+                            );
+                          }}
+                        >
+                          <MicOff className="w-4 h-4" />
+                          <span>Mute</span>
+                        </button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
             </div>
           </div>
         );

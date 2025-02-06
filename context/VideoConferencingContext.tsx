@@ -92,6 +92,7 @@ interface VideoConferencingContextContextType {
   toggleRaiseHand: () => void;
   chatMessages: ChatMessage[];
   handleMeetingHostAndCohost: () => void;
+  handleMuteRemoteUserMicrophone: (action: string, uid: number) => void;
   sendCoHostPermission: (message: string, uid: any) => Promise<void>;
   sendChatMessage: (content: string, type: "text" | "emoji") => Promise<void>;
 }
@@ -147,8 +148,8 @@ export function VideoConferencingProvider({
   } | null>(null);
   const [raisedHands, setRaisedHands] = useState<Record<string, boolean>>({});
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const { currentUser } = useAuth()
-  const router = useRouter()
+  const { currentUser } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     AgoraRTC.setLogLevel(4);
@@ -194,18 +195,21 @@ export function VideoConferencingProvider({
     certificate: "",
   });
 
-  const setScreenShare = useCallback((uid: string | null, name: string, isLocal: boolean) => {
-    setIsSharingScreen(uid);
-    if (uid) {
-      setScreenSharingUser({
-        uid,
-        name,
-        isLocal
-      });
-    } else {
-      setScreenSharingUser(null);
-    }
-  }, []);
+  const setScreenShare = useCallback(
+    (uid: string | null, name: string, isLocal: boolean) => {
+      setIsSharingScreen(uid);
+      if (uid) {
+        setScreenSharingUser({
+          uid,
+          name,
+          isLocal,
+        });
+      } else {
+        setScreenSharingUser(null);
+      }
+    },
+    []
+  );
   const updateRemoteParticipant = useCallback(
     (uid: string, updates: Partial<any>) => {
       setRemoteParticipants((prev) => {
@@ -232,14 +236,16 @@ export function VideoConferencingProvider({
   );
 
   const handleMeetingHostAndCohost = useCallback(() => {
-    console.log('meeting ', meetingRoomData)
+    console.log("meeting ", meetingRoomData);
     if (meetingRoomData && currentUser) {
       const isHost = meetingRoomData?.room?.roomSubscribers?.some(
-        (user: { isOwner: boolean; userId: string }) => user.isOwner && user?.userId === currentUser?.id
+        (user: { isOwner: boolean; userId: string }) =>
+          user.isOwner && user?.userId === currentUser?.id
       );
 
       const isCoHost = meetingRoomData?.room?.roomSubscribers?.some(
-        (user: { isCoHost: boolean; userId: string }) => user.isCoHost && user?.userId === currentUser?.id
+        (user: { isCoHost: boolean; userId: string }) =>
+          user.isCoHost && user?.userId === currentUser?.id
       );
 
       setUserIsHost(isHost);
@@ -319,72 +325,104 @@ export function VideoConferencingProvider({
   //   [meetingConfig.uid, updateRemoteParticipant, setScreenShare, handleMeetingHostAndCohost]
   // );
 
-  const handleRTMMessage = useCallback(async ({ text, peerId }: any) => {
-    if (!text) return;
+  const handleMuteRemoteUserMicrophone = (action: string, uid: number) => {
+    rtmChannel.sendMessage({
+      text: JSON.stringify({
+        type: action,
+        uid: uid,
+      }),
+    });
+  };
 
-    try {
-      const message = JSON.parse(text);
-      const uid = String(message.uid).replace(/[^a-zA-Z0-9]/g, '');
+  const handleRTMMessage = useCallback(
+    async ({ text, peerId }: any) => {
+      if (!text) return;
 
-      switch (message.type) {
-        case 'video-state':
-          updateRemoteParticipant(uid, {
-            videoEnabled: message.enabled
-          });
-          break;
+      try {
+        const message = JSON.parse(text);
+        const uid = String(message.uid).replace(/[^a-zA-Z0-9]/g, "");
 
-        case 'audio-state':
-          updateRemoteParticipant(uid, {
-            audioEnabled: message.enabled
-          });
-          break;
+        switch (message.type) {
+          case "video-state":
+            updateRemoteParticipant(uid, {
+              videoEnabled: message.enabled,
+            });
+            break;
 
-        case 'screen-share-state':
-          if (message.isSharing) {
-            setScreenShare(String(message.uid), message.name, false);
-          } else {
-            setScreenShare(null, "", false);
-          }
-          break;
+          case "audio-state":
+            updateRemoteParticipant(uid, {
+              audioEnabled: message.enabled,
+            });
+            break;
 
-        case 'user-info':
-          if (uid === String(meetingConfig.uid)) return;
+          case "screen-share-state":
+            if (message.isSharing) {
+              setScreenShare(String(message.uid), message.name, false);
+            } else {
+              setScreenShare(null, "", false);
+            }
+            break;
 
-          updateRemoteParticipant(uid, {
-            name: message.name,
-            rtcUid: uid
-          });
-          break;
-        case 'hand-state':
-          setRaisedHands((prev: any) => ({
-            ...prev,
-            [uid]: message.isRaised
-          }));
-          break;
-        case 'chat':
-          setChatMessages(prev => [...prev, {
-            id: `${message.timestamp}-${uid}`,
-            sender: {
-              uid: uid,
-              name: message.senderName
-            },
-            content: message.content,
-            timestamp: message.timestamp,
-            type: message.messageType,
-            isLocal: String(uid) === String(meetingConfig.uid)
-          }]);
-          break;
+          case "user-info":
+            if (uid === String(meetingConfig.uid)) return;
+
+            updateRemoteParticipant(uid, {
+              name: message.name,
+              rtcUid: uid,
+            });
+            break;
+          case "hand-state":
+            setRaisedHands((prev: any) => ({
+              ...prev,
+              [uid]: message.isRaised,
+            }));
+            break;
+          case "chat":
+            setChatMessages((prev) => [
+              ...prev,
+              {
+                id: `${message.timestamp}-${uid}`,
+                sender: {
+                  uid: uid,
+                  name: message.senderName,
+                },
+                content: message.content,
+                timestamp: message.timestamp,
+                type: message.messageType,
+                isLocal: String(uid) === String(meetingConfig.uid),
+              },
+            ]);
+            break;
           case "give-cohost":
             console.log("co host granted to user");
             handleMeetingHostAndCohost();
             break;
+          case "mute-microphone":
+            if (message.uid === meetingConfig.uid) {
+              if (
+                localUserTrack?.audioTrack?.enabled
+                // localUserTrack?.videoTrack?.enabled
+              ) {
+                await localUserTrack?.audioTrack!.setEnabled(false);
+                // await localUserTrack?.videoTrack!.setEnabled(false);
+              }
+            }
+            break;
+        }
+      } catch (error) {
+        console.error("Error processing RTM message:", error);
       }
-    } catch (error) {
-      console.error("Error processing RTM message:", error);
-    }
-    //removed setspeakingparticipants from the dependecy array
-  }, [meetingConfig.uid, updateRemoteParticipant, setScreenShare, handleMeetingHostAndCohost]);
-  
+      //removed setspeakingparticipants from the dependecy array
+    },
+    [
+      meetingConfig.uid,
+      updateRemoteParticipant,
+      setScreenShare,
+      handleMeetingHostAndCohost,
+      localUserTrack?.audioTrack,
+    ]
+  );
+
   useEffect(() => {
     if (!rtmChannel) return;
 
@@ -462,7 +500,6 @@ export function VideoConferencingProvider({
   useEffect(() => {
     remoteScreenShareParticipantsRef.current = remoteScreenShareParticipants;
   }, [remoteScreenShareParticipants]);
-
 
   const fetchMeetingRoomData = useCallback(async () => {
     try {
@@ -561,7 +598,7 @@ export function VideoConferencingProvider({
         setScreenSharingUser({
           uid: String(meetingConfig.uid),
           name: username,
-          isLocal: true
+          isLocal: true,
         });
 
         if (screenVideoTrack) {
@@ -574,11 +611,11 @@ export function VideoConferencingProvider({
         if (rtmChannel) {
           await rtmChannel.sendMessage({
             text: JSON.stringify({
-              type: 'screen-share-state',
+              type: "screen-share-state",
               uid: rtcScreenShareOptions.uid,
               name: username,
-              isSharing: true
-            })
+              isSharing: true,
+            }),
           });
         }
       }
@@ -606,14 +643,19 @@ export function VideoConferencingProvider({
     if (rtmChannel) {
       await rtmChannel.sendMessage({
         text: JSON.stringify({
-          type: 'screen-share-state',
+          type: "screen-share-state",
           uid: rtcScreenShareOptions.uid,
           name: "",
-          isSharing: false
-        })
+          isSharing: false,
+        }),
       });
     }
-  }, [rtcScreenShareOptions.uid, username, screenTrack?.screenAudioTrack, screenTrack?.screenVideoTrack]);
+  }, [
+    rtcScreenShareOptions.uid,
+    username,
+    screenTrack?.screenAudioTrack,
+    screenTrack?.screenVideoTrack,
+  ]);
 
   const handleEndScreenShare = useCallback(
     async (action: string, uid: number) => {
@@ -706,10 +748,15 @@ export function VideoConferencingProvider({
     }
   };
 
-  const rtcSubscribeScreen = async (user: any, mediaType: "audio" | "video") => {
+  const rtcSubscribeScreen = async (
+    user: any,
+    mediaType: "audio" | "video"
+  ) => {
     try {
-      if ((mediaType === 'video' && !user.hasVideo) ||
-        (mediaType === 'audio' && !user.hasAudio)) {
+      if (
+        (mediaType === "video" && !user.hasVideo) ||
+        (mediaType === "audio" && !user.hasAudio)
+      ) {
         return;
       }
 
@@ -721,7 +768,11 @@ export function VideoConferencingProvider({
       await rtcScreenShareClient.subscribe(user, mediaType);
 
       const uid = String(user.uid);
-      if (mediaType === "video" && user.videoTrack && user.videoTrack.isScreenTrack) {
+      if (
+        mediaType === "video" &&
+        user.videoTrack &&
+        user.videoTrack.isScreenTrack
+      ) {
         const videoTrack = user.videoTrack;
 
         setRemoteScreenShareParticipants((prevUsers) => ({
@@ -737,7 +788,7 @@ export function VideoConferencingProvider({
         setScreenSharingUser({
           uid: uid,
           name: username,
-          isLocal: false
+          isLocal: false,
         });
       }
 
@@ -746,13 +797,17 @@ export function VideoConferencingProvider({
         try {
           await audioTrack.play();
         } catch (error) {
-          console.log('Error playing audio track:', error);
+          console.log("Error playing audio track:", error);
         }
       }
-
     } catch (error: any) {
-      if (error.code === 'UNEXPECTED_RESPONSE' || error.code === 'ERR_SUBSCRIBE_REQUEST_INVALID') {
-        console.log(`Stream not available for user ${user.uid} ${mediaType}. Skipping subscription.`);
+      if (
+        error.code === "UNEXPECTED_RESPONSE" ||
+        error.code === "ERR_SUBSCRIBE_REQUEST_INVALID"
+      ) {
+        console.log(
+          `Stream not available for user ${user.uid} ${mediaType}. Skipping subscription.`
+        );
         return;
       }
       console.error(`Error subscribing to ${mediaType}:`, error);
@@ -1019,22 +1074,22 @@ export function VideoConferencingProvider({
           return;
         }
 
-      const attributes = await rtmClient.getUserAttributesByKeys(memberId, [
-        "name",
-        "userRtcUid",
-      ]);
+        const attributes = await rtmClient.getUserAttributesByKeys(memberId, [
+          "name",
+          "userRtcUid",
+        ]);
 
-      const participantData = {
-        name: attributes.name || "Anonymous",
-        rtcUid: attributes.userRtcUid,
-        audioEnabled: true,
-        videoEnabled: true,
-      };
+        const participantData = {
+          name: attributes.name || "Anonymous",
+          rtcUid: attributes.userRtcUid,
+          audioEnabled: true,
+          videoEnabled: true,
+        };
 
-      setRemoteParticipants(prevParticipants => ({
-        ...prevParticipants,
-        [memberId]: participantData,
-      }));
+        setRemoteParticipants((prevParticipants) => ({
+          ...prevParticipants,
+          [memberId]: participantData,
+        }));
 
         remoteUsersRef.current = {
           ...remoteUsersRef.current,
@@ -1178,8 +1233,11 @@ export function VideoConferencingProvider({
           return;
         }
 
-      rtmClient = AgoraRTM.createInstance(meetingConfig.appid);
-      const sanitizedUid = String(meetingConfig.uid).replace(/[^a-zA-Z0-9]/g, '');
+        rtmClient = AgoraRTM.createInstance(meetingConfig.appid);
+        const sanitizedUid = String(meetingConfig.uid).replace(
+          /[^a-zA-Z0-9]/g,
+          ""
+        );
 
         await rtmClient.login({
           uid: sanitizedUid,
@@ -1386,10 +1444,14 @@ export function VideoConferencingProvider({
         rtcClient.setClientRole(meetingConfig.role);
       }
 
-      if (!meetingConfig || meetingConfig.uid === "" || meetingConfig.uid == null) {
-        alert("Meeting config not populated")
-        router.push(`/studio/meeting/${channelName}`)
-        return
+      if (
+        !meetingConfig ||
+        meetingConfig.uid === "" ||
+        meetingConfig.uid == null
+      ) {
+        alert("Meeting config not populated");
+        router.push(`/studio/meeting/${channelName}`);
+        return;
       }
       meetingConfig.uid = await rtcClient.join(
         meetingConfig.appid || "",
@@ -1549,7 +1611,10 @@ export function VideoConferencingProvider({
   const leaveCall = useCallback(async () => {
     try {
       if (isSharingScreen === String(meetingConfig.uid)) {
-        await handleEndScreenShare('end-screen-share', meetingConfig.uid as number);
+        await handleEndScreenShare(
+          "end-screen-share",
+          meetingConfig.uid as number
+        );
       }
 
       await releaseMediaResources();
@@ -1705,56 +1770,59 @@ export function VideoConferencingProvider({
   }, [onMemberDisconnected, onParticipantJoined]);
 
   return (
-
-<VideoConferencingContext.Provider
-value={{
-  currentStep, setCurrentStep,
-  meetingRoomId, setMeetingRoomId,
-  isMicrophoneEnabled,
-  isCameraEnabled,
-  toggleMicrophone,
-  toggleCamera,
-  localUserTrack,
-  meetingConfig,
-  videoRef,
-  initializeLocalMediaTracks,
-  setLocalUserTrack,
-  releaseMediaResources,
-  joinMeetingRoom,
-  publishLocalMediaTracks,
-  setMeetingStage,
-  meetingStage,
-  setChannelName,
-  channelName,
-  remoteParticipants,
-  hasJoinedMeeting,
-  remoteUsersRef,
-  setUsername,
-  username,
-  setHasJoinedMeeting,
-  speakingParticipants,
-  handleShareScreen,
-  handleEndScreenShare,
-  userIsHost,
-  userIsCoHost,
-  meetingRoomData,
-  screenTrack,
-  isSharingScreen,
-  screenSharingUser,
-  leaveCall,
-  setBackgroundColor,
-  setBackgroundBlurring,
-  setBackgroundImage,
-  raisedHands,
-  toggleRaiseHand,
-  chatMessages,
-  sendChatMessage,
-  rtcScreenShareOptions,
-  handleMeetingHostAndCohost,
-  sendCoHostPermission,
-}}>
-{children}
-</VideoConferencingContext.Provider>
+    <VideoConferencingContext.Provider
+      value={{
+        currentStep,
+        setCurrentStep,
+        meetingRoomId,
+        setMeetingRoomId,
+        isMicrophoneEnabled,
+        isCameraEnabled,
+        toggleMicrophone,
+        toggleCamera,
+        localUserTrack,
+        meetingConfig,
+        videoRef,
+        initializeLocalMediaTracks,
+        setLocalUserTrack,
+        releaseMediaResources,
+        joinMeetingRoom,
+        publishLocalMediaTracks,
+        setMeetingStage,
+        meetingStage,
+        setChannelName,
+        channelName,
+        remoteParticipants,
+        hasJoinedMeeting,
+        remoteUsersRef,
+        setUsername,
+        username,
+        setHasJoinedMeeting,
+        speakingParticipants,
+        handleShareScreen,
+        handleEndScreenShare,
+        userIsHost,
+        userIsCoHost,
+        meetingRoomData,
+        screenTrack,
+        isSharingScreen,
+        screenSharingUser,
+        leaveCall,
+        setBackgroundColor,
+        setBackgroundBlurring,
+        setBackgroundImage,
+        raisedHands,
+        toggleRaiseHand,
+        chatMessages,
+        sendChatMessage,
+        rtcScreenShareOptions,
+        handleMeetingHostAndCohost,
+        sendCoHostPermission,
+        handleMuteRemoteUserMicrophone,
+      }}
+    >
+      {children}
+    </VideoConferencingContext.Provider>
   );
 }
 

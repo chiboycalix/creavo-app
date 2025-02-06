@@ -64,7 +64,7 @@ const PostItem = ({ post }: PostItemType) => {
     e: React.MouseEvent<HTMLButtonElement | HTMLDivElement>
   ) => {
     e.preventDefault();
-    router.push(`/posts/${post.id}`);
+    router.push(`socials/posts/${post.id}`);
   };
 
   const postSideMenu: any[] = [
