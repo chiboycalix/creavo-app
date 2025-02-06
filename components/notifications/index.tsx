@@ -22,12 +22,12 @@ const fetchNotifications = async () => {
 const NotificationsPopover = () => {
   const [open, setOpen] = React.useState(false);
 
-  const { data: notifications, isPending: isLoading, error } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: fetchNotifications,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+  // const { data: notifications, isPending: isLoading, error } = useQuery({
+  //   queryKey: ['notifications'],
+  //   queryFn: fetchNotifications,
+  //   staleTime: 5 * 60 * 1000,
+  //   refetchOnWindowFocus: false,
+  // });
 
   const [loading, setLoading] = useState(false)
   const notif = {
