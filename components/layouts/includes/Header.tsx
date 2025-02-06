@@ -28,6 +28,9 @@ import { FaUser, FaCog, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa'
 import { BsPlusCircle } from 'react-icons/bs';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import Notifications from '@/components/notifications';
+import NotificationsPopover from '@/components/notifications';
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;
@@ -53,6 +56,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
     return navItems.some(item => pathname.startsWith(item.href));
   };
 
+  const notifications = []
 
   return (
     <header className="bg-white fixed top-0 right-0 left-0 md:left-64 z-30 border-b">
@@ -123,13 +127,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
             {isAuthenticated ? (
               <>
                 {/* Notification Button */}
-                <button
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
-                  aria-label="Notifications"
-                >
-                  <BiBell className="h-5 w-5 text-gray-500" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-                </button>
+                <NotificationsPopover />
 
                 {/* User Menu */}
                 <NavMenu as="div" className="relative">

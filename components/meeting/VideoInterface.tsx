@@ -1,4 +1,3 @@
-
 "use client"
 import SettingsModal from './SettingsModal';
 import Input from '@/components/ui/Input';
@@ -25,10 +24,9 @@ export default function VideoInterface({
   const { currentUser } = useAuth();
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [handleSelectMicrophone, setHandleSelectMicrophone] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     isMicrophoneEnabled,
-    setMeetingStage,
-    setHasJoinedMeeting,
     hasJoinedMeeting,
     isCameraEnabled,
     toggleMicrophone,
@@ -41,14 +39,16 @@ export default function VideoInterface({
   } = useVideoConferencing();
 
   const handleGoLive = async () => {
+    setIsLoading(true);
     try {
-      await joinMeetingRoom(channelName)
-      setMeetingStage("hasJoinedMeeting")
-      setHasJoinedMeeting(true);
+      await joinMeetingRoom(channelName);
     } catch (error: any) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   useEffect(() => {
     setChannelName(channelName)
@@ -147,8 +147,9 @@ export default function VideoInterface({
                   <Button
                     onClick={handleGoLive}
                     className="bg-primary hover:bg-primary-700 w-full py-2"
+                    disabled={isLoading}
                   >
-                    Go Live
+                    {isLoading ? "Loading..." : "Go Live"}
                   </Button>
                 </div>
               </div>

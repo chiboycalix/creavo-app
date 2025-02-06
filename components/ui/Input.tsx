@@ -47,6 +47,7 @@ type Props = {
   maxRows?: number;
   minRows?: number;
   resize?: "none" | "vertical" | "horizontal" | "both";
+  selectSize?: "small" | "large"
 } & React.ComponentProps<'input'> & React.ComponentProps<'textarea'>;
 
 const generateTimeOptions = () => {
@@ -88,6 +89,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
   numberOfMonths = 2,
   onTimeRangeSelect,
   selectedTimeRange,
+  selectSize = "large",
   ...rest
 }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -244,8 +246,9 @@ const Input = forwardRef<HTMLInputElement, Props>(({
         >
           <div className="relative">
             <div className={cn(
-              "flex items-center justify-between w-full py-3",
+              "flex items-center justify-between w-full py-1",
               leftIcon ? "pl-10" : "pl-3",
+              selectSize === "small" ? "py-1" : "py-3",
               "pr-3"
             )}>
               {renderIcon(leftIcon, cn("left-0 pl-3", leftIconClassName))}
