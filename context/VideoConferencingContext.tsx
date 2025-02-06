@@ -291,18 +291,31 @@ export function VideoConferencingProvider({
           }));
           break;
         case 'chat':
-          setChatMessages(prev => [...prev, {
-            id: `${message.timestamp}-${uid}`,
-            sender: {
-              uid: uid,
-              name: message.senderName
-            },
-            content: message.content,
-            timestamp: message.timestamp,
-            type: message.messageType,
-            isLocal: String(uid) === String(meetingConfig.uid)
-          }]);
+          setChatMessages(prev => {
+            const messageId = `${message.timestamp}-${uid}`;
+            const messageExists = prev.some(msg => msg.id === messageId);
+
+            if (messageExists) {
+              return prev;
+            }
+
+            return [
+              ...prev,
+              {
+                id: messageId,
+                sender: {
+                  uid: uid,
+                  name: message.senderName
+                },
+                content: message.content,
+                timestamp: message.timestamp,
+                type: message.messageType,
+                isLocal: String(uid) === String(meetingConfig.uid),
+              }
+            ];
+          });
           break;
+
         case "give-cohost":
           console.log("co host granted to user");
           handleMeetingHostAndCohost();
@@ -1274,24 +1287,25 @@ export function VideoConferencingProvider({
         messageType: type,
       };
 
+      setChatMessages(prev => [
+        ...prev,
+        {
+          id: `${messageData.timestamp}-${messageData.uid}`,
+          sender: {
+            uid: messageData.uid,
+            name: messageData.senderName
+          },
+          content: messageData.content,
+          timestamp: messageData.timestamp,
+          type: messageData.messageType,
+          isLocal: true,
+        }
+      ]);
+
+      // Send the message
       await sendRateLimitedMessage({
         text: JSON.stringify(messageData),
       });
-
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          id: `${messageData.timestamp}-${meetingConfig.uid}`,
-          sender: {
-            uid: String(meetingConfig.uid),
-            name: username,
-          },
-          content: content,
-          timestamp: messageData.timestamp,
-          type: type,
-          isLocal: true,
-        },
-      ]);
     } catch (error) {
       console.error("Error sending chat message:", error);
     }
