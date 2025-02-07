@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import PermissionModal from "@/components/meeting/PermissionModal";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import VideoInterface from "@/components/meeting/VideoInterface";
 import { useEffect, useState } from "react";
 import { useVideoConferencing } from "@/context/VideoConferencingContext";
 import { useParams } from "next/navigation";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import VideoInterface from "@/components/meeting/VideoInterface";
 import { useAuth } from "@/context/AuthContext";
 
 export default function WaitingRoom() {
@@ -12,9 +13,7 @@ export default function WaitingRoom() {
   const [showPermissionPopup, setShowPermissionPopup] = useState(true);
   const [hasPermissions, setHasPermissions] = useState(false);
   const params = useParams();
-  // const searchParams = useSearchParams();
   const { getCurrentUser } = useAuth();
-  // const username = searchParams.get("username");
   const username = getCurrentUser()?.username;
 
   const handleAllowPermissions = async () => {

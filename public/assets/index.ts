@@ -10,3 +10,4 @@ export { default as ChatEmpty } from "./ChatEmpty.svg";
 
 export { default as BackgroundOne } from "./virtualBackgrounds/backgroundOne.jpg";
 export { default as BackgroundTwo } from "./virtualBackgrounds/backgroundTwo.jpg";
+export { default as NotificationGif } from "./NotificationIcon.gif"

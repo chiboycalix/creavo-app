@@ -131,13 +131,10 @@ const LiveStreamInterface = () => {
   };
 
   const handleEndCall = async () => {
-    await leaveCall();
-    router.push(
-      `${ROUTES.VIDEO_CONFERENCING.LEAVE_MEETING}?channelName=${channelName}`
-    );
     setHasEndedCall(true);
     setShowInviteModal(false);
     setShowInvitePeople(false);
+    await leaveCall();
   };
 
   const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -157,20 +154,18 @@ const LiveStreamInterface = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-[150] bg-[#1A1C1D] border border-gray-600">
-      <div className="w-full h-full flex flex-col max-w-[1440px] mx-auto p-2 md:p-4 lg:p-6">
-        {/* Top Bar */}
+    <div className="fixed inset-0 flex items-center justify-center z-[150] bg-[#1A1C1D]">
+      {
+        hasEndedCall ? <EndCallScreen /> : <div className="w-full h-full flex flex-col max-w-[1440px] mx-auto p-2 md:p-4 lg:p-6">
+          {/* Top Bar */}
 
-        {/* Main Video Area */}
-        <div
-          className={cn(
-            "relative flex-1 rounded-md overflow-hidden",
-            showInvitePeople && "blur-sm"
-          )}
-        >
-          {hasEndedCall ? (
-            <EndCallScreen />
-          ) : (
+          {/* Main Video Area */}
+          <div
+            className={cn(
+              "relative flex-1 rounded-md overflow-hidden",
+              showInvitePeople && "blur-sm"
+            )}
+          >
             <>
               <div className="text-white flex h-full">
                 {/* Left Side - Only show when single participant */}
@@ -236,255 +231,255 @@ const LiveStreamInterface = () => {
                 )}
               </AnimatePresence>
             </>
-          )}
 
-          {/* Invite Modal */}
-          {showInviteModal && !hasEndedCall && (
-            <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white rounded-lg p-2 md:p-3 lg:p-4 w-[90%] md:w-96 max-w-[95vw] md:max-w-md">
-              <div className="flex justify-between items-center mb-2 md:mb-3">
-                <h3 className="font-semibold text-sm md:text-base">
-                  You&apos;re set!
-                </h3>
-                <button
-                  onClick={() => setShowInviteModal(false)}
-                  className="hover:bg-gray-100 p-1 rounded-full transition-colors"
-                >
-                  <X className="w-4 h-4 md:w-5 md:h-5" />
-                </button>
-              </div>
-              <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3">
-                Use this meeting code to invite others to join.
-              </p>
-              <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 mb-2 md:mb-3">
-                <div className="flex-1 bg-primary-100 rounded-lg p-2 text-xs md:text-sm break-all">
-                  {`${window.location.origin}${ROUTES.VIDEO_CONFERENCING.MEETING}/${channelName}`}
+            {/* Invite Modal */}
+            {showInviteModal && !hasEndedCall && (
+              <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white rounded-lg p-2 md:p-3 lg:p-4 w-[90%] md:w-96 max-w-[95vw] md:max-w-md">
+                <div className="flex justify-between items-center mb-2 md:mb-3">
+                  <h3 className="font-semibold text-sm md:text-base">
+                    You&apos;re set!
+                  </h3>
+                  <button
+                    onClick={() => setShowInviteModal(false)}
+                    className="hover:bg-gray-100 p-1 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4 md:w-5 md:h-5" />
+                  </button>
+                </div>
+                <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3">
+                  Use this meeting code to invite others to join.
+                </p>
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 mb-2 md:mb-3">
+                  <div className="flex-1 bg-primary-100 rounded-lg p-2 text-xs md:text-sm break-all">
+                    {`${window.location.origin}${ROUTES.VIDEO_CONFERENCING.MEETING}/${channelName}`}
+                  </div>
+                </div>
+                <div className="flex items-center justify-evenly gap-2">
+                  <Button
+                    className="w-1/3 flex items-center justify-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-indigo-700 transition-colors"
+                    onClick={() => {
+                      toast.success("Meeting Link copied!")
+                      navigator.clipboard.writeText(
+                        `${window.location.origin}${ROUTES.VIDEO_CONFERENCING.MEETING}/${channelName}`
+                      );
+                    }}
+                  >
+                    Copy link
+                  </Button>
+
+                  <Button
+                    onClick={() => setShowInvitePeople(true)}
+                    className="w-1/3 flex items-center justify-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-indigo-700 transition-colors"
+                  >
+                    <Plus className="w-3 h-3 md:w-4 md:h-4 bg-white text-primary" />
+                    Invite
+                  </Button>
                 </div>
               </div>
-              <div className="flex items-center justify-evenly gap-2">
-                <Button
-                  className="w-1/3 flex items-center justify-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-indigo-700 transition-colors"
-                  onClick={() => {
-                    toast.success("Meeting Link copied!")
-                    navigator.clipboard.writeText(
-                      `${window.location.origin}${ROUTES.VIDEO_CONFERENCING.MEETING}/${channelName}`
-                    );
-                  }}
-                >
-                  Copy link
-                </Button>
-
-                <Button
-                  onClick={() => setShowInvitePeople(true)}
-                  className="w-1/3 flex items-center justify-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-indigo-700 transition-colors"
-                >
-                  <Plus className="w-3 h-3 md:w-4 md:h-4 bg-white text-primary" />
-                  Invite
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Request to Join Call */}
-        {joinRequests &&
-          joinRequests?.map((request, index) => (
-            <JoinRequestNotification
-              key={index}
-              requesterName={request.name}
-              onAllow={() => handleAllow(request.id)}
-              onDeny={() => handleDeny(request.id)}
-              onClose={() =>
-                setJoinRequests((requests) =>
-                  requests.filter((r) => r.id !== request.id)
-                )
-              }
-            />
-          ))}
-
-        {showInvitePeople && !hasEndedCall && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg w-[90%] md:w-[560px] max-h-[80vh] overflow-y-auto">
-            <div className="p-4 md:p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Invite People</h2>
-                <button
-                  onClick={() => setShowInvitePeople(false)}
-                  className="hover:bg-gray-100 p-1.5 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div>
-                <InvitePeopleTab />
-              </div>
-            </div>
+            )}
           </div>
-        )}
 
-        {/* Bottom Controls */}
-        <div
-          className={cn(
-            "mt-4 md:mt-8 relative isolate", // Added isolate
-            showInvitePeople && "blur-sm"
+          {/* Request to Join Call */}
+          {joinRequests &&
+            joinRequests?.map((request, index) => (
+              <JoinRequestNotification
+                key={index}
+                requesterName={request.name}
+                onAllow={() => handleAllow(request.id)}
+                onDeny={() => handleDeny(request.id)}
+                onClose={() =>
+                  setJoinRequests((requests) =>
+                    requests.filter((r) => r.id !== request.id)
+                  )
+                }
+              />
+            ))}
+
+          {showInvitePeople && !hasEndedCall && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg w-[90%] md:w-[560px] max-h-[80vh] overflow-y-auto">
+              <div className="p-4 md:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Invite People</h2>
+                  <button
+                    onClick={() => setShowInvitePeople(false)}
+                    className="hover:bg-gray-100 p-1.5 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div>
+                  <InvitePeopleTab />
+                </div>
+              </div>
+            </div>
           )}
-        >
-          <div className="overflow-x-auto pb-4 md:pb-0">
-            <div className="flex items-center justify-between min-w-[640px] md:min-w-0 gap-4 md:grid md:grid-cols-3 md:gap-2 lg:gap-4">
-              <div className="flex items-center gap-1 md:gap-2">
-                <IconButton
-                  leftIcon={
-                    isMicrophoneEnabled ? (
-                      <Mic size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
-                    ) : (
-                      <MicOff
-                        size={14}
-                        className="md:w-4 md:h-4 lg:w-5 lg:h-5"
-                      />
-                    )
-                  }
-                  showDivider
-                  onLeftClick={toggleMicrophone}
-                  onRightClick={() => { }}
-                  tooltip={
-                    isMicrophoneEnabled
-                      ? "Mute microphone"
-                      : "Unmute microphone"
-                  }
-                  rightTooltip="Microphone settings"
-                />
-                <IconButton
-                  leftIcon={
-                    isCameraEnabled ? (
-                      <Video
-                        size={14}
-                        className="md:w-4 md:h-4 lg:w-5 lg:h-5"
-                      />
-                    ) : (
-                      <VideoOff
-                        size={14}
-                        className="md:w-4 md:h-4 lg:w-5 lg:h-5"
-                      />
-                    )
-                  }
-                  showDivider
-                  onLeftClick={toggleCamera}
-                  onRightClick={() => { }}
-                  tooltip={
-                    isCameraEnabled ? "Turn off camera" : "Turn on camera"
-                  }
-                  rightTooltip="Camera settings"
-                />
-              </div>
 
-              {/* Center section */}
-              <div className="flex items-center justify-center gap-1 md:gap-2">
-                <IconButton
-                  leftIcon={
-                    isSharingScreen && screenSharingUser?.isLocal ? (
+          {/* Bottom Controls */}
+          <div
+            className={cn(
+              "mt-4 md:mt-8 relative isolate", // Added isolate
+              showInvitePeople && "blur-sm"
+            )}
+          >
+            <div className="overflow-x-auto pb-4 md:pb-0">
+              <div className="flex items-center justify-between min-w-[640px] md:min-w-0 gap-4 md:grid md:grid-cols-3 md:gap-2 lg:gap-4">
+                <div className="flex items-center gap-1 md:gap-2">
+                  <IconButton
+                    leftIcon={
+                      isMicrophoneEnabled ? (
+                        <Mic size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                      ) : (
+                        <MicOff
+                          size={14}
+                          className="md:w-4 md:h-4 lg:w-5 lg:h-5"
+                        />
+                      )
+                    }
+                    showDivider
+                    onLeftClick={toggleMicrophone}
+                    onRightClick={() => { }}
+                    tooltip={
+                      isMicrophoneEnabled
+                        ? "Mute microphone"
+                        : "Unmute microphone"
+                    }
+                    rightTooltip="Microphone settings"
+                  />
+                  <IconButton
+                    leftIcon={
+                      isCameraEnabled ? (
+                        <Video
+                          size={14}
+                          className="md:w-4 md:h-4 lg:w-5 lg:h-5"
+                        />
+                      ) : (
+                        <VideoOff
+                          size={14}
+                          className="md:w-4 md:h-4 lg:w-5 lg:h-5"
+                        />
+                      )
+                    }
+                    showDivider
+                    onLeftClick={toggleCamera}
+                    onRightClick={() => { }}
+                    tooltip={
+                      isCameraEnabled ? "Turn off camera" : "Turn on camera"
+                    }
+                    rightTooltip="Camera settings"
+                  />
+                </div>
+
+                {/* Center section */}
+                <div className="flex items-center justify-center gap-1 md:gap-2">
+                  <IconButton
+                    leftIcon={
+                      isSharingScreen && screenSharingUser?.isLocal ? (
+                        <Share
+                          size={14}
+                          className="md:w-4 md:h-4 lg:w-5 lg:h-5 rotate-180"
+                        />
+                      ) : (
+                        <Share
+                          size={14}
+                          className="md:w-4 md:h-4 lg:w-5 lg:h-5"
+                        />
+                      )
+                    }
+                    showDivider
+                    onLeftClick={
+                      isSharingScreen ? handleEndScreenShare : handleShareScreen
+                    }
+                    onRightClick={() => { }}
+                    className=""
+                    tooltip="Share screen"
+                    rightTooltip="Screen sharing settings"
+                  />
+                  <IconButton
+                    leftIcon={
+                      <SquareArrowOutUpRight
+                        size={14}
+                        className="md:w-4 md:h-4 lg:w-5 lg:h-5"
+                      />
+                    }
+                    onLeftClick={handleShowColorPicker}
+                    className=""
+                    tooltip="set background"
+                    rightTooltip=""
+                  />
+                  <IconButton
+                    leftIcon={
+                      <Smile size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    }
+                    onLeftClick={handleEmojiClick}
+                    className={cn(showEmojiPopup && "bg-gray-100")}
+                    tooltip="Reactions"
+                  />
+                  <IconButton
+                    leftIcon={
                       <Share
                         size={14}
-                        className="md:w-4 md:h-4 lg:w-5 lg:h-5 rotate-180"
+                        className="md:w-4 md:h-4 lg:w-5 lg:h-5 -rotate-90"
                       />
-                    ) : (
-                      <Share
+                    }
+                    showDivider
+                    onLeftClick={handleEndCall}
+                    className="bg-red-600 text-white hover:bg-red-600"
+                    iconClass="hover:bg-red-700 text-white"
+                    tooltip="Leave meeting"
+                    rightTooltip="Leave meeting options"
+                  />
+                  <IconButton
+                    leftIcon={
+                      <Hand size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    }
+                    onLeftClick={toggleRaiseHand}
+                    iconClass={cn(
+                      "hover:bg-primary-600 text-white",
+                      isRaised ? "bg-primary-500" : ""
+                    )}
+                    tooltip={isRaised ? "Lower Hand" : "Raise Hand"}
+                  />
+                </div>
+
+                {/* Right section */}
+                <div className="flex items-center justify-end gap-1 md:gap-2">
+                  <IconButton
+                    leftIcon={
+                      <MessageSquare
                         size={14}
                         className="md:w-4 md:h-4 lg:w-5 lg:h-5"
                       />
-                    )
-                  }
-                  showDivider
-                  onLeftClick={
-                    isSharingScreen ? handleEndScreenShare : handleShareScreen
-                  }
-                  onRightClick={() => { }}
-                  className=""
-                  tooltip="Share screen"
-                  rightTooltip="Screen sharing settings"
-                />
-                <IconButton
-                  leftIcon={
-                    <SquareArrowOutUpRight
-                      size={14}
-                      className="md:w-4 md:h-4 lg:w-5 lg:h-5"
-                    />
-                  }
-                  onLeftClick={handleShowColorPicker}
-                  className=""
-                  tooltip="set background"
-                  rightTooltip=""
-                />
-                <IconButton
-                  leftIcon={
-                    <Smile size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
-                  }
-                  onLeftClick={handleEmojiClick}
-                  className={cn(showEmojiPopup && "bg-gray-100")}
-                  tooltip="Reactions"
-                />
-                <IconButton
-                  leftIcon={
-                    <Share
-                      size={14}
-                      className="md:w-4 md:h-4 lg:w-5 lg:h-5 -rotate-90"
-                    />
-                  }
-                  showDivider
-                  onLeftClick={handleEndCall}
-                  className="bg-red-600 text-white hover:bg-red-600"
-                  iconClass="hover:bg-red-700 text-white"
-                  tooltip="Leave meeting"
-                  rightTooltip="Leave meeting options"
-                />
-                <IconButton
-                  leftIcon={
-                    <Hand size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
-                  }
-                  onLeftClick={toggleRaiseHand}
-                  iconClass={cn(
-                    "hover:bg-primary-600 text-white",
-                    isRaised ? "bg-primary-500" : ""
-                  )}
-                  tooltip={isRaised ? "Lower Hand" : "Raise Hand"}
-                />
-              </div>
-
-              {/* Right section */}
-              <div className="flex items-center justify-end gap-1 md:gap-2">
-                <IconButton
-                  leftIcon={
-                    <MessageSquare
-                      size={14}
-                      className="md:w-4 md:h-4 lg:w-5 lg:h-5"
-                    />
-                  }
-                  onLeftClick={() => setShowChat(!showChat)}
-                  className={cn(showChat && "bg-primary-100 text-primary-900")}
-                  tooltip="Toggle chat"
-                />
-                <IconButton
-                  leftIcon={
-                    <Users size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
-                  }
-                  showDivider
-                  rightIcon={totalParticipants}
-                  onLeftClick={() => setShowChat(!showChat)}
-                  onRightClick={() => setShowChat(!showChat)}
-                  className={""}
-                  tooltip="Toggle participants list"
-                  rightTooltip="Show all participants"
-                />
-                <IconButton
-                  leftIcon={
-                    <Menu size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
-                  }
-                  onLeftClick={handleOptionsClick}
-                  className={cn(showOptionsMenu && "bg-gray-100")}
-                  tooltip="More options"
-                />
+                    }
+                    onLeftClick={() => setShowChat(!showChat)}
+                    className={cn(showChat && "bg-primary-100 text-primary-900")}
+                    tooltip="Toggle chat"
+                  />
+                  <IconButton
+                    leftIcon={
+                      <Users size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    }
+                    showDivider
+                    rightIcon={totalParticipants}
+                    onLeftClick={() => setShowChat(!showChat)}
+                    onRightClick={() => setShowChat(!showChat)}
+                    className={""}
+                    tooltip="Toggle participants list"
+                    rightTooltip="Show all participants"
+                  />
+                  <IconButton
+                    leftIcon={
+                      <Menu size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    }
+                    onLeftClick={handleOptionsClick}
+                    className={cn(showOptionsMenu && "bg-gray-100")}
+                    tooltip="More options"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      }
 
       <CallOptionsMenu
         isOpen={showOptionsMenu}
