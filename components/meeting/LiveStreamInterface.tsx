@@ -9,12 +9,10 @@ import EndCallScreen from "./EndCallScreen";
 import EmojiPopup from "./EmojiPopup";
 import { VideoGrid } from "./VideoGrid";
 import ChatAndParticipant from "./ChatAndParticipant";
-import { useToast } from "@/context/ToastContext";
 import {
   X,
   Mic,
   MoreVertical,
-  Copy,
   Plus,
   MicOff,
   Video,
@@ -411,7 +409,7 @@ const LiveStreamInterface = () => {
                       <Smile size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
                     }
                     onLeftClick={handleEmojiClick}
-                    className={cn(showEmojiPopup && "bg-gray-100")}
+                    className={cn(showEmojiPopup && "bg-primary-900")}
                     tooltip="Reactions"
                   />
                   <IconButton
@@ -451,7 +449,7 @@ const LiveStreamInterface = () => {
                       />
                     }
                     onLeftClick={() => setShowChat(!showChat)}
-                    className={cn(showChat && "bg-primary-100 text-primary-900")}
+                    className={cn(showChat && "bg-primary-900 text-primary-900")}
                     tooltip="Toggle chat"
                   />
                   <IconButton
@@ -471,7 +469,7 @@ const LiveStreamInterface = () => {
                       <Menu size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
                     }
                     onLeftClick={handleOptionsClick}
-                    className={cn(showOptionsMenu && "bg-gray-100")}
+                    className={cn(showOptionsMenu && "bg-primary-900")}
                     tooltip="More options"
                   />
                 </div>

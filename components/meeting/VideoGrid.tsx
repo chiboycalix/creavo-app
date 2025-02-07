@@ -85,10 +85,10 @@ export function RegularGrid({ participants }: any) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const visibleParticipants = isMobile ? participants.slice(0, 8) : participants;
+  // const visibleParticipants = isMobile ? participants.slice(0, 8) : participants;
 
   if (isMobile) {
-    return <MobileView visibleParticipants={visibleParticipants} />
+    return <MobileView visibleParticipants={participants} />
   } else {
     return <DesktopView participants={participants} />
   }
@@ -159,10 +159,22 @@ export function VideoGrid({
     isSharingScreen,
     meetingConfig
   } = useVideoConferencing();
+
   const [orientation, setOrientation] = useState(window.innerWidth > window.innerHeight ? "landscape" : "portrait");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Update for mobile condition
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 640);
+      setOrientation(window.innerWidth > window.innerHeight ? "landscape" : "portrait");
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const { participants } = useMemo(() => {
-
     const validRemoteParticipants = Object.entries(remoteParticipants || {})
       .map(([uid, user]: any) => {
         if (uid === String(meetingConfig?.uid)) {
@@ -197,19 +209,43 @@ export function VideoGrid({
     };
   }, [localUser, remoteParticipants, userIsHost, meetingRoomData, meetingConfig?.uid]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setOrientation(window.innerWidth > window.innerHeight ? "landscape" : "portrait");
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+  // If screen sharing is active, show the screen share at the top and participants below it
   if (isSharingScreen) {
+    if (isMobile) {
+      // Mobile layout: screen share takes full width and participants below it
+      return (
+        <div className="h-full w-full flex flex-col gap-2">
+          <div className="w-full h-[60vh] bg-black">
+            {/* The screen share player */}
+            <ScreenShareView remoteParticipants={remoteParticipants} />
+          </div>
+
+          {/* Below the screen share, show the participants in a grid with 2 columns */}
+          <div className="w-full grid grid-cols-2 gap-2">
+            {participants.slice(1, 3).map((participant: any) => (
+              <div key={participant.uid} className="w-full h-[200px] flex-shrink-0">
+                <ParticipantVideo participant={participant} />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    } else {
+      // Desktop layout: screen share on the left and participants in a column on the right
+      return (
+        <div className="h-full w-full flex lg:flex-row gap-2">
+          <ScreenShareView remoteParticipants={remoteParticipants} />
+          <ParticipantsColumn participants={participants} />
+        </div>
+      );
+    }
+  }
+
+  // Normal grid layout when no screen is shared
+  if (isMobile) {
     return (
-      <div className="h-full w-full flex flex-col lg:flex-row gap-2">
-        <ScreenShareView remoteParticipants={remoteParticipants} />
-        <ParticipantsColumn participants={participants} />
+      <div className="h-full w-full">
+        <RegularGrid participants={participants} key={orientation} />
       </div>
     );
   }
@@ -220,3 +256,4 @@ export function VideoGrid({
     </div>
   );
 }
+
