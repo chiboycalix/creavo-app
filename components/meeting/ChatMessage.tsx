@@ -33,7 +33,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           <span className="text-xs text-gray-400">{message.timestamp}</span>
         </div>
         <div className={cn(
-          "w-full rounded-lg py-2 text-xs text-white",
+          "w-full rounded-lg py-2 text-xs text-gray-400",
         )}>
           {message.content}
         </div>

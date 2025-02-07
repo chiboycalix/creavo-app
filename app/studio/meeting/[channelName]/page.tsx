@@ -16,6 +16,10 @@ export default function WaitingRoom() {
   const { getCurrentUser } = useAuth();
   const username = getCurrentUser()?.username;
 
+  useEffect(() => {
+    document.title = `Creveo - ${params?.channelName}`
+  }, [])
+
   const handleAllowPermissions = async () => {
     try {
       await Promise.all([
