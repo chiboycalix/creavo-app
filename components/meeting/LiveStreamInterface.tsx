@@ -28,7 +28,6 @@ import {
 import { cn } from "@/lib/utils";
 import { AnimatePresence } from "framer-motion";
 import { useVideoConferencing } from "@/context/VideoConferencingContext";
-import { useRouter } from "next/navigation";
 import { generalHelpers } from "@/helpers";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
@@ -78,14 +77,11 @@ const LiveStreamInterface = () => {
     raisedHands,
     screenSharingUser
   } = useVideoConferencing();
-  const router = useRouter();
   const totalParticipants = Object.keys(remoteParticipants || {}).length + 1;
   const [showColorPicker, setShowColorPicker] = useState(false);
   const { getCurrentUser } = useAuth();
   const username = getCurrentUser()?.username;
   const isRaised = raisedHands[String(meetingConfig.uid)];
-
-  console.log(screenSharingUser?.isLocal, "ScreenShareView")
 
   const newRequest = {
     id: "unique-id",
