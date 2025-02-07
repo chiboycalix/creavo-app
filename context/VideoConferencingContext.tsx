@@ -94,6 +94,7 @@ interface VideoConferencingContextContextType {
   handleMeetingHostAndCohost: () => void;
   sendCoHostPermission: (message: string, uid: any) => Promise<void>;
   sendChatMessage: (content: string, type: "text" | "emoji") => Promise<void>;
+  muteRemoteUser: (uid: any) => void;
 }
 
 let rtcClient: IAgoraRTCClient;
@@ -320,18 +321,82 @@ export function VideoConferencingProvider({
           console.log("co host granted to user");
           handleMeetingHostAndCohost();
           break;
+
+        case "mute-audio":
+          if (uid === String(meetingConfig.uid)) {
+            try {
+              if (localUserTrack?.audioTrack) {
+                await localUserTrack.audioTrack.setEnabled(false);
+
+                // Update the state to reflect the muted status
+                setIsMicrophoneEnabled(false);
+
+                // Send a confirmation back to all participants
+                const confirmMessage = {
+                  type: "audio-state",
+                  enabled: false,
+                  uid: meetingConfig.uid
+                };
+
+                await sendRateLimitedMessage({
+                  text: JSON.stringify(confirmMessage)
+                });
+
+                // Update local participant state
+                updateRemoteParticipant(uid, {
+                  audioEnabled: false
+                });
+
+                console.log("Audio muted by host/co-host");
+              }
+            } catch (error) {
+              console.error("Error handling forced mute:", error);
+            }
+          }
+          break;
       }
     } catch (error) {
       console.error("Error processing RTM message:", error);
     }
-  }, [meetingConfig.uid, updateRemoteParticipant, setScreenShare, handleMeetingHostAndCohost]);
+  }, [updateRemoteParticipant,
+    setScreenShare,
+    handleMeetingHostAndCohost,
+    localUserTrack?.audioTrack,
+    meetingConfig]);
+
+  const muteRemoteUser = async (uid: string) => {
+    if (!rtmClient) return;
+
+    try {
+      const muteMessage = JSON.stringify({
+        type: "mute-audio",
+        enabled: false,
+        uid,
+        forceMute: true  // Add this flag to indicate it's a forced mute
+      });
+
+      // Update local state immediately
+      updateRemoteParticipant(uid, {
+        audioEnabled: false
+      });
+
+      await rtmClient.sendMessageToPeer({ text: muteMessage }, uid);
+      console.log(`Sent mute request to ${uid}`);
+    } catch (error) {
+      console.error("Error processing RTM message:", error);
+      console.error("Error sending mute request:", error);
+    }
+  }
+
 
   useEffect(() => {
     if (!rtmChannel) return;
 
     rtmChannel.on("ChannelMessage", handleRTMMessage);
+    rtmClient.on("MessageFromPeer", handleRTMMessage);
     return () => {
       rtmChannel.off("ChannelMessage", handleRTMMessage);
+      rtmClient.off("MessageFromPeer", handleRTMMessage);
     };
   }, [handleRTMMessage]);
 
@@ -1361,60 +1426,71 @@ export function VideoConferencingProvider({
     await leaveCall();
   }, [leaveCall]);
 
-  const initializeRealtimeMessaging = useCallback(async (name: string) => {
-    try {
-      if (!meetingConfig.appid || !meetingConfig.rtmToken || !meetingConfig.channel) {
-        console.error("Missing required RTM configuration");
-        return;
-      }
+  const initializeRealtimeMessaging = useCallback(
+    async (name: string) => {
+      try {
+        if (
+          !meetingConfig.appid ||
+          !meetingConfig.rtmToken ||
+          !meetingConfig.channel
+        ) {
+          console.error("Missing required RTM configuration");
+          return;
+        }
 
-      if (!rtmClient) {
         rtmClient = AgoraRTM.createInstance(meetingConfig.appid);
+        const sanitizedUid = String(meetingConfig.uid).replace(
+          /[^a-zA-Z0-9]/g,
+          ""
+        );
+
+        await rtmClient.login({
+          uid: sanitizedUid,
+          token: meetingConfig.rtmToken,
+        });
+        rtmClient.on("MessageFromPeer", handleRTMMessage);
+        const channel = rtmClient.createChannel(meetingConfig.channel);
+        rtmChannel = channel;
+        await channel.join();
+
+        await rtmClient.addOrUpdateLocalUserAttributes({
+          name: name.slice(0, 64),
+          userRtcUid: sanitizedUid,
+        });
+
+        // Initial user info broadcast
+        await channel.sendMessage({
+          text: JSON.stringify({
+            type: "user-info",
+            uid: sanitizedUid,
+            name: name,
+          }),
+        });
+
+        // Set up member join/leave handlers
+        channel.on("MemberJoined", onParticipantJoined);
+        channel.on("MemberLeft", onMemberDisconnected);
+        channel.on("ChannelMessage", handleRTMMessage);
+        window.addEventListener("beforeunload", disconnectFromMessaging);
+
+        await fetchActiveMeetingParticipants();
+      } catch (error) {
+        console.error("Error in initializeRealtimeMessaging:", error);
+        throw error;
       }
-
-      const sanitizedUid = String(meetingConfig.uid).replace(/[^a-zA-Z0-9]/g, "");
-
-      rtmChannel = rtmClient.createChannel(meetingConfig.channel);
-
-      await rtmClient.login({
-        uid: sanitizedUid,
-        token: meetingConfig.rtmToken,
-      });
-
-      await rtmChannel.join();
-
-      rtmChannel.on("MemberJoined", onParticipantJoined);
-      rtmChannel.on("MemberLeft", onMemberDisconnected);
-      rtmChannel.on("ChannelMessage", handleRTMMessage);
-
-      await rtmClient.addOrUpdateLocalUserAttributes({
-        name: name.slice(0, 64),
-        userRtcUid: sanitizedUid,
-      });
-
-      await rtmChannel.sendMessage({
-        text: JSON.stringify({ type: "user-info", uid: sanitizedUid, name }),
-      });
-
-      window.addEventListener("beforeunload", disconnectFromMessaging);
-
-      fetchActiveMeetingParticipants().catch(console.error);
-
-    } catch (error) {
-      console.error("Error in initializeRealtimeMessaging:", error);
-      throw error;
-    }
-  }, [
-    meetingConfig.appid,
-    meetingConfig.rtmToken,
-    meetingConfig.channel,
-    meetingConfig.uid,
-    onMemberDisconnected,
-    disconnectFromMessaging,
-    fetchActiveMeetingParticipants,
-    handleRTMMessage,
-    onParticipantJoined,
-  ]);
+    },
+    [
+      meetingConfig.appid,
+      meetingConfig.rtmToken,
+      meetingConfig.channel,
+      meetingConfig.uid,
+      onMemberDisconnected,
+      handleRTMMessage,
+      onParticipantJoined,
+      fetchActiveMeetingParticipants,
+      disconnectFromMessaging
+    ]
+  );
 
 
   const connectToMeetingRoom = async () => {
@@ -1663,6 +1739,7 @@ export function VideoConferencingProvider({
         rtcScreenShareOptions,
         handleMeetingHostAndCohost,
         sendCoHostPermission,
+        muteRemoteUser
       }}>
       {children}
     </VideoConferencingContext.Provider>
