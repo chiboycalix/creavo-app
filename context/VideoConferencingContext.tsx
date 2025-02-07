@@ -103,9 +103,7 @@ let rtmChannel: RtmChannel;
 let rtcScreenShareClient: IAgoraRTCClient;
 let processor = null as any;
 
-const VideoConferencingContext = createContext<
-  VideoConferencingContextContextType | undefined
->(undefined);
+const VideoConferencingContext = createContext<VideoConferencingContextContextType | undefined>(undefined);
 
 export function VideoConferencingProvider({
   children,
@@ -118,33 +116,21 @@ export function VideoConferencingProvider({
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
   const [hasJoinedMeeting, setHasJoinedMeeting] = useState(false);
   const [meetingStage, setMeetingStage] = useState("prepRoom");
-  const [remoteParticipants, setRemoteParticipants] = useState<
-    Record<string, any>
-  >({});
-  const [remoteScreenShareParticipants, setRemoteScreenShareParticipants] =
-    useState<Record<string, any> | null>({});
-
+  const [remoteParticipants, setRemoteParticipants] = useState<Record<string, any>>({});
+  const [remoteScreenShareParticipants, setRemoteScreenShareParticipants] = useState<Record<string, any> | null>({});
   const [username, setUsername] = useState("");
   const [channelName, setChannelName] = useState("");
-  const [localUserTrack, setLocalUserTrack] = useState<
-    ILocalTrack | undefined | any
-  >(undefined);
+  const [localUserTrack, setLocalUserTrack] = useState<ILocalTrack | undefined | any>(undefined);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const remoteUsersRef = useRef(remoteParticipants);
-  const [speakingParticipants, setSpeakingParticipants] = useState<
-    Record<string, boolean>
-  >({});
-  const remoteScreenShareParticipantsRef = useRef(
-    remoteScreenShareParticipants
-  );
+  const [speakingParticipants, setSpeakingParticipants] = useState<Record<string, boolean>>({});
+  const remoteScreenShareParticipantsRef = useRef(remoteScreenShareParticipants);
   const [meetingRoomData, setMeetingRoomData] = useState<any | null>(null);
   const [userIsHost, setUserIsHost] = useState(false);
   const [userIsCoHost, setUserIsCoHost] = useState(false);
   const [isSharingScreen, setIsSharingScreen] = useState<string | null>(null);
   const [screenSharingUser, setScreenSharingUser] = useState<{
-    uid: string;
-    name: string;
-    isLocal: boolean;
+    uid: string; name: string; isLocal: boolean;
   } | null>(null);
   const [raisedHands, setRaisedHands] = useState<Record<string, boolean>>({});
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -299,7 +285,6 @@ export function VideoConferencingProvider({
             if (messageExists) {
               return prev;
             }
-
             return [
               ...prev,
               {
@@ -327,10 +312,8 @@ export function VideoConferencingProvider({
             try {
               if (localUserTrack?.audioTrack) {
                 await localUserTrack.audioTrack.setEnabled(false);
-
                 // Update the state to reflect the muted status
                 setIsMicrophoneEnabled(false);
-
                 // Send a confirmation back to all participants
                 const confirmMessage = {
                   type: "audio-state",
@@ -341,12 +324,10 @@ export function VideoConferencingProvider({
                 await sendRateLimitedMessage({
                   text: JSON.stringify(confirmMessage)
                 });
-
                 // Update local participant state
                 updateRemoteParticipant(uid, {
                   audioEnabled: false
                 });
-
                 console.log("Audio muted by host/co-host");
               }
             } catch (error) {
@@ -358,11 +339,13 @@ export function VideoConferencingProvider({
     } catch (error) {
       console.error("Error processing RTM message:", error);
     }
-  }, [updateRemoteParticipant,
+  }, [
+    updateRemoteParticipant,
     setScreenShare,
     handleMeetingHostAndCohost,
     localUserTrack?.audioTrack,
-    meetingConfig]);
+    meetingConfig
+  ]);
 
   const muteRemoteUser = async (uid: string) => {
     if (!rtmClient) return;
@@ -387,7 +370,6 @@ export function VideoConferencingProvider({
       console.error("Error sending mute request:", error);
     }
   }
-
 
   useEffect(() => {
     if (!rtmChannel) return;
@@ -1143,8 +1125,6 @@ export function VideoConferencingProvider({
     }
   }, [meetingConfig?.uid, remoteParticipants]);
 
-
-
   const onMediaStreamPublished = useCallback(
     async (user: any, mediaType: "audio" | "video") => {
       try {
@@ -1492,7 +1472,6 @@ export function VideoConferencingProvider({
     ]
   );
 
-
   const connectToMeetingRoom = async () => {
     try {
       rtcClient = AgoraRTC.createClient({
@@ -1692,7 +1671,6 @@ export function VideoConferencingProvider({
   }, [onMemberDisconnected, onParticipantJoined]);
 
   return (
-
     <VideoConferencingContext.Provider
       value={{
         currentStep, setCurrentStep,

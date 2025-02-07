@@ -9,12 +9,10 @@ import EndCallScreen from "./EndCallScreen";
 import EmojiPopup from "./EmojiPopup";
 import { VideoGrid } from "./VideoGrid";
 import ChatAndParticipant from "./ChatAndParticipant";
-import { useToast } from "@/context/ToastContext";
 import {
   X,
   Mic,
   MoreVertical,
-  Copy,
   Plus,
   MicOff,
   Video,
@@ -30,7 +28,6 @@ import {
 import { cn } from "@/lib/utils";
 import { AnimatePresence } from "framer-motion";
 import { useVideoConferencing } from "@/context/VideoConferencingContext";
-import { useRouter } from "next/navigation";
 import { generalHelpers } from "@/helpers";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
@@ -80,14 +77,11 @@ const LiveStreamInterface = () => {
     raisedHands,
     screenSharingUser
   } = useVideoConferencing();
-  const router = useRouter();
   const totalParticipants = Object.keys(remoteParticipants || {}).length + 1;
   const [showColorPicker, setShowColorPicker] = useState(false);
   const { getCurrentUser } = useAuth();
   const username = getCurrentUser()?.username;
   const isRaised = raisedHands[String(meetingConfig.uid)];
-
-  console.log(screenSharingUser?.isLocal, "ScreenShareView")
 
   const newRequest = {
     id: "unique-id",
@@ -411,7 +405,7 @@ const LiveStreamInterface = () => {
                       <Smile size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
                     }
                     onLeftClick={handleEmojiClick}
-                    className={cn(showEmojiPopup && "bg-gray-100")}
+                    className={cn(showEmojiPopup && "bg-primary-900")}
                     tooltip="Reactions"
                   />
                   <IconButton
@@ -451,7 +445,7 @@ const LiveStreamInterface = () => {
                       />
                     }
                     onLeftClick={() => setShowChat(!showChat)}
-                    className={cn(showChat && "bg-primary-100 text-primary-900")}
+                    className={cn(showChat && "bg-primary-900 text-primary-900")}
                     tooltip="Toggle chat"
                   />
                   <IconButton
@@ -471,7 +465,7 @@ const LiveStreamInterface = () => {
                       <Menu size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
                     }
                     onLeftClick={handleOptionsClick}
-                    className={cn(showOptionsMenu && "bg-gray-100")}
+                    className={cn(showOptionsMenu && "bg-primary-900")}
                     tooltip="More options"
                   />
                 </div>
