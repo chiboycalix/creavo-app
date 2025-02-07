@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import {
   MoreVertical,
-  Crown,
-  UserRoundX,
   UserRoundPlus,
   Hand,
   MicOff,
@@ -17,22 +15,13 @@ import { useVideoConferencing } from "@/context/VideoConferencingContext";
 
 const ParticipantList = ({ allParticipants }: any) => {
   const {
-    isMicrophoneEnabled,
-    isCameraEnabled,
-    speakingParticipants,
     raisedHands,
-    sendCoHostPermission,
     userIsCoHost,
     userIsHost,
     handleMeetingHostAndCohost,
     muteRemoteUser
   } = useVideoConferencing();
   const { getCurrentUser } = useAuth();
-
-  console.log("participants", allParticipants);
-
-  console.log("host", userIsHost);
-  console.log("cohost", userIsCoHost);
 
   useEffect(() => {
     handleMeetingHostAndCohost();
