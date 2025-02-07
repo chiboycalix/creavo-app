@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import {
   MoreVertical,
-  Crown,
   UserRoundX,
   UserRoundPlus,
   Hand,
@@ -17,22 +16,14 @@ import { useVideoConferencing } from "@/context/VideoConferencingContext";
 
 const ParticipantList = ({ allParticipants }: any) => {
   const {
-    isMicrophoneEnabled,
-    isCameraEnabled,
-    speakingParticipants,
     raisedHands,
     sendCoHostPermission,
     userIsCoHost,
     userIsHost,
     handleMeetingHostAndCohost,
-    handleMuteRemoteUserMicrophone,
+    muteRemoteUser
   } = useVideoConferencing();
   const { getCurrentUser } = useAuth();
-
-  console.log("participants", allParticipants);
-
-  console.log("host", userIsHost);
-  console.log("cohost", userIsCoHost);
 
   useEffect(() => {
     handleMeetingHostAndCohost();
@@ -42,6 +33,7 @@ const ParticipantList = ({ allParticipants }: any) => {
     <div className="space-y-4">
       {[...allParticipants]?.map((applicant, index) => {
         const hasRaisedHand = raisedHands[applicant.uid];
+
         return (
           <div key={index} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -63,7 +55,7 @@ const ParticipantList = ({ allParticipants }: any) => {
             <div className="flex gap-1 items-center">
               {hasRaisedHand && <Hand className="text-white w-4 h-4" />}
 
-              {applicant.uid === getCurrentUser()?.id &&
+              {applicant.uid !== getCurrentUser()?.id &&
                 (userIsCoHost || userIsHost) && (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -105,12 +97,7 @@ const ParticipantList = ({ allParticipants }: any) => {
 
                         <button
                           className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
-                          onClick={() => {
-                            handleMuteRemoteUserMicrophone(
-                              "mute-microphone",
-                              applicant?.uid
-                            );
-                          }}
+                          onClick={() => muteRemoteUser(applicant?.uid)}
                         >
                           <MicOff className="w-4 h-4" />
                           <span>Mute</span>
