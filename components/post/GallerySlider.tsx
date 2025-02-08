@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
@@ -91,7 +90,7 @@ const GallerySlider = ({
                   <img
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    className={`object-cover md:max-h-[87vh] max-h-[90vh]`}
+                    className={`object-contain md:max-h-[87vh] h-[calc(87vh)]`}
                     onLoad={() => setLoaded(true)}
                   />
                 ) : (
