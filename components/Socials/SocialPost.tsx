@@ -1,13 +1,17 @@
 import type React from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronUp, PlusCircle } from "lucide-react"
-import MediaWrapper from "./post/MediaWrapper"
+import MediaWrapper from "../post/MediaWrapper"
 import { useState } from "react"
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon, PlusIcon } from "@heroicons/react/24/solid"
 import { FaCirclePlus } from "react-icons/fa6";
 import { RiShareForwardFill, RiUserFollowFill } from "react-icons/ri";
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
+import { usePost } from "@/context/PostContext"
+import { useRouter } from "next/navigation"
+import LikeButton from "./LikeButton"
+import FollowButton from "./FollowButton"
 interface SocialMetric {
   icon: React.ReactNode
   count?: string
@@ -16,20 +20,28 @@ interface SocialMetric {
 export default function SocialPost({ post }: { post: any }) {
   const [showAllTags, setShowAllTags] = useState(false)
   const { getCurrentUser } = useAuth();
+  const currId = getCurrentUser()?.id;
 
-  const metrics: SocialMetric[] = [
-    { icon: <HeartIcon className="w-6 h-6" />, count: "243.7K" },
-    { icon: <ChatBubbleOvalLeftEllipsisIcon className="w-6 h-6" />, count: "2156k" },
-    { icon: <BookmarkIcon className="w-6 h-6" />, count: "188.9K" },
-    { icon: <VscEye className="w-6 h-6" />, count: "200.9k" },
-    { icon: <RiShareForwardFill className="w-6 h-6" />, count: "202.2K" },
-  ]
   console.log({ post })
   const tags = ["fyp", "biker", "bikergirlsof", "bikerboys",
     "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
     "bikergirlsof", "bikerboys", "bikerboysof",
     "bikersof", "bikerchick"]
-  console.log(getCurrentUser(), "getCurrentUser")
+
+  const metrics: SocialMetric[] = [
+    {
+      icon: <LikeButton
+        postId={post.id}
+        initialLikes={post?.metadata?.likesCount || 0}
+        initiallyLiked={false}
+      />,
+    },
+    { icon: <ChatBubbleOvalLeftEllipsisIcon className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: "2156k" },
+    { icon: <BookmarkIcon className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: "188.9K" },
+    { icon: <VscEye className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: post?.mediaResource?.[0]?.metadata?.viewsCount || 0 },
+    { icon: <RiShareForwardFill className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: "202.2K" },
+  ]
+
   return (
     <div className="flex items-start gap-2 w-full md:max-w-xl mx-auto ">
       {/* Main Post Container */}
@@ -46,19 +58,19 @@ export default function SocialPost({ post }: { post: any }) {
           </div>
 
           {/* Metrics - Mobile & Tablet */}
-          <div className="absolute right-4 bottom-10 flex flex-col gap-4 lg:hidden">
-            <div className="mb-4 relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center">
-              <img
-                src={post?.avatar}
-                alt="Post author"
-                className="w-10 h-10 rounded-full"
+          <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
+            {
+              post.userId !== currId && <FollowButton
+                followedId={post.userId}
+                avatar={post?.avatar}
               />
-              <FaCirclePlus className="text-primary-700 w-6 h-6 absolute -bottom-3 z-40 left-2" />
-            </div>
+            }
             {metrics.map((metric, index) => (
-              <div key={index} className="flex flex-col items-center gap-1">
-                <div className=" p-2 rounded-full">{metric.icon}</div>
-                <span className="text-sm font-medium">{metric.count}</span>
+              <div key={index} className="flex flex-col items-center mb-4">
+                <div className="text-sm rounded-full cursor-pointer">
+                  {metric.icon}
+                </div>
+                <span className="text-xs font-semibold">{metric.count}</span>
               </div>
             ))}
           </div>
@@ -112,19 +124,17 @@ export default function SocialPost({ post }: { post: any }) {
 
         </div>
         <div className="flex-1 relative z-50">
-          <div className="mb-4 relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center">
-            <img
-              src={post?.avatar}
-              alt="Post author"
-              className="w-10 h-10 rounded-full"
+          {
+            post.userId !== currId && <FollowButton
+              followedId={post.userId}
+              avatar={post?.avatar}
             />
-            <div className="bg-primary-700 absolute -bottom-3 left-2 rounded-full w-6 h-6 flex items-center justify-center">
-              <PlusIcon className="text-sm text-white w-5 h-5" />
-            </div>
-          </div>
+          }
+
+
           {metrics.map((metric, index) => (
-            <div key={index} className="flex flex-col items-center gap-1">
-              <div className="text-sm text-[#BFBFBF] p-2 rounded-full cursor-pointer transition-colors">
+            <div key={index} className="flex flex-col items-center mb-4">
+              <div className="text-sm rounded-full cursor-pointer transition-colors">
                 {metric.icon}
               </div>
               <span className="text-xs text-gray-800 font-semibold">{metric.count}</span>

@@ -1,6 +1,6 @@
 "use client"
 import SocialPostSkeleton from '@/components/sketetons/SocialPostSkeleton'
-import SocialPost from '@/components/SocialPost'
+import SocialPost from '@/components/Socials/SocialPost'
 import { useFetchPosts } from '@/queries/usePost'
 import Image from 'next/image'
 import React from 'react'
