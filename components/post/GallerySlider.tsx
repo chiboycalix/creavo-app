@@ -18,7 +18,6 @@ const GallerySlider = ({
   galleryImgs,
   className = '',
   imageClass = '',
-  ratioClass = 'aspect-w-4 aspect-h-3',
   galleryClass = 'rounded-xl',
   navigation = true,
 }: GallerySliderTypes) => {
@@ -75,7 +74,7 @@ const GallerySlider = ({
         {/* Main image */}
         <div className={` h-full overflow-hidden ${galleryClass}`}>
           <Link
-            className={`relative flex items-center justify-center border-2 h-full ${ratioClass}`}
+            className={`relative flex items-center justify-center h-full `}
             href={''}
           >
             <AnimatePresence initial={false} custom={direction}>
@@ -92,9 +91,8 @@ const GallerySlider = ({
                   <img
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    className={`object-cover ${imageClass}`}
+                    className={`object-cover h-full`}
                     onLoad={() => setLoaded(true)}
-                    sizes="(max-width: 1025px) 100vw, 300px"
                   />
                 ) : (
                   <video
@@ -110,39 +108,14 @@ const GallerySlider = ({
 
         {/* Buttons + bottom nav bar */}
         <>
-          {/* Buttons */}
-          {loaded && navigation && (
-            <div className={`border-3 border-red-300`}>
-              {index > 0 && (
-                <button
-                  className="absolute w-8 h-8 left-3 top-[calc(50%-16px)] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-6000 dark:hover:border-neutral-500 rounded-full flex items-center justify-center hover:border-neutral-300 focus:outline-none"
-                  style={{ transform: 'translate3d(0, 0, 0)' }}
-                  onClick={() => changePhotoId(index - 1)}
-                >
-                  <ChevronLeftIcon className="h-4 w-4" />
-                </button>
-              )}
-              {index + 1 < images.length && (
-                <button
-                  className="absolute w-8 h-8 right-3 top-[calc(50%-16px)] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-6000 dark:hover:border-neutral-500 rounded-full flex items-center justify-center hover:border-neutral-300 focus:outline-none"
-                  style={{ transform: 'translate3d(0, 0, 0)' }}
-                  onClick={() => changePhotoId(index + 1)}
-                >
-                  <ChevronRightIcon className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Bottom Nav bar */}
 
           {images.length > 1 && (
             <>
-              <div className="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-neutral-900 opacity-50 rounded-b-lg"></div>
+              <div className="absolute z-[500] bottom-0 inset-x-0 h-10 bg-gradient-to-t from-neutral-900 opacity-50 rounded-b-lg"></div>
               <div className="flex items-center justify-center absolute bottom-2 left-1/2 transform -translate-x-1/2 space-x-1.5">
                 {images?.map((_, i) => (
                   <button
-                    className={`w-1.5 h-1.5 rounded-full ${i === index ? 'bg-white' : 'bg-white/60 '
+                    className={`w-1.5 relative z-[500] h-1.5 rounded-full ${i === index ? 'bg-white' : 'bg-white/60 '
                       }`}
                     onClick={() => changePhotoId(i)}
                     key={i}
