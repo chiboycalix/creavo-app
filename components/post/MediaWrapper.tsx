@@ -161,7 +161,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
           <video
             ref={videoRef}
             src={postMedia?.[0]?.url || ''}
-            className="w-full h-full object-cover"
+            className="w-full object-fit h-[87vh]"
             loop
             playsInline
           />

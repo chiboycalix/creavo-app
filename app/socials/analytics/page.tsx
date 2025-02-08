@@ -35,7 +35,7 @@ const Analytics = () => {
               </div>
             ) : (
               posts?.data.posts?.map((post: any) =>
-                <div key={post.id} className='mb-20'><SocialPost post={post} /></div>)
+                <div key={post.id} className='mb-10'><SocialPost post={post} /></div>)
             )}
           </div>
         </div>

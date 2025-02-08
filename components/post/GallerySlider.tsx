@@ -91,13 +91,13 @@ const GallerySlider = ({
                   <img
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    className={`object-cover h-full`}
+                    className={`object-cover md:max-h-[87vh] max-h-[90vh]`}
                     onLoad={() => setLoaded(true)}
                   />
                 ) : (
                   <video
                     src={currentMedia?.url || ''}
-                    className={`object-cover ${imageClass}`}
+                    className={`object-cover h-screen ${imageClass}`}
                     onLoad={() => setLoaded(true)}
                   />
                 )}
@@ -107,24 +107,22 @@ const GallerySlider = ({
         </div>
 
         {/* Buttons + bottom nav bar */}
-        <>
+        <div className=''>
 
           {images.length > 1 && (
-            <>
-              <div className="absolute z-[500] bottom-0 inset-x-0 h-10 bg-gradient-to-t from-neutral-900 opacity-50 rounded-b-lg"></div>
-              <div className="flex items-center justify-center absolute bottom-2 left-1/2 transform -translate-x-1/2 space-x-1.5">
-                {images?.map((_, i) => (
-                  <button
-                    className={`w-1.5 relative z-[500] h-1.5 rounded-full ${i === index ? 'bg-white' : 'bg-white/60 '
-                      }`}
-                    onClick={() => changePhotoId(i)}
-                    key={i}
-                  />
-                ))}
-              </div>
-            </>
+            <div className="flex justify-center space-x-2 mt-4">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  className={`h-2 w-2 relative bottom-2 z-20 rounded-full ${i === index ? 'bg-primary-700' : 'bg-gray-400'
+                    }`}
+                  onClick={() => changePhotoId(i)}
+                />
+              ))}
+            </div>
           )}
-        </>
+
+        </div>
       </div>
     </MotionConfig>
   )

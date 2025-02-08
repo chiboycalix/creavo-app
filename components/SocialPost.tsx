@@ -28,7 +28,7 @@ export default function SocialPost({ post }: { post: any }) {
     "bikersof", "bikerchick"]
 
   return (
-    <div className="flex items-start gap-2 w-full md:max-w-xl mx-auto">
+    <div className="flex items-start gap-2 w-full md:max-w-xl mx-auto ">
       {/* Main Post Container */}
       <div className="bg-black text-white rounded-xl overflow-hidden flex-grow">
         <div className="relative">
