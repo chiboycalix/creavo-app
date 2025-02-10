@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 const ProfileCompletionManager = () => {
   const { currentUser } = useAuth();
   const [showAlert, setShowAlert] = useState(false);
-  console.log({ currentUser })
+
   useEffect(() => {
     if (currentUser && !currentUser.profileSetupCompleted) {
       setShowAlert(true);

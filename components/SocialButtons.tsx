@@ -12,13 +12,8 @@ const SocialButtons = () => {
 
   const handleGoogleLogin = async () => {
     setLoading(true)
-    // const account = new Account(client);
 
     try {
-      console.log('Initiating Google OAuth...')
-      console.log('Google OAuth session created')
-
-      // Fetch user data from backend after successful OAuth
       const response = await fetch(
         `${process.env.REACT_APP_BASEURL}/auth/google/userdata`,
         {
@@ -27,7 +22,6 @@ const SocialButtons = () => {
         }
       )
       const data = await response.json()
-      console.log('User Data:', data)
 
       // Save token and user info
       localStorage.setItem('accessToken', data.token)

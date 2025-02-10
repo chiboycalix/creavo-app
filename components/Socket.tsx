@@ -27,34 +27,29 @@ const Socket: React.FC<SocketProps> = ({ username }) => {
 
         ws.on("auth_error", (error: string) => {
           setAlert(error);
-          console.log("WebSocket authentication error:", error);
         });
 
         ws.on("suggested_username_response", (response: WebSocketResponse) => {
           setResponse(response);
           setLoading(false);
-          console.log("Suggested usernames from DB:", response);
           setSuggestedUsernames(response.data || []);
         });
 
         ws.on("connect_error", (error) => {
           setAlert(`${error}`);
           setLoading(false);
-          console.log("WebSocket connection error:", error);
         });
       }
     } catch (error) {
-      console.log("WebSocket error:", error);
       setAlert(String(error));
       setLoading(false);
     }
   }, [ws]);
 
   useEffect(() => {
-    console.log("WebSocket username:", username);
     if (wsRef.current && username.length > 0) {
       setLoading(true);
-      wsRef.current.emit("suggest_username_request", username, () => {});
+      wsRef.current.emit("suggest_username_request", username, () => { });
     }
   }, [username]);
 

@@ -68,7 +68,6 @@ export const ScreenSharePlayer: React.FC<ScreenSharePlayerProps> = ({
     if (node) {
       videoRef.current = node;
       if (videoTrack) {
-        console.log("Playing video track after setting ref...");
         videoTrack.play(node);
       }
     }

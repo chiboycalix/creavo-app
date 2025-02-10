@@ -72,7 +72,6 @@ const ParticipantList = ({ allParticipants }: any) => {
                           <button
                             className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
                             onClick={() => {
-                              console.log("Remove clicked");
                             }}
                           >
                             <UserRoundPlus className="w-4 h-4" />

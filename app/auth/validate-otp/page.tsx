@@ -31,7 +31,7 @@ export default function OtpContent() {
       const data = (await AUTH_API.validateOTP({
         token: otp
       })) as any;
-      console.log({ data }, "datasss")
+
       if (data.code === 200) {
         setAlert(data.message);
         setAuth(true, data.data, data.data.token);
@@ -40,7 +40,6 @@ export default function OtpContent() {
         setAlert(data.message);
       }
     } catch (error: any) {
-      console.log({ error }, "Error")
       setAlert(String(error.message));
     } finally {
       setIsVerifyingOtp(false)

@@ -25,7 +25,6 @@ export default function PostModalWrapper() {
           const res = await fetchPostDetail(parsedId);
           setPostDetail(res);
         } else {
-          console.log("Invalid ID:", id);
         }
       }
     };

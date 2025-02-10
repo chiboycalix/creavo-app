@@ -126,7 +126,6 @@ const NotificationsPopover = () => {
 
   useEffect(() => {
     if (ws) {
-      console.log("WebSocket initialized, setting up listeners...");
       ws.on("notification", handleNotification);
     }
   }, [ws]);

@@ -25,10 +25,8 @@ export default function Upload() {
       setMediaFiles(files);
       setStep(step + 1);
       setShowPostModal(true);
-      console.log("Media files:", files);
-      console.log("Step:", step, showCourseModal);
     },
-    [step, showCourseModal]
+    [step]
   );
 
   const handleBack = () => {

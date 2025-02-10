@@ -37,7 +37,6 @@ const EditPostModal = ({ post, onClose }: EditPostModalProps) => {
       setTitle(postData?.title || '')
       setBody(postData?.body || '')
     } catch (error) {
-      console.log('Error fetching post data:', error)
       setError(true)
     }
   }, [post])

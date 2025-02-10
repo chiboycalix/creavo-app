@@ -220,7 +220,6 @@ export function VideoConferencingProvider({
   );
 
   const handleMeetingHostAndCohost = useCallback(() => {
-    console.log('meeting ', meetingRoomData)
     if (meetingRoomData && currentUser) {
       const isHost = meetingRoomData?.room?.roomSubscribers?.some(
         (user: { isOwner: boolean; userId: string }) => user.isOwner && user?.userId === currentUser?.id
@@ -303,7 +302,6 @@ export function VideoConferencingProvider({
           break;
 
         case "give-cohost":
-          console.log("co host granted to user");
           handleMeetingHostAndCohost();
           break;
 
@@ -328,7 +326,6 @@ export function VideoConferencingProvider({
                 updateRemoteParticipant(uid, {
                   audioEnabled: false
                 });
-                console.log("Audio muted by host/co-host");
               }
             } catch (error) {
               console.error("Error handling forced mute:", error);
@@ -364,7 +361,6 @@ export function VideoConferencingProvider({
       });
 
       await rtmClient.sendMessageToPeer({ text: muteMessage }, uid);
-      console.log(`Sent mute request to ${uid}`);
     } catch (error) {
       console.error("Error processing RTM message:", error);
       console.error("Error sending mute request:", error);

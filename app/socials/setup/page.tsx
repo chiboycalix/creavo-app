@@ -23,7 +23,6 @@ const ProfileSetup = () => {
   const { getAuth, getCurrentUser, setAuth } = useAuth();
   const user = getCurrentUser();
   const router = useRouter();
-  // const [user, setUser] = useState<any>({});
   const [firstName, setFirstName] = useState<string>(user?.profile?.firstName || "");
   const [lastName, setLastName] = useState<string>(user?.profile?.lastName || "");
   const [bio, setBio] = useState<string>(user?.profile?.bio || "");
@@ -36,14 +35,10 @@ const ProfileSetup = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    // setUser(user);
-    console.log(user)
     if (!getAuth()) router.push("/auth");
-    // if (user?.profileSetupCompleted) router.push("/");
   }, [getAuth, router, user]);
 
 
-  // Trigger file input for profile image
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
@@ -86,7 +81,6 @@ const ProfileSetup = () => {
       const result = await response.json();
       return result.secure_url;
     } catch (error) {
-      console.log("Image upload error:", error);
       setAlert("Failed to upload image");
     }
   };
@@ -127,7 +121,6 @@ const ProfileSetup = () => {
         router.push(ROUTES.SELECT_INTERESTS);
       }
     } catch (error) {
-      console.log("Profile update error:", error);
       setAlert("Failed to update profile");
       setLoading(false);
     }

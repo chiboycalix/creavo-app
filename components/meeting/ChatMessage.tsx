@@ -15,7 +15,6 @@ interface ChatMessageProps {
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
-  console.log({ message })
   return (
     <div className={cn(
       "flex gap-3",
