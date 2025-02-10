@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Check } from "lucide-react";
 import { baseUrl } from "@/utils/constant";
+import { useWebSocket } from "@/context/WebSocket";
 interface FollowButtonProps {
   followedId: number | string;
   avatar: string;
@@ -14,6 +15,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
   const { getAuth } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const ws = useWebSocket();
 
   // Fetch initial follow status
   const { data: followStatus } = useQuery({
@@ -39,7 +41,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
   const followMutation = useMutation({
     mutationFn: async () => {
       if (!getAuth()) {
-        router.push("/auth");
+        router.push("/auth?tab=signin");
         return;
       }
 
@@ -53,7 +55,16 @@ const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
       });
 
       if (!response.ok) throw new Error("Failed to follow the user");
-      return response.json();
+      const result = await response.json();
+      console.log({ ws })
+      if (ws && ws.connected) {
+        const request = { userId: followedId, notificationId: result.data.id };
+        console.log({ request, ws })
+        ws.emit("follow", request);
+      } else {
+        console.error("Failed to follow user", followedId);
+      }
+      return result;
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['followStatus', followedId] });
@@ -66,7 +77,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
       queryClient.setQueryData(['followStatus', followedId], {
         data: { followed: true },
       });
-      queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] });
+      queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] })
     },
   });
 

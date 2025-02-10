@@ -174,7 +174,7 @@ export const PostProvider = ({ children }: PostProviderProps) => {
         post.id === postId
           ? {
             ...post,
-            mediaResource: post.mediaResource.map(
+            mediaResource: post?.mediaResource?.map(
               (media: PostMediaType, index) =>
                 index === 0
                   ? {

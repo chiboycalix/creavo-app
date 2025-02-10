@@ -1,94 +1,116 @@
 import { baseUrl } from "@/utils/constant";
-import React from 'react';
-import { Heart } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import Cookies from 'js-cookie';
+import React from "react";
+import { Heart } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Cookies from "js-cookie";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 interface Post {
-  id: string;
-  likes: number;
+  id: number;
+  metadata: {
+    likesCount: number;
+  };
   isLiked: boolean;
 }
 
 interface LikeButtonProps {
-  postId: string;
-  initialLikes: number;
-  initiallyLiked: boolean;
+  postId: number;
 }
 
-const LikeButton: React.FC<LikeButtonProps> = ({
-  postId,
-  initialLikes,
-  initiallyLiked,
-}) => {
+const LikeButton: React.FC<LikeButtonProps> = ({ postId }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
-  const [currentState, setCurrentState] = React.useState({
-    likes: initialLikes,
-    isLiked: initiallyLiked,
+
+  const { data: post, isLoading } = useQuery<Post>({
+    queryKey: ["post", postId],
+    queryFn: async () => {
+      // First check if we have cached data
+      const cachedData = queryClient.getQueryData<Post>(["post", postId]);
+
+      const response = await fetch(`${baseUrl}/posts/${postId}`);
+      if (!response.ok) throw new Error("Failed to fetch post data");
+      const data = await response.json();
+
+      // If we have cached data, use its isLiked state
+      if (cachedData) {
+        return {
+          ...data.data,
+          isLiked: cachedData.isLiked
+        };
+      }
+
+      // Otherwise use the server response
+      return {
+        ...data.data,
+        isLiked: Boolean(data.data.isLiked)
+      };
+    },
+    staleTime: Infinity, // Keep the data fresh indefinitely
+    gcTime: Infinity,    // Never garbage collect (previously cacheTime)
   });
 
-  const toggleLike = async () => {
-    const response = await fetch(`${baseUrl}/posts/${postId}/toggle-like`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Cookies.get("accessToken")}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to toggle like');
-    }
-
-    return response.json();
-  };
-
   const toggleMutation = useMutation({
-    mutationFn: toggleLike,
-    onMutate: async () => {
-      // Cancel any outgoing refetches to avoid overwriting our optimistic update
-      await queryClient.cancelQueries({ queryKey: ['post', postId] });
+    mutationFn: async () => {
+      const response = await fetch(`${baseUrl}/posts/${postId}/toggle-like`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
+      });
 
-      // Get the current state
-      const previousState = {
-        likes: currentState.likes,
-        isLiked: currentState.isLiked,
-      };
-
-      // Calculate new state
-      const newState = {
-        likes: previousState.isLiked ? previousState.likes - 1 : previousState.likes + 1,
-        isLiked: !previousState.isLiked,
-      };
-
-      // Update local state
-      setCurrentState(newState);
-
-      // Update cache if it exists
-      queryClient.setQueryData<Post>(['post', postId], (old) =>
-        old ? { ...old, ...newState } : { id: postId, ...newState }
-      );
-
-      return { previousState };
+      if (!response.ok) throw new Error("Failed to toggle like");
+      const data = await response.json();
+      return data;
     },
-    onError: (err, variables, context) => {
-      if (context) {
-        // Revert local state
-        setCurrentState(context.previousState);
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["post", postId] });
+      const previousPost = queryClient.getQueryData<Post>(["post", postId]);
 
-        // Revert cache if it exists
-        queryClient.setQueryData<Post>(['post', postId], (old) =>
-          old ? { ...old, ...context.previousState } : { id: postId, ...context.previousState }
-        );
+      if (previousPost) {
+        const newPost = {
+          ...previousPost,
+          isLiked: !previousPost.isLiked,
+          metadata: {
+            ...previousPost.metadata,
+            likesCount: previousPost.metadata.likesCount + (previousPost.isLiked ? -1 : 1),
+          },
+        };
+
+        // Update the cache with the new state
+        queryClient.setQueryData(["post", postId], newPost);
+      }
+
+      return { previousPost };
+    },
+    onSuccess: (responseData, _, context) => {
+      const previousPost = context?.previousPost;
+      if (previousPost) {
+        const updatedPost = {
+          ...previousPost,
+          isLiked: !previousPost.isLiked,
+          metadata: {
+            ...previousPost.metadata,
+            likesCount: responseData.data.metadata.likesCount,
+          },
+        };
+
+        // Persist the updated state in cache
+        queryClient.setQueryData(["post", postId], updatedPost);
+
+        // Also update any queries that might contain this post
+        queryClient.invalidateQueries({
+          queryKey: ["posts"], // If you have a posts list query
+          exact: false,
+        });
       }
     },
-    onSettled: () => {
-      // Refetch to ensure server state
-      queryClient.invalidateQueries({ queryKey: ['post', postId] });
+    onError: (_, __, context) => {
+      if (context?.previousPost) {
+        queryClient.setQueryData(["post", postId], context.previousPost);
+      }
     },
   });
 
@@ -100,20 +122,29 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     toggleMutation.mutate();
   };
 
+  if (isLoading || !post) {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <Heart className="w-6 h-6 stroke-gray-500" />
+        <span className="text-xs font-semibold">0</span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-2">
       <button
         onClick={handleLikeClick}
         disabled={toggleMutation.isPending}
         className="flex items-center focus:outline-none"
-        aria-label={currentState.isLiked ? "Unlike post" : "Like post"}
+        aria-label={post.isLiked ? "Unlike post" : "Like post"}
       >
         <Heart
-          className={`w-6 h-6 transition-colors duration-200 ${currentState.isLiked ? 'fill-red-500 stroke-red-500' : 'sm:fill-gray-500 sm:text-gray-500 fill-white text-white'
+          className={`w-6 h-6 transition-colors duration-200 ${post.isLiked ? "fill-red-500 stroke-red-500" : "md:fill-gray-500 md:stroke-gray-500 fill-white stroke-white"
             }`}
         />
       </button>
-      <span className="text-xs sm:text-gray-800 text-white font-semibold">{currentState.likes}</span>
+      <span className="text-xs font-semibold">{post.metadata.likesCount}</span>
     </div>
   );
 };

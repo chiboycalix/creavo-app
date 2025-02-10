@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Bell, X } from 'lucide-react';
 import {
@@ -8,7 +8,10 @@ import {
 } from "@/components/ui/popover"
 import Input from '../ui/Input';
 import Image from 'next/image';
-import { NotificationGif } from '@/public/assets';
+import { NotificationGif, ProfileIcon } from '@/public/assets';
+import { useWebSocket } from '@/context/WebSocket';
+import { NotificationGroup } from './NotificationGroup';
+import { NotificationItem } from './NotificationItem';
 
 
 const fetchNotifications = async () => {
@@ -21,6 +24,7 @@ const fetchNotifications = async () => {
 
 const NotificationsPopover = () => {
   const [open, setOpen] = React.useState(false);
+  const ws = useWebSocket();
 
   // const { data: notifications, isPending: isLoading, error } = useQuery({
   //   queryKey: ['notifications'],
@@ -30,26 +34,114 @@ const NotificationsPopover = () => {
   // });
 
   const [loading, setLoading] = useState(false)
-  const notif = {
-    items: [
-      // {
-      //   id: 1,
-      //   message: "First notification",
-      //   timestamp: "202210-12"
-      // }
+  const notifications = {
+    today: [
+      {
+        id: '1',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy Edibo',
+        action: 'liked your post',
+        timestamp: '5mins ago'
+      },
+      {
+        id: '2',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy ademola',
+        action: 'started following you',
+        timestamp: '15mins ago',
+        isFollowing: false
+      },
+      {
+        id: '3',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy ademola',
+        action: 'started following you',
+        timestamp: '15mins ago',
+        isFollowing: false
+      }
     ],
-    unreadCount: 0
-  }
+    thisWeek: [
+      {
+        id: '1',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy Edibo',
+        action: 'liked your post',
+        timestamp: '5mins ago'
+      },
+      {
+        id: '2',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy ademola',
+        action: 'started following you',
+        timestamp: '15mins ago',
+        isFollowing: false
+      },
+      {
+        id: '3',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy ademola',
+        action: 'started following you',
+        timestamp: '15mins ago',
+        isFollowing: false
+      }
+    ],
+    thisMonth: [
+      {
+        id: '1',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy Edibo',
+        action: 'liked your post',
+        timestamp: '5mins ago'
+      },
+      {
+        id: '2',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy ademola',
+        action: 'started following you',
+        timestamp: '15mins ago',
+        isFollowing: false
+      },
+      {
+        id: '3',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy ademola',
+        action: 'started following you',
+        timestamp: '15mins ago',
+        isFollowing: false
+      },
+      {
+        id: '4',
+        userImage: "/assets/Pupil.png",
+        userName: 'Timothy ademola',
+        action: 'started following you',
+        timestamp: '15mins ago',
+        isFollowing: false
+      }
+    ]
+  } as any
+
+  const handleNotification = (data: any) => {
+    console.log("Received notification:", data);
+  };
+
+  useEffect(() => {
+    if (ws) {
+      console.log("WebSocket initialized, setting up listeners...");
+      ws.on("notification", handleNotification);
+    }
+  }, [ws]);
+
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className="relative p-2 rounded-full hover:bg-gray-100">
           <Bell className="h-6 w-6 text-gray-500" />
-          {notif?.unreadCount > 0 && (
+          {/* {notif?.unreadCount > 0 && (
             <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
               {notif.unreadCount}
             </span>
-          )}
+          )} */}
         </button>
       </PopoverTrigger>
 
@@ -82,7 +174,7 @@ const NotificationsPopover = () => {
           </div>
         </div>
 
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-[80vh] overflow-y-auto">
           {loading && (
             <div className="flex items-center justify-center py-4">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900" />
@@ -95,21 +187,7 @@ const NotificationsPopover = () => {
             </div>
           )} */}
 
-          {notif?.items?.map((notification: any) => (
-            <div
-              key={notification.id}
-              className="p-4 border-b border-gray-100 last:border-0"
-            >
-              <div className="text-sm">
-                {notification.message}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {new Date(notification.timestamp).toLocaleString()}
-              </div>
-            </div>
-          ))}
-
-          {notif?.items?.length === 0 && (
+          {notifications?.today?.length === 0 && (
             <div className="text-center text-gray-500 py-4 h-full items-center justify-center flex flex-col mt-28">
               <Image
                 src={NotificationGif}
@@ -119,6 +197,32 @@ const NotificationsPopover = () => {
               <p>There are no notifications at the moment.</p>
             </div>
           )}
+
+          <div className="min-h-[80vh] overflow-y-auto">
+            {notifications.today.length > 0 && (
+              <NotificationGroup title="Today">
+                {notifications.today.map((notification: any) => (
+                  <NotificationItem key={notification.id} {...notification} />
+                ))}
+              </NotificationGroup>
+            )}
+
+            {notifications.thisWeek.length > 0 && (
+              <NotificationGroup title="This Week">
+                {notifications.thisWeek.map((notification: any) => (
+                  <NotificationItem key={notification.id} {...notification} />
+                ))}
+              </NotificationGroup>
+            )}
+
+            {notifications.thisMonth.length > 0 && (
+              <NotificationGroup title="This Month">
+                {notifications.thisMonth.map((notification: any) => (
+                  <NotificationItem key={notification.id} {...notification} />
+                ))}
+              </NotificationGroup>
+            )}
+          </div>
         </div>
       </PopoverContent>
     </Popover>

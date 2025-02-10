@@ -206,7 +206,7 @@ const PostItem = ({ post }: PostItemType) => {
               aria-label="Share post"
             >
               <FaShareAlt className="text-xl text-gray-700" />
-              <span className="text-sm">{post.metadata.shareCount}</span>
+              <span className="text-sm">{post?.metadata?.shareCount}</span>
             </Popover.Button>
             <Popover.Panel
               className="absolute z-10 bottom-full right-0 mb-2 transition-all duration-500 ease-in-out bg-gray-50 shadow-md rounded px-2 py-2.5 w-48"

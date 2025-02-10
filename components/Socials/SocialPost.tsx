@@ -22,7 +22,8 @@ export default function SocialPost({ post }: { post: any }) {
   const { getCurrentUser } = useAuth();
   const currId = getCurrentUser()?.id;
 
-  console.log({ post })
+  console.log({ currId })
+
   const tags = ["fyp", "biker", "bikergirlsof", "bikerboys",
     "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
     "bikergirlsof", "bikerboys", "bikerboysof",
@@ -32,8 +33,6 @@ export default function SocialPost({ post }: { post: any }) {
     {
       icon: <LikeButton
         postId={post.id}
-        initialLikes={post?.metadata?.likesCount || 0}
-        initiallyLiked={false}
       />,
     },
     { icon: <ChatBubbleOvalLeftEllipsisIcon className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: "2156k" },
@@ -41,7 +40,7 @@ export default function SocialPost({ post }: { post: any }) {
     { icon: <VscEye className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: post?.mediaResource?.[0]?.metadata?.viewsCount || 0 },
     { icon: <RiShareForwardFill className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: "202.2K" },
   ]
-
+  console.log({ post })
   return (
     <div className="flex items-start gap-2 w-full md:max-w-xl mx-auto ">
       {/* Main Post Container */}
@@ -130,7 +129,6 @@ export default function SocialPost({ post }: { post: any }) {
               avatar={post?.avatar}
             />
           }
-
 
           {metrics.map((metric, index) => (
             <div key={index} className="flex flex-col items-center mb-4">

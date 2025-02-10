@@ -69,5 +69,5 @@ export const useWebSocket = (): Socket | null => {
     throw new Error("useWebSocket must be used within a WebSocketProvider");
   }
 
-  return context.ws;
+  return context?.ws ?? null;
 };
