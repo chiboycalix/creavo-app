@@ -22,29 +22,19 @@ const ParticipantList = ({ allParticipants }: any) => {
     muteRemoteUser,
     setUserIsCoHost,
     fetchMeetingRoomData,
+    sendCoHostPermission,
   } = useVideoConferencing();
   const { getCurrentUser } = useAuth();
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchMeetingRoomData();
-      await handleMeetingHostAndCohost();
-    };
-
-    fetchData();
-  }, [fetchMeetingRoomData, allParticipants, handleMeetingHostAndCohost]);
-
-  useEffect(() => {
+    fetchMeetingRoomData();
     setUserIsCoHost(userIsCoHost);
-  }, [ userIsCoHost, setUserIsCoHost]);
+  }, [userIsCoHost]);
 
   return (
     <div className="space-y-4">
       {[...allParticipants]?.map((applicant, index) => {
         const hasRaisedHand = raisedHands[applicant.uid];
-        console.log(applicant.id);
-        console.log(getCurrentUser()?.id);
-
         return (
           <div key={index} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -84,8 +74,7 @@ const ParticipantList = ({ allParticipants }: any) => {
                         {userIsHost && (
                           <button
                             className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
-                            onClick={() => {
-                            }}
+                            onClick={() => sendCoHostPermission(applicant?.uid)}
                           >
                             <UserRoundPlus className="w-4 h-4" />
                             <span>Make Co-host</span>
