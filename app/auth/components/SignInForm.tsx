@@ -56,7 +56,7 @@ export default function SignInForm() {
         );
         return;
       }
-      if (error.message === "Your account has not been verified. Check email for otp") {
+      if (error.data[0] === "Your account has not been verified. Check email for otp") {
         router.push(`${ROUTES.VALIDATE_OTP(email)}`);
         showToast(
           'error',

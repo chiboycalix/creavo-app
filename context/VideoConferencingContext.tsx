@@ -81,6 +81,7 @@ interface VideoConferencingContextContextType {
   isSharingScreen: any;
   userIsHost: boolean;
   userIsCoHost: boolean;
+  setUserIsCoHost: (isCoHost: boolean) => void;
   meetingRoomData: any;
   screenTrack: any;
   screenSharingUser: any;
@@ -95,6 +96,7 @@ interface VideoConferencingContextContextType {
   sendCoHostPermission: (message: string, uid: any) => Promise<void>;
   sendChatMessage: (content: string, type: "text" | "emoji") => Promise<void>;
   muteRemoteUser: (uid: any) => void;
+  fetchMeetingRoomData: ()=> void;
 }
 
 let rtcClient: IAgoraRTCClient;
@@ -1698,6 +1700,7 @@ export function VideoConferencingProvider({
         handleEndScreenShare,
         userIsHost,
         userIsCoHost,
+        setUserIsCoHost,
         meetingRoomData,
         screenTrack,
         isSharingScreen,
@@ -1713,7 +1716,8 @@ export function VideoConferencingProvider({
         rtcScreenShareOptions,
         handleMeetingHostAndCohost,
         sendCoHostPermission,
-        muteRemoteUser
+        muteRemoteUser,
+        fetchMeetingRoomData,
       }}>
       {children}
     </VideoConferencingContext.Provider>

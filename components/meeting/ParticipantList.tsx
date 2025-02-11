@@ -19,18 +19,31 @@ const ParticipantList = ({ allParticipants }: any) => {
     userIsCoHost,
     userIsHost,
     handleMeetingHostAndCohost,
-    muteRemoteUser
+    muteRemoteUser,
+    setUserIsCoHost,
+    fetchMeetingRoomData,
   } = useVideoConferencing();
   const { getCurrentUser } = useAuth();
 
   useEffect(() => {
-    handleMeetingHostAndCohost();
-  }, [allParticipants, handleMeetingHostAndCohost]);
+    const fetchData = async () => {
+      await fetchMeetingRoomData();
+      await handleMeetingHostAndCohost();
+    };
+
+    fetchData();
+  }, [fetchMeetingRoomData, allParticipants, handleMeetingHostAndCohost]);
+
+  useEffect(() => {
+    setUserIsCoHost(userIsCoHost);
+  }, [ userIsCoHost, setUserIsCoHost]);
 
   return (
     <div className="space-y-4">
       {[...allParticipants]?.map((applicant, index) => {
         const hasRaisedHand = raisedHands[applicant.uid];
+        console.log(applicant.id);
+        console.log(getCurrentUser()?.id);
 
         return (
           <div key={index} className="flex items-center justify-between">
