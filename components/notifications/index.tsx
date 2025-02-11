@@ -24,6 +24,7 @@ const fetchNotifications = async () => {
 
 const NotificationsPopover = () => {
   const [open, setOpen] = React.useState(false);
+  const [notification, setNotifications] = useState([])
   const ws = useWebSocket();
 
   // const { data: notifications, isPending: isLoading, error } = useQuery({
@@ -121,6 +122,10 @@ const NotificationsPopover = () => {
   } as any
 
   const handleNotification = (data: any) => {
+    setNotifications(prevUser => ({
+      ...prevUser,
+      data
+    }));
     console.log("Received notification:", data);
   };
 
@@ -129,7 +134,7 @@ const NotificationsPopover = () => {
       ws.on("notification", handleNotification);
     }
   }, [ws]);
-
+  console.log({ notification })
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

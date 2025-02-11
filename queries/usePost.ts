@@ -8,14 +8,15 @@ export const useFetchPosts = () => {
     queryKey: ["posts"],
     queryFn: async () => {
       const response = await fetch(
-        `${baseUrl}/posts?page=1&limit=20`,
+        `${baseUrl}/posts?page=1&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
           },
         }
       );
-      return response.json();
+      const result = await response.json();
+      return result
     }
   });
 }

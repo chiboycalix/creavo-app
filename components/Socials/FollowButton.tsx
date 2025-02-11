@@ -1,43 +1,44 @@
 import React from "react";
+import Cookies from "js-cookie";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Check } from "lucide-react";
 import { baseUrl } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
+
 interface FollowButtonProps {
   followedId: number | string;
   avatar: string;
+  initialFollowStatus?: boolean;
 }
 
-const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
+const FollowButton: React.FC<FollowButtonProps> = ({
+  followedId,
+  avatar,
+}) => {
   const { getAuth } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
   const ws = useWebSocket();
 
-  // Fetch initial follow status
   const { data: followStatus } = useQuery({
     queryKey: ['followStatus', followedId],
     queryFn: async () => {
       if (!getAuth()) return { data: { followed: false } };
 
       const response = await fetch(`${baseUrl}/users/${followedId}/follows/status`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${Cookies.get("accessToken")}`,
-        },
+        headers: { Authorization: `Bearer ${Cookies.get("accessToken")}` },
       });
 
+      if (!response.ok) throw new Error("Failed to fetch follow status");
       return response.json();
     },
     enabled: !!getAuth(),
-    staleTime: 1000 * 30, // Refetch only if older than 30 sec
-    refetchInterval: 5000, // ✅ Auto-sync every 5 sec
+    staleTime: 0,
+    placeholderData: (prev) => prev || { data: { followed: false } }, // Prevent flicker
   });
 
-  // Follow mutation
   const followMutation = useMutation({
     mutationFn: async () => {
       if (!getAuth()) {
@@ -56,10 +57,8 @@ const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
 
       if (!response.ok) throw new Error("Failed to follow the user");
       const result = await response.json();
-      console.log({ ws })
       if (ws && ws.connected) {
         const request = { userId: followedId, notificationId: result.data.id };
-        console.log({ request, ws })
         ws.emit("follow", request);
       } else {
         console.error("Failed to follow user", followedId);
@@ -69,19 +68,31 @@ const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['followStatus', followedId] });
 
-      queryClient.setQueryData(['followStatus', followedId], {
-        data: { followed: true },
+      const previousStatus = queryClient.getQueryData(['followStatus', followedId]);
+
+      queryClient.setQueryData(['followStatus', followedId], { data: { followed: true } });
+
+      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
+        if (!oldData?.data?.posts) return oldData;
+
+        const updatedPosts = oldData.data.posts.map((post: any) =>
+          post.userId === followedId ? { ...post, followed: true } : post
+        );
+
+        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
       });
+
+      return { previousStatus };
     },
-    onSuccess: () => {
-      queryClient.setQueryData(['followStatus', followedId], {
-        data: { followed: true },
-      });
-      queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] })
+    onError: (_, __, context) => {
+      queryClient.setQueryData(['followStatus', followedId], context?.previousStatus);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] });
     },
   });
 
-  // Unfollow mutation
+
   const unfollowMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`${baseUrl}/users/${followedId}/unfollow`, {
@@ -98,26 +109,35 @@ const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['followStatus', followedId] });
 
-      queryClient.setQueryData(['followStatus', followedId], {
-        data: { followed: false },
-      });
-    },
-    onSuccess: () => {
-      queryClient.setQueryData(['followStatus', followedId], {
-        data: { followed: false },
+      const previousStatus = queryClient.getQueryData(['followStatus', followedId]);
+
+      queryClient.setQueryData(['followStatus', followedId], { data: { followed: false } });
+
+      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
+        if (!oldData?.data?.posts) return oldData;
+
+        const updatedPosts = oldData.data.posts.map((post: any) =>
+          post.userId === followedId ? { ...post, followed: false } : post
+        );
+
+        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
       });
 
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] });
-      }, 3000); // ✅ Delay re-fetch by 3 seconds
+      return { previousStatus };
+    },
+    onError: (_, __, context) => {
+      queryClient.setQueryData(['followStatus', followedId], context?.previousStatus);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] });
     },
   });
 
-  const isFollowing = followStatus?.data?.followed;
+  const isFollowing = followStatus?.data?.followed ?? false;
 
   const handleToggleFollow = () => {
     if (!getAuth()) {
-      router.push("/auth?tab=signin"); // Redirect to login page if not authenticated
+      router.push("/auth?tab=signin");
       return;
     }
 
@@ -128,18 +148,17 @@ const FollowButton: React.FC<FollowButtonProps> = ({ followedId, avatar }) => {
     }
   };
 
-
   return (
     <div className="relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center mb-6">
       <img
         src={avatar}
         alt="Post author"
-        className="w-10 h-10 rounded-full"
+        className="w-12 h-10 object-cover rounded-full"
       />
       <button
         onClick={handleToggleFollow}
         aria-label={isFollowing ? "Unfollow this user" : "Follow this user"}
-        className="bg-primary-700 absolute -bottom-3 left-2 rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 hover:bg-primary-800"
+        className="bg-primary-700 absolute -bottom-3 left-2 rounded-full w-4 h-4 flex items-center justify-center transition-all duration-200 hover:bg-primary-800"
       >
         {isFollowing ? (
           <Check className="text-sm text-white w-5 h-5" />

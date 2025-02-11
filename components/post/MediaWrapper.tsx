@@ -28,10 +28,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
   const { updateViewsCount } = usePost()
   const { isGloballyPaused, setIsGloballyPaused } = useVideoPlayback()
 
-  const isImage =
-    (postMedia &&
-      /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(postMedia[0]?.url || '')) ||
-    (postMedia && postMedia[0]?.mimeType === 'image/*')
+  const isImage = (postMedia && (postMedia && postMedia[0]?.mimeType === 'image/jpeg'))
 
   const togglePlay = () => {
     if (videoRef.current) {

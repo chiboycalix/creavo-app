@@ -1,17 +1,14 @@
 import type React from "react"
-import { Button } from "@/components/ui/button"
-import { ChevronDown, ChevronUp, PlusCircle } from "lucide-react"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import MediaWrapper from "../post/MediaWrapper"
 import { useState } from "react"
-import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon, PlusIcon } from "@heroicons/react/24/solid"
-import { FaCirclePlus } from "react-icons/fa6";
-import { RiShareForwardFill, RiUserFollowFill } from "react-icons/ri";
+import { ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon } from "@heroicons/react/24/solid"
+import { RiShareForwardFill } from "react-icons/ri";
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
-import { usePost } from "@/context/PostContext"
-import { useRouter } from "next/navigation"
 import LikeButton from "./LikeButton"
 import FollowButton from "./FollowButton"
+import { useComments } from "@/context/CommentsContext"
 interface SocialMetric {
   icon: React.ReactNode
   count?: string
@@ -19,11 +16,9 @@ interface SocialMetric {
 
 export default function SocialPost({ post }: { post: any }) {
   const [showAllTags, setShowAllTags] = useState(false)
+  const { isOpen, toggle } = useComments()
   const { getCurrentUser } = useAuth();
   const currId = getCurrentUser()?.id;
-
-  console.log({ currId })
-
   const tags = ["fyp", "biker", "bikergirlsof", "bikerboys",
     "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
     "bikergirlsof", "bikerboys", "bikerboysof",
@@ -33,16 +28,25 @@ export default function SocialPost({ post }: { post: any }) {
     {
       icon: <LikeButton
         postId={post.id}
+        initialLikesCount={post.likesCount}
+        initialIsLiked={post?.liked || false}
       />,
     },
-    { icon: <ChatBubbleOvalLeftEllipsisIcon className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: "2156k" },
-    { icon: <BookmarkIcon className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: "188.9K" },
-    { icon: <VscEye className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: post?.mediaResource?.[0]?.metadata?.viewsCount || 0 },
-    { icon: <RiShareForwardFill className="w-6 h-6 text-white sm:text-[#BFBFBF]" />, count: "202.2K" },
+    {
+      icon: <ChatBubbleOvalLeftEllipsisIcon
+        onClick={toggle}
+        className="w-8 h-8 text-white sm:text-[#BFBFBF]" />,
+      count: post?.commentsCount
+    },
+    {
+      icon: <BookmarkIcon className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.bookmarkCount
+    },
+    { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
+    { icon: <RiShareForwardFill className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.sharesCount },
   ]
-  console.log({ post })
+
   return (
-    <div className="flex items-start gap-2 w-full md:max-w-xl mx-auto ">
+    <div className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full">
       {/* Main Post Container */}
       <div className="bg-black text-white rounded-xl overflow-hidden flex-grow">
         <div className="relative">
@@ -52,16 +56,17 @@ export default function SocialPost({ post }: { post: any }) {
               postId={post.id}
               title={post.title}
               size="object-cover"
-              postMedia={post.mediaResource}
+              postMedia={post.media}
             />
           </div>
 
           {/* Metrics - Mobile & Tablet */}
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
             {
-              post.userId !== currId && <FollowButton
-                followedId={post.userId}
-                avatar={post?.avatar}
+              Number(post.userId) !== currId && <FollowButton
+                followedId={post?.userId}
+                avatar={"/assets/display.jpg"}
+                initialFollowStatus={post?.followed}
               />
             }
             {metrics.map((metric, index) => (
@@ -86,7 +91,6 @@ export default function SocialPost({ post }: { post: any }) {
                   <div className={`flex flex-wrap gap-2 mt-1 ${!showAllTags && 'max-h-[1.6rem]'} overflow-hidden transition-all duration-300`}>
                     <div>
                       <p className="text-xs leading-6">{post.body}</p>
-                      {/* <p className="text-xs leading-6">It looks like the click handler on the dots might not be properly attached due to incomplete or misplaced JSX. Here’s how you can fix it:</p> */}
                     </div>
                     {tags.map((tag, index) => (
                       <span key={index} className="text-gray-400 text-xs leading-6">
@@ -118,15 +122,14 @@ export default function SocialPost({ post }: { post: any }) {
       </div>
 
       {/* Metrics - Desktop */}
-      <div className="hidden lg:flex flex-col gap-4 h-full justify-between pb-4">
-        <div className="basis-11/12">
-
-        </div>
+      <div className="hidden lg:flex flex-col gap-4 h-full justify-between">
         <div className="flex-1 relative z-50">
           {
-            post.userId !== currId && <FollowButton
-              followedId={post.userId}
-              avatar={post?.avatar}
+            Number(post.userId) !== currId &&
+            <FollowButton
+              followedId={post?.userId}
+              avatar={"/assets/display.jpg"}
+              initialFollowStatus={post?.followed}
             />
           }
 

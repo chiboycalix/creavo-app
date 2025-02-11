@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
-import Link from 'next/link'
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[]
@@ -25,9 +25,7 @@ const GallerySlider = ({
   const [direction, setDirection] = useState(0)
   const images = galleryImgs?.length > 0 ? galleryImgs : []
 
-  const isImage = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(
-    galleryImgs[index]?.url || ''
-  )
+  const isImage = galleryImgs[index]?.mimeType === "image/jpeg"
 
   const changePhotoId = (newVal: number) => {
     if (newVal > index) {
@@ -54,7 +52,6 @@ const GallerySlider = ({
 
   const currentMedia = images[index]
 
-  // Prevent the code from breaking if galleryImgs is empty
   if (!images || images.length === 0) {
     return <div>No images to display.</div>
   }
