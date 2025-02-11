@@ -52,7 +52,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const notifications = []
 
   return (
-    <header className="bg-white fixed top-0 right-0 left-0 md:left-64 z-30 border-b">
+    <header className="bg-white fixed top-0 right-0 left-0 md:left-64 z-30">
       <div className="px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex h-16 justify-between items-center w-full gap-4">
           {/* Left Section with Menu Toggle and Search */}

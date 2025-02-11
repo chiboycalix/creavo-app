@@ -144,7 +144,6 @@ const LiveStreamInterface = () => {
   };
 
   const handleEmojiSelect = (emoji: string) => {
-    console.log("Selected emoji:", emoji);
   };
 
   return (

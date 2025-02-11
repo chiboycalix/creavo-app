@@ -52,8 +52,8 @@ export default function TopicSelection() {
   );
 
   useEffect(() => {
-    console.log("Selected Topics updated:", selectedTopics);
   }, [selectedTopics]);
+
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -117,11 +117,10 @@ export default function TopicSelection() {
                 <button
                   key={topic}
                   onClick={() => toggleTopic(topic)}
-                  className={`px-4 py-2 rounded-full shadow-sm text-sm ${
-                    selectedTopics?.includes(topic)
-                      ? "bg-[#37169C] text-white"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
+                  className={`px-4 py-2 rounded-full shadow-sm text-sm ${selectedTopics?.includes(topic)
+                    ? "bg-[#37169C] text-white"
+                    : "bg-gray-100 text-gray-800"
+                    }`}
                 >
                   {topic}
                 </button>

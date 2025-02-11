@@ -136,7 +136,6 @@ const PostDetailsInputModal = ({
     const uploadedMedia = await Promise.all(mediaUploads);
 
     saveToLocalStorage("cloudinaryMedia", uploadedMedia);
-    console.log("Saved to local storage", uploadedMedia);
     return uploadedMedia;
   };
 

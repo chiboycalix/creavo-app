@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
-import Link from 'next/link'
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[]
@@ -18,7 +17,6 @@ const GallerySlider = ({
   galleryImgs,
   className = '',
   imageClass = '',
-  ratioClass = 'aspect-w-4 aspect-h-3',
   galleryClass = 'rounded-xl',
   navigation = true,
 }: GallerySliderTypes) => {
@@ -27,9 +25,7 @@ const GallerySlider = ({
   const [direction, setDirection] = useState(0)
   const images = galleryImgs?.length > 0 ? galleryImgs : []
 
-  const isImage = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(
-    galleryImgs[index]?.url || ''
-  )
+  const isImage = galleryImgs[index]?.mimeType === "image/jpeg"
 
   const changePhotoId = (newVal: number) => {
     if (newVal > index) {
@@ -56,7 +52,6 @@ const GallerySlider = ({
 
   const currentMedia = images[index]
 
-  // Prevent the code from breaking if galleryImgs is empty
   if (!images || images.length === 0) {
     return <div>No images to display.</div>
   }
@@ -75,7 +70,7 @@ const GallerySlider = ({
         {/* Main image */}
         <div className={` h-full overflow-hidden ${galleryClass}`}>
           <Link
-            className={`relative flex items-center justify-center border-2 h-full ${ratioClass}`}
+            className={`relative flex items-center justify-center h-full `}
             href={''}
           >
             <AnimatePresence initial={false} custom={direction}>
@@ -92,14 +87,13 @@ const GallerySlider = ({
                   <img
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    className={`object-cover ${imageClass}`}
+                    className={`object-contain md:max-h-[87vh] h-[calc(87vh)]`}
                     onLoad={() => setLoaded(true)}
-                    sizes="(max-width: 1025px) 100vw, 300px"
                   />
                 ) : (
                   <video
                     src={currentMedia?.url || ''}
-                    className={`object-cover ${imageClass}`}
+                    className={`object-cover h-screen ${imageClass}`}
                     onLoad={() => setLoaded(true)}
                   />
                 )}
@@ -109,49 +103,22 @@ const GallerySlider = ({
         </div>
 
         {/* Buttons + bottom nav bar */}
-        <>
-          {/* Buttons */}
-          {loaded && navigation && (
-            <div className={`border-3 border-red-300`}>
-              {index > 0 && (
+        <div className=''>
+
+          {images.length > 1 && (
+            <div className="flex justify-center space-x-2 mt-4">
+              {images.map((_, i) => (
                 <button
-                  className="absolute w-8 h-8 left-3 top-[calc(50%-16px)] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-6000 dark:hover:border-neutral-500 rounded-full flex items-center justify-center hover:border-neutral-300 focus:outline-none"
-                  style={{ transform: 'translate3d(0, 0, 0)' }}
-                  onClick={() => changePhotoId(index - 1)}
-                >
-                  <ChevronLeftIcon className="h-4 w-4" />
-                </button>
-              )}
-              {index + 1 < images.length && (
-                <button
-                  className="absolute w-8 h-8 right-3 top-[calc(50%-16px)] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-6000 dark:hover:border-neutral-500 rounded-full flex items-center justify-center hover:border-neutral-300 focus:outline-none"
-                  style={{ transform: 'translate3d(0, 0, 0)' }}
-                  onClick={() => changePhotoId(index + 1)}
-                >
-                  <ChevronRightIcon className="h-4 w-4" />
-                </button>
-              )}
+                  key={i}
+                  className={`h-2 w-2 relative bottom-2 z-20 rounded-full ${i === index ? 'bg-primary-700' : 'bg-gray-400'
+                    }`}
+                  onClick={() => changePhotoId(i)}
+                />
+              ))}
             </div>
           )}
 
-          {/* Bottom Nav bar */}
-
-          {images.length > 1 && (
-            <>
-              <div className="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-neutral-900 opacity-50 rounded-b-lg"></div>
-              <div className="flex items-center justify-center absolute bottom-2 left-1/2 transform -translate-x-1/2 space-x-1.5">
-                {images?.map((_, i) => (
-                  <button
-                    className={`w-1.5 h-1.5 rounded-full ${i === index ? 'bg-white' : 'bg-white/60 '
-                      }`}
-                    onClick={() => changePhotoId(i)}
-                    key={i}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </>
+        </div>
       </div>
     </MotionConfig>
   )

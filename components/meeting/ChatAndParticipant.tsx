@@ -57,7 +57,6 @@ const ChatAndParticipant = ({ onClose, localUser, remoteParticipants }: {
   }
 
   const handleSelectEmoji = (emoji: string) => {
-    console.log({ emoji })
     setMessageInput(prev => prev + emoji);
   }
 

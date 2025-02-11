@@ -53,7 +53,6 @@ const SelectInterests = () => {
 
   // Use useEffect to observe state changes in selectedInterests
   useEffect(() => {
-    console.log("Selected Topics updated:", selectedInterests);
   }, [selectedInterests]); // Runs every time selectedInterests changes
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -85,7 +84,7 @@ const SelectInterests = () => {
       }
 
       setAlert(data.message);
-    //   setAuth(true, data.data);
+      //   setAuth(true, data.data);
 
       router.push("/");
     } catch (error) {
@@ -119,11 +118,10 @@ const SelectInterests = () => {
                 <button
                   key={topic}
                   onClick={() => toggleTopic(topic)}
-                  className={`px-4 py-2 rounded-full shadow-sm text-sm ${
-                    selectedInterests?.includes(topic)
+                  className={`px-4 py-2 rounded-full shadow-sm text-sm ${selectedInterests?.includes(topic)
                       ? "bg-[#37169C] text-white"
                       : "bg-gray-100 text-gray-800"
-                  }`}
+                    }`}
                 >
                   {topic}
                 </button>

@@ -1,5 +1,5 @@
 // GuestList.js
-import React, { useState} from "react";
+import React, { useState } from "react";
 
 interface Subscriber {
   userId: string;
@@ -14,7 +14,7 @@ interface GuestListProps {
 
 const GuestList: React.FC<GuestListProps> = ({ roomSubscribers }) => {
   const guests = roomSubscribers?.filter(subscriber => subscriber?.isCoHost === false && subscriber?.isOwner === false);
-   console.log('guests:', guests);
+
   return (
     <div>
       <ul>

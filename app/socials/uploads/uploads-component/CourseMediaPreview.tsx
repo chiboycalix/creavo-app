@@ -10,7 +10,6 @@ const CourseMediaPreview = ({
   file,
   iconSize = false,
 }: CourseMediaPreviewProps) => {
-  console.log(file)
   const sizeClass = iconSize ? 'w-20 h-20' : 'w-full h-full'
 
   return (

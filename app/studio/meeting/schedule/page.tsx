@@ -40,7 +40,6 @@ export default function Schedule() {
               label="Date"
               rightIcon={<BiCaretDown />}
               onDateSelect={(date) => {
-                console.log("Selected date:", date);
               }}
               selectedDate={new Date()}
               className="w-full"

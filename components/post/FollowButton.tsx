@@ -98,23 +98,22 @@ const FollowButton = ({ followedId }: FollowButtonProp) => {
         loading
           ? "Processing your request"
           : isFollowing === null
-          ? "Loading follow status"
-          : isFollowing
-          ? "Unfollow this user"
-          : "Follow this user"
+            ? "Loading follow status"
+            : isFollowing
+              ? "Unfollow this user"
+              : "Follow this user"
       }
       aria-pressed={isFollowing ?? undefined} // Fixed here
-      className={`bg-[#37169C] text-white px-4 py-2.5 text-sm rounded hover:bg-purple-700 ${
-        isFollowing ? "Following" : "Follow"
-      }`}
+      className={`bg-[#37169C] text-white px-4 py-2.5 text-sm rounded hover:bg-purple-700 ${isFollowing ? "Following" : "Follow"
+        }`}
     >
       {loading
         ? "Loading..."
         : isFollowing === null
-        ? "Follow"
-        : isFollowing
-        ? "Unfollow"
-        : "Follow"}
+          ? "Follow"
+          : isFollowing
+            ? "Unfollow"
+            : "Follow"}
     </button>
   );
 };

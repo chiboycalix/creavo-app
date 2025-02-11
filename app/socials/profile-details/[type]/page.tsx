@@ -26,14 +26,8 @@ const FollowModal = () => {
 
   const { type } = useParams() as { type: string }; // Ensure `type` is a string
 
-  // const baseUrl = process.env.NEXT_PUBLIC_BASEURL; // Use environment variables
-
   const fetchUsers = useCallback(async () => {
     if (!id || !type) return;
-
-    console.log("this is id", id)
-    console.log("this is type", type)
-
     setIsLoading(true);
     setError(null);
 

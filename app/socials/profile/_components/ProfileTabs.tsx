@@ -45,7 +45,6 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const [selectedTab, setSelectedTab] = useState(tabs.indexOf(initialTab));
 
   useEffect(() => {
-    console.log('post data', posts)
     const currentTab = searchParams.get("tab") as string;
     if (currentTab && tabs.includes(currentTab)) {
       setSelectedTab(tabs.indexOf(currentTab));
@@ -58,8 +57,6 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
     setSelectedTab(index);
   };
 
-  // const courses = courses;
-  // const posts = posts;
 
   return (
     <TabGroup selectedIndex={selectedTab} onChange={handleTabChange}>

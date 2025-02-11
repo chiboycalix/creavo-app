@@ -178,12 +178,10 @@ const CourseDetailsInputModal = ({
       }
 
       const courseData = await courseResponse?.json();
-      console.log("Course created:", courseData);
       localStorage.removeItem("uploadedMedia");
       setAlert(courseData?.data.message);
       router.push(`/courses`);
     } catch (error) {
-      console.log("Error uploading course:", error);
       setAlert("Failed to upload course");
     } finally {
       setLoading(false);
