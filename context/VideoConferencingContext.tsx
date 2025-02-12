@@ -807,7 +807,16 @@ export function VideoConferencingProvider({
     try {
       const [audioTrack, videoTrack] = await Promise.all([
         AgoraRTC.createMicrophoneAudioTrack({
-          encoderConfig: "music_standard",
+          // encoderConfig: "music_standard",
+          encoderConfig: {
+            sampleRate: 48000,
+            stereo: true,
+            bitrate: 128,
+          },
+          AEC: true,
+          ANS: true,
+          AGC: true,
+          
         }),
         AgoraRTC.createCameraVideoTrack(),
       ]);
