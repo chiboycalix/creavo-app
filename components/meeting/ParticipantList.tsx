@@ -18,13 +18,12 @@ const ParticipantList = ({ allParticipants }: any) => {
     raisedHands,
     userIsCoHost,
     userIsHost,
-    handleMeetingHostAndCohost,
     muteRemoteUser,
     setUserIsCoHost,
     fetchMeetingRoomData,
     sendCoHostPermission,
+    meetingConfig,
   } = useVideoConferencing();
-  const { getCurrentUser } = useAuth();
 
   useEffect(() => {
     fetchMeetingRoomData();
@@ -56,7 +55,7 @@ const ParticipantList = ({ allParticipants }: any) => {
             <div className="flex gap-1 items-center">
               {hasRaisedHand && <Hand className="text-white w-4 h-4" />}
 
-              {applicant.uid !== getCurrentUser()?.id &&
+              {applicant.uid !== meetingConfig?.uid &&
                 (userIsCoHost || userIsHost) && (
                   <Popover>
                     <PopoverTrigger asChild>

@@ -328,17 +328,8 @@ export function VideoConferencingProvider({
                 console.log("Before state update:", userIsCoHost);
 
                 // Update local participant state
+                fetchMeetingRoomData();
                 handleMeetingHostAndCohost();
-                setUserIsCoHost(true); // Ensure re-render
-                const confirmMessage = {
-                  type: "give-cohost",
-                  userIsCoHost: true,
-                  uid: meetingConfig.uid,
-                };
-
-                await sendRateLimitedMessage({
-                  text: JSON.stringify(confirmMessage),
-                });
 
                 updateRemoteParticipant(uid, {
                   userIsCoHost: true,
@@ -1683,9 +1674,11 @@ export function VideoConferencingProvider({
       }
       const data = await response.json();
       console.log("Cohost permission sent successfully:", data);
-      // Assuming you have an API endpoint to send host permissions
-      rtmChannel.sendMessage({
-        text: JSON.stringify({ command: "give-cohost", uid }),
+      await rtmChannel.sendMessage({
+        text: JSON.stringify({
+          type: "give-cohost",
+          uid,
+        }),
       });
       fetchMeetingRoomData();
     } catch (error) {
