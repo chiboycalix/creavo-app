@@ -12,6 +12,7 @@ import { NotificationGif, ProfileIcon } from '@/public/assets';
 import { useWebSocket } from '@/context/WebSocket';
 import { NotificationGroup } from './NotificationGroup';
 import { NotificationItem } from './NotificationItem';
+import { transformNotifications } from './notification';
 
 
 const fetchNotifications = async () => {
@@ -23,8 +24,11 @@ const fetchNotifications = async () => {
 };
 
 const NotificationsPopover = () => {
-  const [open, setOpen] = React.useState(false);
-  const [notification, setNotifications] = useState([])
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [open, setOpen] = useState<boolean>(false);
+
+
   const ws = useWebSocket();
 
   // const { data: notifications, isPending: isLoading, error } = useQuery({
@@ -34,120 +38,52 @@ const NotificationsPopover = () => {
   //   refetchOnWindowFocus: false,
   // });
 
-  const [loading, setLoading] = useState(false)
-  const notifications = {
-    today: [
-      {
-        id: '1',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy Edibo',
-        action: 'liked your post',
-        timestamp: '5mins ago'
-      },
-      {
-        id: '2',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy ademola',
-        action: 'started following you',
-        timestamp: '15mins ago',
-        isFollowing: false
-      },
-      {
-        id: '3',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy ademola',
-        action: 'started following you',
-        timestamp: '15mins ago',
-        isFollowing: false
-      }
-    ],
-    thisWeek: [
-      {
-        id: '1',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy Edibo',
-        action: 'liked your post',
-        timestamp: '5mins ago'
-      },
-      {
-        id: '2',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy ademola',
-        action: 'started following you',
-        timestamp: '15mins ago',
-        isFollowing: false
-      },
-      {
-        id: '3',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy ademola',
-        action: 'started following you',
-        timestamp: '15mins ago',
-        isFollowing: false
-      }
-    ],
-    thisMonth: [
-      {
-        id: '1',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy Edibo',
-        action: 'liked your post',
-        timestamp: '5mins ago'
-      },
-      {
-        id: '2',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy ademola',
-        action: 'started following you',
-        timestamp: '15mins ago',
-        isFollowing: false
-      },
-      {
-        id: '3',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy ademola',
-        action: 'started following you',
-        timestamp: '15mins ago',
-        isFollowing: false
-      },
-      {
-        id: '4',
-        userImage: "/assets/Pupil.png",
-        userName: 'Timothy ademola',
-        action: 'started following you',
-        timestamp: '15mins ago',
-        isFollowing: false
-      }
-    ]
-  } as any
+  const handleNotification = (newNotification: any) => {
+    console.log({ newNotification })
+    setNotifications((prevNotifications) => {
+      if (!Array.isArray(prevNotifications)) return [newNotification];
 
-  const handleNotification = (data: any) => {
-    setNotifications(prevUser => ({
-      ...prevUser,
-      data
-    }));
-    console.log("Received notification:", data);
+      const exists = prevNotifications.some((n) => n.data.id === newNotification.data.id);
+
+      if (exists) return prevNotifications;
+
+      return [...prevNotifications, newNotification];
+    });
+
+    setUnreadCount((prev) => prev + 1);
   };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+
+    if (isOpen) {
+      setUnreadCount(0);
+    }
+  };
+
+  console.log({ notifications })
 
   useEffect(() => {
     if (ws) {
       ws.on("notification", handleNotification);
     }
   }, [ws]);
-  console.log({ notification })
+
+  const groupedNotifications = transformNotifications(notifications);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button className="relative p-2 rounded-full hover:bg-gray-100">
           <Bell className="h-6 w-6 text-gray-500" />
-          {/* {notif?.unreadCount > 0 && (
+          {unreadCount > 0 && (
             <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
-              {notif.unreadCount}
+              {unreadCount}
             </span>
-          )} */}
+          )}
         </button>
       </PopoverTrigger>
+
 
       <PopoverContent className="w-[26rem] p-0 mr-4 min-h-[90vh]">
         <div className="flex w-full items-center justify-between p-4 border-b border-gray-100">
@@ -179,11 +115,9 @@ const NotificationsPopover = () => {
         </div>
 
         <div className="max-h-[80vh] overflow-y-auto">
-          {loading && (
-            <div className="flex items-center justify-center py-4">
+          {/* <div className="flex items-center justify-center py-4">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900" />
-            </div>
-          )}
+            </div> */}
 
           {/* {error && (
             <div className="text-red-500 text-center py-4">
@@ -191,7 +125,7 @@ const NotificationsPopover = () => {
             </div>
           )} */}
 
-          {notifications?.today?.length === 0 && (
+          {groupedNotifications?.today?.length === 0 && (
             <div className="text-center text-gray-500 py-4 h-full items-center justify-center flex flex-col mt-28">
               <Image
                 src={NotificationGif}
@@ -203,25 +137,25 @@ const NotificationsPopover = () => {
           )}
 
           <div className="min-h-[80vh] overflow-y-auto">
-            {notifications.today.length > 0 && (
+            {groupedNotifications.today.length > 0 && (
               <NotificationGroup title="Today">
-                {notifications.today.map((notification: any) => (
+                {groupedNotifications.today.map((notification: any) => (
                   <NotificationItem key={notification.id} {...notification} />
                 ))}
               </NotificationGroup>
             )}
 
-            {notifications.thisWeek.length > 0 && (
+            {groupedNotifications.thisWeek.length > 0 && (
               <NotificationGroup title="This Week">
-                {notifications.thisWeek.map((notification: any) => (
+                {groupedNotifications.thisWeek.map((notification: any) => (
                   <NotificationItem key={notification.id} {...notification} />
                 ))}
               </NotificationGroup>
             )}
 
-            {notifications.thisMonth.length > 0 && (
+            {groupedNotifications.thisMonth.length > 0 && (
               <NotificationGroup title="This Month">
-                {notifications.thisMonth.map((notification: any) => (
+                {groupedNotifications.thisMonth.map((notification: any) => (
                   <NotificationItem key={notification.id} {...notification} />
                 ))}
               </NotificationGroup>
