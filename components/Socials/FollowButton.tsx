@@ -16,16 +16,17 @@ interface FollowButtonProps {
 const FollowButton: React.FC<FollowButtonProps> = ({
   followedId,
   avatar,
+  initialFollowStatus = false,
 }) => {
+  const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const ws = useWebSocket();
 
   const { data: followStatus } = useQuery({
     queryKey: ['followStatus', followedId],
     queryFn: async () => {
-      if (!getAuth()) return { data: { followed: false } };
+      if (!getAuth()) return { data: { followed: initialFollowStatus } };
 
       const response = await fetch(`${baseUrl}/users/${followedId}/follows/status`, {
         headers: { Authorization: `Bearer ${Cookies.get("accessToken")}` },
@@ -36,8 +37,10 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     },
     enabled: !!getAuth(),
     staleTime: 0,
-    placeholderData: (prev) => prev || { data: { followed: false } }, // Prevent flicker
+    initialData: { data: { followed: initialFollowStatus } },
   });
+
+  const isFollowing = followStatus?.data?.followed ?? initialFollowStatus;
 
   const followMutation = useMutation({
     mutationFn: async () => {
@@ -57,18 +60,18 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 
       if (!response.ok) throw new Error("Failed to follow the user");
       const result = await response.json();
+
       if (ws && ws.connected) {
-        const request = { userId: followedId, notificationId: result.data.id };
+        const request = { userId: followedId, notificationId: result?.data?.id };
         ws.emit("follow", request);
       } else {
-        console.error("Failed to follow user", followedId);
+        console.log("Failed to follow user", followedId);
       }
+
       return result;
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['followStatus', followedId] });
-
-      const previousStatus = queryClient.getQueryData(['followStatus', followedId]);
 
       queryClient.setQueryData(['followStatus', followedId], { data: { followed: true } });
 
@@ -81,17 +84,14 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 
         return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
       });
-
-      return { previousStatus };
     },
-    onError: (_, __, context) => {
-      queryClient.setQueryData(['followStatus', followedId], context?.previousStatus);
+    onError: () => {
+      queryClient.setQueryData(['followStatus', followedId], { data: { followed: false } });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] });
     },
   });
-
 
   const unfollowMutation = useMutation({
     mutationFn: async () => {
@@ -108,11 +108,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['followStatus', followedId] });
-
-      const previousStatus = queryClient.getQueryData(['followStatus', followedId]);
-
       queryClient.setQueryData(['followStatus', followedId], { data: { followed: false } });
-
       queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
         if (!oldData?.data?.posts) return oldData;
 
@@ -122,18 +118,14 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 
         return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
       });
-
-      return { previousStatus };
     },
-    onError: (_, __, context) => {
-      queryClient.setQueryData(['followStatus', followedId], context?.previousStatus);
+    onError: () => {
+      queryClient.setQueryData(['followStatus', followedId], { data: { followed: true } });
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] });
+      queryClient.setQueryData(['followStatus', followedId], { data: { followed: false } });
     },
   });
-
-  const isFollowing = followStatus?.data?.followed ?? false;
 
   const handleToggleFollow = () => {
     if (!getAuth()) {

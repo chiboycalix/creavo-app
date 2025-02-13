@@ -7,12 +7,15 @@ export const useFetchPosts = () => {
   return useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
+      const token = Cookies.get("accessToken")
+      const header = {
+        Authorization: `${token ? `Bearer ${token}` : ""}`
+      }
       const response = await fetch(
-        `${baseUrl}/posts?page=1&limit=10`,
+        // `${baseUrl}/posts?page=1&limit=10`,
+        `${baseUrl}/users/10804/posts?page=1&limit=10`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("accessToken")}`,
-          },
+          headers: { ...header }
         }
       );
       const result = await response.json();
