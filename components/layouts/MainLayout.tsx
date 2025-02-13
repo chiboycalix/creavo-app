@@ -123,7 +123,7 @@ export default function MainLayout({
             />
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
-            <div className="p-6">
+            <div className="p-0 sm:p-6">
               <ProfileCompletionManager />
               {children}
             </div>

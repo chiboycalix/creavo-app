@@ -23,7 +23,7 @@ export default function SocialPost({ post }: { post: any }) {
     "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
     "bikergirlsof", "bikerboys", "bikerboysof",
     "bikersof", "bikerchick"]
-
+  console.log({ post })
 
   const metrics: SocialMetric[] = [
     {
@@ -50,7 +50,7 @@ export default function SocialPost({ post }: { post: any }) {
   return (
     <div className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full">
       {/* Main Post Container */}
-      <div className="bg-black text-white rounded-xl overflow-hidden flex-grow">
+      <div className="bg-black text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
         <div className="relative">
           {/* Main Image */}
           <div className="aspect-[12.5/16] relative">
@@ -68,7 +68,7 @@ export default function SocialPost({ post }: { post: any }) {
               Number(post.userId) !== currId &&
               <FollowButton
                 followedId={post?.userId}
-                avatar={"/assets/display.jpg"}
+                avatar={post?.user_profile_avatar || "/assets/display.jpg"}
                 initialFollowStatus={post?.followed}
               />
             }
@@ -131,7 +131,7 @@ export default function SocialPost({ post }: { post: any }) {
             Number(post.userId) !== currId &&
             <FollowButton
               followedId={post?.userId}
-              avatar={"/assets/display.jpg"}
+              avatar={post?.user_profile_avatar || "/assets/display.jpg"}
               initialFollowStatus={post?.followed}
             />
           }

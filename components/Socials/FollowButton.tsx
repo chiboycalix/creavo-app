@@ -6,6 +6,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Check } from "lucide-react";
 import { baseUrl } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 
 interface FollowButtonProps {
   followedId: number | string;
@@ -142,15 +147,15 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 
   return (
     <div className="relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center mb-6">
-      <img
-        src={avatar}
-        alt="Post author"
-        className="w-12 h-10 object-cover rounded-full"
-      />
+      <Avatar className="w-12 h-12">
+        <AvatarImage src={avatar} alt="Post author avatar" />
+        <AvatarFallback>.</AvatarFallback>
+      </Avatar>
+
       <button
         onClick={handleToggleFollow}
         aria-label={isFollowing ? "Unfollow this user" : "Follow this user"}
-        className="bg-primary-700 absolute -bottom-3 left-2 rounded-full w-4 h-4 flex items-center justify-center transition-all duration-200 hover:bg-primary-800"
+        className="bg-primary-700 absolute -bottom-3 left-3 rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 hover:bg-primary-800"
       >
         {isFollowing ? (
           <Check className="text-sm text-white w-5 h-5" />

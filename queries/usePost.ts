@@ -1,6 +1,6 @@
+import Cookies from "js-cookie";
 import { useQuery } from "@tanstack/react-query";
 import { baseUrl } from "@/utils/constant";
-import Cookies from "js-cookie";
 
 export const useFetchPosts = () => {
   return useQuery({
@@ -11,8 +11,8 @@ export const useFetchPosts = () => {
         Authorization: `${token ? `Bearer ${token}` : ""}`,
       };
       const response = await fetch(
-        `${baseUrl}/posts?page=1&limit=10`,
-        // `${baseUrl}/users/10804/posts?page=1&limit=10`,
+        // `${baseUrl}/posts?page=1&limit=10`,
+        `${baseUrl}/users/10804/posts?page=1&limit=10`,
         {
           headers: { ...header },
         }
