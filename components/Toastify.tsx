@@ -10,7 +10,7 @@ interface ToastifyProps {
 const Toastify = ({ message, onClose }: ToastifyProps) => {
   const showToast = useCallback(() => {
     if (message) {
-      const toastId = toast.success(message, {
+      const toastId = toast?.success(message, {
         className: "bg-white text-purple-700",
         progressClassName: "bg-purple-700",
         autoClose: 3000,
@@ -23,7 +23,7 @@ const Toastify = ({ message, onClose }: ToastifyProps) => {
 
       // Force close after 3 seconds as a fallback
       setTimeout(() => {
-        toast.dismiss(toastId);
+        toast?.dismiss(toastId);
         if (onClose) {
           onClose();
         }

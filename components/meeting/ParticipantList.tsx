@@ -1,10 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  MoreVertical,
-  UserRoundPlus,
-  Hand,
-  MicOff,
-} from "lucide-react";
+import { MoreVertical, UserRoundPlus, Hand, MicOff } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -18,20 +13,23 @@ const ParticipantList = ({ allParticipants }: any) => {
     raisedHands,
     userIsCoHost,
     userIsHost,
-    handleMeetingHostAndCohost,
-    muteRemoteUser
+    muteRemoteUser,
+    setUserIsCoHost,
+    fetchMeetingRoomData,
+    sendCoHostPermission,
+    removeRemoteUser,
+    meetingConfig,
   } = useVideoConferencing();
-  const { getCurrentUser } = useAuth();
 
   useEffect(() => {
-    handleMeetingHostAndCohost();
-  }, [allParticipants, handleMeetingHostAndCohost]);
+    fetchMeetingRoomData();
+    setUserIsCoHost(userIsCoHost);
+  }, [userIsCoHost]);
 
   return (
     <div className="space-y-4">
       {[...allParticipants]?.map((applicant, index) => {
         const hasRaisedHand = raisedHands[applicant.uid];
-
         return (
           <div key={index} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -53,7 +51,7 @@ const ParticipantList = ({ allParticipants }: any) => {
             <div className="flex gap-1 items-center">
               {hasRaisedHand && <Hand className="text-white w-4 h-4" />}
 
-              {applicant.uid !== getCurrentUser()?.id &&
+              {applicant.uid !== meetingConfig?.uid &&
                 (userIsCoHost || userIsHost) && (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -71,8 +69,7 @@ const ParticipantList = ({ allParticipants }: any) => {
                         {userIsHost && (
                           <button
                             className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
-                            onClick={() => {
-                            }}
+                            onClick={() => sendCoHostPermission(applicant?.uid)}
                           >
                             <UserRoundPlus className="w-4 h-4" />
                             <span>Make Co-host</span>
@@ -86,6 +83,15 @@ const ParticipantList = ({ allParticipants }: any) => {
                           >
                             <MicOff className="w-4 h-4" />
                             <span>Mute</span>
+                          </button>
+                        )}
+                        {userIsHost && (
+                          <button
+                            className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
+                            onClick={() => removeRemoteUser(applicant?.uid)}
+                          >
+                            <MicOff className="w-4 h-4" />
+                            <span>Remove</span>
                           </button>
                         )}
                       </div>
