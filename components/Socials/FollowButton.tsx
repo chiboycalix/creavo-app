@@ -17,9 +17,9 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   followedId,
   avatar,
 }) => {
+  const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const ws = useWebSocket();
 
   const { data: followStatus } = useQuery({
@@ -58,9 +58,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       if (!response.ok) throw new Error("Failed to follow the user");
       const result = await response.json();
       if (ws && ws.connected) {
-        const request = { userId: followedId, notificationId: result.data.id };
-        console.log({ result })
-        console.log({ request, followedId })
+        const request = { userId: followedId, notificationId: result?.data?.id };
         ws.emit("follow", request);
       } else {
         console.log("Failed to follow user", followedId);

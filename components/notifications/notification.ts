@@ -41,7 +41,16 @@ export const transformNotifications = (notifications: any[]) => {
   sortedNotifications?.forEach((notification: any) => {
     if (!notification?.data) return;
 
-    const { id, user_, event, createdAt, content } = notification.data;
+    const {
+      id,
+      event,
+      createdAt,
+      content,
+      user_profile_firstName,
+      user_profile_lastName,
+      user_profile_avatar,
+    } = notification.data;
+
     const {
       category,
       time,
@@ -58,17 +67,17 @@ export const transformNotifications = (notifications: any[]) => {
       action = "liked your post";
     }
 
-    // Format notification object
     const formattedNotification = {
       id: id.toString(),
-      userImage: user_?.avatar || "/assets/Pupil.png",
-      userName: `${user_?.firstName || ""} ${user_?.lastName || ""}`.trim(),
+      userImage: user_profile_avatar || "/assets/Pupil.png",
+      userName: `${user_profile_firstName || ""} ${
+        user_profile_lastName || ""
+      }`.trim(),
       action,
       timestamp: time,
       ...(isFollowing !== undefined ? { isFollowing } : {}),
     };
 
-    // ✅ Step 2: Add notification to appropriate category
     groupedNotifications[category].push(formattedNotification);
   });
 

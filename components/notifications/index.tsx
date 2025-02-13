@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/popover";
 import Input from "../ui/Input";
 import Image from "next/image";
-import { NotificationGif, ProfileIcon } from "@/public/assets";
+import { NotificationGif } from "@/public/assets";
 import { useWebSocket } from "@/context/WebSocket";
 import { NotificationGroup } from "./NotificationGroup";
 import { NotificationItem } from "./NotificationItem";
@@ -28,7 +28,6 @@ const NotificationsPopover = () => {
   const ws = useWebSocket();
 
   const handleNotification = (newNotification: any) => {
-    console.log({ newNotification });
     setNotifications((prevNotifications) => {
       if (!Array.isArray(prevNotifications)) return [newNotification];
 
@@ -51,17 +50,9 @@ const NotificationsPopover = () => {
     }
   };
 
-  console.log({ notifications });
-
   useEffect(() => {
     if (ws) {
-
       ws.on("notification", handleNotification);
-      console.log("hiiiii")
-      // Cleanup function to remove the event listener when the component unmounts
-      // return () => {
-      //   ws.off("notification", handleNotification);
-      // };
     }
   }, [ws]);
 

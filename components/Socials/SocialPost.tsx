@@ -24,12 +24,14 @@ export default function SocialPost({ post }: { post: any }) {
     "bikergirlsof", "bikerboys", "bikerboysof",
     "bikersof", "bikerchick"]
 
+
   const metrics: SocialMetric[] = [
     {
       icon: <LikeButton
         postId={post.id}
+        likedId={post.userId}
         initialLikesCount={post.likesCount}
-        initialIsLiked={post?.liked || false}
+        initialIsLiked={post.liked}
       />,
     },
     {
@@ -63,7 +65,8 @@ export default function SocialPost({ post }: { post: any }) {
           {/* Metrics - Mobile & Tablet */}
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
             {
-              Number(post.userId) !== currId && <FollowButton
+              Number(post.userId) !== currId &&
+              <FollowButton
                 followedId={post?.userId}
                 avatar={"/assets/display.jpg"}
                 initialFollowStatus={post?.followed}
