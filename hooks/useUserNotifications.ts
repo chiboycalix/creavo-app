@@ -8,7 +8,7 @@ export function useUserNotifications(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
       const response = await fetch(
-        `${baseUrl}/users/${userId}/notifications?page=1&limit=30`,
+        `${baseUrl}/users/${userId}/notifications?page=1&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,

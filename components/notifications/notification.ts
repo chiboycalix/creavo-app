@@ -34,8 +34,8 @@ export const transformNotifications = (notifications: any[]) => {
   // ✅ Step 1: Sort notifications by `createdAt` (latest first)
   const sortedNotifications = notifications?.sort(
     (a, b) =>
-      new Date(b.data.createdAt).getTime() -
-      new Date(a.data.createdAt).getTime()
+      new Date(b?.data?.createdAt).getTime() -
+      new Date(a?.data?.createdAt).getTime()
   );
 
   sortedNotifications?.forEach((notification: any) => {
