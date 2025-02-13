@@ -24,6 +24,7 @@ import { useAuth } from "./AuthContext";
 import { baseUrl } from "@/utils/constant";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/constants/routes";
 
 interface RemoteParticipant {
   name: string;
@@ -97,6 +98,7 @@ interface VideoConferencingContextContextType {
   sendChatMessage: (content: string, type: "text" | "emoji") => Promise<void>;
   muteRemoteUser: (uid: any) => void;
   fetchMeetingRoomData: () => void;
+  removeRemoteUser: (uid: string | number) => Promise<void>;
 }
 
 let rtcClient: IAgoraRTCClient;
@@ -369,6 +371,21 @@ export function VideoConferencingProvider({
                 }
               } catch (error) {
                 console.error("Error handling forced mute:", error);
+              }
+            }
+            break;
+
+          case "remove-user":
+            if (uid === String(meetingConfig?.uid)) {
+              try {
+                console.log("Before removal");
+
+                await leaveCall();
+                console.log("After removal");
+                router?.push(ROUTES?.HOME)
+                alert('You were removed by the Host')
+              } catch (error) {
+                console.error("Error removing User", error);
               }
             }
             break;
@@ -807,7 +824,6 @@ export function VideoConferencingProvider({
           AEC: true,
           ANS: true,
           AGC: true,
-          
         }),
         AgoraRTC.createCameraVideoTrack(),
       ]);
@@ -1686,6 +1702,16 @@ export function VideoConferencingProvider({
     }
   };
 
+  const removeRemoteUser = async (uid: string | number): Promise<void> => {
+    console.log("removed", uid);
+    await rtmChannel.sendMessage({
+      text: JSON.stringify({
+        type: "remove-user",
+        uid,
+      }),
+    });
+  };
+
   useEffect(() => {
     window.addEventListener("beforeunload", disconnectFromMessaging);
     return () => {
@@ -1789,6 +1815,7 @@ export function VideoConferencingProvider({
         sendCoHostPermission,
         muteRemoteUser,
         fetchMeetingRoomData,
+        removeRemoteUser,
       }}
     >
       {children}

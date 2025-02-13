@@ -1,10 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  MoreVertical,
-  UserRoundPlus,
-  Hand,
-  MicOff,
-} from "lucide-react";
+import { MoreVertical, UserRoundPlus, Hand, MicOff } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -22,6 +17,7 @@ const ParticipantList = ({ allParticipants }: any) => {
     setUserIsCoHost,
     fetchMeetingRoomData,
     sendCoHostPermission,
+    removeRemoteUser,
     meetingConfig,
   } = useVideoConferencing();
 
@@ -87,6 +83,15 @@ const ParticipantList = ({ allParticipants }: any) => {
                           >
                             <MicOff className="w-4 h-4" />
                             <span>Mute</span>
+                          </button>
+                        )}
+                        {userIsHost && (
+                          <button
+                            className="w-full px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center gap-2"
+                            onClick={() => removeRemoteUser(applicant?.uid)}
+                          >
+                            <MicOff className="w-4 h-4" />
+                            <span>Remove</span>
                           </button>
                         )}
                       </div>
