@@ -59,9 +59,11 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       const result = await response.json();
       if (ws && ws.connected) {
         const request = { userId: followedId, notificationId: result.data.id };
+        console.log({ result })
+        console.log({ request, followedId })
         ws.emit("follow", request);
       } else {
-        console.error("Failed to follow user", followedId);
+        console.log("Failed to follow user", followedId);
       }
       return result;
     },
