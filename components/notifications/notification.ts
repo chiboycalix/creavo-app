@@ -31,6 +31,7 @@ export const transformNotifications = (notifications: any[]) => {
     thisMonth: [],
   };
 
+  // ✅ Step 1: Sort notifications by `createdAt` (latest first)
   const sortedNotifications = notifications?.sort(
     (a, b) =>
       new Date(b.data.createdAt).getTime() -
@@ -41,7 +42,11 @@ export const transformNotifications = (notifications: any[]) => {
     if (!notification?.data) return;
 
     const { id, user_, event, createdAt, content } = notification.data;
-    const { category, time } = categorizeNotification(createdAt);
+    const {
+      category,
+      time,
+    }: { category: "today" | "thisWeek" | "thisMonth"; time: string } =
+      categorizeNotification(createdAt);
 
     let action = content;
     let isFollowing = undefined;
@@ -51,10 +56,9 @@ export const transformNotifications = (notifications: any[]) => {
       isFollowing = false;
     } else if (event === "LIKE") {
       action = "liked your post";
-    } else if (event === "UNLIKE") {
-      action = "unliked your post";
     }
 
+    // Format notification object
     const formattedNotification = {
       id: id.toString(),
       userImage: user_?.avatar || "/assets/Pupil.png",
@@ -64,6 +68,7 @@ export const transformNotifications = (notifications: any[]) => {
       ...(isFollowing !== undefined ? { isFollowing } : {}),
     };
 
+    // ✅ Step 2: Add notification to appropriate category
     groupedNotifications[category].push(formattedNotification);
   });
 

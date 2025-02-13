@@ -213,13 +213,14 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       }
 
       // Emit WebSocket event based on the new state
-      if (ws && ws.connected) {
+      if (ws && ws.connected && currentPost?.isLiked) {
         console.log({ data }, "noonooo")
         const eventType = currentPost?.isLiked ? "like" : "unlike";
         const request = {
           userId: data?.data?.userId, // Current user's ID
           notificationId: data.data.id, // Assuming the response contains the notification ID
         };
+        console.log({ request })
         ws.emit("like", request);
       }
     },
