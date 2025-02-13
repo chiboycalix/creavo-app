@@ -11,8 +11,8 @@ export const useFetchPosts = () => {
         Authorization: `${token ? `Bearer ${token}` : ""}`,
       };
       const response = await fetch(
-        // `${baseUrl}/posts?page=1&limit=10`,
-        `${baseUrl}/users/10804/posts?page=1&limit=10`,
+        `${baseUrl}/posts?page=1&limit=10`,
+        // `${baseUrl}/users/10804/posts?page=1&limit=10`,
         {
           headers: { ...header },
         }
