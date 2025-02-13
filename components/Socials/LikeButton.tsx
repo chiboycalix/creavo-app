@@ -44,7 +44,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   });
 
   const isLiked = likeStatus?.data?.liked ?? initialIsLiked;
-
+  // console.log({ isLiked })
   // Like post mutation
   const likePostMutation = useMutation({
     mutationFn: async () => {
