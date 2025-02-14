@@ -5,6 +5,7 @@ import { NavItem } from '@/types/navigation';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
+import { CrevoeLogo } from '@/public/assets';
 
 interface SidebarProps {
   navItems: NavItem[];
@@ -30,16 +31,16 @@ export default function Sidebar({ navItems }: SidebarProps) {
         md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}
       >
-        <nav className="p-4">
-          <ul className="space-y-2">
-            <div className="px-4 mb-14">
-              <div className="mb-6 mt-4 flex justify-start">
+        <nav className="px-4">
+          <ul className="">
+            <div className="mb-6">
+              <div className="flex justify-start">
                 <Link href="/" className="relative">
                   <Image
                     width={144}
                     height={50}
-                    className="w-36"
-                    src="/assets/icons/logo.png"
+                    // className="w-36"
+                    src={CrevoeLogo}
                     alt="STRIDEZ logo"
                     priority
                     style={{ width: 'auto', height: 'auto' }}

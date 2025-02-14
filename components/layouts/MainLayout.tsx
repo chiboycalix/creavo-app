@@ -42,7 +42,7 @@ export default function MainLayout({
       label: 'Socials',
       icon: LayoutDashboard,
       navItems: [
-        { title: 'Explore for You', href: '/socials', icon: Compass },
+        { title: 'For You', href: '/socials', icon: Compass },
         { title: 'Analytics', href: '/socials/analytics', icon: BarChart },
         { title: 'Reports', href: '/socials/reports', icon: FileText },
         { title: 'Calendar', href: '/socials/schedule', icon: Calendar },

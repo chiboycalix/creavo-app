@@ -166,7 +166,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
           {...rest}
           type={variant === 'password' ? (showPassword ? 'text' : 'password') : rest.type}
           className={cn(
-            "outline-none focus:ring-0 ring-primary-700 border-primary-200 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
+            "outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
             hasLeftIcon ? "pl-10" : "pl-3",
             hasRightIcon ? "pr-10" : "pr-3",
             errorMessage ? "bg-red-100" : "bg-gray-100",
@@ -217,7 +217,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
             {label}
           </label>
         )}
-        {renderInput("border-0 rounded-xl")}
+        {renderInput("bg-gray-100 rounded-full bg-primary-50")}
         {errorMessage && <small className="text-red-600 text-sm">{errorMessage}</small>}
       </div>
     ),
@@ -243,7 +243,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
         )}
         <div
           className={cn(
-            "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-200",
+            "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-100",
             className
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -263,7 +263,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
             </div>
             {isOpen && (
               <div className={cn(
-                "absolute w-full top-full left-0 right-0 mt-2 bg-white border border-primary-200 rounded-lg shadow-lg z-50",
+                "absolute w-full top-full left-0 right-0 mt-2 bg-white border border-primary-100 rounded-lg shadow-lg z-50",
                 dropdownClass
               )}>
                 {options.map((option) => (
@@ -302,7 +302,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
         <Popover>
           <PopoverTrigger asChild>
             <div className={cn(
-              "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-200 py-3",
+              "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-100 py-3",
               leftIcon ? "pl-10" : "pl-3",
               rightIcon ? "pr-10" : "pr-3",
               errorMessage && "bg-red-100",
@@ -343,7 +343,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
         <Popover>
           <PopoverTrigger asChild>
             <div className={cn(
-              "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-200 py-3",
+              "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-100 py-3",
               leftIcon ? "pl-10" : "pl-3",
               rightIcon ? "pr-10" : "pr-3",
               errorMessage && "bg-red-100",
@@ -401,7 +401,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <div className={cn(
-              "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-200 py-3",
+              "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-100 py-3",
               leftIcon ? "pl-10" : "pl-3",
               rightIcon ? "pr-10" : "pr-3",
               errorMessage && "bg-red-100",
@@ -496,10 +496,10 @@ const Input = forwardRef<HTMLInputElement, Props>(({
           <Textarea
             {...rest}
             className={cn(
-              "flex min-h-[80px] w-full rounded-md border border-primary-200 bg-white px-3 py-2 text-base",
+              "flex min-h-[80px] w-full rounded-md border border-primary-100 bg-white px-3 py-2 text-base",
               "placeholder:text-neutral-500 focus-visible:outline-none outline-none",
               "disabled:cursor-not-allowed disabled:opacity-50",
-              "md:text-sm outline-none focus:ring-0 ring-primary-700 border-primary-200 border-2",
+              "md:text-sm outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
               errorMessage && "border-red-500 focus-visible:ring-red-500",
@@ -536,7 +536,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
             {...rest}
             type="text"
             className={cn(
-              "outline-none focus:ring-0 ring-primary-700 border-primary-200 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
+              "outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
               leftIcon ? "pl-10" : "pl-3", // Padding for left icon
               "pr-32", // Add padding to the right to accommodate the button
               errorMessage ? "bg-red-100" : "bg-gray-100",
@@ -547,7 +547,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
             <button
               type="button"
               onClick={onButtonClick}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 px-8 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-full border-l border-primary-200"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 px-8 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-full border-l border-primary-100"
             >
               {buttonCaption}
             </button>

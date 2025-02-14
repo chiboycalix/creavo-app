@@ -53,7 +53,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
 
   return (
     <header className="bg-white fixed top-0 right-0 left-0 md:left-64 z-30">
-      <div className="px-4 sm:px-6 lg:px-8 w-full">
+      <div className="px-4 sm:px-6 lg:px-0 w-full">
         <div className="flex h-16 justify-between items-center w-full gap-4">
           {/* Left Section with Menu Toggle and Search */}
           <div className="flex items-center space-x-4">
@@ -70,7 +70,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
             </button>
 
             {/* Search - Hidden on Mobile */}
-            <div className="hidden md:block w-64 lg:w-96">
+            <div className="hidden md:block w-64 lg:w-72">
               <Input variant="search" placeholder="Search" />
             </div>
           </div>
