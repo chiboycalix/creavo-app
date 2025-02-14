@@ -3,7 +3,7 @@ import SocialPostSkeleton from '@/components/sketetons/SocialPostSkeleton'
 import SocialPost from '@/components/Socials/SocialPost'
 import { useComments } from '@/context/CommentsContext'
 import { generalHelpers } from '@/helpers'
-import { useFetchPosts } from '@/queries/usePost'
+import { useFetchPosts } from '@/hooks/useFetchPosts'
 import Image from 'next/image'
 import React from 'react'
 

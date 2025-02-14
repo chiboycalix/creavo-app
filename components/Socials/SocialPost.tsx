@@ -1,14 +1,25 @@
+import MediaWrapper from "../post/MediaWrapper"
+import LikeButton from "./LikeButton"
+import FollowButton from "./FollowButton"
 import type React from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import MediaWrapper from "../post/MediaWrapper"
 import { useState } from "react"
 import { ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon } from "@heroicons/react/24/solid"
 import { RiShareForwardFill } from "react-icons/ri";
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
-import LikeButton from "./LikeButton"
-import FollowButton from "./FollowButton"
+
 import { useComments } from "@/context/CommentsContext"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Comments } from "./Comments"
+
 interface SocialMetric {
   icon: React.ReactNode
   count?: string
@@ -23,7 +34,6 @@ export default function SocialPost({ post }: { post: any }) {
     "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
     "bikergirlsof", "bikerboys", "bikerboysof",
     "bikersof", "bikerchick"]
-  console.log({ post })
 
   const metrics: SocialMetric[] = [
     {
@@ -35,9 +45,24 @@ export default function SocialPost({ post }: { post: any }) {
       />,
     },
     {
-      icon: <ChatBubbleOvalLeftEllipsisIcon
-        onClick={toggle}
-        className="w-8 h-8 text-white sm:text-[#BFBFBF]" />,
+      icon: <div className="">
+        <Dialog>
+          <DialogTrigger asChild>
+            <ChatBubbleOvalLeftEllipsisIcon
+              className="w-8 h-8 text-white sm:text-[#BFBFBF]" />
+          </DialogTrigger>
+          <DialogContent className="h-[84vh] min-w-[80%] p-2 border-none">
+            <DialogHeader>
+              <DialogTitle></DialogTitle>
+            </DialogHeader>
+            <Comments
+              post={post}
+            />
+            <DialogFooter>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>,
       count: post?.commentsCount
     },
     {
