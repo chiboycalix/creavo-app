@@ -8,8 +8,6 @@ import { ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon } from "@heroicons/react/2
 import { RiShareForwardFill } from "react-icons/ri";
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
-
-import { useComments } from "@/context/CommentsContext"
 import {
   Dialog,
   DialogContent,
@@ -27,9 +25,9 @@ interface SocialMetric {
 
 export default function SocialPost({ post }: { post: any }) {
   const [showAllTags, setShowAllTags] = useState(false)
-  const { isOpen, toggle } = useComments()
   const { getCurrentUser } = useAuth();
   const currId = getCurrentUser()?.id;
+  console.log({ post })
   const tags = ["fyp", "biker", "bikergirlsof", "bikerboys",
     "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
     "bikergirlsof", "bikerboys", "bikerboysof",
@@ -51,7 +49,7 @@ export default function SocialPost({ post }: { post: any }) {
             <ChatBubbleOvalLeftEllipsisIcon
               className="w-8 h-8 text-white sm:text-[#BFBFBF]" />
           </DialogTrigger>
-          <DialogContent className="h-[84vh] min-w-[80%] p-2 border-none">
+          <DialogContent className="h-[85vh] min-w-[80%] p-2 border-none">
             <DialogHeader>
               <DialogTitle></DialogTitle>
             </DialogHeader>
@@ -112,9 +110,9 @@ export default function SocialPost({ post }: { post: any }) {
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 pt-4">
-                  <h3 className="font-semibold">{post?.username}</h3>
+                  <h3 className="font-semibold">{post?.user_username}</h3>
                 </div>
-                <div className="relative">
+                <div className="relative w-full">
 
                   <div className={`flex flex-wrap gap-2 mt-1 ${!showAllTags && 'max-h-[1.6rem]'} overflow-hidden transition-all duration-300`}>
                     <div>

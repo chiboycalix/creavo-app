@@ -184,9 +184,10 @@ const LikeButton: React.FC<LikeButtonProps> = ({
         aria-label={isLiked ? "Unlike post" : "Like post"}
       >
         <Heart
-          className={`w-6 h-6 transition-colors duration-200 ${isLiked
-            ? "fill-red-500 stroke-red-500"
-            : "md:hover:stroke-red-500 stroke-gray-500"
+          className={`w-8 h-8 transition-colors duration-200 
+            ${isLiked
+              ? "fill-red-500 stroke-red-500"
+              : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
             }`}
         />
       </button>

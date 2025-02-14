@@ -24,7 +24,7 @@ type Props = {
   errorMessage?: string | false;
   onKeyPress?: React.KeyboardEventHandler<HTMLInputElement> & unknown;
   className?: string;
-  variant?: "text" | "password" | "search" | "select" | "datePicker" | "dateRangePicker" | "timeRangePicker" | "textarea";
+  variant?: "text" | "password" | "search" | "select" | "datePicker" | "dateRangePicker" | "timeRangePicker" | "textarea" | "comment";
   options?: { label: any; value: any }[];
   onSelect?: (value: string) => void;
   leftIcon?: ReactNode;
@@ -48,6 +48,8 @@ type Props = {
   minRows?: number;
   resize?: "none" | "vertical" | "horizontal" | "both";
   selectSize?: "small" | "large"
+  buttonCaption?: string;
+  onButtonClick?: () => void;
 } & React.ComponentProps<'input'> & React.ComponentProps<'textarea'>;
 
 const generateTimeOptions = () => {
@@ -90,6 +92,8 @@ const Input = forwardRef<HTMLInputElement, Props>(({
   onTimeRangeSelect,
   selectedTimeRange,
   selectSize = "large",
+  buttonCaption,
+  onButtonClick,
   ...rest
 }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -512,6 +516,46 @@ const Input = forwardRef<HTMLInputElement, Props>(({
       </div>
     ),
 
+    comment: (
+      <div className="leading-3">
+        {label && (
+          <label className="flex items-center text-gray-900 font-medium text-sm gap-x-2 mb-1">
+            {label}
+          </label>
+        )}
+        <div className="relative">
+          {renderIcon(
+            leftIcon,
+            cn("left-0 pl-3", leftIconClassName),
+            onLeftIconClick
+          )}
+          <input
+            ref={ref}
+            value={value}
+            onChange={onChange}
+            {...rest}
+            type="text"
+            className={cn(
+              "outline-none focus:ring-0 ring-primary-700 border-primary-200 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
+              leftIcon ? "pl-10" : "pl-3", // Padding for left icon
+              "pr-32", // Add padding to the right to accommodate the button
+              errorMessage ? "bg-red-100" : "bg-gray-100",
+              className
+            )}
+          />
+          {buttonCaption && (
+            <button
+              type="button"
+              onClick={onButtonClick}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 px-8 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-full border-l border-primary-200"
+            >
+              {buttonCaption}
+            </button>
+          )}
+          {errorMessage && <small className="text-red-600 text-sm">{errorMessage}</small>}
+        </div>
+      </div>
+    ),
   };
 
   return variants[variant] || variants.text;

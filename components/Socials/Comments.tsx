@@ -1,51 +1,21 @@
-import { useFetchComments } from "@/hooks/useFetchComments"
 import MediaWrapper from "../post/MediaWrapper"
+import CommentSectionSkeleton from "../sketetons/CommentSectionSkeleton";
 import CommentItem from "./CommentItem"
-import { motion } from 'framer-motion';
+import Input from "@/components/ui/Input";
+import { useFetchComments } from "@/hooks/useFetchComments"
+import { Heart, X } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { useAuth } from "@/context/AuthContext";
 
-export function Comments({ post }: { post: any }) {
-  console.log({ post })
-  const { data: comments } = useFetchComments(post?.id)
-  console.log({ comments })
-
-  const sampleData = {
-    currentUser: {
-      id: '1',
-      name: 'Current User',
-      avatar: "/assets/display.jpg"
-    },
-    comments: [
-      {
-        id: '1',
-        user: {
-          id: '2',
-          name: 'Ralph Edwards',
-          avatar: "/assets/display.jpg"
-        },
-        content: 'In mauris porttitor tincidunt mauris massa sit lorem e.',
-        timestamp: 'Aug 19, 2024',
-        likes: 50400,
-        replies: [
-          {
-            id: '2',
-            user: {
-              id: '3',
-              name: 'Ralph Edwards',
-              avatar: "/assets/display.jpg"
-            },
-            content: 'In mauris porttitor tincidunt mauris massa sit lorem sed.',
-            timestamp: 'Aug 19, 2021',
-            likes: 5248,
-            replies: []
-          }
-        ]
-      }
-    ]
-  };
+export function Comments({ post, onClose }: { post: any, onClose?: () => void }) {
+  const { data: comments, isPending: isFetchingComments } = useFetchComments(post?.id)
+  const { getCurrentUser } = useAuth();
+  const currentUser = getCurrentUser();
 
   return (
-    <div className="flex items-start h-full gap-4 w-full">
-      <div className="basis-5/12 bg-black/20 rounded-xl backdrop-blur-md">
+    <div className="h-[75vh] flex gap-4 w-full">
+      {/* Media Section */}
+      <div className="basis-5/12 bg-black/90 rounded-xl backdrop-blur-md">
         <MediaWrapper
           postId={post.id}
           title={post.title}
@@ -54,34 +24,54 @@ export function Comments({ post }: { post: any }) {
           isRenderedInComment
         />
       </div>
-      <div className="flex-1 max-h-[75vh] overflow-y-auto">
-        <div className="flex-1 overflow-y-auto">
-          {sampleData?.comments.map((comment) => (
-            <CommentItem key={comment.id} comment={comment} />
-          ))}
-        </div>
 
-        <div className="border-t p-4">
-          <div className="flex items-center gap-3">
-            <img
-              src={sampleData?.currentUser.avatar}
-              alt="Your avatar"
-              className="w-8 h-8 rounded-full"
-            />
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium"
-            >
-              Post
-            </motion.button>
-          </div>
-        </div>
+      {/* Comments Section */}
+      <div className="flex flex-col flex-1 h-full">
+        {isFetchingComments ? (
+          <CommentSectionSkeleton />
+        ) : (
+          <>
+            {/* Scrollable Comments */}
+            <div className="flex-1 overflow-y-auto pr-2">
+              {comments?.data?.comments?.map((comment: any) => (
+                <CommentItem key={comment.id} comment={comment} />
+              ))}
+            </div>
+
+            {/* Input Section */}
+            <div className="w-full">
+              <div className="flex items-center gap-2 w-full">
+                <div className="basis-1/12">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={currentUser?.avatar} alt="User avatar" />
+                    <AvatarFallback>.</AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="flex-1">
+                  <Input
+                    variant="comment"
+                    buttonCaption="Post"
+                    onButtonClick={() => console.log("Button clicked!")}
+                    placeholder="Write a comment..."
+                    className="rounded-full w-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Icons Column */}
+      <div className="basis-0.5/12 flex flex-col items-center gap-4 mt-2 mr-1">
+        {/* Close Button */}
+        {onClose && (
+          <X className="cursor-pointer text-gray-400 hover:text-white" size={24} onClick={onClose} />
+        )}
+
+        {/* Heart Icon */}
+        <Heart className="cursor-pointer text-red-500" size={24} />
       </div>
     </div>
-  )
+  );
 }
