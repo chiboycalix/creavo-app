@@ -43,7 +43,7 @@ const Explore = () => {
               </div>
             ) : (
               result?.map((post: any) =>
-                <div key={post.id} className='mb-10 h-full'>
+                <div key={post.id} className='sm:mb-10 mb-0 h-full'>
                   <SocialPost post={post} />
                 </div>)
             )}

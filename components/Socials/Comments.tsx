@@ -13,7 +13,7 @@ export function Comments({ post, onClose }: { post: any, onClose?: () => void })
   const currentUser = getCurrentUser();
 
   return (
-    <div className="h-[75vh] flex gap-4 w-full">
+    <div className="h-full flex gap-4 w-full">
       {/* Media Section */}
       <div className="basis-5/12 bg-black/90 rounded-xl backdrop-blur-md">
         <MediaWrapper

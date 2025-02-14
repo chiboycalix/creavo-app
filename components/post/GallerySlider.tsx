@@ -18,7 +18,7 @@ const GallerySlider = ({
   galleryImgs,
   className = '',
   imageClass = '',
-  galleryClass = 'rounded-xl',
+  galleryClass = 'rounded-none',
   isRenderedInComment = false,
   navigation = true,
 }: GallerySliderTypes) => {
@@ -70,7 +70,7 @@ const GallerySlider = ({
         {...handlers}
       >
         {/* Main image */}
-        <div className={` h-full overflow-hidden ${galleryClass}`}>
+        <div className={` h-full overflow-hidden sm:rounded-xl rounded-none`}>
           <Link
             className={`relative flex items-center justify-center h-full `}
             href={''}
