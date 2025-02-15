@@ -23,10 +23,18 @@ import {
   UploadCloud,
   User2,
   Compass,
-  Calendar
+  Calendar,
+  CompassIcon,
+  LightbulbIcon,
+  Store,
+  UserPlusIcon,
+  PlusSquareIcon,
+  TvMinimalPlay
 } from 'lucide-react';
 import { shouldUseMainLayout } from '@/utils/path-utils';
 import ProfileCompletionManager from '../ProfileCompletionManager';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import SidebarSkeleton from '../sketetons/SidebarSkeleton';
 
 export default function MainLayout({
   children,
@@ -35,25 +43,32 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const { loading, currentUser } = useAuth();
-
   const headerButtons: HeaderButton[] = [
     {
       id: 'socials',
-      label: 'Socials',
-      icon: LayoutDashboard,
+      label: 'Explore',
+      icon: CompassIcon,
       navItems: [
         { title: 'For You', href: '/socials', icon: Compass },
-        { title: 'Analytics', href: '/socials/analytics', icon: BarChart },
-        { title: 'Reports', href: '/socials/reports', icon: FileText },
-        { title: 'Calendar', href: '/socials/schedule', icon: Calendar },
-        { title: 'Upload Video', href: '/socials/uploads', icon: UploadCloud },
-        { title: 'Profile', href: `/socials/profile`, icon: User2 },
+        { title: 'Following', href: '/socials/following', icon: UserPlusIcon },
+        { title: 'Upload Post', href: '/socials/uploads', icon: PlusSquareIcon },
+        { title: 'Watchlist', href: '/socials/watchlist', icon: TvMinimalPlay },
+        // { title: 'Calendar', href: '/socials/schedule', icon: Calendar },
+        {
+          title: 'Profile', href: `/socials/profile`,
+          icon: (
+            <Avatar className="w-1 h-1">
+              <AvatarImage src={currentUser ? currentUser?.avatar : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"} sizes='sm' />
+              <AvatarFallback>P</AvatarFallback>
+            </Avatar>
+          )
+        },
       ]
     },
     {
       id: 'studio',
       label: 'Studio',
-      icon: FolderKanban,
+      icon: LightbulbIcon,
       navItems: [
         { title: 'All Projects', href: '/studio', icon: FolderOpen },
         { title: 'Active', href: '/studio/active', icon: FolderOpen },
@@ -63,8 +78,8 @@ export default function MainLayout({
     },
     {
       id: 'market',
-      label: 'Market Place',
-      icon: Settings,
+      label: 'Marketplace',
+      icon: Store,
       navItems: [
         { title: 'Profile', href: '/market', icon: User },
         { title: 'Security', href: '/market/security', icon: Shield },
@@ -112,7 +127,10 @@ export default function MainLayout({
     <SidebarProvider>
       <div className="flex h-screen bg-gray-50 pb-14 overflow-hidden">
         <aside className="fixed left-0 top-0 h-full z-50">
-          <Sidebar navItems={currentNavItems} />
+          {
+            loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} />
+          }
+
         </aside>
 
         <div className="flex-1 lg:ml-64">

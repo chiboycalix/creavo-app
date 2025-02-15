@@ -3,14 +3,14 @@ import CommentSectionSkeleton from "../sketetons/CommentSectionSkeleton";
 import CommentItem from "./CommentItem";
 import Input from "@/components/ui/Input";
 import Link from "next/link";
+import Image from "next/image";
 import { useFetchComments } from "@/hooks/useFetchComments";
-import { Heart, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
-import Image from "next/image";
 import { CommentPayload } from "@/types";
 
 export function Comments({ post, onClose }: { post: any; onClose?: () => void }) {

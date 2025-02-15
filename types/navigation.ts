@@ -1,9 +1,9 @@
 import { LucideIcon } from "lucide-react";
 
 export type NavItem = {
-  title: string;
+  title: string | React.ReactNode;
   href: string;
-  icon: LucideIcon;
+  icon: LucideIcon | any;
 };
 
 export type HeaderButton = {

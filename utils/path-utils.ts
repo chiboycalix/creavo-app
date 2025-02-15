@@ -20,9 +20,9 @@ export const LAYOUT_PATHS = [
   "/classroom/*",
 
   "/socials",
-  "/socials/analytics",
+  "/socials/following",
   "/socials/profile",
-  "/socials/reports",
+  "/socials/watchlist",
   "/socials/uploads",
   "/socials/schedule",
 

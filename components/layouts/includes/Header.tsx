@@ -49,8 +49,6 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
     return navItems.some(item => pathname.startsWith(item.href));
   };
 
-  const notifications = []
-
   return (
     <header className="bg-white fixed top-0 right-0 left-0 md:left-64 z-30">
       <div className="pr-4 sm:pr-6 lg:pr-6 w-full">
@@ -89,16 +87,15 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                     const firstRoute = button.navItems[0].href;
                     router.push(firstRoute);
                   }}
-                  className={`p-2 sm:px-3 lg:px-4 lg:py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center space-x-2
-                    ${isActive ? 'bg-primary-50 ring-1 ring-primary-100' : ''}`}
+                  className={`p-2 sm:px-3 lg:px-4 lg:py-2 rounded-lg transition-all flex flex-col items-center space-x-2 space-y-0`}
                 >
-                  <Icon
-                    size={20}
-                    className={`${isActive ? 'text-primary-500' : 'text-gray-500'} 
-                    transition-colors`}
-                  />
-                  <span className={`${isActive ? 'text-primary-500 font-medium' : 'text-gray-700'}
-                    hidden lg:inline transition-colors`}>
+                  <div className={`px-6 rounded-full py-1.5 ${isActive ? "bg-primary-700" : "bg-gray-100"}`}>
+                    <Icon
+                      size={20}
+                      className={`${isActive ? 'text-white' : 'text-gray-500'} transition-colors`}
+                    />
+                  </div>
+                  <span className={`${isActive ? 'text-primary-500' : 'text-gray-700'} text-sm hidden lg:inline transition-colors`}>
                     {button.label}
                   </span>
                 </button>
@@ -276,7 +273,6 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
           leave="transition-all duration-200 ease-in"
           leaveFrom="opacity-100 translate-y-0"
           leaveTo="opacity-0 -translate-y-2"
-        // className="py-2 md:hidden"
         >
           <div className='mb-4'>
             <Input variant="search" placeholder="Search" className="w-full" />
