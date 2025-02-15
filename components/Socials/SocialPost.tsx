@@ -52,7 +52,7 @@ export default function SocialPost({ post }: { post: any }) {
             <ChatBubbleOvalLeftEllipsisIcon
               className="w-8 h-8 text-white sm:text-[#BFBFBF]" />
           </DialogTrigger>
-          <DialogContent className="h-[85vh] min-w-[80%] p-2 border-none">
+          <DialogContent className="h-[90vh] min-w-[80%] p-2 border-none">
             <DialogHeader>
               <DialogTitle></DialogTitle>
             </DialogHeader>
