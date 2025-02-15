@@ -2,7 +2,7 @@ import React from 'react'
 
 const SocialPostSkeleton = () => {
   return (
-    <div className="max-w-xl bg-white rounded-xl overflow-hidden animate animate-pulse">
+    <div className="max-w-xl bg-white rounded-xl overflow-hidden animate animate-pulse sm:mb-10 mb-0">
       <div className="relative">
         {/* Basic Badge Skeleton */}
         <div className="absolute top-4 left-4 z-10">

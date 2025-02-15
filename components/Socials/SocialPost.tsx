@@ -27,11 +27,14 @@ export default function SocialPost({ post }: { post: any }) {
   const [showAllTags, setShowAllTags] = useState(false)
   const { getCurrentUser } = useAuth();
   const currId = getCurrentUser()?.id;
-  console.log({ post })
-  const tags = ["fyp", "biker", "bikergirlsof", "bikerboys",
+
+  const tags = [
+    "fyp",
+    "biker", "bikergirlsof", "bikerboys",
     "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
     "bikergirlsof", "bikerboys", "bikerboysof",
-    "bikersof", "bikerchick"]
+    "bikersof", "bikerchick"
+  ]
 
   const metrics: SocialMetric[] = [
     {

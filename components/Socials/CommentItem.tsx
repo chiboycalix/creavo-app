@@ -23,21 +23,20 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4">
-      <div className={`basis-11/12 flex gap-3 p-4 ${depth > 0 ? 'pl-12' : ''}`}>
+      <div className={`basis-11/12 flex gap-3 px-4  ${depth > 0 ? 'pl-12' : ''}`}>
         <div className='basis-1/12'>
           <img
-            src={comment._user.avatar}
+            src={comment._user?.avatar}
             alt={comment._user.firstName}
             className="w-10 h-10 rounded-full flex-shrink-0"
           />
         </div>
         <div className="flex-1">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <h3 className="font-semibold text-sm">{comment._user.firstName} {comment._user.lastName}</h3>
             <p className="text-xs text-gray-500">{moment(comment.createdAt).format('MMM DD, YYYY')}</p>
           </div>
           <p className="text-sm text-gray-800 text-justify">{comment?.body}</p>
-          {/* <p className="text-sm text-gray-800 text-justify">In mauris porttitor tincidunt mauris massa sit lorem e. Fringilla pharetra vel massa enim sollicitudin cras. At pulvinar eget sociis adipiscing eget donec ultricies nibh tristique. </p> */}
           <div className="flex gap-6 mt-3 justify-end">
             <div className="flex gap-1">
               <motion.button

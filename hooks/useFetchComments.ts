@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { baseUrl } from "@/utils/constant";
 import Cookies from "js-cookie";
 
@@ -17,6 +17,8 @@ export function useFetchComments(postId: string | undefined) {
       );
       return response.json();
     },
+    refetchInterval: 3000,
+    placeholderData: keepPreviousData,
     enabled: !!postId,
   });
 }

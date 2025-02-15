@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ChevronDown, Eye, EyeOff, Search, CalendarIcon, ArrowUpAzIcon } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, Search, CalendarIcon, ArrowUpAzIcon, Loader2 } from "lucide-react";
 import { ReactNode, forwardRef, useState, useRef } from "react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -10,6 +10,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "./textarea";
+import Spinner from "../Spinner";
 
 type TimeRange = {
   from: string;
@@ -50,6 +51,7 @@ type Props = {
   selectSize?: "small" | "large"
   buttonCaption?: string;
   onButtonClick?: () => void;
+  isLoading?: boolean;
 } & React.ComponentProps<'input'> & React.ComponentProps<'textarea'>;
 
 const generateTimeOptions = () => {
@@ -94,6 +96,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({
   selectSize = "large",
   buttonCaption,
   onButtonClick,
+  isLoading,
   ...rest
 }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -549,7 +552,9 @@ const Input = forwardRef<HTMLInputElement, Props>(({
               onClick={onButtonClick}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 px-8 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-full border-l border-primary-100"
             >
-              {buttonCaption}
+              {
+                isLoading ? <Loader2 /> : buttonCaption
+              }
             </button>
           )}
           {errorMessage && <small className="text-red-600 text-sm">{errorMessage}</small>}
