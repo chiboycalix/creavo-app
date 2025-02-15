@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
+import { CommentPayload } from "@/types/index";
 
 export function Comments({ post, onClose }: { post: any; onClose?: () => void }) {
   const { data: comments, isPending: isFetchingComments } = useFetchComments(post?.id);

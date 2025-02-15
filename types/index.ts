@@ -27,3 +27,8 @@ export type ILocalTrack = {
     screenVideoTrack: ILocalVideoTrack;
   } | null;
 };
+
+export interface CommentPayload {
+  comment: string;
+  postId: number;
+}

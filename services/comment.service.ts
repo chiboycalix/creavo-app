@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/apiClient";
+import { CommentPayload } from "@/types";
 
 export const addCommentService = async (payload: CommentPayload) => {
   try {
