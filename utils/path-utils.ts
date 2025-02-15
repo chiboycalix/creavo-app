@@ -24,12 +24,12 @@ export const LAYOUT_PATHS = [
   "/socials/profile",
   "/socials/watchlist",
   "/socials/uploads",
-  "/socials/schedule",
 
   "/studio",
-  "/studio/active",
-  "/studio/archived",
+  "/studio/create-course",
+  "/studio/module-management",
   "/studio/meeting/*",
+  "/studio/schedule",
 
   "/market",
   "/market/security",

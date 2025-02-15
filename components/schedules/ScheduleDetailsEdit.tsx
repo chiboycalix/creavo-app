@@ -4,7 +4,7 @@ import { baseUrl } from "@/utils/constant";
 import React, { useState, useCallback, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Schedule } from "@/app/socials/schedule/page";
+import { Schedule } from "@/app/studio/schedule/page";
 
 interface ScheduleDetailsEditProps {
   editedDetails: Schedule;

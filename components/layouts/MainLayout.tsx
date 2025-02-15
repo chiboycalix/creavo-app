@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import React, { useState, useEffect } from 'react';
+import ProfileCompletionManager from '../ProfileCompletionManager';
+import SidebarSkeleton from '../sketetons/SidebarSkeleton';
 import Header from './includes/Header';
 import Sidebar from './includes/Sidebar';
 import { NavItem, HeaderButton } from '@/types/navigation';
@@ -8,33 +10,25 @@ import { SidebarProvider } from '@/context/SidebarContext';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Home,
-  BarChart,
-  FileText,
-  FolderKanban,
   FolderOpen,
   Archive,
   Video,
-  Settings,
   User,
   Shield,
   Sliders,
-  UploadCloud,
-  User2,
   Compass,
-  Calendar,
   CompassIcon,
   LightbulbIcon,
   Store,
   UserPlusIcon,
   PlusSquareIcon,
-  TvMinimalPlay
+  TvMinimalPlay,
+  Calendar,
+  Home
 } from 'lucide-react';
 import { shouldUseMainLayout } from '@/utils/path-utils';
-import ProfileCompletionManager from '../ProfileCompletionManager';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import SidebarSkeleton from '../sketetons/SidebarSkeleton';
+import { RiHome8Line } from "react-icons/ri";
 
 export default function MainLayout({
   children,
@@ -53,7 +47,6 @@ export default function MainLayout({
         { title: 'Following', href: '/socials/following', icon: UserPlusIcon },
         { title: 'Upload Post', href: '/socials/uploads', icon: PlusSquareIcon },
         { title: 'Watchlist', href: '/socials/watchlist', icon: TvMinimalPlay },
-        // { title: 'Calendar', href: '/socials/schedule', icon: Calendar },
         {
           title: 'Profile', href: `/socials/profile`,
           icon: (
@@ -70,10 +63,11 @@ export default function MainLayout({
       label: 'Studio',
       icon: LightbulbIcon,
       navItems: [
-        { title: 'All Projects', href: '/studio', icon: FolderOpen },
-        { title: 'Active', href: '/studio/active', icon: FolderOpen },
-        { title: 'Archived', href: '/studio/archived', icon: Archive },
-        { title: 'Video conferencing', href: '/studio/meeting', icon: Video }
+        { title: 'Dashboard', href: '/studio', icon: RiHome8Line },
+        { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
+        { title: 'Module Management', href: '/studio/module-management', icon: PlusSquareIcon },
+        { title: 'Calendar', href: '/studio/schedule', icon: Calendar },
+        { title: 'Classroom & webinar', href: '/studio/meeting', icon: Video }
       ]
     },
     {

@@ -76,7 +76,7 @@ export default function Sidebar({ navItems }: SidebarProps) {
                               }`}
                           />
                         ) : (
-                          <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+                          <img src={Icon} alt="icon" className="w-6 h-6" />
                         )}
                       </div>
                       <span
