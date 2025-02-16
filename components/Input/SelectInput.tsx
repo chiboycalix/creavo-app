@@ -47,7 +47,7 @@ export const SelectInput = ({
       )}
       <div
         className={cn(
-          "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-100",
+          "relative cursor-pointer bg-primary-50 rounded border-2 border-primary-100",
           className
         )}
         onClick={() => setIsOpen(!isOpen)}
