@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import React, { useState, useEffect } from 'react';
+import ProfileCompletionManager from '../ProfileCompletionManager';
+import SidebarSkeleton from '../sketetons/SidebarSkeleton';
 import Header from './includes/Header';
 import Sidebar from './includes/Sidebar';
 import { NavItem, HeaderButton } from '@/types/navigation';
@@ -8,25 +10,25 @@ import { SidebarProvider } from '@/context/SidebarContext';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Home,
-  BarChart,
-  FileText,
-  FolderKanban,
   FolderOpen,
   Archive,
   Video,
-  Settings,
   User,
   Shield,
   Sliders,
-  UploadCloud,
-  User2,
   Compass,
-  Calendar
+  CompassIcon,
+  LightbulbIcon,
+  Store,
+  UserPlusIcon,
+  PlusSquareIcon,
+  TvMinimalPlay,
+  Calendar,
+  ChartAreaIcon
 } from 'lucide-react';
 import { shouldUseMainLayout } from '@/utils/path-utils';
-import ProfileCompletionManager from '../ProfileCompletionManager';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { RiHome8Line, RiHome2Fill, RiHome8Fill } from "react-icons/ri";
 
 export default function MainLayout({
   children,
@@ -35,36 +37,50 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const { loading, currentUser } = useAuth();
-
   const headerButtons: HeaderButton[] = [
     {
       id: 'socials',
-      label: 'Socials',
-      icon: LayoutDashboard,
+      label: 'Explore',
+      icon: CompassIcon,
       navItems: [
-        { title: 'Explore for You', href: '/socials', icon: Compass },
-        { title: 'Analytics', href: '/socials/analytics', icon: BarChart },
-        { title: 'Reports', href: '/socials/reports', icon: FileText },
-        { title: 'Calendar', href: '/socials/schedule', icon: Calendar },
-        { title: 'Upload Video', href: '/socials/uploads', icon: UploadCloud },
-        { title: 'Profile', href: `/socials/profile`, icon: User2 },
+        { title: 'For You', href: '/socials', icon: Compass },
+        { title: 'Following', href: '/socials/following', icon: UserPlusIcon },
+        { title: 'Upload Post', href: '/socials/uploads', icon: PlusSquareIcon },
+        { title: 'Watchlist', href: '/socials/watchlist', icon: TvMinimalPlay },
+        {
+          title: 'Profile', href: `/socials/profile`,
+          icon: (
+            <Avatar className="w-1 h-1">
+              <AvatarImage src={currentUser ? currentUser?.avatar : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"} sizes='sm' />
+              <AvatarFallback>P</AvatarFallback>
+            </Avatar>
+          )
+        },
       ]
     },
     {
       id: 'studio',
       label: 'Studio',
-      icon: FolderKanban,
+      icon: LightbulbIcon,
       navItems: [
-        { title: 'All Projects', href: '/studio', icon: FolderOpen },
-        { title: 'Active', href: '/studio/active', icon: FolderOpen },
-        { title: 'Archived', href: '/studio/archived', icon: Archive },
-        { title: 'Video conferencing', href: '/studio/meeting', icon: Video }
+        { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill /> },
+        { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
+        { title: 'Module Management', href: '/studio/module-management', icon: PlusSquareIcon },
+        { title: 'Calendar', href: '/studio/schedule', icon: Calendar },
+        { title: 'Classroom & webinar', href: '/studio/meeting', icon: Video},
+        { title: 'Analytics', href: '/studio/meeting', icon: ChartAreaIcon,
+          children: [
+            { title: 'Schedule', href: '/studio/meeting/schedule', icon: Calendar },
+            { title: 'Join Meeting', href: '/studio/meeting/join', icon: Video },
+            { title: 'Meeting History', href: '/studio/meeting/history', icon: Archive }
+          ]
+        }
       ]
     },
     {
       id: 'market',
-      label: 'Market Place',
-      icon: Settings,
+      label: 'Marketplace',
+      icon: Store,
       navItems: [
         { title: 'Profile', href: '/market', icon: User },
         { title: 'Security', href: '/market/security', icon: Shield },
@@ -112,7 +128,10 @@ export default function MainLayout({
     <SidebarProvider>
       <div className="flex h-screen bg-gray-50 pb-14 overflow-hidden">
         <aside className="fixed left-0 top-0 h-full z-50">
-          <Sidebar navItems={currentNavItems} />
+          {
+            loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} />
+          }
+
         </aside>
 
         <div className="flex-1 lg:ml-64">
@@ -123,7 +142,7 @@ export default function MainLayout({
             />
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
-            <div className="p-6">
+            <div className="p-0 sm:p-6">
               <ProfileCompletionManager />
               {children}
             </div>

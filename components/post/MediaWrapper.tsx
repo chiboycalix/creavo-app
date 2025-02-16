@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect, MutableRefObject } from 'react'
-import { FaPlay, FaPause } from 'react-icons/fa'
+import React, { useState, useRef, useEffect } from 'react'
 import GallerySlider from './GallerySlider'
+import Cookies from "js-cookie";
+import { FaPlay, FaPause } from 'react-icons/fa'
 import { PostMediaType, usePost } from '@/context/PostContext'
 import { useVideoPlayback } from '@/context/VideoPlaybackContext'
-import Cookies from "js-cookie";
 import { baseUrl } from '@/utils/constant'
 
 type MediaWrapperProps = {
@@ -13,6 +13,7 @@ type MediaWrapperProps = {
   postId?: number
   media?: string
   mediaClass?: string
+  isRenderedInComment?: boolean;
 }
 
 const MediaWrapper: React.FC<MediaWrapperProps> = ({
@@ -20,15 +21,16 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
   size,
   postMedia,
   postId,
+  isRenderedInComment,
 }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
   const [hasBeenViewed, setHasBeenViewed] = useState(false)
-  const videoRef = useRef<HTMLVideoElement | null>(null)
   const { updateViewsCount } = usePost()
   const { isGloballyPaused, setIsGloballyPaused } = useVideoPlayback()
 
-  const isImage = (postMedia && (postMedia && postMedia[0]?.mimeType === 'image/jpeg'))
+  const isImage = (postMedia && (postMedia && postMedia[0]?.mimeType === 'image/jpeg') || postMedia && postMedia[0]?.mimeType === 'image/*')
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -152,6 +154,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
           galleryImgs={postMedia}
           className="w-full h-full object-cover"
           imageClass="h-full"
+          isRenderedInComment={isRenderedInComment}
         />
       ) : (
         <>

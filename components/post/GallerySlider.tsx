@@ -12,12 +12,14 @@ type GallerySliderTypes = {
   navigation?: boolean
   ratioClass?: string
   galleryClass?: string
+  isRenderedInComment?: boolean;
 }
 const GallerySlider = ({
   galleryImgs,
   className = '',
   imageClass = '',
-  galleryClass = 'rounded-xl',
+  galleryClass = 'rounded-none',
+  isRenderedInComment = false,
   navigation = true,
 }: GallerySliderTypes) => {
   const [loaded, setLoaded] = useState(false)
@@ -25,7 +27,7 @@ const GallerySlider = ({
   const [direction, setDirection] = useState(0)
   const images = galleryImgs?.length > 0 ? galleryImgs : []
 
-  const isImage = galleryImgs[index]?.mimeType === "image/jpeg"
+  const isImage = galleryImgs[index]?.mimeType === "image/jpeg" || galleryImgs[index]?.mimeType === "image/*"
 
   const changePhotoId = (newVal: number) => {
     if (newVal > index) {
@@ -68,7 +70,7 @@ const GallerySlider = ({
         {...handlers}
       >
         {/* Main image */}
-        <div className={` h-full overflow-hidden ${galleryClass}`}>
+        <div className={` h-full overflow-hidden sm:rounded-xl rounded-none`}>
           <Link
             className={`relative flex items-center justify-center h-full `}
             href={''}
@@ -87,7 +89,8 @@ const GallerySlider = ({
                   <img
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    className={`object-contain md:max-h-[87vh] h-[calc(87vh)]`}
+                    // className={`object-cover md:max-h-[87vh] h-[calc(87vh)]`}
+                    className={`${isRenderedInComment ? "object-cover h-[calc(79vh)] w-full" : "object-cover md:max-h-[87vh] h-[calc(87vh)]"}`}
                     onLoad={() => setLoaded(true)}
                   />
                 ) : (

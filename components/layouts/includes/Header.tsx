@@ -6,9 +6,7 @@ import Image from 'next/image';
 import NotificationsPopover from '@/components/notifications';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  User, Search, ChevronDown, X, Menu,
-} from 'lucide-react';
+import { User, Search, ChevronDown, X, Menu } from 'lucide-react';
 import { HeaderButton, NavItem } from '@/types/navigation';
 import { useSidebar } from '@/context/SidebarContext';
 import { useAuth } from '@/context/AuthContext';
@@ -49,12 +47,10 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
     return navItems.some(item => pathname.startsWith(item.href));
   };
 
-  const notifications = []
-
   return (
     <header className="bg-white fixed top-0 right-0 left-0 md:left-64 z-30">
-      <div className="px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex h-16 justify-between items-center w-full gap-4">
+      <div className="pr-4 sm:pr-6 lg:pr-6 w-full">
+        <div className="flex h-20 justify-between items-center w-full gap-4">
           {/* Left Section with Menu Toggle and Search */}
           <div className="flex items-center space-x-4">
             <button
@@ -70,7 +66,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
             </button>
 
             {/* Search - Hidden on Mobile */}
-            <div className="hidden md:block w-64 lg:w-96">
+            <div className="hidden md:block w-64 lg:w-72">
               <Input variant="search" placeholder="Search" />
             </div>
           </div>
@@ -89,16 +85,15 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                     const firstRoute = button.navItems[0].href;
                     router.push(firstRoute);
                   }}
-                  className={`p-2 sm:px-3 lg:px-4 lg:py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center space-x-2
-                    ${isActive ? 'bg-primary-50 ring-1 ring-primary-100' : ''}`}
+                  className={`p-2 sm:px-3 lg:px-4 lg:py-2 rounded-lg transition-all flex flex-col items-center space-x-2 space-y-0`}
                 >
-                  <Icon
-                    size={20}
-                    className={`${isActive ? 'text-primary-500' : 'text-gray-500'} 
-                    transition-colors`}
-                  />
-                  <span className={`${isActive ? 'text-primary-500 font-medium' : 'text-gray-700'}
-                    hidden lg:inline transition-colors`}>
+                  <div className={`px-6 rounded-full py-1.5 ${isActive ? "bg-primary-700" : "bg-gray-100"}`}>
+                    <Icon
+                      size={20}
+                      className={`${isActive ? 'text-white' : 'text-gray-500'} transition-colors`}
+                    />
+                  </div>
+                  <span className={`${isActive ? 'text-primary-500' : 'text-gray-700'} text-sm hidden lg:inline transition-colors`}>
                     {button.label}
                   </span>
                 </button>
@@ -276,7 +271,6 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
           leave="transition-all duration-200 ease-in"
           leaveFrom="opacity-100 translate-y-0"
           leaveTo="opacity-0 -translate-y-2"
-        // className="py-2 md:hidden"
         >
           <div className='mb-4'>
             <Input variant="search" placeholder="Search" className="w-full" />

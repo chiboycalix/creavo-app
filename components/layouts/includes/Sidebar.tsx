@@ -1,10 +1,13 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { NavItem } from '@/types/navigation';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useSidebar } from '@/context/SidebarContext';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { NavItem } from "@/types/navigation";
+import { usePathname } from "next/navigation";
+import { useSidebar } from "@/context/SidebarContext";
+import { CrevoeLogo } from "@/public/assets";
+import { NavItemComponent } from "./NavItem";
 
 interface SidebarProps {
   navItems: NavItem[];
@@ -12,7 +15,7 @@ interface SidebarProps {
 
 export default function Sidebar({ navItems }: SidebarProps) {
   const pathname = usePathname();
-  const { isOpen, close } = useSidebar()
+  const { isOpen, close } = useSidebar();
 
   return (
     <>
@@ -24,31 +27,28 @@ export default function Sidebar({ navItems }: SidebarProps) {
       )}
 
       <aside
-        className={`
-        bg-white w-64 min-h-screen fixed top-0 left-0 bottom-0 z-50
+        className={`bg-white w-64 min-h-screen fixed top-0 left-0 bottom-0 z-50
         transform transition-transform duration-300 ease-in-out flex flex-col
-        md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}
+        md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <nav className="p-4">
-          <ul className="space-y-2">
-            <div className="px-4 mb-14">
-              <div className="mb-6 mt-4 flex justify-start">
+        <nav className="px-4">
+          <ul className="">
+            <div className="mb-6">
+              <div className="flex justify-start">
                 <Link href="/" className="relative">
                   <Image
                     width={144}
                     height={50}
-                    className="w-36"
-                    src="/assets/icons/logo.png"
+                    src={CrevoeLogo}
                     alt="STRIDEZ logo"
                     priority
-                    style={{ width: 'auto', height: 'auto' }}
+                    style={{ width: "auto", height: "auto" }}
                   />
                 </Link>
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {navItems.map((item, index) => {
+              {/* {navItems.map((item, index) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
 
@@ -56,36 +56,74 @@ export default function Sidebar({ navItems }: SidebarProps) {
                   <li key={index}>
                     <Link
                       href={item.href}
-                      className={`flex items-center px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors
-                    ${isActive ? 'bg-primary-50' : ''}`}
+                      className={`group flex items-center 
+                        px-4 mb-2 py-2 rounded-lg hover:bg-primary-500
+                        hover:text-white transition-colors ${isActive ? "bg-primary-700" : ""}`}
                     >
-                      <Icon
-                        size={20}
-                        className={`mr-3 ${isActive ? 'text-primary-500' : 'text-gray-500'}`}
-                      />
-                      <span className={isActive ? 'text-primary-500 font-medium' : 'text-gray-700'}>
+                      <div className="mr-3">
+                        {React.isValidElement(Icon) ? (
+                          React.cloneElement(Icon as React.ReactElement<any>, {
+                            className: `${isActive
+                              ? "text-white"
+                              : "text-gray-500 group-hover:text-white"
+                              }`,
+                          })
+                        ) : Icon ? (
+                          <Icon
+                            size={20}
+                            className={`${isActive
+                              ? "text-white"
+                              : "text-gray-500 group-hover:text-white"
+                              }`}
+                          />
+                        ) : (
+                          <img src={Icon} alt="icon" className="w-6 h-6" />
+                        )}
+                      </div>
+                      <span
+                        className={isActive
+                          ? "text-white font-medium"
+                          : "text-gray-700 group-hover:text-white"
+                        }
+                      >
                         {item.title}
                       </span>
                     </Link>
                   </li>
                 );
-              })}
+              })} */}
+              {navItems.map((item, index) => (
+          <li key={index}>
+            <NavItemComponent item={item} pathname={pathname} />
+          </li>
+        ))}
             </div>
           </ul>
-
 
           <div className="border-b mx-3 my-6" />
 
           <div className="mt-4 px-3 text-[11px] text-gray-500">
             <ul className="flex flex-wrap gap-x-5 items-start text-gray-600 gap-y-3 my-2.5">
-              <li className="hover:font-medium cursor-pointer transition-all">Company</li>
-              <li className="hover:font-medium cursor-pointer transition-all">About</li>
-              <li className="hover:font-medium cursor-pointer transition-all">Contact</li>
+              <li className="hover:font-medium cursor-pointer transition-all">
+                Company
+              </li>
+              <li className="hover:font-medium cursor-pointer transition-all">
+                About
+              </li>
+              <li className="hover:font-medium cursor-pointer transition-all">
+                Contact
+              </li>
             </ul>
             <ul className="flex flex-wrap gap-x-5 items-start text-gray-600 gap-y-3 my-2.5">
-              <li className="hover:font-medium cursor-pointer transition-all">Help</li>
-              <li className="hover:font-medium cursor-pointer transition-all">Safety</li>
-              <li className="hover:font-medium cursor-pointer transition-all">Privacy Center</li>
+              <li className="hover:font-medium cursor-pointer transition-all">
+                Help
+              </li>
+              <li className="hover:font-medium cursor-pointer transition-all">
+                Safety
+              </li>
+              <li className="hover:font-medium cursor-pointer transition-all">
+                Privacy Center
+              </li>
               <li className="text-xs hover:font-medium cursor-pointer transition-all">
                 Terms & Policies
               </li>

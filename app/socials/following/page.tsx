@@ -2,7 +2,7 @@
 import React from 'react'
 
 const Analytics = () => {
-  return <div>analytics</div>
+  return <div>Following</div>
 }
 
 export default Analytics

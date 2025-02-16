@@ -1,14 +1,16 @@
 import { LucideIcon } from "lucide-react";
 
-export type NavItem = {
+export interface NavItem {
   title: string;
   href: string;
-  icon: LucideIcon;
-};
+  icon: LucideIcon | React.ReactElement;
+  children?: NavItem[];
+  isExpanded?: boolean;
+}
 
-export type HeaderButton = {
+export interface HeaderButton {
   id: string;
   label: string;
-  navItems: NavItem[];
   icon: LucideIcon;
-};
+  navItems: NavItem[];
+}

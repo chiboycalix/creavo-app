@@ -5,49 +5,50 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
-
-interface Post {
-  id: number;
-  likesCount: number;
-  isLiked: boolean;
-}
+import { useWebSocket } from "@/context/WebSocket";
 
 interface LikeButtonProps {
   postId: number;
   initialLikesCount: number;
   initialIsLiked: boolean;
+  likedId: number;
 }
 
 const LikeButton: React.FC<LikeButtonProps> = ({
   postId,
   initialLikesCount,
-  initialIsLiked
+  initialIsLiked,
+  likedId,
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
+  const ws = useWebSocket();
 
-  const { data: post } = useQuery<Post>({
-    queryKey: ["post", postId],
+  // Fetch like status
+  const { data: likeStatus } = useQuery({
+    queryKey: ['likeStatus', postId],
     queryFn: async () => {
-      return {
-        id: postId,
-        likesCount: initialLikesCount,
-        isLiked: initialIsLiked
-      };
+      if (!getAuth()) return { data: { liked: initialIsLiked } };
+
+      const response = await fetch(`${baseUrl}/posts/${postId}/like-status`, {
+        headers: { Authorization: `Bearer ${Cookies.get("accessToken")}` },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch like status");
+      return response.json();
     },
-    initialData: {
-      id: postId,
-      likesCount: initialLikesCount,
-      isLiked: initialIsLiked
-    },
-    staleTime: Infinity,
-    gcTime: Infinity,
+    enabled: !!getAuth(),
+    staleTime: 0,
+    placeholderData: { data: { liked: initialIsLiked } }, // Prevent flicker
   });
 
-  const toggleMutation = useMutation({
+  const isLiked = likeStatus?.data?.liked ?? initialIsLiked;
+  // console.log({ isLiked })
+  // Like post mutation
+  const likePostMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`${baseUrl}/posts/${postId}/toggle-like`, {
+      const response = await fetch(`${baseUrl}/posts/${postId}/like-post`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -55,65 +56,143 @@ const LikeButton: React.FC<LikeButtonProps> = ({
         },
       });
 
-      if (!response.ok) throw new Error("Failed to toggle like");
+      if (!response.ok) throw new Error("Failed to like post");
+      const result = await response.json();
+
+      // Emit WebSocket event
+      if (ws && ws.connected) {
+        const request = {
+          userId: likedId, // Current user's ID
+          notificationId: result?.data?.id, // Assuming the response contains the notification ID
+        };
+        console.log({ request });
+        ws.emit("like", request);
+      } else {
+        console.log("Failed to emit like event", likedId);
+      }
+
+      return result;
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["likeStatus", postId] });
+
+      // Optimistically update the like status and likes count
+      queryClient.setQueryData(['likeStatus', postId], { data: { liked: true } });
+
+      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
+        if (!oldData?.data?.posts) return oldData;
+
+        const updatedPosts = oldData.data.posts.map((post: any) =>
+          post.id === postId ? { ...post, liked: true, likesCount: post.likesCount + 1 } : post
+        );
+
+        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
+      });
+
+      return { previousLikesCount: initialLikesCount };
+    },
+    onError: (_, __, context) => {
+      // Revert to the previous likes count on error
+      queryClient.setQueryData(['likeStatus', postId], { data: { liked: false } });
+      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
+        if (!oldData?.data?.posts) return oldData;
+
+        const updatedPosts = oldData.data.posts.map((post: any) =>
+          post.id === postId ? { ...post, liked: false, likesCount: context?.previousLikesCount } : post
+        );
+
+        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['likeStatus', postId] });
+    },
+  });
+
+  // Unlike post mutation
+  const unlikePostMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${baseUrl}/posts/${postId}/unlike-post`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to unlike post");
       return response.json();
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["post", postId] });
-      const previousPost = queryClient.getQueryData<Post>(["post", postId]);
+      await queryClient.cancelQueries({ queryKey: ["likeStatus", postId] });
 
-      if (previousPost) {
-        const newPost = {
-          ...previousPost,
-          isLiked: !previousPost.isLiked,
-          likesCount: previousPost.likesCount + (previousPost.isLiked ? -1 : 1)
-        };
-        queryClient.setQueryData(["post", postId], newPost);
-      }
+      // Optimistically update the like status and likes count
+      queryClient.setQueryData(['likeStatus', postId], { data: { liked: false } });
 
-      return { previousPost };
+      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
+        if (!oldData?.data?.posts) return oldData;
+
+        const updatedPosts = oldData.data.posts.map((post: any) =>
+          post.id === postId ? { ...post, liked: false, likesCount: post.likesCount - 1 } : post
+        );
+
+        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
+      });
+
+      return { previousLikesCount: initialLikesCount };
     },
     onError: (_, __, context) => {
-      if (context?.previousPost) {
-        queryClient.setQueryData(["post", postId], context.previousPost);
-      }
+      // Revert to the previous likes count on error
+      queryClient.setQueryData(['likeStatus', postId], { data: { liked: true } });
+      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
+        if (!oldData?.data?.posts) return oldData;
+
+        const updatedPosts = oldData.data.posts.map((post: any) =>
+          post.id === postId ? { ...post, liked: true, likesCount: context?.previousLikesCount } : post
+        );
+
+        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
+      });
     },
-    onSuccess: () => {
-      const currentPost = queryClient.getQueryData<Post>(["post", postId]);
-      if (currentPost) {
-        queryClient.setQueryData(["post", postId], {
-          ...currentPost,
-          isLiked: currentPost.isLiked
-        });
-      }
-    }
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['likeStatus', postId] });
+    },
   });
 
-  const handleLikeClick = () => {
+  const handleToggleLike = () => {
     if (!getAuth()) {
       router.push("/auth?tab=signin");
       return;
     }
-    toggleMutation.mutate();
+
+    if (isLiked) {
+      unlikePostMutation.mutate();
+    } else {
+      likePostMutation.mutate();
+    }
   };
-  // console.log({ post })
+
+  // Get the current likes count from the cache or use the initial value
+  const currentLikesCount = (queryClient.getQueryData<{ data: { posts: { id: number; likesCount: number }[] } }>(['posts'])?.data?.posts.find((post) => post.id === postId)?.likesCount) ?? initialLikesCount;
+
   return (
     <div className="flex flex-col items-center gap-2">
       <button
-        onClick={handleLikeClick}
-        disabled={toggleMutation.isPending}
+        onClick={handleToggleLike}
+        disabled={likePostMutation.isPending || unlikePostMutation.isPending}
         className="flex items-center focus:outline-none transition-opacity disabled:opacity-50"
-        aria-label={post.isLiked ? "Unlike post" : "Like post"}
+        aria-label={isLiked ? "Unlike post" : "Like post"}
       >
         <Heart
-          className={`w-6 h-6 transition-colors duration-200 ${post.isLiked
-            ? "fill-red-500 stroke-red-500"
-            : "md:hover:stroke-red-500 stroke-gray-500"
+          className={`w-8 h-8 transition-colors duration-200 
+            ${isLiked
+              ? "fill-red-500 stroke-red-500"
+              : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
             }`}
         />
       </button>
       <span className="text-xs font-semibold">
-        {post.likesCount.toLocaleString()}
+        {currentLikesCount}
       </span>
     </div>
   );

@@ -3,7 +3,7 @@
 import React from "react";
 import CoHostList from "@/app/socials/live/CoHostList";
 import GuestList from "@/app/socials/live/GuestList";
-import { Schedule } from "@/app/socials/schedule/page";
+import { Schedule } from "@/app/studio/schedule/page";
 
 type ScheduleDetailsViewProps = {
   scheduleDetails: Schedule;
