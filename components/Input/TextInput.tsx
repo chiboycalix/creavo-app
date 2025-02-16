@@ -5,21 +5,19 @@ export type TextInputProps = {
   label?: ReactNode;
   errorMessage?: string | false;
   className?: string;
-  icon?: ReactNode; // Add icon prop
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   leftIconClassName?: string;
   rightIconClassName?: string;
   onLeftIconClick?: () => void;
   onRightIconClick?: () => void;
-  maxLength?: number;
+  maxLength?: number; // Add maxLength prop
 } & React.ComponentProps<'input'>;
 
 export const TextInput = ({
   label,
   errorMessage,
   className,
-  icon, // Add icon prop
   leftIcon,
   rightIcon,
   leftIconClassName,
@@ -41,14 +39,6 @@ export const TextInput = ({
         </label>
       )}
       <div className="relative">
-        {icon && (
-          <div
-            className={cn("absolute inset-y-0 left-0 pl-3 flex items-center", leftIconClassName)}
-            onClick={onLeftIconClick}
-          >
-            {icon}
-          </div>
-        )}
         {leftIcon && (
           <div
             className={cn("absolute inset-y-0 left-0 pl-3 flex items-center", leftIconClassName)}
@@ -60,14 +50,14 @@ export const TextInput = ({
         <input
           className={cn(
             "outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
-            (icon || leftIcon) ? "pl-10" : "pl-3",
+            leftIcon ? "pl-10" : "pl-3",
             rightIcon ? "pr-10" : "pr-3",
             errorMessage ? "bg-red-100" : "bg-gray-100",
             className
           )}
           value={value}
           onChange={onChange}
-          maxLength={maxLength}
+          maxLength={maxLength} // Pass maxLength to the input element
           {...rest}
         />
         {rightIcon && (

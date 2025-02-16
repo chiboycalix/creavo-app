@@ -1,3 +1,4 @@
+"use client"
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 import { Textarea } from "../ui/textarea"; // Assuming Textarea is a custom component

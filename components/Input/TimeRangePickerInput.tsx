@@ -1,3 +1,4 @@
+"use client"
 import { cn } from "@/lib/utils";
 import { CalendarIcon, ArrowUpAzIcon } from "lucide-react";
 import { ReactNode, useState } from "react";

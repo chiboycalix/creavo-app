@@ -1,3 +1,4 @@
+"use client"
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 import { ReactNode } from "react";

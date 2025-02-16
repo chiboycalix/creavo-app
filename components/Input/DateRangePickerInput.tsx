@@ -1,3 +1,4 @@
+"use client"
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
