@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import ChatMessage from './ChatMessage';
-import Input from '@/components/ui/Input';
+import ParticipantList from './ParticipantList';
+import EmojiPicker from './EmojiPicker';
+import { Input } from '@/components/Input';
 import { ChevronRight, Search, Send, Smile, Users, X } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { ChatEmpty } from '@/public/assets';
-import ParticipantList from './ParticipantList';
 import { useVideoConferencing } from '@/context/VideoConferencingContext';
-import EmojiPicker from './EmojiPicker';
 
 const ChatAndParticipant = ({ onClose, localUser, remoteParticipants }: {
   onClose: () => void;
@@ -168,15 +168,7 @@ const ChatAndParticipant = ({ onClose, localUser, remoteParticipants }: {
                 <TabsContent value="participants" className="absolute left-0 right-0 bg-[#11131A] min-h-0 h-[calc(100vh-8rem)] overflow-y-auto">
                   <div className="p-4">
                     <div className='mb-6'>
-                      <Input
-                        variant='search'
-                        placeholder="Find what you're looking for"
-                        className='rounded-sm bg-[#191B23] text-[#8F9099]'
-                        leftIcon={<Search />}
-                        leftIconClassName='text-white'
-                        rightIcon={<Search />}
-                        rightIconClassName="hidden"
-                      />
+                      <Input variant="search" placeholder="Find what you're looking for" className='bg-[#191B23] text-[#8F9099]' />
                     </div>
                     <div className="space-y-4">
                       <div className="space-y-4">

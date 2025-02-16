@@ -1,9 +1,9 @@
 import MediaWrapper from "../post/MediaWrapper";
 import CommentSectionSkeleton from "../sketetons/CommentSectionSkeleton";
 import CommentItem from "./CommentItem";
-import Input from "@/components/ui/Input";
 import Link from "next/link";
 import Image from "next/image";
+import { Input } from "@/components/Input";
 import { useFetchComments } from "@/hooks/useFetchComments";
 import { X } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";

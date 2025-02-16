@@ -1,5 +1,5 @@
 "use client"
-
+import Toastify from "@/components/Toastify";
 import React, {
   useState,
   useRef,
@@ -10,7 +10,6 @@ import React, {
   FormEvent,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Toastify from "@/components/Toastify";
 import { baseUrl } from "@/utils/constant";
 import { Button } from "@/components/ui/button";
 
@@ -120,7 +119,7 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 max-w-md mx-auto w-full">
+    <div className="flex-1 max-w-lg mx-auto w-full">
       <Toastify message={alert} />
       <div className="w-full">
         <div className="text-center mb-8">
@@ -144,13 +143,13 @@ const ResetPassword: React.FC = () => {
                   onChange={(e) => handleChange(e, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   required
-                  className="w-[3em] h-[3em] text-center input-no-spinner border rounded-lg border-black mx-2 my-4"
+                  className="w-[4rem] h-[4rem] text-center input-no-spinner border rounded-lg border-black mx-2 my-4"
                 />
               ))}
             </div>
             <Button
               type="submit"
-              className="w-full"
+              className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
             >
               Submit
             </Button>

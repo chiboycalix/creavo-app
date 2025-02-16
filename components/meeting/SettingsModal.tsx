@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Bell, Mic, Volume2, X, VideoIcon, MessageSquareIcon, HandIcon, StopCircleIcon, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal from './Modal'
-import Input from '@/components/ui/Input';
+import {Input} from '@/components/Input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';

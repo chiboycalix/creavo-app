@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Input from "@/components/ui/Input";
+import {Input} from "@/components/Input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { X } from "lucide-react";
@@ -39,9 +39,6 @@ export default function Schedule() {
               variant="datePicker"
               label="Date"
               rightIcon={<BiCaretDown />}
-              onDateSelect={(date) => {
-              }}
-              selectedDate={new Date()}
               className="w-full"
             />
           </div>

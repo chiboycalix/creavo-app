@@ -1,9 +1,9 @@
 'use client';
 
-import Input from '@/components/ui/Input';
 import Link from 'next/link';
 import Image from 'next/image';
 import NotificationsPopover from '@/components/notifications';
+import { Input } from '@/components/Input';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { User, Search, ChevronDown, X, Menu } from 'lucide-react';
@@ -66,7 +66,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
             </button>
 
             {/* Search - Hidden on Mobile */}
-            <div className="hidden md:block w-64 lg:w-72">
+            <div className="hidden md:block w-64 lg:w-80">
               <Input variant="search" placeholder="Search" />
             </div>
           </div>

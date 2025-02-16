@@ -1,7 +1,7 @@
 'use client';
 
-import Input from "@/components/ui/Input";
 import Spinner from "@/components/Spinner";
+import { Input } from "@/components/Input";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
