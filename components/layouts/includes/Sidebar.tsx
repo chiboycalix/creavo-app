@@ -7,6 +7,7 @@ import { NavItem } from "@/types/navigation";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "@/context/SidebarContext";
 import { CrevoeLogo } from "@/public/assets";
+import { NavItemComponent } from "./NavItem";
 
 interface SidebarProps {
   navItems: NavItem[];
@@ -47,7 +48,7 @@ export default function Sidebar({ navItems }: SidebarProps) {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {navItems.map((item, index) => {
+              {/* {navItems.map((item, index) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
 
@@ -90,7 +91,12 @@ export default function Sidebar({ navItems }: SidebarProps) {
                     </Link>
                   </li>
                 );
-              })}
+              })} */}
+              {navItems.map((item, index) => (
+          <li key={index}>
+            <NavItemComponent item={item} pathname={pathname} />
+          </li>
+        ))}
             </div>
           </ul>
 

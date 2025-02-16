@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Bell, X } from "lucide-react";
+import Image from "next/image";
+import NotificationSkeleton from "../sketetons/NotificationSkeleton";
+import { Bell } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import Image from "next/image";
 import { NotificationGif } from "@/public/assets";
 import { useWebSocket } from "@/context/WebSocket";
 import { NotificationGroup } from "./NotificationGroup";
@@ -13,20 +14,20 @@ import { NotificationItem } from "./NotificationItem";
 import { transformNotifications } from "./notification";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
 import { useAuth } from "@/context/AuthContext";
-import NotificationSkeleton from "../sketetons/NotificationSkeleton";
 
 const NotificationsPopover = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState<boolean>(false);
+  const [hasUnreadNotifications, setHasUnreadNotifications] =
+    useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
   const { getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
-  const { data: apiNotifications, isPending: isFetchingNotifications } = useUserNotifications(currentUser?.id);
+  const { data: apiNotifications, isPending: isFetchingNotifications } =
+    useUserNotifications(currentUser?.id);
 
   const ws = useWebSocket();
-  console.log({ apiNotifications })
-  // Function to normalize notification format
+
   const normalizeNotification = (notification: any) => ({
     type: notification.event?.toLowerCase() || "unknown",
     data: {
@@ -34,27 +35,37 @@ const NotificationsPopover = () => {
       userId: notification.data?.userId || notification.userId,
       actorId: notification.data?.actorId || notification.actorId,
       event: notification.event || "UNKNOWN",
-      resourceType: notification.data?.resourceType || notification.resourceType,
+      resourceType:
+        notification.data?.resourceType || notification.resourceType,
       metadata: notification.data?.metadata
         ? JSON.parse(notification.data.metadata)
         : notification.metadata
-          ? JSON.parse(notification.metadata)
-          : {},
+        ? JSON.parse(notification.metadata)
+        : {},
       content: notification.data?.content || notification.content,
       isRead: notification.data?.isRead ?? false,
       createdAt: notification.data?.createdAt || notification.createdAt,
       updatedAt: notification.data?.updatedAt || notification.updatedAt,
-      user_username: notification.data?.user_username || notification.user_username,
-      user_profile_firstName: notification.data?.user_profile_firstName || notification.user_profile_firstName,
-      user_profile_lastName: notification.data?.user_profile_lastName || notification.user_profile_lastName,
-      user_profile_avatar: notification.data?.user_profile_avatar || notification.user_profile_avatar,
+      user_username:
+        notification.data?.user_username || notification.user_username,
+      user_profile_firstName:
+        notification.data?.user_profile_firstName ||
+        notification.user_profile_firstName,
+      user_profile_lastName:
+        notification.data?.user_profile_lastName ||
+        notification.user_profile_lastName,
+      user_profile_avatar:
+        notification.data?.user_profile_avatar ||
+        notification.user_profile_avatar,
       isFollowing: notification.event === "FOLLOW" ? true : undefined,
     },
   });
 
   useEffect(() => {
     if (apiNotifications) {
-      const formattedNotifications = apiNotifications?.data?.notifications?.map(normalizeNotification);
+      const formattedNotifications = apiNotifications?.data?.notifications?.map(
+        normalizeNotification
+      );
       setNotifications(formattedNotifications);
     }
   }, [apiNotifications]);
@@ -66,7 +77,9 @@ const NotificationsPopover = () => {
     setNotifications((prevNotifications) => {
       if (!Array.isArray(prevNotifications)) return [formattedNotification];
 
-      const exists = prevNotifications.some((n) => n.data.id === formattedNotification.data.id);
+      const exists = prevNotifications.some(
+        (n) => n.data.id === formattedNotification.data.id
+      );
       if (exists) return prevNotifications;
 
       setHasUnreadNotifications(true);
@@ -117,15 +130,20 @@ const NotificationsPopover = () => {
           )}
 
           <div className="min-h-[80vh] overflow-y-auto">
-            {
-              isFetchingNotifications ? <NotificationSkeleton /> : groupedNotifications.today.length > 0 && (
+            {isFetchingNotifications ? (
+              <NotificationSkeleton />
+            ) : (
+              groupedNotifications.today.length > 0 && (
                 <NotificationGroup title="Today">
                   {groupedNotifications.today.map((notification: any) => (
-                    <NotificationItem key={notification?.id} {...notification} />
+                    <NotificationItem
+                      key={notification?.id}
+                      {...notification}
+                    />
                   ))}
                 </NotificationGroup>
               )
-            }
+            )}
           </div>
         </div>
       </PopoverContent>

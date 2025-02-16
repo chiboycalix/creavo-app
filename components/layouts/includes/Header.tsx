@@ -6,9 +6,7 @@ import Image from 'next/image';
 import NotificationsPopover from '@/components/notifications';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  User, Search, ChevronDown, X, Menu,
-} from 'lucide-react';
+import { User, Search, ChevronDown, X, Menu } from 'lucide-react';
 import { HeaderButton, NavItem } from '@/types/navigation';
 import { useSidebar } from '@/context/SidebarContext';
 import { useAuth } from '@/context/AuthContext';
