@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { NavItem } from '@/types/navigation';
 
 export const NavItemComponent = ({ item, pathname, level = 0 }: { item: NavItem; pathname: string; level?: number }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isActive = pathname === item.href;
+  const isActive = pathname?.split("/")[2] === item?.href?.split("/")[2];
   const hasChildren = item.children && item.children.length > 0;
   const Icon = item.icon;
 

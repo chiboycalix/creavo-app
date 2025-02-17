@@ -1,15 +1,23 @@
 "use client"
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/Input'
 import { Switch } from '@/components/ui/switch'
 import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
+import { generalHelpers } from '@/helpers'
 
 const CreateCourse = () => {
-  const [username, setUsername] = useState("")
+  const [course, setCourse] = useState("")
   const [description, setDescription] = useState("")
   const [files, setFiles] = useState<File[]>([]);
+  const router = useRouter()
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    const slugTitle = generalHelpers?.convertToSlug(course)
+    router.push(`/studio/create-course/${slugTitle}`)
+  }
 
   return (
     <Card className='border-none mt-4 max-w-5xl mx-auto'>
@@ -17,15 +25,15 @@ const CreateCourse = () => {
         <CardTitle className="text-base font-semibold">New Course</CardTitle>
       </CardHeader>
       <CardContent className='border-none'>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className='mb-8'>
             <Input
               variant="text"
               label="Course Name"
               maxLength={54}
               placeholder="Enter course title"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={course}
+              onChange={(e) => setCourse(e.target.value)}
             />
             <p className='text-sm mt-1'>You can always change this later</p>
           </div>
@@ -86,6 +94,7 @@ const CreateCourse = () => {
           <div className='w-full mt-12'>
             <Button
               type="submit"
+              disabled={!course}
               className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
             >
               Continue

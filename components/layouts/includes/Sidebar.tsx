@@ -48,55 +48,11 @@ export default function Sidebar({ navItems }: SidebarProps) {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {/* {navItems.map((item, index) => {
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-
-                return (
-                  <li key={index}>
-                    <Link
-                      href={item.href}
-                      className={`group flex items-center 
-                        px-4 mb-2 py-2 rounded-lg hover:bg-primary-500
-                        hover:text-white transition-colors ${isActive ? "bg-primary-700" : ""}`}
-                    >
-                      <div className="mr-3">
-                        {React.isValidElement(Icon) ? (
-                          React.cloneElement(Icon as React.ReactElement<any>, {
-                            className: `${isActive
-                              ? "text-white"
-                              : "text-gray-500 group-hover:text-white"
-                              }`,
-                          })
-                        ) : Icon ? (
-                          <Icon
-                            size={20}
-                            className={`${isActive
-                              ? "text-white"
-                              : "text-gray-500 group-hover:text-white"
-                              }`}
-                          />
-                        ) : (
-                          <img src={Icon} alt="icon" className="w-6 h-6" />
-                        )}
-                      </div>
-                      <span
-                        className={isActive
-                          ? "text-white font-medium"
-                          : "text-gray-700 group-hover:text-white"
-                        }
-                      >
-                        {item.title}
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })} */}
               {navItems.map((item, index) => (
-          <li key={index}>
-            <NavItemComponent item={item} pathname={pathname} />
-          </li>
-        ))}
+                <li key={index}>
+                  <NavItemComponent item={item} pathname={pathname} />
+                </li>
+              ))}
             </div>
           </ul>
 
