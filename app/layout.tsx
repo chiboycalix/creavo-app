@@ -11,6 +11,7 @@ import { WebSocketProvider } from "@/context/WebSocket";
 import { VideoConferencingProvider } from "@/context/VideoConferencingContext";
 import ReactQueryProvider from "@/context/QueryContext";
 import { CommentsProvider } from "@/context/CommentsContext";
+import { MarketProvider } from "@/context/MarketContext";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -35,20 +36,23 @@ export default function RootLayout({
             <WebSocketProvider>
               <CommentsProvider>
                 <MainLayout>
-                  <ToastProvider>
-                    <PostProvider>
-                      <VideoConferencingProvider>
-                        <VideoPlaybackProvider>{children}</VideoPlaybackProvider>
-                        <Toaster richColors expand />
-                      </VideoConferencingProvider>
-                    </PostProvider>
-                  </ToastProvider>
+                  <MarketProvider>
+                    <ToastProvider>
+                      <PostProvider>
+                        <VideoConferencingProvider>
+                          <VideoPlaybackProvider>
+                            {children}
+                          </VideoPlaybackProvider>
+                          <Toaster richColors expand />
+                        </VideoConferencingProvider>
+                      </PostProvider>
+                    </ToastProvider>
+                  </MarketProvider>
                 </MainLayout>
               </CommentsProvider>
             </WebSocketProvider>
           </AuthProvider>
         </ReactQueryProvider>
-
       </body>
     </html>
   );
