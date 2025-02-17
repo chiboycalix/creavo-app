@@ -81,12 +81,9 @@ export default function OtpContent() {
       <Toastify message={alert} />
 
       <div className="w-full bg-white">
-
         <div className="w-full">
           <p className="font-bold text-2xl text-center">Hey, {email} </p>
-          <p className="text-center">
-            An Otp has been sent to your email, please enter the 6
-            digits below</p>
+          <p className="text-center">An Otp has been sent to your email, please enter the 6 digits below</p>
           <form onSubmit={handleSubmit} className="w-full">
             <section className="w-full mt-6 sm:mt-8 md:mt-10">
               <InputOTP
@@ -108,15 +105,12 @@ export default function OtpContent() {
               <div className="mt-4">
                 <Button
                   type="submit"
-                  className="bg-primary px-2 w-full"
+                  className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
                 >
                   {
                     isVerifyingOtp ? <Loader2 className="text-white animate-spin" size={60} /> : "Confirm"
                   }
-
                 </Button>
-
-
                 <div className="flex justify-end mt-2">
                   <Button
                     variant={"link"}
@@ -127,11 +121,9 @@ export default function OtpContent() {
                     Resend OTP
                   </Button>
                 </div>
-
               </div>
             </section>
           </form>
-
         </div>
       </div>
     </div>

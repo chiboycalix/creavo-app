@@ -7,8 +7,10 @@ import VolumeControlPopup from "./VolumeControlPopup";
 import JoinRequestNotification from "./JoinRequestNotification";
 import EndCallScreen from "./EndCallScreen";
 import EmojiPopup from "./EmojiPopup";
-import { VideoGrid } from "./VideoGrid";
 import ChatAndParticipant from "./ChatAndParticipant";
+import BackgroundColorPicker from "./BackgroundColorPicker";
+import InvitePeopleTab from "./InvitePeople/InvitePeopleTab";
+import { VideoGrid } from "./VideoGrid";
 import {
   X,
   Mic,
@@ -31,8 +33,6 @@ import { useVideoConferencing } from "@/context/VideoConferencingContext";
 import { generalHelpers } from "@/helpers";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
-import BackgroundColorPicker from "./BackgroundColorPicker";
-import InvitePeopleTab from "./InvitePeople/InvitePeopleTab";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 
@@ -227,7 +227,7 @@ const LiveStreamInterface = () => {
 
             {/* Invite Modal */}
             {showInviteModal && !hasEndedCall && (
-              <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white rounded-lg p-2 md:p-3 lg:p-4 w-[90%] md:w-96 max-w-[95vw] md:max-w-md">
+              <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-white rounded-lg p-2 md:p-3 lg:p-4 w-[90%] md:w-96 max-w-[95vw] md:max-w-xl">
                 <div className="flex justify-between items-center mb-2 md:mb-3">
                   <h3 className="font-semibold text-sm md:text-base">
                     You&apos;re set!
@@ -249,7 +249,7 @@ const LiveStreamInterface = () => {
                 </div>
                 <div className="flex items-center justify-evenly gap-2">
                   <Button
-                    className="w-1/3 flex items-center justify-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-indigo-700 transition-colors"
+                    className="w-1/3 flex items-center justify-center gap-1 bg-primary-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-primary-700 transition-colors"
                     onClick={() => {
                       toast.success("Meeting Link copied!")
                       navigator.clipboard.writeText(
@@ -262,7 +262,7 @@ const LiveStreamInterface = () => {
 
                   <Button
                     onClick={() => setShowInvitePeople(true)}
-                    className="w-1/3 flex items-center justify-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-indigo-700 transition-colors"
+                    className="w-1/3 flex items-center justify-center gap-1 bg-primary-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-primary-700 transition-colors"
                   >
                     <Plus className="w-3 h-3 md:w-4 md:h-4 bg-white text-primary" />
                     Invite

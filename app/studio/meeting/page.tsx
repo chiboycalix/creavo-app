@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import Input from "@/components/ui/Input";
 import Image from "next/image";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { Input } from "@/components/Input";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVideoConferencing } from "@/context/VideoConferencingContext";
 import { TeamPeople } from "@/public/assets";
@@ -94,7 +94,9 @@ export default function VideoConferencing() {
               <p>Engage face-to-face in real time.</p>
             </div>
             <div className="mt-4 w-full relative">
-              <Button className="w-full" onClick={handleSheduleMeeting}>
+              <Button
+                 className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
+                onClick={handleSheduleMeeting}>
                 Create Video Conferencing
               </Button>
               <AnimatePresence>
@@ -138,7 +140,7 @@ export default function VideoConferencing() {
             </div>
             <div className="w-full mt-3 relative">
               <Button
-                className="w-full"
+                className="w-full h-[50px] p-2.5"
                 variant="outline"
                 onClick={openJoinModal}
               >

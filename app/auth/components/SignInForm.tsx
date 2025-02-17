@@ -1,6 +1,6 @@
 "use client";
 import SocialButtons from "@/components/SocialButtons";
-import Input from "@/components/ui/Input";
+import { Input } from "@/components/Input";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { LockIcon, Mail } from "lucide-react";
@@ -96,7 +96,7 @@ export default function SignInForm() {
         onSubmit={handleSubmit}
       >
         <Input
-          icon={<Mail className="h-5 w-5 text-gray-400" />}
+          leftIcon={<Mail className="h-5 w-5 text-gray-400" />}
           label="Email"
           variant="text"
           id="email"
@@ -107,7 +107,7 @@ export default function SignInForm() {
           className="w-full"
         />
         <Input
-          icon={<LockIcon className="h-5 w-5 text-gray-400" />}
+          leftIcon={<LockIcon className="h-5 w-5 text-gray-400" />}
           label="Password"
           variant="password"
           id="password"
@@ -129,7 +129,11 @@ export default function SignInForm() {
             Forgot password?
           </div>
         </div>
-        <Button type="submit" disabled={loading} className="w-full">
+        <Button
+          type="submit"
+          disabled={loading}
+          className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
+          >
           {loading ? <Spinner /> : "Sign In with Stridez"}
         </Button>
       </form>

@@ -1,12 +1,11 @@
 "use client";
-
 import React, { useState } from "react";
 import Toastify from "@/components/Toastify";
+import Link from "next/link";
+import { Input } from "@/components/Input";
 import { useRouter } from "next/navigation.js";
 import { baseUrl } from "@/utils/constant";
-import Input from "@/components/ui/Input";
 import { Mail } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function ForgotPassword() {
@@ -68,7 +67,7 @@ export default function ForgotPassword() {
 
             <Button
               type="submit"
-              className="bg-purple-900 px-2 mx-auto w-full"
+              className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
             >
               Send OTP
             </Button>

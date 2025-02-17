@@ -34,7 +34,7 @@ export default function WelcomeContent() {
   }
 
   return (
-    <div className="flex-1 flex flex-col items-center">
+    <div className="flex-1 flex flex-col items-center w-full">
       <div className="h-24 w-24">
         <img src={"/assets/Congrats.png"} alt="congrats" />
       </div>
@@ -46,11 +46,11 @@ export default function WelcomeContent() {
           personalize the app for your use case to enhance your experience.
         </p>
 
-        <div>
+        <div className="w-1/2 mt-4">
           <Button
             onClick={(e)=>handleSetupProfile(e)}
             type="button"
-            className="bg-purple-900 rounded-lg text-white hover:bg-opacity-90 text-xs py-3 px-6 cursor-pointer"
+            className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
           >
             Set up your profile
           </Button>

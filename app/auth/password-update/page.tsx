@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import Toastify from "@/components/Toastify";
+import { Input } from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
-import Input from "@/components/ui/Input";
 import { LockIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -93,7 +93,7 @@ const PasswordUpdate = () => {
               )}
             </div>
 
-            <Button type="submit" className="bg-primary w-full px-2">
+            <Button type="submit" className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6">
               Save Password
             </Button>
             <p className=" text-center py-4">

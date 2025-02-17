@@ -116,7 +116,6 @@ const tableData = [
 // ] as any;
 
 const StudioDashboard = () => {
-
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -159,8 +158,6 @@ const StudioDashboard = () => {
     }
 
   ] as any;
-
-
 
   return (
     <div className="w-full py-8">

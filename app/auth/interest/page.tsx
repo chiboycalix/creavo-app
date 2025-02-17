@@ -1,13 +1,14 @@
 "use client"
-
 import "react-toastify/dist/ReactToastify.css";
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/Spinner";
 import Toastify from "@/components/Toastify";
-import { useRouter } from "next/router";
-import { baseUrl } from "@/utils/constant";
 import Cookies from "js-cookie";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { baseUrl } from "@/utils/constant";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/Input";
 
 const topicsList = [
   "Product design",
@@ -103,12 +104,11 @@ export default function TopicSelection() {
             Select topics of your interest to personalize your experience.
           </p>
 
-          <input
-            type="text"
+          <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search topics"
-            className="mb-1 w-full text-sm px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500"
+            className="mb-1 w-full text-sm focus:ring-1 focus:ring-primary-500"
+            variant="search" placeholder="Search topics"
           />
 
           <div className="flex flex-wrap justify-center gap-2 my-8">
@@ -118,7 +118,7 @@ export default function TopicSelection() {
                   key={topic}
                   onClick={() => toggleTopic(topic)}
                   className={`px-4 py-2 rounded-full shadow-sm text-sm ${selectedTopics?.includes(topic)
-                    ? "bg-[#37169C] text-white"
+                    ? "bg-primary text-white"
                     : "bg-gray-100 text-gray-800"
                     }`}
                 >
@@ -127,12 +127,12 @@ export default function TopicSelection() {
               ))}
           </div>
 
-          <button
+          <Button
             onClick={handleSave}
-            className="w-full bg-[#37169C] text-white py-2.5 text-sm rounded-xl hover:bg-[#37169C]/85 transition-all"
+            className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
           >
             {loading ? <Spinner className="text-white" /> : "Save and Continue"}
-          </button>
+          </Button>
 
           <button
             onClick={handleSkip}

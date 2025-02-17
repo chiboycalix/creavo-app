@@ -1,7 +1,7 @@
 'use client';
 import Spinner from '@/components/Spinner';
 import SocialButtons from '@/components/SocialButtons';
-import Input from '@/components/ui/Input';
+import {Input} from '@/components/Input';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LockIcon, Mail } from 'lucide-react';
@@ -10,6 +10,7 @@ import { AUTH_API } from '@/lib/api';
 import { ROUTES } from '@/constants/routes';
 import { useToast } from '@/context/ToastContext';
 import { STATUS_CODES } from '@/constants/statusCodes';
+import { Button } from '@/components/ui/button';
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -114,7 +115,7 @@ export default function SignUpForm() {
           className="w-full"
         />
         <Input
-          icon={<LockIcon className="h-5 w-5 text-gray-400" />}
+          leftIcon={<LockIcon className="h-5 w-5 text-gray-400" />}
           label="Password"
           variant="password"
           placeholder="*****"
@@ -126,7 +127,7 @@ export default function SignUpForm() {
 
         <div>
           <Input
-            icon={<LockIcon className="h-5 w-5 text-gray-400" />}
+            leftIcon={<LockIcon className="h-5 w-5 text-gray-400" />}
             label="Confirm Password"
             variant="password"
             placeholder="*****"
@@ -154,17 +155,17 @@ export default function SignUpForm() {
             Forgot password?
           </div>
         </div>
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="bg-[#37169c] h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
+          className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
         >
           {loading ? (
             <Spinner className={""} />
           ) : (
             "Create an account with Stridez"
           )}
-        </button>
+        </Button>
 
         <div className="text-center text-sm">
           By creating an account, you agree to our{' '}

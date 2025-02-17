@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 import PostModal from "@/components/post/post-modal";
+import { useParams, useRouter } from "next/navigation";
 import { PostType, usePost } from "@/context/PostContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { useVideoPlayback } from "@/context/VideoPlaybackContext";
 
 export default function PostModalWrapper() {
-  const { getCurrentUser } = useAuth();
   const router = useRouter();
+  const { getCurrentUser } = useAuth();
   const { fetchPostDetail } = usePost();
   const { setIsGloballyPaused } = useVideoPlayback();
   const [postDetail, setPostDetail] = useState<PostType | null>(null);

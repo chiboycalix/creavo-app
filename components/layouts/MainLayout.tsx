@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { shouldUseMainLayout } from '@/utils/path-utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { RiHome8Line, RiHome2Fill, RiHome8Fill } from "react-icons/ri";
+import { RiHome8Fill } from "react-icons/ri";
 
 export default function MainLayout({
   children,
@@ -63,12 +63,13 @@ export default function MainLayout({
       label: 'Studio',
       icon: LightbulbIcon,
       navItems: [
-        { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill /> },
+        { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill size={20} /> },
         { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
         { title: 'Module Management', href: '/studio/module-management', icon: PlusSquareIcon },
         { title: 'Calendar', href: '/studio/schedule', icon: Calendar },
-        { title: 'Classroom & webinar', href: '/studio/meeting', icon: Video},
-        { title: 'Analytics', href: '/studio/meeting', icon: ChartAreaIcon,
+        { title: 'Classroom & webinar', href: '/studio/meeting', icon: Video },
+        {
+          title: 'Analytics', href: '/studio/analytics', icon: ChartAreaIcon,
           children: [
             { title: 'Schedule', href: '/studio/meeting/schedule', icon: Calendar },
             { title: 'Join Meeting', href: '/studio/meeting/join', icon: Video },
