@@ -2,7 +2,7 @@ import React from "react";
 import { StatCard } from "@/components/analytics/StatCard";
 import { LineChart } from "@/components/analytics/LineChart";
 import { ChartHeader } from "@/components/analytics/ChatHeaders";
-import CompletionRate from "@/components/studio/CompletionRate";
+import CompletionRate from "@/components/studio/dashboard/CompletionRate";
 
 function OverviewPage() {
   const revenueData = [42, 43, 60, 45, 55, 53, 52, 83, 48, 52, 68, 65, 60, 58];
