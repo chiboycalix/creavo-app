@@ -109,19 +109,19 @@ const Curriculum = () => {
   }, []);
 
   useEffect(() => {
-    router.push(`?module=module-one`);
+    router.push(`?module=introductory-video`);
     setSelectedModule({
       id: "1",
-      name: "Module one",
-      slug: "module-one",
+      name: "Introductory Video",
+      slug: "introductory-video",
       content: [
         {
           id: 1,
-          title: "Video one",
+          title: "Introduction to programming",
         },
         {
           id: 2,
-          title: "Video two",
+          title: "How does the browser works",
         },
       ],
     })
