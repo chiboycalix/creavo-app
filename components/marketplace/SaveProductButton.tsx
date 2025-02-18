@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Heart } from "lucide-react";
 import { useMarketContext } from "@/context/MarketContext";
 
@@ -15,12 +15,17 @@ const SaveProductButton: React.FC<LikeButtonProps> = ({
   savedId,
   onToggleSave,
 }) => {
-  const { isSaved, setIsSaved } = useMarketContext();
+  const { isSaved, setIsSaved, savedProducts  } = useMarketContext();
 
   const handleToggleSave = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
     event.preventDefault();
     onToggleSave(productId);
   };
+
+  useEffect(() => {
+    const isProductSaved = savedProducts.includes(productId);
+    setIsSaved(isProductSaved);
+  }, [productId, savedProducts, setIsSaved]);
 
   return (
     <div className="flex flex-col items-center gap-2">

@@ -30,6 +30,13 @@ export default {
           "100": "#E2E2D5",
           "200": "#888883",
         },
+        marketPlace: {
+          "digital": "#C9DCE1",
+          "ebook": "#C0E1CC",
+          "courses": "#EAD16B",
+          "events": "#E8DAA8",
+          "services": "#F8DCDC",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
