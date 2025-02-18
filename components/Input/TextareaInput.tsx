@@ -70,7 +70,7 @@ export const TextareaInput = ({
         )}
         <Textarea
           className={cn(
-            "flex min-h-[80px] w-full rounded-md border border-primary-100 bg-primary-50 px-3 py-2 text-base",
+            "flex min-h-[80px] w-full rounded-md border border-primary-100 bg-primary-50/25 px-3 py-2 text-base",
             "placeholder:text-neutral-500 focus-visible:outline-none outline-none focus-visible:border-none",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "md:text-sm outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2",

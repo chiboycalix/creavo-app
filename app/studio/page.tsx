@@ -1,9 +1,9 @@
 "use client"
 import React, { useState } from "react";
-import RevenueAndCompletionCharts from "@/components/studio/RevenueAndCompletionCharts";
-import RecentCourses from "@/components/studio/RecentCourses";
+import RecentCourses from "@/components/studio/dashboard/RecentCourses";
+import RevenueAndCompletionCharts from "@/components/studio/dashboard/RevenueAndCompletionCharts";
 import DynamicTable from "@/components/table";
-import { StatisticsCard } from "@/components/studio/StatisticCard";
+import { StatisticsCard } from "@/components/studio/dashboard/StatisticCard";
 import { File, LayoutDashboard, PlusSquareIcon, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

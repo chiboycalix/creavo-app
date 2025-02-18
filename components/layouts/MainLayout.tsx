@@ -10,7 +10,6 @@ import { SidebarProvider } from '@/context/SidebarContext';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
 import {
-  FolderOpen,
   Archive,
   Video,
   User,
@@ -132,7 +131,6 @@ export default function MainLayout({
           {
             loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} />
           }
-
         </aside>
 
         <div className="flex-1 lg:ml-64">
