@@ -48,7 +48,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white fixed top-0 right-0 left-0 md:left-64 z-30">
+    <header className="bg-white fixed top-0 right-0 left-0 md:left-72 z-30">
       <div className="pr-4 sm:pr-6 lg:pr-6 w-full">
         <div className="flex h-20 justify-between items-center w-full gap-4">
           {/* Left Section with Menu Toggle and Search */}

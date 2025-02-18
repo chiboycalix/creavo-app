@@ -9,7 +9,7 @@ import { NavItem, HeaderButton } from "@/types/navigation";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
-import {  BookmarkIcon } from "@heroicons/react/24/solid"
+import { BookmarkIcon } from "@heroicons/react/24/solid"
 import {
   Archive,
   Video,
@@ -28,6 +28,7 @@ import {
 
   BookMarkedIcon,
   BellIcon,
+  Bookmark,
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -41,7 +42,7 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const { loading, currentUser } = useAuth();
-  const headerButtons: HeaderButton[] = [
+  const headerButtons: HeaderButton[] = React.useMemo(() => [
     {
       id: "socials",
       label: "Explore",
@@ -93,23 +94,6 @@ export default function MainLayout({
         { title: 'Calendar', href: '/studio/schedule', icon: Calendar },
         { title: 'Classroom & webinar', href: '/studio/meeting', icon: Video },
         {
-          title: "Dashboard",
-          href: "/studio",
-          icon: <RiHome8Fill size={20} />,
-        },
-        {
-          title: "Create course",
-          href: "/studio/create-course",
-          icon: PlusSquareIcon,
-        },
-        {
-          title: "Module Management",
-          href: "/studio/module-management",
-          icon: PlusSquareIcon,
-        },
-        { title: "Calendar", href: "/studio/schedule", icon: Calendar },
-        { title: "Classroom & webinar", href: "/studio/meeting", icon: Video },
-        {
           title: "Analytics",
           href: "/studio/analytics",
           icon: ChartAreaIcon,
@@ -129,21 +113,21 @@ export default function MainLayout({
       icon: Store,
       navItems: [
         { title: "Explore", href: "/market", icon: CompassIcon },
-        { title: "Saved", href: "/market/saved", icon: BookmarkIcon },
+        { title: "Saved", href: "/market/saved", icon: Bookmark },
         {
           title: "Notifications",
           href: "/market/notifications",
           icon: BellIcon,
         },
-         ]
+      ]
     }
-  ];
+  ], [currentUser]);
 
   const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(
     headerButtons[0].navItems
   );
 
-  const findNavItemsForPath = (path: string) => {
+  const findNavItemsForPath = React.useCallback((path: string) => {
     for (const button of headerButtons) {
 
       // Check main nav items
@@ -152,12 +136,12 @@ export default function MainLayout({
         if (path.startsWith(item.href)) {
           return true;
         }
-        
+
         // Check children if they exist
         if (item.children) {
           return item.children.some(child => path.startsWith(child.href));
         }
-        
+
         return false;
       });
 
@@ -168,12 +152,12 @@ export default function MainLayout({
       }
     }
     return headerButtons[0].navItems;
-  };
+  }, [headerButtons]);
 
   useEffect(() => {
     const navItems = findNavItemsForPath(pathname);
     setCurrentNavItems(navItems);
-  }, [pathname, currentUser]);
+  }, [pathname, currentUser, findNavItemsForPath]);
 
   if (loading) {
     return (
@@ -197,7 +181,7 @@ export default function MainLayout({
           {loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} />}
         </aside>
 
-        <div className="flex-1 lg:ml-64">
+        <div className="flex-1 lg:ml-72">
           <header className="fixed top-0 right-0 left-0 lg:left-64 z-30">
             <Header
               onButtonClick={setCurrentNavItems}
