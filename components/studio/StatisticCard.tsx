@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 type StatisticsCard = {
   title: string;
   count: number;
-  icon: any;
+  icon?: any;
 };
 
 export const StatisticsCard = ({ title, count, icon }: StatisticsCard) => {
