@@ -34,8 +34,8 @@ export const LAYOUT_PATHS = [
   "/studio/analytics/*",
 
   "/market",
-  "/market/security",
-  "/market/preferences",
+  "/market/saved",
+  "/market/notifications",
 ].filter((path) => !path.startsWith("/auth"));
 
 export const shouldUseMainLayout = (pathname: string): boolean => {
