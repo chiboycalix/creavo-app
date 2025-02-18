@@ -47,7 +47,7 @@ export const SelectInput = ({
       )}
       <div
         className={cn(
-          "relative cursor-pointer bg-primary-50 rounded border-2 border-primary-100",
+          "relative cursor-pointer bg-primary-50/25 rounded border-2 border-primary-100",
           className
         )}
         onClick={() => setIsOpen(!isOpen)}
@@ -79,7 +79,7 @@ export const SelectInput = ({
                   key={option.value}
                   className={cn(
                     "px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm",
-                    value === option.value && "bg-primary-50",
+                    value === option.value && "bg-primary-50/25",
                     dropdownItemClass
                   )}
                   onClick={() => {

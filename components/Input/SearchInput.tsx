@@ -48,8 +48,8 @@ export const SearchInput = ({
             "outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
             leftIcon ? "pl-10" : "pl-3",
             rightIcon ? "pr-10" : "pr-3",
-            errorMessage ? "bg-red-100" : "bg-gray-100",
-            "bg-primary-50 rounded-full", // Specific styles for search input
+            errorMessage ? "bg-red-100" : "bg-primary-50/25",
+            "bg-primary-50/25 rounded-full",
             className
           )}
           {...rest}

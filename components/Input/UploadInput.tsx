@@ -211,7 +211,7 @@ export const UploadInput = ({
       )}
       <div
         className={cn(
-          "relative border-2 border-dashed bg-primary-50 border-primary-100 rounded-lg p-4 py-32 cursor-pointer",
+          "relative border-2 border-dashed bg-white border-primary-100 rounded-lg p-4 py-28 cursor-pointer",
           isDragging && isDragging && "border-primary-500 bg-primary-100",
           errorMessage && "border-red-500",
           className
@@ -241,7 +241,7 @@ export const UploadInput = ({
           </p>
         </div>
       </div>
-      <p className='mt-4'>Only support MP4, MOV and FLV videos</p>
+      <p className='mt-4 text-sm'>Only support MP4, MOV and FLV videos</p>
       {files.length > 0 && (
         <div className="mt-4 flex flex-col gap-2">
           {files.map((file, index) => (
