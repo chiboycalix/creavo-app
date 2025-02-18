@@ -32,3 +32,10 @@ export interface CommentPayload {
   comment: string;
   postId: number;
 }
+
+export enum KEYS {
+  REDUX_STORE = "cVYHWVYQhuKE2Rg8FIkm6w==",
+}
+export interface CreateModuleForm {
+  moduleTitle: string;
+}

@@ -48,7 +48,7 @@ export const CommentInput = ({
             "outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
             leftIcon ? "pl-10" : "pl-3", // Padding for left icon
             "pr-32", // Add padding to the right to accommodate the button
-            errorMessage ? "bg-red-100" : "bg-gray-100",
+            errorMessage ? "bg-red-100" : "bg-primary-50/25",
             className
           )}
           {...rest}
