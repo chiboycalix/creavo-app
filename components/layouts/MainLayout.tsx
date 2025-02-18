@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useState, useEffect } from "react";
@@ -11,8 +12,19 @@ import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 import {  BookmarkIcon } from "@heroicons/react/24/solid"
 
+=======
+'use client';
+import React, { useState, useEffect } from 'react';
+import ProfileCompletionManager from '../ProfileCompletionManager';
+import SidebarSkeleton from '../sketetons/SidebarSkeleton';
+import Header from './includes/Header';
+import Sidebar from './includes/Sidebar';
+import { NavItem, HeaderButton } from '@/types/navigation';
+import { SidebarProvider } from '@/context/SidebarContext';
+import { useAuth } from '@/context/AuthContext';
+import { usePathname } from 'next/navigation';
+>>>>>>> main
 import {
-  FolderOpen,
   Archive,
   Video,
   User,
@@ -27,11 +39,18 @@ import {
   TvMinimalPlay,
   Calendar,
   ChartAreaIcon,
+<<<<<<< HEAD
   BookMarkedIcon,
   BellIcon,
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+=======
+  User2
+} from 'lucide-react';
+import { shouldUseMainLayout } from '@/utils/path-utils';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+>>>>>>> main
 import { RiHome8Fill } from "react-icons/ri";
 
 export default function MainLayout({
@@ -79,6 +98,22 @@ export default function MainLayout({
       label: "Studio",
       icon: LightbulbIcon,
       navItems: [
+<<<<<<< HEAD
+=======
+        { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill size={20} /> },
+        { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
+        { title: 'Module Management', href: '/studio/module-management', icon: PlusSquareIcon },
+        {
+          title: 'Trainee', href: '/studio/trainee', icon: User2,
+          children: [
+            { title: 'All Trainee', href: '/studio/trainee/all-trainee', icon: Calendar },
+            { title: 'Trainee Progress', href: '/studio/trainee/progress', icon: Video },
+            { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
+          ]
+        },
+        { title: 'Calendar', href: '/studio/schedule', icon: Calendar },
+        { title: 'Classroom & webinar', href: '/studio/meeting', icon: Video },
+>>>>>>> main
         {
           title: "Dashboard",
           href: "/studio",
@@ -101,6 +136,7 @@ export default function MainLayout({
           href: "/studio/analytics",
           icon: ChartAreaIcon,
           children: [
+<<<<<<< HEAD
             {
               title: "Schedule",
               href: "/studio/meeting/schedule",
@@ -119,6 +155,16 @@ export default function MainLayout({
           ],
         },
       ],
+=======
+            { title: 'Overview', href: '/studio/analytics/overview' },
+            { title: 'Sales Metrics', href: '/studio/analytics/sales-metrics' },
+            { title: 'Engagement Metrics', href: '/studio/analytics/engagement-metrics' },
+            { title: 'Revenue and ROI', href: '/studio/analytics/revenue-and-ROI' },
+            { title: 'Feedback', href: '/studio/analytics/feedback' },
+          ]
+        }
+      ]
+>>>>>>> main
     },
     {
       id: "market",
@@ -142,13 +188,32 @@ export default function MainLayout({
 
   const findNavItemsForPath = (path: string) => {
     for (const button of headerButtons) {
+<<<<<<< HEAD
       const matchingNavItem = button.navItems.find(
         (item) =>
           path.startsWith(item.href) ||
           item.href.split("/")[1] === path.split("/")[1]
       );
+=======
+      // Check main nav items
+      const matchingNavItem = button.navItems.find(item => {
+        // Check if the current path starts with the nav item's href
+        if (path.startsWith(item.href)) {
+          return true;
+        }
+        
+        // Check children if they exist
+        if (item.children) {
+          return item.children.some(child => path.startsWith(child.href));
+        }
+        
+        return false;
+      });
+>>>>>>> main
 
       if (matchingNavItem) {
+        // If the matching item has children and the path matches a child route,
+        // we still want to show the parent's nav items
         return button.navItems;
       }
     }
@@ -178,11 +243,15 @@ export default function MainLayout({
     <SidebarProvider>
       <div className="flex h-screen bg-gray-50 pb-14 overflow-hidden">
         <aside className="fixed left-0 top-0 h-full z-50">
+<<<<<<< HEAD
           {loading ? (
             <SidebarSkeleton />
           ) : (
             <Sidebar navItems={currentNavItems} />
           )}
+=======
+          {loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} />}
+>>>>>>> main
         </aside>
 
         <div className="flex-1 lg:ml-64">

@@ -31,6 +31,7 @@ export const LAYOUT_PATHS = [
   "/studio/module-management",
   "/studio/meeting/*",
   "/studio/schedule",
+  "/studio/analytics/*",
 
   "/market",
   "/market/saved",

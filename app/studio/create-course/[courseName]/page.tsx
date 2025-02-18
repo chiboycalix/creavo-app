@@ -1,9 +1,12 @@
 "use client";
-import React from 'react'
+import React, { useState } from 'react'
 import { generalHelpers } from '@/helpers';
 import { useParams } from 'next/navigation';
 import { PenBox } from 'lucide-react';
 import CustomTab from '@/components/CustomTab';
+import Curriculum from '@/components/studio/create-course/curriculum';
+import Quiz from '@/components/studio/create-course/quiz';
+import Grade from '@/components/studio/create-course/grade';
 
 const CourseName = () => {
   const { courseName } = useParams();
@@ -13,17 +16,17 @@ const CourseName = () => {
     {
       id: 1,
       title: "Curriculum",
-      content: (<div>Curriculumn</div>)
+      content: (<Curriculum />)
     },
     {
       id: 2,
       title: "Quiz",
-      content: (<div>Quiz</div>)
+      content: (<Quiz />)
     },
     {
       id: 3,
       title: "Grade",
-      content: (<div>Publish</div>)
+      content: (<Grade />)
     },
   ]
   return (
