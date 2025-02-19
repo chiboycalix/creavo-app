@@ -91,7 +91,7 @@ const MarketPlaceExplore = () => {
 
   return (
     <div>
-      <div>
+      <div className="w-full">
         <FeaturedProducts
           productCategories={productCategories}
           products={products}
@@ -100,7 +100,7 @@ const MarketPlaceExplore = () => {
         />
       </div>
 
-      <div className="mt-10">
+      <div className="mt-10 w-full">
         <ExploreCategories
           productCategories={productCategories}
           pathname={pathname}

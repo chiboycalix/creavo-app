@@ -16,11 +16,10 @@ const PopularCourses: React.FC<PopularCoursesProps> = ({
     handleToggleSave,
     isSaved,
 }) => {
-    console.log('courses here',courses);
   return (
     <div>
       <h1>Popular Courses</h1>
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {courses?.map((item: any) => (
           <ProductCard
             key={item.id}

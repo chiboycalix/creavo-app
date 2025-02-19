@@ -20,7 +20,7 @@ const ExploreCategories: React.FC<ExploreCategoriesProps> = ({
   handleTabChange,
 }) => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 w-full">
       <h1>Explore Categories</h1>
       <div className="grid grid-cols-3 gap-4">
         {productCategories

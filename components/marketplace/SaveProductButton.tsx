@@ -15,9 +15,11 @@ const SaveProductButton: React.FC<LikeButtonProps> = ({
   savedId,
   onToggleSave,
 }) => {
-  const { isSaved, setIsSaved, savedProducts  } = useMarketContext();
+  const { isSaved, setIsSaved, savedProducts } = useMarketContext();
 
-  const handleToggleSave = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
+  const handleToggleSave = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): Promise<void> => {
     event.preventDefault();
     onToggleSave(productId);
   };
@@ -30,15 +32,16 @@ const SaveProductButton: React.FC<LikeButtonProps> = ({
   return (
     <div className="flex flex-col items-center gap-2">
       <button
-        onClick={(e)=>handleToggleSave(e)}
+        onClick={(e) => handleToggleSave(e)}
         className="flex items-center focus:outline-none transition-opacity disabled:opacity-50"
         aria-label={isSaved ? "Unsave product" : "Save post"}
       >
         <Heart
           className={`w-6 h-6 transition-colors duration-200 
-            ${isSaved
-              ? "fill-red-500 stroke-red-500"
-              : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
+            ${
+              initialIsSaved || isSaved
+                ? "fill-red-500 stroke-red-500"
+                : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
             }`}
         />
       </button>
