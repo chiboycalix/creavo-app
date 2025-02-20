@@ -20,8 +20,7 @@ const MarketPlaceExplore = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { fetchProducts, fetchPopularCourses, fetchPopularEvents, handleToggleSave, isSaved } =
-    useMarketContext();
+  const { fetchProducts, fetchPopularCourses, fetchPopularEvents, handleToggleSave, isSaved } = useMarketContext();
 
   const initialTab = (searchParams.get("tab") as TabValue) || "All";
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);

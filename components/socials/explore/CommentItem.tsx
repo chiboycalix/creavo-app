@@ -25,7 +25,7 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 mb-4">
-      <div className={`flex items-start gap-3 px-4 ${depth > 0 ? 'pl-12' : ''}`}>
+      <div className={`flex items-start gap-3 ${depth > 0 ? 'pl-12' : ''}`}>
         {/* Avatar */}
         <img
           src={comment._user?.avatar}

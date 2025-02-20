@@ -1,24 +1,21 @@
-import MediaWrapper from "../post/MediaWrapper";
-import CommentSectionSkeleton from "../sketetons/CommentSectionSkeleton";
+import CommentSectionSkeleton from "../../sketetons/CommentSectionSkeleton";
 import CommentItem from "./CommentItem";
 import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/Input";
 import { useFetchComments } from "@/hooks/useFetchComments";
-import { X } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
 import { CommentPayload } from "@/types";
 
-export function Comments({ post, onClose }: { post: any; onClose?: () => void }) {
-  const { data: comments, isPending: isFetchingComments } = useFetchComments(post?.id);
+export function Comments({ postId }: { postId: number; }) {
+  const { data: comments, isPending: isFetchingComments } = useFetchComments(postId);
   const { getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
   const [comment, setComment] = useState("");
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const { mutate: handleAddComment, isPending: isAddingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => addCommentService(payload),
@@ -30,33 +27,13 @@ export function Comments({ post, onClose }: { post: any; onClose?: () => void })
   const handleSubmit = async () => {
     await handleAddComment({
       comment,
-      postId: post?.id,
+      postId
     });
   };
 
   return (
-    <div className="relative flex flex-col gap-2 md:flex-row h-full w-full">
-      {/* Media Section */}
-      <div className="bg-black/90 rounded-xl md:basis-5/12 w-full md:w-auto">
-        <MediaWrapper
-          postId={post.id}
-          title={post.title}
-          size="object-cover"
-          postMedia={post.media}
-          isRenderedInComment
-        />
-      </div>
-
-      {/* Drawer (Tablet & Mobile) */}
-      <div
-        className={`fixed md:relative bottom-0 left-0 roundex-xl w-full md:flex-1 h-[80vh] bg-white border rounded-t-xl md:rounded-xl transition-transform duration-300 ${isDrawerOpen ? "translate-y-0" : "translate-y-[90%] md:translate-y-0"
-          } md:h-auto flex flex-col overflow-hidden`}
-      >
-        <div className="flex justify-between items-center p-3 md:hidden">
-          <p className="font-semibold">Comments</p>
-          <X className="cursor-pointer" onClick={() => setIsDrawerOpen(false)} size={24} />
-        </div>
-
+    <div className="relative h-full w-full">
+      <div className="">
         {isFetchingComments ? (
           <CommentSectionSkeleton />
         ) : comments?.data?.comments?.length === 0 ? (
@@ -65,7 +42,7 @@ export function Comments({ post, onClose }: { post: any; onClose?: () => void })
             <p>Be the first to comment</p>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-2 max-h-[60vh] md:max-h-[73vh]">
+          <div className="flex-1 overflow-y-auto max-h-[60vh] md:max-h-[73vh]">
             {comments?.data?.comments?.map((comment: any) => (
               <CommentItem key={comment.id} comment={comment} />
             ))}
@@ -104,14 +81,6 @@ export function Comments({ post, onClose }: { post: any; onClose?: () => void })
           )}
         </div>
       </div>
-
-      {/* Floating Comments Button (Tablet & Mobile) */}
-      <button
-        className="md:hidden fixed bottom-20 right-4 bg-primary-700 text-white w-10 h-10 rounded-full shadow-lg"
-        onClick={() => setIsDrawerOpen(true)}
-      >
-        💬
-      </button>
     </div>
   );
 }
