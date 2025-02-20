@@ -1,32 +1,63 @@
-'use client'
-
-import React, { createContext, useContext, useState } from 'react'
-
-interface CommentsContextType {
-  isOpen: boolean
-  toggle: () => void
-  close: () => void
+"use client"
+export interface Comment {
+  id: number;
+  username: string;
+  text: string;
 }
 
-const CommentsContext = createContext<CommentsContextType | undefined>(undefined)
+interface Post {
+  id: number;
+  username: string;
+  content: string;
+  likes: number;
+  comments: Comment[];
+}
 
-export function CommentsProvider({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false)
+// context/CommentContext.tsx
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-  const toggle = () => setIsOpen(!isOpen)
-  const close = () => setIsOpen(false)
+interface CommentContextType {
+  showComments: boolean;
+  activePostId: number | null;
+  setShowComments: (show: boolean) => void;
+  setActivePostId: (id: number | null) => void;
+  activePost: Post | undefined;
+  toggleComments: (postId: number) => void;
+}
+
+const CommentContext = createContext<CommentContextType | undefined>(undefined);
+
+export function CommentProvider({ children, posts }: { children: ReactNode; posts: any }) {
+  const [showComments, setShowComments] = useState(false);
+  const [activePostId, setActivePostId] = useState<number | null>(null);
+
+  const activePost = posts?.data?.posts.find((post: any) => post.id === activePostId);
+
+  const toggleComments = (postId: number) => {
+    setActivePostId(postId);
+    setShowComments(true);
+  };
 
   return (
-    <CommentsContext.Provider value={{ isOpen, toggle, close }}>
+    <CommentContext.Provider
+      value={{
+        showComments,
+        activePostId,
+        setShowComments,
+        setActivePostId,
+        activePost,
+        toggleComments,
+      }}
+    >
       {children}
-    </CommentsContext.Provider>
-  )
+    </CommentContext.Provider>
+  );
 }
 
-export function useComments() {
-  const context = useContext(CommentsContext)
+export const useComments = () => {
+  const context = useContext(CommentContext);
   if (context === undefined) {
-    throw new Error('useComments must be used within a CommentsProvider')
+    throw new Error('useComments must be used within a CommentProvider');
   }
-  return context
-}
+  return context;
+};

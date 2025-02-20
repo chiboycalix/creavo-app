@@ -1,8 +1,8 @@
+import Cookies from "js-cookie";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { baseUrl } from "@/utils/constant";
-import Cookies from "js-cookie";
 
-export function useFetchComments(postId: string | undefined) {
+export function useFetchComments(postId: number | undefined) {
   return useQuery({
     queryKey: ["comments", postId],
     queryFn: async () => {

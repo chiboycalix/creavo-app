@@ -1,4 +1,4 @@
-import MediaWrapper from "../post/MediaWrapper"
+import MediaWrapper from "../../post/MediaWrapper"
 import LikeButton from "./LikeButton"
 import FollowButton from "./FollowButton"
 import type React from "react"
@@ -8,24 +8,17 @@ import { ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon } from "@heroicons/react/2
 import { RiShareForwardFill } from "react-icons/ri";
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Comments } from "./Comments"
+import { useComments } from "@/context/CommentsContext"
 
 interface SocialMetric {
   icon: React.ReactNode
   count?: string
 }
 
-export default function SocialPost({ post }: { post: any }) {
+export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const [showAllTags, setShowAllTags] = useState(false)
   const { getCurrentUser } = useAuth();
+  const { toggleComments } = useComments()
   const currId = getCurrentUser()?.id;
 
   const tags = [
@@ -46,24 +39,10 @@ export default function SocialPost({ post }: { post: any }) {
       />,
     },
     {
-      icon: <div className="">
-        <Dialog>
-          <DialogTrigger asChild>
-            <ChatBubbleOvalLeftEllipsisIcon
-              className="w-8 h-8 text-white sm:text-[#BFBFBF]" />
-          </DialogTrigger>
-          <DialogContent className="h-[90vh] min-w-[80%] p-2 border-none">
-            <DialogHeader>
-              <DialogTitle></DialogTitle>
-            </DialogHeader>
-            <Comments
-              post={post}
-            />
-            <DialogFooter>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>,
+      icon: <ChatBubbleOvalLeftEllipsisIcon
+        className="w-8 h-8 text-white sm:text-[#BFBFBF]"
+        onClick={() => toggleComments(post?.id)}
+      />,
       count: post?.commentsCount
     },
     {
@@ -74,7 +53,7 @@ export default function SocialPost({ post }: { post: any }) {
   ]
 
   return (
-    <div className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full">
+    <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full sm:mb-10 mb-0">
       {/* Main Post Container */}
       <div className="bg-black text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
         <div className="relative">
