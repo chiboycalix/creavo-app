@@ -32,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div
       key={product?.id}
-      className="relative flex flex-col gap-4 p-1 bg-white rounded-md border-2 w-56 justify-between items-center"
+      className="relative flex flex-col gap-4 p-1 bg-white rounded-md border-2 justify-between items-center w-[calc(20%-16px)] min-w-[200px]"
     >
       <div className="flex w-[100%]">
         <img src={product?.seller?.avatar} alt="avatar" className="w-full" />

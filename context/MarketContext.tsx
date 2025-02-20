@@ -31,6 +31,8 @@ interface MarketContextType {
   handleToggleSave: (product: any) => void;
   isSaved: boolean;
   setIsSaved: (isSaved: boolean) => void;
+  searchRoom: boolean;
+  setSearchRoom: (searchRoom: boolean) => void;
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -51,6 +53,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [savedProducts, setSavedProducts] = useState<any>([]);
   const [isSaved, setIsSaved] = useState(false);
+  const [searchRoom, setSearchRoom] = useState(false);
 
   const fetchProducts = () => {
     return [
@@ -413,6 +416,8 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         handleToggleSave,
         isSaved,
         setIsSaved,
+        searchRoom,
+        setSearchRoom,
       }}
     >
       {children}

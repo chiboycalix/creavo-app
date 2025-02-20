@@ -15,7 +15,7 @@ const PopularEvents: React.FC<PopularEventsProps> = ({
 }) => {
   console.log("courses here", events);
   return (
-    <div>
+    <div className="flex flex-col flex-wrap gap-4 justify-start">
       <h1>Popular Events</h1>
       <div className="flex flex-wrap gap-4">
         {events?.map((item: any) => (
