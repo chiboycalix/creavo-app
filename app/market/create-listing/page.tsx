@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Spinner from "@/components/Spinner";
 import { MdOutlineCloudUpload } from "react-icons/md";
 import { formatFileSize } from "@/utils";
+import UploadProduct from "./_components/UploadProduct";
+import UploadSuccess from "./_components/UploadSuccess";
 
 type PostUploadModalProps = {
   handleClose: () => void;
@@ -27,7 +29,7 @@ const CreateListing = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLink, setSelectedLink] = useState(""); // Stores the selected route
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
-  const [fileType, setFileType] = useState<"video" | "image" | null>(null);
+  const [fileType, setFileType] = useState<"image" | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [location, setLocation] = useState<Location | null>(null);
   const [deviceId, setDeviceId] = useState<string | null>(null);
@@ -84,8 +86,8 @@ const CreateListing = () => {
   const handleOpenModal = () => {
     // setSelectedLink(link);
     console.log("I am open");
-
     setIsModalOpen(true);
+    setStep(2);
   };
 
   const handleClose = () => {
@@ -109,7 +111,7 @@ const CreateListing = () => {
     if (files.some((file) => file.size > 20000000)) {
       setAlert("File size should be less than 20MB");
       setLoading(false);
-      setAlert("")
+      setAlert("");
       return;
     }
 
@@ -121,7 +123,7 @@ const CreateListing = () => {
     }
 
     setMediaFiles((prevFiles) => [...prevFiles, ...files]);
-    setFileType(files[0].type.startsWith("video") ? "video" : "image");
+    setFileType(files[0].type.startsWith("image") ? "image" : null);
     setLoading(false);
   };
 
@@ -134,7 +136,7 @@ const CreateListing = () => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
     setMediaFiles((prevFiles) => [...prevFiles, ...files]);
-    setFileType(files[0].type.startsWith("video") ? "video" : "image");
+    setFileType(files[0].type.startsWith("image") ? "image" : null);
   };
 
   const handleGetLocation = useCallback(() => {
@@ -171,9 +173,15 @@ const CreateListing = () => {
     );
   };
 
-  function handleSubmit(mediaFiles: File[]): void {
-    throw new Error("Function not implemented.");
+  function handleSubmit(): void {
+    setStep(3);
+    // throw new Error("Function not implemented.");
   }
+
+  const handleViewListing = () => {
+    setLoading(false);
+    handleClose();
+  };
 
   const renderThumbnails = () => {
     return mediaFiles.map((file, index) => (
@@ -236,7 +244,6 @@ const CreateListing = () => {
       </div>
 
       {/* Modal */}
-
       <AnimatePresence>
         {isModalOpen && (
           <Transition show={isModalOpen} as={React.Fragment}>
@@ -254,92 +261,24 @@ const CreateListing = () => {
               />
 
               {/* Modal Content */}
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                  className="relative w-full max-w-md p-6 bg-white rounded-xl shadow-xl"
-                  onClick={(e: React.MouseEvent<HTMLInputElement>) =>
-                    e.stopPropagation()
-                  }
-                >
-                  <button
-                    onClick={handleClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                  >
-                    <XIcon className="h-6 w-6" />
-                  </button>
-                  <div>
-                    <h3 className="text-base font-medium text-gray-900">
-                      Upload File
-                    </h3>
-                    <p className="text-xs">Add your videos & pictures here</p>
-                  </div>
+              {step === 2 && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <UploadProduct
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSubmit={handleSubmit}
+                  />
+                </div>
+              )}
 
-                    <div className="mt-4">
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      id="title"
-                      placeholder="Enter Title"
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                    />
-                    </div>
-
-                  <div
-                    className="drag-drop-area mt-4 p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer"
-                    onClick={handleFileClick}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                  >
-                    <input
-                      type="file"
-                      accept="image/*, video/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      ref={fileInputRef}
-                      multiple
-                    />
-                    <div className="flex flex-col items-center">
-                      <MdOutlineCloudUpload className="h-12 w-12 mb-2 text-primary" />
-                      <p className="text-sm text-gray-500">
-                        Drag & Drop file or{" "}
-                        <span className="text-primary">browse</span>
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Max 20 MB files are allowed
-                      </p>
-                    </div>
-                  </div>
-
-                  {loading && <Spinner />}
-
-                  {mediaFiles.length > 0 && (
-                    <div className="mt-4 flex flex-col gap-2">
-                      {renderThumbnails()}
-                    </div>
-                  )}
-
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      onClick={() => handleSubmit(mediaFiles)}
-                      disabled={mediaFiles.length === 0}
-                      className="bg-primary text-sm text-white px-4 py-2 rounded-lg"
-                    >
-                      Submit
-                    </button>
-                  </div>
-
-                  {alert && (
-                    <p className="text-red-500 text-sm mt-2">{alert}</p>
-                  )}
-                </motion.div>
-              </div>
+              {step === 3 && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <UploadSuccess
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                  />
+                </div>
+              )}
             </Dialog>
           </Transition>
         )}
