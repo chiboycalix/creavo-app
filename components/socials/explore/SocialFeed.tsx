@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import SocialPostSkeleton from '@/components/sketetons/SocialPostSkeleton'
+import debounce from 'lodash/debounce'
 import SocialPost from '@/components/socials/explore/SocialPost'
 import CommentCard from './CommentCard'
 import { useComments } from '@/context/CommentsContext'
@@ -9,15 +10,13 @@ import { motion } from 'framer-motion'
 import { useFetchInfinitePosts } from '@/hooks/useFetchInfinitePosts'
 import { generalHelpers } from '@/helpers'
 import { useInView } from 'react-intersection-observer'
-import debounce from 'lodash/debounce'
 
 const SocialFeed = ({ initialPosts }: any) => {
   const { setActivePostId } = useComments()
   const { ref, inView } = useInView({ rootMargin: "400px" })
-  const firstNewPostRef = useRef<HTMLDivElement>(null)  // Renamed for clarity
+  const firstNewPostRef = useRef<HTMLDivElement>(null)
   const [isFirstLoad, setIsFirstLoad] = useState(true)
-  const currentPageIndexRef = useRef(0)  // Track current page index
-
+  const currentPageIndexRef = useRef(0)
   const {
     data,
     isFetching,
@@ -35,45 +34,44 @@ const SocialFeed = ({ initialPosts }: any) => {
 
   const observerRefs = useRef(new Map())
   const isFetchingNextPageRef = useRef(false)
-
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        const postId = Number((entry.target as HTMLElement).dataset.postId)
-        setActivePostId(postId)
+        const postId = Number((entry.target as HTMLElement).dataset.postId);
+        setActivePostId(postId);
       }
-    })
-  }, [setActivePostId])
+    });
+  }, [setActivePostId]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleIntersection, {
       threshold: 0.8,
-      rootMargin: '-10% 0px',
-    })
+      rootMargin: '-10% 0px'
+    });
 
-    const currentRefs = Array.from(observerRefs.current.values())
+    const currentRefs = Array.from(observerRefs.current.values());
 
     currentRefs.forEach((ref) => {
       if (ref) {
-        observer.observe(ref)
+        observer.observe(ref);
       }
-    })
+    });
 
     return () => {
       currentRefs.forEach((ref) => {
-        if (ref) observer.unobserve(ref)
-      })
-      observer.disconnect()
-    }
-  }, [handleIntersection])
+        if (ref) observer.unobserve(ref);
+      });
+      observer.disconnect();
+    };
+  }, [handleIntersection, initialPosts]);
 
   const setPostRef = useCallback((el: HTMLDivElement | null, postId: number) => {
     if (el) {
-      observerRefs.current.set(postId, el)
+      observerRefs.current.set(postId, el);
     } else {
-      observerRefs.current.delete(postId)
+      observerRefs.current.delete(postId);
     }
-  }, [])
+  }, []);
 
   const scrollToFirstNewPost = useCallback(() => {
     if (firstNewPostRef.current && !isFirstLoad) {
@@ -88,7 +86,7 @@ const SocialFeed = ({ initialPosts }: any) => {
     debounce(async () => {
       if (hasNextPage && !isFetchingNextPageRef.current) {
         isFetchingNextPageRef.current = true
-        currentPageIndexRef.current = (data?.pages.length || 0)  // Update current page index
+        currentPageIndexRef.current = (data?.pages.length || 0)
         await fetchNextPage()
         isFetchingNextPageRef.current = false
         scrollToFirstNewPost()
@@ -110,11 +108,11 @@ const SocialFeed = ({ initialPosts }: any) => {
   const isEmpty = !data?.pages[0]?.data?.posts?.length
 
   return (
-    <div className='w-full'>
+    <div className='w-full hide-scrollbar '>
       <motion.div className="progress-bar" />
       <div className='flex md:flex-row flex-col gap-8'>
         <div className='basis-6/12'>
-          <div className='mb-0 scroll-container'>
+          <div className='mb-0 overflow-y-auto'>
             {isFetching && !data ? (
               <>
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num: number) => (
@@ -172,11 +170,11 @@ const SocialFeed = ({ initialPosts }: any) => {
                 )
               })
             )}
-            <div ref={ref} style={{ padding: '16px', textAlign: 'center' }}>
+            <div ref={ref} style={{ padding: '4px', textAlign: 'center' }}>
               {queryIsFetchingNextPage
-                ? 'Loading more posts...'
+                ? <div className='h-1 w-10/12 rounded-lg bg-gray-400 animate-pulse'></div>
                 : hasNextPage
-                  ? 'Scroll to load more'
+                  ? ''
                   : 'No more posts'}
             </div>
           </div>

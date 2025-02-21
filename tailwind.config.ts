@@ -13,17 +13,17 @@ export default {
       colors: {
         primary: {
           DEFAULT: "#0073b4",
-          '50': '#f0f9ff',
-          '100': '#dff2ff',
-          '200': '#b9e6fe',
-          '300': '#7bd3fe',
-          '400': '#34bdfc',
-          '500': '#0aa5ed',
-          '600': '#0084cb',
-          '700': '#0073b4',
-          '800': '#055987',
-          '900': '#0a4970',
-          '950': '#072f4a',
+          "50": "#f0f9ff",
+          "100": "#dff2ff",
+          "200": "#b9e6fe",
+          "300": "#7bd3fe",
+          "400": "#34bdfc",
+          "500": "#0aa5ed",
+          "600": "#0084cb",
+          "700": "#0073b4",
+          "800": "#055987",
+          "900": "#0a4970",
+          "950": "#072f4a",
         },
         black: "#000000",
         secondary: {
@@ -31,11 +31,11 @@ export default {
           "200": "#888883",
         },
         marketPlace: {
-          "digital": "#C9DCE1",
-          "ebook": "#C0E1CC",
-          "courses": "#EAD16B",
-          "events": "#E8DAA8",
-          "services": "#F8DCDC",
+          digital: "#C9DCE1",
+          ebook: "#C0E1CC",
+          courses: "#EAD16B",
+          events: "#E8DAA8",
+          services: "#F8DCDC",
         },
       },
       borderRadius: {
@@ -45,5 +45,19 @@ export default {
       },
     },
   },
-  plugins: [require("tailwind-scrollbar"), require("tailwindcss-animate")],
+  plugins: [
+    require("tailwind-scrollbar"),
+    require("tailwindcss-animate"),
+    function ({ addUtilities }: any) {
+      addUtilities({
+        ".hide-scrollbar": {
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
+      });
+    },
+  ],
 } satisfies Config;

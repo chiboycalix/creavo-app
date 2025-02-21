@@ -17,7 +17,7 @@ export function useFetchComments(postId: number | undefined) {
       );
       return response.json();
     },
-    refetchInterval: 3000,
+    refetchInterval: 1000,
     placeholderData: keepPreviousData,
     enabled: !!postId,
   });
