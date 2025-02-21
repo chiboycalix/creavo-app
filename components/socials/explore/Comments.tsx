@@ -10,17 +10,28 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
 import { CommentPayload } from "@/types";
+import { useWebSocket } from "@/context/WebSocket";
 
 export function Comments({ postId }: { postId: number; }) {
   const { data: comments, isPending: isFetchingComments } = useFetchComments(postId);
   const { getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
   const [comment, setComment] = useState("");
+  const ws = useWebSocket();
 
   const { mutate: handleAddComment, isPending: isAddingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => addCommentService(payload),
-    onSuccess() {
+    onSuccess(data) {
       setComment("");
+      if (ws && ws.connected) {
+        const request = {
+          userId: data.userId,
+          notificationId: data?.id,
+        };
+        ws.emit("comment", request);
+      } else {
+        console.log("Failed to emit like event", data?.id);
+      }
     },
   });
 

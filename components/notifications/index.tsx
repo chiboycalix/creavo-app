@@ -40,8 +40,8 @@ const NotificationsPopover = () => {
       metadata: notification.data?.metadata
         ? JSON.parse(notification.data.metadata)
         : notification.metadata
-        ? JSON.parse(notification.metadata)
-        : {},
+          ? JSON.parse(notification.metadata)
+          : {},
       content: notification.data?.content || notification.content,
       isRead: notification.data?.isRead ?? false,
       createdAt: notification.data?.createdAt || notification.createdAt,
@@ -72,6 +72,7 @@ const NotificationsPopover = () => {
 
   // Handle WebSocket notifications
   const handleNotification = (newNotification: any) => {
+    console.log({ newNotification })
     const formattedNotification = normalizeNotification(newNotification);
 
     setNotifications((prevNotifications) => {
@@ -83,7 +84,7 @@ const NotificationsPopover = () => {
       if (exists) return prevNotifications;
 
       setHasUnreadNotifications(true);
-      return [formattedNotification, ...prevNotifications]; // Add new notification at the top
+      return [formattedNotification, ...prevNotifications];
     });
   };
 
@@ -100,7 +101,7 @@ const NotificationsPopover = () => {
   }, [ws]);
 
   const groupedNotifications = transformNotifications(notifications);
-
+  console.log({ hasUnreadNotifications })
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

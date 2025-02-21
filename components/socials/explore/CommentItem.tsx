@@ -51,7 +51,7 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
             >
               <BiLike className="w-4 h-4" />
             </motion.button>
-            <span className="text-xs text-gray-500">5</span>
+            <span className="text-xs text-gray-500">0</span>
           </div>
           <div className="flex items-center gap-1">
             <motion.button
@@ -60,7 +60,7 @@ const CommentItem = ({ comment, depth = 0 }: { comment: Comment; depth?: number 
             >
               <MessageSquare className="w-4 h-4" />
             </motion.button>
-            <span className="text-xs text-gray-500">15</span>
+            <span className="text-xs text-gray-500">0</span>
           </div>
         </div>
       </div>

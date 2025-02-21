@@ -44,8 +44,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   });
 
   const isLiked = likeStatus?.data?.liked ?? initialIsLiked;
-  // console.log({ isLiked })
-  // Like post mutation
+
   const likePostMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`${baseUrl}/posts/${postId}/like-post`, {
@@ -62,10 +61,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       // Emit WebSocket event
       if (ws && ws.connected) {
         const request = {
-          userId: likedId, // Current user's ID
-          notificationId: result?.data?.id, // Assuming the response contains the notification ID
+          userId: likedId,
+          notificationId: result?.data?.id,
         };
-        console.log({ request });
         ws.emit("like", request);
       } else {
         console.log("Failed to emit like event", likedId);
