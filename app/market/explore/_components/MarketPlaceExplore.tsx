@@ -53,7 +53,7 @@ const MarketPlaceExplore = () => {
   ];
 
   const priceOptions = [
-    { value: "all", label: "All" },
+    { value: "All", label: "All" },
     { value: "free", label: "Free" },
     { value: "under5", label: "Under $5" },
     { value: "5to25", label: "$5 - $25" },
@@ -106,11 +106,11 @@ const MarketPlaceExplore = () => {
   );
 
   const handleSelectByPrice = (value: string) => {
-    if (value === "all") {
-      setSelectedPrices(["all"]); // Select only "All" and clear others
+    if (value === "All") {
+      setSelectedPrices(["All"]); // Select only "All" and clear others
     } else {
       setSelectedPrices((prev) => {
-        if (prev.includes("all")) return [value]; // Disable "All" if another is selected
+        if (prev.includes("All")) return [value]; // Disable "All" if another is selected
 
         if (prev.includes(value)) {
           return prev.filter((item) => item !== value); // Deselect option

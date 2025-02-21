@@ -119,6 +119,7 @@ export default function MainLayout({
           href: "/market/notifications",
           icon: BellIcon,
         },
+        { title: "Create Listing", href: "/market/create-listing", icon: PlusSquareIcon },
       ]
     }
   ], [currentUser]);
