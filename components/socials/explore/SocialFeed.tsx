@@ -11,11 +11,12 @@ import { generalHelpers } from '@/helpers'
 import { useInView } from 'react-intersection-observer'
 import debounce from 'lodash/debounce'
 
-const SocialFeed = ({ initialPosts }: any) => {  // Rename posts prop to initialPosts for clarity
+const SocialFeed = ({ initialPosts }: any) => {
   const { setActivePostId } = useComments()
   const { ref, inView } = useInView({ rootMargin: "400px" })
-  const lastItemRef = useRef<HTMLDivElement>(null)
+  const firstNewPostRef = useRef<HTMLDivElement>(null)  // Renamed for clarity
   const [isFirstLoad, setIsFirstLoad] = useState(true)
+  const currentPageIndexRef = useRef(0)  // Track current page index
 
   const {
     data,
@@ -24,7 +25,7 @@ const SocialFeed = ({ initialPosts }: any) => {  // Rename posts prop to initial
     hasNextPage,
     isFetchingNextPage: queryIsFetchingNextPage,
   } = useFetchInfinitePosts({
-    initialData: {  // Pass initial data to the query
+    initialData: {
       pages: [{
         data: initialPosts?.data || { posts: [], likedStatuses: [], followStatuses: [] }
       }],
@@ -64,7 +65,7 @@ const SocialFeed = ({ initialPosts }: any) => {  // Rename posts prop to initial
       })
       observer.disconnect()
     }
-  }, [handleIntersection])  // Remove posts dependency as we're using data from the query
+  }, [handleIntersection])
 
   const setPostRef = useCallback((el: HTMLDivElement | null, postId: number) => {
     if (el) {
@@ -75,8 +76,8 @@ const SocialFeed = ({ initialPosts }: any) => {  // Rename posts prop to initial
   }, [])
 
   const scrollToFirstNewPost = useCallback(() => {
-    if (lastItemRef.current && !isFirstLoad) {
-      lastItemRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (firstNewPostRef.current && !isFirstLoad) {
+      firstNewPostRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
     if (isFirstLoad) {
       setIsFirstLoad(false)
@@ -87,12 +88,13 @@ const SocialFeed = ({ initialPosts }: any) => {  // Rename posts prop to initial
     debounce(async () => {
       if (hasNextPage && !isFetchingNextPageRef.current) {
         isFetchingNextPageRef.current = true
+        currentPageIndexRef.current = (data?.pages.length || 0)  // Update current page index
         await fetchNextPage()
         isFetchingNextPageRef.current = false
         scrollToFirstNewPost()
       }
     }, 300),
-    [hasNextPage, fetchNextPage, scrollToFirstNewPost]
+    [hasNextPage, fetchNextPage, scrollToFirstNewPost, data?.pages.length]
   )
 
   useEffect(() => {
@@ -113,7 +115,7 @@ const SocialFeed = ({ initialPosts }: any) => {  // Rename posts prop to initial
       <div className='flex md:flex-row flex-col gap-8'>
         <div className='basis-6/12'>
           <div className='mb-0 scroll-container'>
-            {isFetching && !data ? (  // Only show loading state if no data
+            {isFetching && !data ? (
               <>
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num: number) => (
                   <SocialPostSkeleton key={num} />
@@ -148,9 +150,10 @@ const SocialFeed = ({ initialPosts }: any) => {  // Rename posts prop to initial
                 return (
                   <React.Fragment key={pageIndex}>
                     {result?.map((post: any, postIndex: number) => {
-                      const isLastPostOfPreviousPage =
-                        pageIndex < data.pages.length - 1 &&
-                        postIndex === result.length - 1
+                      // Track the first post of the new page
+                      const isFirstPostOfNewPage =
+                        pageIndex === currentPageIndexRef.current &&
+                        postIndex === 0;
 
                       return (
                         <SocialPost
@@ -158,8 +161,8 @@ const SocialFeed = ({ initialPosts }: any) => {  // Rename posts prop to initial
                           key={post.id}
                           ref={(el: any) => {
                             setPostRef(el, post.id)
-                            if (isLastPostOfPreviousPage) {
-                              lastItemRef.current = el
+                            if (isFirstPostOfNewPage) {
+                              firstNewPostRef.current = el
                             }
                           }}
                         />
