@@ -50,21 +50,19 @@ const SocialFeed = ({ initialPosts }: any) => {
       rootMargin: '-10% 0px'
     });
 
-    const currentRefs = Array.from(observerRefs.current.values());
+    observerRefs.current.forEach((ref) => observer.unobserve(ref));
 
-    currentRefs.forEach((ref) => {
-      if (ref) {
-        observer.observe(ref);
-      }
+    observerRefs.current.clear();
+    document.querySelectorAll('[data-post-id]').forEach((el) => {
+      const postId = Number(el.getAttribute('data-post-id'));
+      observer.observe(el);
+      observerRefs.current.set(postId, el);
     });
 
     return () => {
-      currentRefs.forEach((ref) => {
-        if (ref) observer.unobserve(ref);
-      });
       observer.disconnect();
     };
-  }, [handleIntersection, initialPosts]);
+  }, [handleIntersection, data?.pages.length]);
 
   const setPostRef = useCallback((el: HTMLDivElement | null, postId: number) => {
     if (el) {
@@ -120,7 +118,7 @@ const SocialFeed = ({ initialPosts }: any) => {
 
   return (
     <div className='w-full min-h-screen'>
-      <div className='flex md:flex-row flex-col'>
+      <div className='flex md:flex-row flex-co gap-6'>
         <div className='basis-6/12'>
           <div
             ref={containerRef}

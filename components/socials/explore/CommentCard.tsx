@@ -7,12 +7,12 @@ import { useComments } from "@/context/CommentsContext";
 import { useFetchComments } from "@/hooks/useFetchComments";
 
 const CommentCard = () => {
-  const { showComments, setShowComments, activePost, activePostId } =
+  const { showComments, setShowComments, activePostId } =
     useComments();
   const { data: comments, isPending: isFetchingComments } = useFetchComments(
     activePostId as any
   );
-  if (!showComments || !activePost) return null;
+  if (!showComments) return null;
 
   return (
     <Card className="border-none fixed w-full md:w-[37.5%]">
