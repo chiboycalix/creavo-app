@@ -49,6 +49,6 @@ export const useFetchInfinitePosts = (options = {}) => {
       return allPages.length + 1;
     },
     initialPageParam: 1,
-    ...options, // Spread any additional options, including initialData
+    ...options,
   });
 };

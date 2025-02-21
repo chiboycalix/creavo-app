@@ -12,11 +12,11 @@ import { generalHelpers } from '@/helpers'
 import { useInView } from 'react-intersection-observer'
 
 const SocialFeed = ({ initialPosts }: any) => {
-  const { setActivePostId } = useComments()
   const { ref, inView } = useInView({ rootMargin: "400px" })
   const firstNewPostRef = useRef<HTMLDivElement>(null)
   const [isFirstLoad, setIsFirstLoad] = useState(true)
   const currentPageIndexRef = useRef(0)
+
   const {
     data,
     isFetching,
@@ -32,74 +32,30 @@ const SocialFeed = ({ initialPosts }: any) => {
     }
   })
 
-  const observerRefs = useRef(new Map())
-  const isFetchingNextPageRef = useRef(false)
-  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const postId = Number((entry.target as HTMLElement).dataset.postId);
-        setActivePostId(postId);
+  const debouncedFetchNextPage = useCallback(
+    debounce(async () => {
+      if (hasNextPage && !queryIsFetchingNextPage) {
+        currentPageIndexRef.current = (data?.pages.length || 0)
+        await fetchNextPage()
+        scrollToFirstNewPost()
       }
-    });
-  }, [setActivePostId]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleIntersection, {
-      threshold: 0.8,
-      rootMargin: '-10% 0px'
-    });
-
-    const currentRefs = Array.from(observerRefs.current.values());
-
-    currentRefs.forEach((ref) => {
-      if (ref) {
-        observer.observe(ref);
-      }
-    });
-
-    return () => {
-      currentRefs.forEach((ref) => {
-        if (ref) observer.unobserve(ref);
-      });
-      observer.disconnect();
-    };
-  }, [handleIntersection, initialPosts]);
-
-  const setPostRef = useCallback((el: HTMLDivElement | null, postId: number) => {
-    if (el) {
-      observerRefs.current.set(postId, el);
-    } else {
-      observerRefs.current.delete(postId);
-    }
-  }, []);
+    }, 300),
+    [hasNextPage, fetchNextPage, queryIsFetchingNextPage, data?.pages.length]
+  )
 
   const scrollToFirstNewPost = useCallback(() => {
     if (firstNewPostRef.current && !isFirstLoad) {
-      firstNewPostRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      firstNewPostRef.current.scrollIntoView({ behavior: 'smooth' })
     }
     if (isFirstLoad) {
       setIsFirstLoad(false)
     }
   }, [isFirstLoad])
 
-  const debouncedFetchNextPage = useCallback(
-    debounce(async () => {
-      if (hasNextPage && !isFetchingNextPageRef.current) {
-        isFetchingNextPageRef.current = true
-        currentPageIndexRef.current = (data?.pages.length || 0)
-        await fetchNextPage()
-        isFetchingNextPageRef.current = false
-        scrollToFirstNewPost()
-      }
-    }, 300),
-    [hasNextPage, fetchNextPage, scrollToFirstNewPost, data?.pages.length]
-  )
-
   useEffect(() => {
     if (inView) {
       debouncedFetchNextPage()
     }
-
     return () => {
       debouncedFetchNextPage.cancel()
     }
@@ -108,11 +64,17 @@ const SocialFeed = ({ initialPosts }: any) => {
   const isEmpty = !data?.pages[0]?.data?.posts?.length
 
   return (
-    <div className='w-full hide-scrollbar '>
-      <motion.div className="progress-bar" />
-      <div className='flex md:flex-row flex-col gap-8'>
+    <div className='w-full min-h-screen'>
+      <div className='flex md:flex-row flex-col'>
         <div className='basis-6/12'>
-          <div className='mb-0 overflow-y-auto'>
+          <div
+            className='overflow-y-auto snap-y snap-mandatory'
+            style={{
+              height: 'calc(100vh - 0rem)',
+              overflowY: 'auto',
+              scrollSnapType: 'y mandatory',
+            }}
+          >
             {isFetching && !data ? (
               <>
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((num: number) => (
@@ -148,38 +110,41 @@ const SocialFeed = ({ initialPosts }: any) => {
                 return (
                   <React.Fragment key={pageIndex}>
                     {result?.map((post: any, postIndex: number) => {
-                      // Track the first post of the new page
                       const isFirstPostOfNewPage =
                         pageIndex === currentPageIndexRef.current &&
                         postIndex === 0;
 
                       return (
-                        <SocialPost
-                          post={post}
+                        <div
                           key={post.id}
-                          ref={(el: any) => {
-                            setPostRef(el, post.id)
-                            if (isFirstPostOfNewPage) {
-                              firstNewPostRef.current = el
-                            }
-                          }}
-                        />
+                          className="snap-start"
+                          style={{ height: 'calc(100vh - 6rem)' }}
+                        >
+                          <SocialPost
+                            post={post}
+                            ref={(el: any) => {
+                              if (isFirstPostOfNewPage) {
+                                firstNewPostRef.current = el
+                              }
+                            }}
+                          />
+                        </div>
                       )
                     })}
                   </React.Fragment>
                 )
               })
             )}
-            <div ref={ref} style={{ padding: '4px', textAlign: 'center' }}>
+            <div ref={ref} className="py-1 text-center">
               {queryIsFetchingNextPage
-                ? <div className='h-1 w-10/12 rounded-lg bg-gray-400 animate-pulse'></div>
+                ? <div className='h-1 w-10/12 rounded-lg bg-gray-400 animate-pulse mx-auto'></div>
                 : hasNextPage
                   ? ''
                   : 'No more posts'}
             </div>
           </div>
         </div>
-        <div className='flex-1 w-full'>
+        <div className='flex-1'>
           <CommentCard />
         </div>
       </div>
