@@ -35,9 +35,9 @@ export function CommentProvider({ children, posts }: { children: ReactNode; post
 
   const toggleComments = (postId: number) => {
     setActivePostId(postId);
-    setShowComments(true);
+    setShowComments(!showComments);
   };
-
+  console.log({ showComments })
   return (
     <CommentContext.Provider
       value={{

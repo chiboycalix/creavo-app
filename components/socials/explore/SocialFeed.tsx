@@ -6,7 +6,6 @@ import debounce from 'lodash/debounce'
 import SocialPost from '@/components/socials/explore/SocialPost'
 import CommentCard from './CommentCard'
 import { useComments } from '@/context/CommentsContext'
-import { motion } from 'framer-motion'
 import { useFetchInfinitePosts } from '@/hooks/useFetchInfinitePosts'
 import { generalHelpers } from '@/helpers'
 import { useInView } from 'react-intersection-observer'
@@ -16,6 +15,11 @@ const SocialFeed = ({ initialPosts }: any) => {
   const firstNewPostRef = useRef<HTMLDivElement>(null)
   const [isFirstLoad, setIsFirstLoad] = useState(true)
   const currentPageIndexRef = useRef(0)
+  const { setActivePostId } = useComments()
+  const observerRefs = useRef(new Map())
+  const containerRef = useRef<HTMLDivElement>(null) as any
+  const isFetchingRef = useRef(false);
+  const postHeightRef = useRef(0);
 
   const {
     data,
@@ -31,26 +35,77 @@ const SocialFeed = ({ initialPosts }: any) => {
       pageParams: [1]
     }
   })
+  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const postId = Number((entry.target as HTMLElement).dataset.postId);
+        setActivePostId(postId);
+      }
+    });
+  }, [setActivePostId]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleIntersection, {
+      threshold: 0.8,
+      rootMargin: '-10% 0px'
+    });
+
+    const currentRefs = Array.from(observerRefs.current.values());
+
+    currentRefs.forEach((ref) => {
+      if (ref) {
+        observer.observe(ref);
+      }
+    });
+
+    return () => {
+      currentRefs.forEach((ref) => {
+        if (ref) observer.unobserve(ref);
+      });
+      observer.disconnect();
+    };
+  }, [handleIntersection, initialPosts]);
+
+  const setPostRef = useCallback((el: HTMLDivElement | null, postId: number) => {
+    if (el) {
+      observerRefs.current.set(postId, el);
+    } else {
+      observerRefs.current.delete(postId);
+    }
+  }, []);
+
+  const scrollToFirstNewPost = useCallback(() => {
+    if (firstNewPostRef.current && !isFirstLoad && containerRef.current && postHeightRef.current) {
+      const scrollPosition = postHeightRef.current * currentPageIndexRef.current * 10;
+      containerRef.current.scrollTo({
+        top: scrollPosition,
+        behavior: 'instant',
+      });
+
+      requestAnimationFrame(() => {
+        containerRef.current.dispatchEvent(new Event('scroll'));
+      });
+    }
+    if (isFirstLoad) {
+      setIsFirstLoad(false);
+    }
+  }, [isFirstLoad]);
+
 
   const debouncedFetchNextPage = useCallback(
     debounce(async () => {
-      if (hasNextPage && !queryIsFetchingNextPage) {
+      if (hasNextPage && !queryIsFetchingNextPage && !isFetchingRef.current) {
+        isFetchingRef.current = true;
         currentPageIndexRef.current = (data?.pages.length || 0)
         await fetchNextPage()
-        scrollToFirstNewPost()
+        isFetchingRef.current = false;
+        requestAnimationFrame(() => {
+          setTimeout(scrollToFirstNewPost, 150);
+        });
       }
     }, 300),
     [hasNextPage, fetchNextPage, queryIsFetchingNextPage, data?.pages.length]
   )
-
-  const scrollToFirstNewPost = useCallback(() => {
-    if (firstNewPostRef.current && !isFirstLoad) {
-      firstNewPostRef.current.scrollIntoView({ behavior: 'smooth' })
-    }
-    if (isFirstLoad) {
-      setIsFirstLoad(false)
-    }
-  }, [isFirstLoad])
 
   useEffect(() => {
     if (inView) {
@@ -68,9 +123,10 @@ const SocialFeed = ({ initialPosts }: any) => {
       <div className='flex md:flex-row flex-col'>
         <div className='basis-6/12'>
           <div
+            ref={containerRef}
             className='overflow-y-auto snap-y snap-mandatory'
             style={{
-              height: 'calc(100vh - 0rem)',
+              height: 'calc(100vh - 6rem)',
               overflowY: 'auto',
               scrollSnapType: 'y mandatory',
             }}
@@ -112,17 +168,19 @@ const SocialFeed = ({ initialPosts }: any) => {
                     {result?.map((post: any, postIndex: number) => {
                       const isFirstPostOfNewPage =
                         pageIndex === currentPageIndexRef.current &&
-                        postIndex === 0;
+                        postIndex === 0
 
                       return (
                         <div
                           key={post.id}
                           className="snap-start"
                           style={{ height: 'calc(100vh - 6rem)' }}
+                          data-post-id={post.id}
                         >
                           <SocialPost
                             post={post}
                             ref={(el: any) => {
+                              setPostRef(el, post.id)
                               if (isFirstPostOfNewPage) {
                                 firstNewPostRef.current = el
                               }
