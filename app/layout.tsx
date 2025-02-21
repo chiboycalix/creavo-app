@@ -20,8 +20,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Creavo",
-  description: "Creavo",
+  title: "Crevoe",
+  description: "Crevoe",
 };
 
 export default function RootLayout({
