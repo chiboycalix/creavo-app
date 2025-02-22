@@ -119,10 +119,10 @@ const SocialFeed = ({ initialPosts }: any) => {
   return (
     <div className='w-full min-h-screen'>
       <div className='flex md:flex-row flex-co gap-6'>
-        <div className='basis-6/12'>
+        <div className='basis-6/12 no-scrollbar'>
           <div
             ref={containerRef}
-            className='overflow-y-auto snap-y snap-mandatory'
+            className='overflow-y-auto snap-y snap-mandatory no-scrollbar'
             style={{
               height: 'calc(100vh - 6rem)',
               overflowY: 'auto',
