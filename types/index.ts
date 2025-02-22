@@ -1,11 +1,9 @@
 import AgoraRTC, {
-  IAgoraRTCClient,
   ILocalAudioTrack,
   ICameraVideoTrack,
   IMicrophoneAudioTrack,
   ILocalVideoTrack,
 } from "agora-rtc-sdk-ng";
-import { UID } from "agora-rtc-react";
 
 export interface Options {
   appid?: string | undefined;
@@ -31,6 +29,7 @@ export type ILocalTrack = {
 export interface CommentPayload {
   comment: string;
   postId: number;
+  commentId?: number;
 }
 
 export enum KEYS {

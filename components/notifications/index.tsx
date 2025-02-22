@@ -12,7 +12,7 @@ import { useWebSocket } from "@/context/WebSocket";
 import { NotificationGroup } from "./NotificationGroup";
 import { NotificationItem } from "./NotificationItem";
 import { transformNotifications } from "./notification";
-import { useUserNotifications } from "@/hooks/useUserNotifications";
+import { useUserNotifications } from "@/hooks/notifications/useUserNotifications";
 import { useAuth } from "@/context/AuthContext";
 
 const NotificationsPopover = () => {

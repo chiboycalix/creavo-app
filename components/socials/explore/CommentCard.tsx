@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X } from "lucide-react";
 import { Comments } from "@/components/socials/explore/Comments";
 import { useComments } from "@/context/CommentsContext";
-import { useFetchComments } from "@/hooks/useFetchComments";
+import { useFetchComments } from "@/hooks/comments/useFetchComments";
 
 const CommentCard = () => {
   const { showComments, setShowComments, activePostId } =

@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce'
 import SocialPost from '@/components/socials/explore/SocialPost'
 import CommentCard from './CommentCard'
 import { useComments } from '@/context/CommentsContext'
-import { useFetchInfinitePosts } from '@/hooks/useFetchInfinitePosts'
+import { useFetchInfinitePosts } from '@/hooks/posts/useFetchInfinitePosts'
 import { generalHelpers } from '@/helpers'
 import { useInView } from 'react-intersection-observer'
 
