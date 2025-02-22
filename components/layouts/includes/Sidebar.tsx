@@ -40,7 +40,7 @@ export default function Sidebar({ navItems }: SidebarProps) {
                     width={144}
                     height={50}
                     src={CrevoeLogo}
-                    alt="STRIDEZ logo"
+                    alt="Crevoe logo"
                     priority
                     style={{ width: "auto", height: "auto" }}
                   />
@@ -88,7 +88,7 @@ export default function Sidebar({ navItems }: SidebarProps) {
               </li>
             </ul>
 
-            <p className="mt-2">© 2024 STRIDEZ</p>
+            <p className="mt-2">© 2025 CREVOE</p>
           </div>
 
           <div className="pb-6" />
