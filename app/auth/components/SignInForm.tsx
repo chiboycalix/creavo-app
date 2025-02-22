@@ -133,8 +133,8 @@ export default function SignInForm() {
           type="submit"
           disabled={loading}
           className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
-          >
-          {loading ? <Spinner /> : "Sign In with Stridez"}
+        >
+          {loading ? <Spinner /> : "Sign In with Crevoe"}
         </Button>
       </form>
     </div>

@@ -1,7 +1,7 @@
 'use client';
 import Spinner from '@/components/Spinner';
 import SocialButtons from '@/components/SocialButtons';
-import {Input} from '@/components/Input';
+import { Input } from '@/components/Input';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LockIcon, Mail } from 'lucide-react';
@@ -163,7 +163,7 @@ export default function SignUpForm() {
           {loading ? (
             <Spinner className={""} />
           ) : (
-            "Create an account with Stridez"
+            "Create an account with Crevoe"
           )}
         </Button>
 

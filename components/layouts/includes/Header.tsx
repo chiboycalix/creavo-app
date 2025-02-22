@@ -227,7 +227,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                               className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <span className="mr-3 h-4 w-4 text-gray-500">📱</span>
-                              Get Stridez App
+                              Get Crevoe App
                             </Link>
                           )}
                         </MenuItem>

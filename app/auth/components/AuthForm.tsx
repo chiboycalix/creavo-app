@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import HeaderImage from "@/components/HeaderImage";
 import ExploreAuth from "@/components/ExploreAuth";
 import SocialButtons from "@/components/SocialButtons";
+import { CrevoeLogo } from "@/public/assets";
 
 export function AuthForm() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export function AuthForm() {
   return (
     <div className="w-full flex-1">
       <div className="flex justify-center items-center flex-col">
-        <HeaderImage src={"/assets/logo.png"} />
+        <HeaderImage src={CrevoeLogo} />
         <ExploreAuth
           isSignIn={isSignIn}
           setIsSignIn={() => handleTabSwitch(!isSignIn)}

@@ -97,7 +97,7 @@ const PasswordUpdate = () => {
               Save Password
             </Button>
             <p className=" text-center py-4">
-              This will be your new password to sign in to stridez
+              This will be your new password to sign in to crevoe
             </p>
           </form>
         </div>
