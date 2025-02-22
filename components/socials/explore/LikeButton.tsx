@@ -21,10 +21,10 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   likedId,
 }) => {
   const queryClient = useQueryClient();
-  const { getAuth } = useAuth();
+  const { getAuth, getCurrentUser } = useAuth();
   const router = useRouter();
   const ws = useWebSocket();
-
+  const currentUser = getCurrentUser();
   // Fetch like status
   const { data: likeStatus } = useQuery({
     queryKey: ['likeStatus', postId],
@@ -57,9 +57,8 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
       if (!response.ok) throw new Error("Failed to like post");
       const result = await response.json();
-
       // Emit WebSocket event
-      if (ws && ws.connected) {
+      if (ws && ws.connected && likedId !== currentUser?.id) {
         const request = {
           userId: likedId,
           notificationId: result?.data?.id,

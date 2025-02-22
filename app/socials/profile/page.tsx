@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserCourses } from "@/hooks/useUserCourses";
-import { useUserPosts } from "@/hooks/useUserPosts";
+import { useUserPosts } from "@/hooks/posts/useUserPosts";
 import { useUserLearning } from "@/hooks/useUserLearning";
 
 const Profile = () => {
