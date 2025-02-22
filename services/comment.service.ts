@@ -5,6 +5,7 @@ export type DeleteCommentPayload = {
   postId: number;
   commentId: number;
 };
+
 export const addCommentService = async (payload: CommentPayload) => {
   try {
     const { data } = await apiClient.post(

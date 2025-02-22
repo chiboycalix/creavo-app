@@ -7,12 +7,23 @@ import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { generalHelpers } from '@/helpers'
+import { CreateCourseForm, createCourseService } from '@/services/course.service'
+import { useMutation } from '@tanstack/react-query'
 
 const CreateCourse = () => {
   const [course, setCourse] = useState("")
   const [description, setDescription] = useState("")
   const [files, setFiles] = useState<File[]>([]);
   const router = useRouter()
+
+
+  const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
+    mutationFn: (payload: CreateCourseForm) => createCourseService(payload),
+    onSuccess: async (data) => { },
+    onError: (error: any) => { },
+  });
+
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     const slugTitle = generalHelpers?.convertToSlug(course)
