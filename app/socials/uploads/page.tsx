@@ -10,6 +10,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import CourseDetailsInputModal from "./uploads-component/CourseDetailsInputModal";
+import { UploadInput } from "@/components/Input/UploadInput";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Upload() {
   const [showCourseModal, setShowCourseModal] = useState(false);
@@ -19,6 +21,7 @@ export default function Upload() {
   const [step, setStep] = useState(1);
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const [files, setFiles] = useState<File[]>([]);
 
   const handleNext = useCallback(
     (files: File[]) => {
@@ -53,10 +56,32 @@ export default function Upload() {
   });
 
   return (
-    <div className="min-h-[85vh] w-full flex justify-center items-center bg-gray-100">
-      <div className="grid grid-cols-1 gap-4 max-w-md">
+    <div className="min-h-[85vh] w-full flex justify-center items-center">
+      <div className="w-10/12">
         {/* Card for Create Post */}
-        <div
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+
+            </CardTitle>
+            <CardContent>
+              <div className="mb-4">
+                <h2>Upload post</h2>
+                <p className="text-sm">Add your videos here</p>
+              </div>
+              <UploadInput
+                label=""
+                accept="video/*,image/*"
+                maxFiles={10}
+                onFilesChange={(files) => setFiles(files)}
+                errorMessage={files.length > 10 ? "You can only upload up to 50 files." : undefined}
+              />
+            </CardContent>
+          </CardHeader>
+        </Card>
+
+
+        {/* <div
           className="group relative bg-white p-3 rounded-3xl shadow-sm hover:shadow-lg hover:bg-primary/10 transition-all duration-300 cursor-pointer"
           onClick={() => setShowPostModal(true)}
         >
@@ -68,10 +93,10 @@ export default function Upload() {
             Use this section to upload your short videos to advertise your
             courses
           </p>
-        </div>
+        </div> */}
 
         {/* Card for Upload Course */}
-        <div
+        {/* <div
           className="group relative bg-white p-3 rounded-3xl shadow-sm hover:shadow-lg hover:bg-primary/10 transition-all duration-300 cursor-pointer"
           onClick={() => setShowCourseModal(true)}
         >
@@ -84,7 +109,7 @@ export default function Upload() {
             Use this section to upload your course materials, which can be
             either documents or videos.
           </p>
-        </div>
+        </div> */}
       </div>
 
       {/* Post Upload Modal */}
