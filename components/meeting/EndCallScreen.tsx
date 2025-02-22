@@ -12,7 +12,7 @@ const EndCallScreen = () => {
       <h2 className="text-3xl font-semibold mb-2 text-white">You left the meeting</h2>
       <div className='flex items-center justify-center gap-4 mt-8'>
         <Button
-          onClick={() => window.location.href = `/studio/meeting/${params?.channelName}`}
+          onClick={() => window.location.href = `/studio/event/meeting/${params?.channelName}`}
           className="border font-semibold hover:bg-primary-700 border-primary-700 hover:text-white text-primary-700 px-6 py-2 rounded-lg flex items-center gap-2 bg-white"
           variant="outline"
         >
@@ -20,7 +20,7 @@ const EndCallScreen = () => {
         </Button>
 
         <Button
-          onClick={() => window.location.href = "/studio/meeting"}
+          onClick={() => window.location.href = "/studio/event/meeting"}
           className="bg-primary-700 font-semibold hover:bg-primary-800 text-white hover:text-white px-6 py-2 rounded-lg flex items-center gap-2 border-none"
         >
           Return to Home

@@ -58,7 +58,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       if (!response.ok) throw new Error("Failed to like post");
       const result = await response.json();
       // Emit WebSocket event
-      if (ws && ws.connected && likedId !== currentUser?.id) {
+      if (ws && ws.connected) {
         const request = {
           userId: likedId,
           notificationId: result?.data?.id,
