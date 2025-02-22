@@ -669,7 +669,7 @@ export function VideoConferencingProvider({
       rtcScreenShareClient.on("user-unpublished", handleUserUnpublishedScreen);
       rtcScreenShareClient.on(
         "connection-state-change",
-        (curState, prevState) => {}
+        (curState, prevState) => { }
       );
 
       const mode = rtcScreenShareOptions?.proxyMode ?? 0;
@@ -1563,7 +1563,7 @@ export function VideoConferencingProvider({
       rtcClient.on("user-published", onMediaStreamPublished);
       rtcClient.on("user-unpublished", onMediaStreamUnpublished);
       rtcClient.on("user-left", onParticipantLeft);
-      rtcClient.on("user-joined", (user) => {});
+      rtcClient.on("user-joined", (user) => { });
 
       await rtcClient.setClientRole("host");
       setupVolumeIndicator();

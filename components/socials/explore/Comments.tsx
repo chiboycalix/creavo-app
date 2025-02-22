@@ -11,7 +11,6 @@ import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
 import { CommentPayload } from "@/types";
 import { useWebSocket } from "@/context/WebSocket";
-import { useFetchCommentReplies } from "@/hooks/comments/useFetchCommentReplies";
 
 export function Comments({ postId }: { postId: number; }) {
   const { data: comments, isPending: isFetchingComments } = useFetchComments(postId);

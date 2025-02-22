@@ -101,7 +101,7 @@ const NotificationsPopover = () => {
   }, [ws]);
 
   const groupedNotifications = transformNotifications(notifications);
-  console.log({ hasUnreadNotifications })
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
