@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 
 export function useUserNotifications(userId: string | undefined) {
   return useQuery({
-    queryKey: ["notifications", userId],
+    queryKey: ["user-notifications", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
       const response = await fetch(

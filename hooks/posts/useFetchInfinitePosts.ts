@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { baseUrl } from "@/utils/constant";
 
 export const useFetchInfinitePosts = (options = {}) => {
@@ -22,6 +22,8 @@ export const useFetchInfinitePosts = (options = {}) => {
       const result = await response.json();
       return result;
     },
+    refetchInterval: 10,
+    placeholderData: keepPreviousData,
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.posts?.length < 10) {
         return undefined;

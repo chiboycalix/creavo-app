@@ -1,10 +1,10 @@
 import Cookies from "js-cookie";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { baseUrl } from "@/utils/constant";
 
 export function useFetchPost(postId: string | undefined) {
   return useQuery({
-    queryKey: ["post", postId],
+    queryKey: ["single-post", postId],
     queryFn: async () => {
       if (!postId) throw new Error("Post ID is required");
       const response = await fetch(`${baseUrl}/posts/${postId}`, {
@@ -14,6 +14,8 @@ export function useFetchPost(postId: string | undefined) {
       });
       return response.json();
     },
+    refetchInterval: 500,
     enabled: !!postId,
+    placeholderData: keepPreviousData,
   });
 }

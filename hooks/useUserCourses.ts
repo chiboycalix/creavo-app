@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 
 export function useUserCourses(userId: string | undefined) {
   return useQuery({
-    queryKey: ["courses", userId],
+    queryKey: ["user-courses", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
       const response = await fetch(`${baseUrl}/users/${userId}/courses`, {

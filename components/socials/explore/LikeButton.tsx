@@ -40,6 +40,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     },
     enabled: !!getAuth(),
     staleTime: 0,
+    refetchInterval: 500,
     placeholderData: { data: { liked: initialIsLiked } }, // Prevent flicker
   });
 

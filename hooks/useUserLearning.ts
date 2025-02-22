@@ -7,7 +7,7 @@ export function useUserLearning(
   isCurrentUser: boolean
 ) {
   return useQuery({
-    queryKey: ["learning", userId],
+    queryKey: ["user-learning", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
       const response = await fetch(
