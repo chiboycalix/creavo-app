@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 /** @type {NextConfig} */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   images: {
     domains: ["ui-avatars.com", "avatar.iran.liara.run"],
     remotePatterns: [
@@ -24,7 +25,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "hebbkx1anhila5yf.public.blob.vercel-storage.com",
-        pathname: "/**"
+        pathname: "/**",
       },
       {
         protocol: "https",
@@ -36,6 +37,18 @@ const nextConfig: NextConfig = {
         hostname: "avatar.iran.liara.run",
         port: "",
         pathname: "/public/**",
+      },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "loremflickr.com",
+        port: "",
+        pathname: "/**",
       },
     ],
   },
