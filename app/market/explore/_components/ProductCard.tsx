@@ -1,7 +1,8 @@
+"use client";
+
 import React from "react";
 import SaveProductButton from "@/components/marketplace/SaveProductButton";
 import { useMarketContext } from "@/context/MarketContext";
-import { useEffect, useState } from "react";
 
 interface Product {
   id: any;
@@ -87,7 +88,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           ) : (
           <span>No ratings or participants found</span>
           )}
-          <div className="flex items-center">
+          <div className="flex items-center bg-[#DFF8F6] px-2  rounded-md">
           <span>
             {"£"}
             {product?.price}

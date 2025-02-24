@@ -16,7 +16,6 @@ const PopularCourses: React.FC<PopularCoursesProps> = ({
     handleToggleSave,
     isSaved,
 }) => {
-    console.log('courses here',courses);
   return (
     <div className="flex flex-wrap gap-4 justify-start">
       <h1>Popular Courses</h1>

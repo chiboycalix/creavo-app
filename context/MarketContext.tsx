@@ -27,6 +27,7 @@ interface MarketContextType {
   fetchProducts: () => void;
   fetchPopularCourses: () => void;
   fetchPopularEvents: () => void;
+  fetchMyListings: () => any;
   savedProducts: any;
   handleToggleSave: (product: any) => void;
   isSaved: boolean;
@@ -377,6 +378,78 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     ];
   };
 
+  const fetchMyListings = () => {
+    return [
+      {
+        id: "1",
+        title: "UI Design Kit",
+        description: "A complete UI/UX design template pack.",
+        price: 29,
+        rating: 4.5,
+        category: "Digital Products",
+        seller: {
+          id: "101",
+          name: "Designer Pro",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      {
+        id: "2",
+        title: "Website Template",
+        description: "Fully responsive website template.",
+        price: 49,
+        rating: 4.8,
+        category: "Digital Products",
+        seller: {
+          id: "102",
+          name: "Web Solutions",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      {
+        id: "3",
+        title: "Social Media Icons Pack",
+        description: "Custom social media icons for brands.",
+        price: 19,
+        rating: 4.2,
+        category: "Digital Products",
+        seller: {
+          id: "103",
+          name: "Graphic Master",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+
+      // E-Books
+      {
+        id: "4",
+        title: "Digital Marketing Guide",
+        description: "Step-by-step guide to digital marketing.",
+        price: 15,
+        rating: 4.6,
+        category: "E-Books",
+        seller: {
+          id: "104",
+          name: "Marketing Guru",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      {
+        id: "5",
+        title: "Python for Beginners",
+        description: "Learn Python programming from scratch.",
+        price: 25,
+        rating: 4.9,
+        category: "E-Books",
+        seller: {
+          id: "105",
+          name: "Code Academy",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+    ];
+  };
+
   const addProduct = (product: Product) => {
     setProducts((prevProducts) => [...prevProducts, product]);
   };
@@ -410,6 +483,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         fetchProducts,
         fetchPopularCourses,
         fetchPopularEvents,
+        fetchMyListings,
         addProduct,
         removeProduct,
         savedProducts,

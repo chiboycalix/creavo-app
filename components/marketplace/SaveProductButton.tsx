@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect } from "react";
 import { Heart } from "lucide-react";
 import { useMarketContext } from "@/context/MarketContext";

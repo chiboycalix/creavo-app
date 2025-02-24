@@ -13,4 +13,5 @@ export interface HeaderButton {
   label: string;
   icon: LucideIcon;
   navItems: NavItem[];
+  dashboardItems?: NavItem[];
 }

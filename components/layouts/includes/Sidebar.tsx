@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { NavItem } from "@/types/navigation";
@@ -11,11 +11,23 @@ import { NavItemComponent } from "./NavItem";
 
 interface SidebarProps {
   navItems: NavItem[];
+  dashboardItems: NavItem[];
 }
 
-export default function Sidebar({ navItems }: SidebarProps) {
+export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
   const pathname = usePathname();
   const { isOpen, close } = useSidebar();
+  const [dashboardMenu, setDashboardMenu] = useState<boolean>(false);
+
+  useEffect(() => {
+    const marketPath = window?.location?.pathname?.includes("/market");
+    const checkPath = () => {
+      if (typeof window !== "undefined" && marketPath) {
+        setDashboardMenu(true);
+      } else setDashboardMenu(false);
+    };
+    checkPath();
+  }, [pathname]);
 
   return (
     <>
@@ -48,11 +60,21 @@ export default function Sidebar({ navItems }: SidebarProps) {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {navItems.map((item, index) => (
+              {navItems?.map((item, index) => (
                 <li key={index}>
                   <NavItemComponent item={item} pathname={pathname} />
                 </li>
               ))}
+              {dashboardMenu && (
+                <>
+                  <div className="mt-4 mb-3 pl-4 font-bold">Your Account</div>
+                  {dashboardItems?.map((item, index) => (
+                    <li key={index}>
+                      <NavItemComponent item={item} pathname={pathname} />
+                    </li>
+                  ))}
+                </>
+              )}
             </div>
           </ul>
 

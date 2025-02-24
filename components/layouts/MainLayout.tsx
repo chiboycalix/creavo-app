@@ -25,10 +25,12 @@ import {
   TvMinimalPlay,
   Calendar,
   ChartAreaIcon,
-
+  LayoutDashboardIcon,
   BookMarkedIcon,
+  TagIcon,
   BellIcon,
   Bookmark,
+  ChartSplineIcon
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -130,6 +132,12 @@ export default function MainLayout({
           icon: BellIcon,
         },
         { title: "Create Listing", href: "/market/create-listing", icon: PlusSquareIcon },
+      ], 
+      dashboardItems: [
+        { title: "Seller dashboard", href: "/market/seller-dashboard", icon: LayoutDashboardIcon },
+        { title: "Your Listings", href: "/market/your-listings", icon: TagIcon },
+        { title: "Insight", href: "/market/insight", icon: ChartSplineIcon },
+
       ]
     }
   ], [currentUser]);
@@ -137,6 +145,11 @@ export default function MainLayout({
   const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(
     headerButtons[0].navItems
   );
+
+  const [currentDashboardItems, setCurrentdashboardItems] = useState<NavItem[]>(
+    headerButtons[2]?.dashboardItems || []
+  );
+
 
   const findNavItemsForPath = React.useCallback((path: string) => {
     for (const button of headerButtons) {
@@ -189,7 +202,7 @@ export default function MainLayout({
       <div className="flex h-screen bg-gray-50 pb-14 overflow-hidden">
         <aside className="fixed left-0 top-0 h-full z-50">
 
-          {loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} />}
+          {loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} dashboardItems={currentDashboardItems} />}
         </aside>
 
         <div className="flex-1 lg:ml-72">
