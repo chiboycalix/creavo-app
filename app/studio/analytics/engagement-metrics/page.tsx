@@ -25,7 +25,7 @@ const courses: Course[] = [
   {
     id: 1,
     title: "Advanced Web Development",
-    image: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?auto=format&fit=crop&q=80&w=300",
+    image: "/assets/Thumbnail.png",
     difficulty: "Advanced",
     uploadDate: "2024-02-15",
     completions: 328,
@@ -37,7 +37,7 @@ const courses: Course[] = [
   {
     id: 2,
     title: "UI/UX Design Fundamentals",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=300",
+    image: "/assets/Thumbnail.png",
     difficulty: "Intermediate",
     uploadDate: "2024-02-10",
     completions: 245,
@@ -49,7 +49,7 @@ const courses: Course[] = [
   {
     id: 3,
     title: "Machine Learning Basics",
-    image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&q=80&w=300",
+    image: "/assets/Thumbnail.png",
     difficulty: "Intermediate",
     uploadDate: "2024-02-08",
     completions: 412, 
@@ -61,7 +61,7 @@ const courses: Course[] = [
   {
     id: 4,
     title: "Digital Marketing Essentials",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=300",
+    image: "/assets/Thumbnail.png",
     difficulty: "Beginner",
     uploadDate: "2024-02-12",
     completions: 567,
