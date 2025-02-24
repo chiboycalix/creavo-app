@@ -59,3 +59,41 @@ export const formatCommentDate = (date: string): string => {
   const diffInDays = now.diff(commentTime, "days");
   return `${diffInDays}d ago`;
 };
+
+export function getMimeTypeFromCloudinaryUrl(url: string): string | null {
+  try {
+    const urlParts = url.split(/[#?]/)[0];
+    const extensionMatch = urlParts.match(/\.([a-zA-Z0-9]+)$/);
+    const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;
+
+    if (!extension) {
+      if (url.includes("/video/")) return "video/mp4"; // Default to mp4 for videos
+      if (url.includes("/image/")) return "image/jpeg"; // Default to jpeg for images
+      return null;
+    }
+
+    // MIME type mapping
+    const mimeTypes: { [key: string]: string } = {
+      mp4: "video/*",
+      mov: "video/*",
+      flv: "video/*",
+      webm: "video/*",
+      jpg: "image/*",
+      jpeg: "image/*",
+      png: "image/*",
+      gif: "image/*",
+      webp: "image/*",
+    };
+
+    return mimeTypes[extension] || null;
+  } catch (error) {
+    console.error("Error parsing MIME type from URL:", error);
+    return null;
+  }
+}
+
+// Usage example
+const url =
+  "https://res.cloudinary.com/dlujwccdb/video/upload/v1740429844/Download_g2xfdd.mp4";
+const mimeType = getMimeTypeFromCloudinaryUrl(url);
+console.log(mimeType); // Output: "video/mp4"

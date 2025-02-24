@@ -285,7 +285,7 @@ const Curriculum = () => {
                             label="Upload Videos"
                             accept="video/*"
                             maxFiles={50}
-                            onFilesChange={(files) => setFiles(files)}
+                            // onFilesChange={(files) => setFiles(files)}
                             errorMessage={files.length > 50 ? "You can only upload up to 50 files." : undefined}
                           />
                         </div>

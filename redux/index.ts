@@ -12,18 +12,20 @@ import {
 import storageSession from "redux-persist/lib/storage/session";
 import moduleReducer from "./slices/module.slice";
 import courseReducer from "./slices/course.slice";
+import uploadReducer from "./slices/upload.slice";
 export type RootState = ReturnType<typeof rootReducer>;
 import { KEYS } from "@/types";
 
 const persistConfig = {
   key: KEYS.REDUX_STORE,
   storage: storageSession,
-  whitelist: ["moduleStore", "courseStore"],
+  whitelist: ["moduleStore", "courseStore", "uploadStore"],
 };
 
 const rootReducer = combineReducers({
   moduleStore: moduleReducer,
   courseStore: courseReducer,
+  uploadStore: uploadReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
