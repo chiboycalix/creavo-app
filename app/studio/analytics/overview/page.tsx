@@ -27,7 +27,7 @@ function OverviewPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-8">
-          <StatCard title="Today Revenue" value="$2,868.99" subtitle="143 Subscription" />
+          <StatCard title="Today Revenue" value="$2,868.99" subtitle="143 Subscription" color="text-green-500"  />
           <StatCard title="Available to withdraw" value="$1,567.99" subtitle="Wed, Jul 20" />
           <StatCard title="Subscribers" value="3,422" subtitle="34 This month" trend={{ value: 3.2, isPositive: true }} />
           <StatCard title="Video Conference Participant" value="156k" subtitle="32k visitors" trend={{ value: 3.2, isPositive: true }} />
