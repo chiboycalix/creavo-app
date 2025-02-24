@@ -12,8 +12,8 @@ export const useFetchInfinitePosts = (options = {}) => {
       };
 
       const response = await fetch(
-        `${baseUrl}/posts?page=${pageParam}&limit=10`,
-        // `${baseUrl}/users/2952/posts?page=1&limit=10`,
+        // `${baseUrl}/posts?page=${pageParam}&limit=10`,
+        `${baseUrl}/users/2952/posts?page=1&limit=10`,
         {
           headers: { ...header },
         }

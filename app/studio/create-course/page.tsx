@@ -16,7 +16,6 @@ const CreateCourse = () => {
   const [files, setFiles] = useState<File[]>([]);
   const router = useRouter()
 
-
   const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
     mutationFn: (payload: CreateCourseForm) => createCourseService(payload),
     onSuccess: async (data) => { },
@@ -98,8 +97,8 @@ const CreateCourse = () => {
               label="Promotional video/images"
               accept="video/*,image/*"
               maxFiles={50}
-              onFilesChange={(files) => setFiles(files)}
               errorMessage={files.length > 50 ? "You can only upload up to 50 files." : undefined}
+            // nextPath=''
             />
           </div>
           <div className='w-full mt-12'>
