@@ -29,7 +29,7 @@ export const ROUTES = {
     LEAVE_MEETING: "/studio/event/meeting/leave-meeting",
   },
 
-  MARKETPLACE: "/market-place",
+  MARKETPLACE: "/market",
 
   CLASSROOM: {
     OVERVIEW: "/classroom/overview",
