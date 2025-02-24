@@ -1,3 +1,4 @@
+import { color } from 'framer-motion';
 import React from 'react';
 
 interface StatCardProps {
@@ -9,11 +10,12 @@ interface StatCardProps {
     isPositive: boolean;
   };
   isLast?: boolean;
+  color?:string;
 }
 
-export function StatCard({ title, value, subtitle, trend, isLast }: StatCardProps) {
+export function StatCard({ title, value, subtitle, trend, isLast, color }: StatCardProps) {
   return (
-    <div className={`bg-white px-6 py-4  w-full }`}>
+    <div className={`bg-white flex flex-col items-start justify-start  px-6 py-4  w-full }`}>
         <div className='flex items-start justify-start gap-5'>
         <h3 className="text-xs text-gray-500 font-medium mb-1">{title}</h3>
         {trend && (
@@ -24,7 +26,7 @@ export function StatCard({ title, value, subtitle, trend, isLast }: StatCardProp
         )}
         </div>
       <div className="flex items-center gap-2">
-        <p className={`text-2xl font-bold ${typeof value === 'string' && value.startsWith('$') ? 'text-emerald-500' : 'text-gray-900'}`}>
+        <p className={`text-2xl font-bold ${color}`}>
           {value}
         </p>
         
