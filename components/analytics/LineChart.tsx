@@ -26,12 +26,14 @@ export function LineChart({
   highlightValue,
   title,
 }: LineChartProps) {
+  console.log("Chart Data:", data); // Debugging log to ensure correct data
+
   return (
     <div className="h-[300px]">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          margin={{ top: 10, right: 30, left: 50, bottom: 0 }} // Increased left margin
         >
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -39,6 +41,8 @@ export function LineChart({
               <stop offset="95%" stopColor="#0EA5E9" stopOpacity={0} />
             </linearGradient>
           </defs>
+
+          {/* X-Axis */}
           <XAxis
             dataKey="x"
             axisLine={false}
@@ -46,29 +50,44 @@ export function LineChart({
             tickMargin={10}
             stroke="#6B7280"
           />
+
+          {/* Y-Axis with improved formatting */}
           <YAxis
-            tickFormatter={(value) => `${value}K`}
+            domain={["auto", "auto"]} // Auto-scale Y-axis
+            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} // Converts numbers to 'K' format
             axisLine={false}
             tickLine={false}
             tickMargin={10}
             stroke="#6B7280"
           />
+
+          {/* Grid Lines */}
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+
+          {/* Tooltip */}
           <Tooltip
             cursor={{ stroke: "red", strokeDasharray: "3 3" }}
             content={({ active, payload }) => {
-                if (active && payload?.length) {
-                  const value = payload[0]?.value;
-                  return (
-                    <div className="bg-blue-600 text-white px-3 py-2 rounded shadow">
-                      {value?.toLocaleString?.() ?? 'N/A'}
+              if (active && payload?.length) {
+                const xValue = payload[0]?.payload?.x; // Extract x value
+                const yValue = payload[0]?.value; // Extract y-axis value
+
+                return (
+                  <div className="bg-white text-black px-3 py-2 rounded shadow">
+                    <p className="text-gray-500 text-xs ">Amount earned</p>
+                    <div className="text-base font-semibold">
+                      {yValue?.toLocaleString()}K
                     </div>
-                  );
-                }
-                return null;
-              }}
-              
+                    <div className="text-xs text-gray-500 font-semibold">{xValue} subscribers</div>
+
+                  </div>
+                );
+              }
+              return null;
+            }}
           />
+
+          {/* Area Chart */}
           <Area
             type="monotone"
             dataKey="value"
@@ -83,6 +102,8 @@ export function LineChart({
               strokeWidth: 2,
             }}
           />
+
+          {/* Highlighted Reference Line & Point */}
           {highlightIndex !== undefined && highlightValue !== undefined && (
             <>
               <ReferenceLine

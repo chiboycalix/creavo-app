@@ -28,9 +28,11 @@ export function ChartHeader({ title, showCourseFilter = false }: ChartHeaderProp
             <SelectValue placeholder="Select period" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="month">This Month</SelectItem>
-            <SelectItem value="quarter">This Quarter</SelectItem>
-            <SelectItem value="year">This Year</SelectItem>
+            <SelectItem value="month">Last 30 days</SelectItem>
+            <SelectItem value="quarter">Last 60 days</SelectItem>
+            <SelectItem value="year">Last 90 days</SelectItem>
+            <SelectItem value="quarter">Last year</SelectItem>
+
           </SelectContent>
         </Select>
       </div>
