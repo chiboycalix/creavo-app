@@ -35,7 +35,7 @@ const SellerDashboard = () => {
               className="flex flex-col flex-1 py-4 pr-5 border-r gap-4"
             >
               <p className="">{item?.title}</p>
-              <h3 className={`text-[${item?.color}] font-bold`}>
+              <h3 className={`text-[${item?.color}] font-bold text-xl`}>
                 {item?.value}
               </h3>
             </div>
