@@ -83,7 +83,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Engagement Metrics</h1>
           <div className="relative">
@@ -98,10 +98,9 @@ function App() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="divide-y divide-gray-200">
+        <div className="bg-gray-50 gap-2 flex flex-col   rounded-lg shadow overflow-hidden">
             {filteredCourses.map((course) => (
-              <div key={course.id} className="p-6 hover:bg-gray-50 transition-colors">
+              <div key={course.id} className="p-6 hover:bg-white shadow transition-colors">
                 <div className="flex items-center space-x-6">
                   <div className="flex-shrink-0 w-8 text-gray-400 font-medium">
                     {String(course.id).padStart(2, '0')}
@@ -119,9 +118,9 @@ function App() {
                       
                     </div>
                     <div className="flex flex-col w-10/12 ">
-                      <h3 className="text-lg font-medium text-gray-900 truncate">{course.title}</h3>
+                      <h3 className=" font-semibold text-sm text-gray-900 ">{course.title}</h3>
                       <div className="flex items-center mt-1 space-x-4">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-xs text-gray-500">
                           Difficulty: {course.difficulty}
                         </span>
                        
@@ -131,17 +130,17 @@ function App() {
 
                  
                     <div className=" flex items-center flex-col ">
-                    <p className=" font-semibold text-gray-900"> {new Date(course.uploadDate).toLocaleDateString()} </p>
-                          <p className="text-sm text-gray-500">Date uploaded</p>
+                    <p className=" font-semibold text-sm text-gray-900"> {new Date(course.uploadDate).toLocaleDateString()} </p>
+                          <p className="text-xs text-gray-500">Date uploaded</p>
                         </div>
                       <div className="text-start">
-                        <p className=" font-semibold text-gray-900">{course.completions}</p>
-                        <p className="text-sm text-gray-500">Completions Count</p>
+                        <p className=" font-semibold text-sm text-gray-900">{course.completions}</p>
+                        <p className="text-xs text-gray-500">Completions Count</p>
                       </div>
                     
                       <button 
                       onClick={() => setSelectedCourse(course)}
-                      className="px-2 py-3 text-sm font-medium bg-gray-100 text-gray-700 rounded-xl  hover:bg-gray-200"
+                      className="px-2 py-3 text-xs font-medium bg-gray-100 text-gray-700 rounded-xl  hover:bg-gray-200"
                     >
                       View more details
                     </button>
@@ -149,7 +148,6 @@ function App() {
                   </div>
               </div>
             ))}
-          </div>
         </div>
       </div>
       {selectedCourse && (
