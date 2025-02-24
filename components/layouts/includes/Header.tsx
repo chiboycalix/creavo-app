@@ -6,7 +6,7 @@ import NotificationsPopover from '@/components/notifications';
 import { Input } from '@/components/Input';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { User, Search, ChevronDown, X, Menu } from 'lucide-react';
+import { User, Search, ChevronDown, X, Menu, Grip } from 'lucide-react';
 import { HeaderButton, NavItem } from '@/types/navigation';
 import { useSidebar } from '@/context/SidebarContext';
 import { useAuth } from '@/context/AuthContext';
@@ -22,6 +22,7 @@ import { Fragment } from 'react';
 import { FaUser, FaCog, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa';
 import { BsPlusCircle } from 'react-icons/bs';
 import { Button } from '@/components/ui/button';
+import QuickActions from '@/components/quickactions';
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;
@@ -116,6 +117,8 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
               <>
                 {/* Notification Button */}
                 <NotificationsPopover />
+
+                <QuickActions />
 
                 {/* User Menu */}
                 <NavMenu as="div" className="relative">
