@@ -9,13 +9,10 @@ import { NavItem, HeaderButton } from "@/types/navigation";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
-import { BookmarkIcon } from "@heroicons/react/24/solid"
 import {
   Archive,
   Video,
   User,
-  Shield,
-  Sliders,
   Compass,
   CompassIcon,
   LightbulbIcon,
@@ -25,8 +22,6 @@ import {
   TvMinimalPlay,
   Calendar,
   ChartAreaIcon,
-
-  BookMarkedIcon,
   BellIcon,
   Bookmark,
 } from "lucide-react";
@@ -96,7 +91,7 @@ export default function MainLayout({
           title: 'Event', href: '/studio/meeting', icon: Video,
           children: [
             {
-              title: 'Classroom', href: '/studio/event/classroom',
+              title: 'Webinar', href: '/studio/event/webinar',
             },
             {
               title: 'Video conference', href: '/studio/event/meeting',
