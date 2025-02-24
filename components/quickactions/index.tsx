@@ -15,7 +15,7 @@ const QuickActions = () => {
       <PopoverTrigger>
         <Grip className="text-gray-500" />
       </PopoverTrigger>
-      <PopoverContent className="mr-4 mt-8 w-[40rem]">
+      <PopoverContent className="mr-2 mt-11 w-[40rem]">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Quick Actions</h2>
           <button onClick={() => setIsOpen(false)} aria-label="Close popover">
