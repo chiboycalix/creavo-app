@@ -119,30 +119,30 @@ const NotificationsPopover = () => {
         </div>
 
         <div className="max-h-[80vh] overflow-y-auto">
-          {groupedNotifications?.today?.length === 0 && (
-            <div className="text-center text-gray-500 py-4 h-full items-center justify-center flex flex-col mt-28">
-              <Image
-                src={NotificationGif}
-                alt="NotificationGif"
-                className="w-32"
-              />
-              <p>There are no notifications at the moment.</p>
-            </div>
-          )}
-
           <div className="min-h-[80vh] overflow-y-auto">
             {isFetchingNotifications ? (
               <NotificationSkeleton />
             ) : (
-              groupedNotifications.today.length > 0 && (
-                <NotificationGroup title="Today">
-                  {groupedNotifications.today.map((notification: any) => (
-                    <NotificationItem
-                      key={notification?.id}
-                      {...notification}
-                    />
-                  ))}
-                </NotificationGroup>
+              groupedNotifications?.today?.length === 0 ? (
+                <div className="text-center text-gray-500 py-4 h-full items-center justify-center flex flex-col mt-28">
+                  <Image
+                    src={NotificationGif}
+                    alt="NotificationGif"
+                    className="w-32"
+                  />
+                  <p>There are no notifications at the moment.</p>
+                </div>
+              ) : (
+                groupedNotifications.today.length > 0 && (
+                  <NotificationGroup title="Today">
+                    {groupedNotifications.today.map((notification: any) => (
+                      <NotificationItem
+                        key={notification?.id}
+                        {...notification}
+                      />
+                    ))}
+                  </NotificationGroup>
+                )
               )
             )}
           </div>
