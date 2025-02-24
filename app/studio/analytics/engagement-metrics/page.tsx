@@ -25,7 +25,7 @@ const courses: Course[] = [
   {
     id: 1,
     title: "Advanced Web Development",
-    image: "/assets/Thumbnail.png",
+    image: "/assets/thumbnail.png",
     difficulty: "Advanced",
     uploadDate: "2024-02-15",
     completions: 328,
@@ -37,7 +37,7 @@ const courses: Course[] = [
   {
     id: 2,
     title: "UI/UX Design Fundamentals",
-    image: "/assets/Thumbnail.png",
+    image: "/assets/thumbnail.png",
     difficulty: "Intermediate",
     uploadDate: "2024-02-10",
     completions: 245,
@@ -49,7 +49,7 @@ const courses: Course[] = [
   {
     id: 3,
     title: "Machine Learning Basics",
-    image: "/assets/Thumbnail.png",
+    image: "/assets/thumbnail.png",
     difficulty: "Intermediate",
     uploadDate: "2024-02-08",
     completions: 412, 
@@ -61,7 +61,7 @@ const courses: Course[] = [
   {
     id: 4,
     title: "Digital Marketing Essentials",
-    image: "/assets/Thumbnail.png",
+    image: "/assets/thumbnail.png",
     difficulty: "Beginner",
     uploadDate: "2024-02-12",
     completions: 567,
@@ -83,7 +83,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Engagement Metrics</h1>
           <div className="relative">
