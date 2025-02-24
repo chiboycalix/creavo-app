@@ -24,8 +24,8 @@ interface CourseModalProps {
 
 export function CourseModal({ course, onClose }: CourseModalProps) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white py-10 rounded-lg p-6 max-w-lg w-full mx-4">
+    <div className="fixed inset-0 top-20 left-20 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white mx-auto rounded-lg p-6 max-w-lg w-full ">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">More insight</h2>
           <button
