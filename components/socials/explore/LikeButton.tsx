@@ -21,10 +21,10 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   likedId,
 }) => {
   const queryClient = useQueryClient();
-  const { getAuth } = useAuth();
+  const { getAuth, getCurrentUser } = useAuth();
   const router = useRouter();
   const ws = useWebSocket();
-
+  const currentUser = getCurrentUser();
   // Fetch like status
   const { data: likeStatus } = useQuery({
     queryKey: ['likeStatus', postId],
@@ -40,12 +40,12 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     },
     enabled: !!getAuth(),
     staleTime: 0,
+    refetchInterval: 500,
     placeholderData: { data: { liked: initialIsLiked } }, // Prevent flicker
   });
 
   const isLiked = likeStatus?.data?.liked ?? initialIsLiked;
-  // console.log({ isLiked })
-  // Like post mutation
+
   const likePostMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`${baseUrl}/posts/${postId}/like-post`, {
@@ -58,14 +58,12 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
       if (!response.ok) throw new Error("Failed to like post");
       const result = await response.json();
-
       // Emit WebSocket event
       if (ws && ws.connected) {
         const request = {
-          userId: likedId, // Current user's ID
-          notificationId: result?.data?.id, // Assuming the response contains the notification ID
+          userId: likedId,
+          notificationId: result?.data?.id,
         };
-        console.log({ request });
         ws.emit("like", request);
       } else {
         console.log("Failed to emit like event", likedId);

@@ -1,5 +1,6 @@
 "use client"
 import HeaderImage from '@/components/HeaderImage';
+import { CrevoeLogo } from '@/public/assets';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
@@ -12,7 +13,7 @@ interface CarouselText {
 const carouselTexts: CarouselText[] = [
   {
     id: 1,
-    title: "Welcome to Stridez",
+    title: "Welcome to Crevoe",
     description: "Discover, share, and grow your skills in an integrated, flexible environment for guides and learners."
   },
   {
@@ -118,7 +119,7 @@ export default function AuthLayout({
 
       <div className="flex-1 md:w-1/2 px-6 py-8 md:px-20 md:py-12 h-full flex flex-col justify-center">
         <div className="flex flex-col justify-center items-center mb-6">
-          <HeaderImage src={'/assets/logo.png'} />
+          <HeaderImage src={CrevoeLogo} />
           <div className='mt-4 w-full'>{children}</div>
         </div>
       </div>

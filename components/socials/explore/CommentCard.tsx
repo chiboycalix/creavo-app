@@ -4,15 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X } from "lucide-react";
 import { Comments } from "@/components/socials/explore/Comments";
 import { useComments } from "@/context/CommentsContext";
-import { useFetchComments } from "@/hooks/useFetchComments";
+import { useFetchComments } from "@/hooks/comments/useFetchComments";
 
 const CommentCard = () => {
-  const { showComments, setShowComments, activePost, activePostId } =
+  const { showComments, setShowComments, activePostId } =
     useComments();
   const { data: comments, isPending: isFetchingComments } = useFetchComments(
     activePostId as any
   );
-  if (!showComments || !activePost) return null;
+  if (!showComments) return null;
 
   return (
     <Card className="border-none fixed w-full md:w-[37.5%]">

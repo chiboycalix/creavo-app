@@ -3,24 +3,40 @@ import CommentItem from "./CommentItem";
 import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/Input";
-import { useFetchComments } from "@/hooks/useFetchComments";
+import { useFetchComments } from "@/hooks/comments/useFetchComments";
 import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
 import { CommentPayload } from "@/types";
+import { useWebSocket } from "@/context/WebSocket";
 
 export function Comments({ postId }: { postId: number; }) {
   const { data: comments, isPending: isFetchingComments } = useFetchComments(postId);
   const { getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
   const [comment, setComment] = useState("");
+  const ws = useWebSocket();
+  const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
+
+  const handleToggleCommentInput = (commentId: string) => {
+    setActiveCommentId((prev) => (prev === commentId ? null : commentId));
+  };
 
   const { mutate: handleAddComment, isPending: isAddingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => addCommentService(payload),
-    onSuccess() {
+    onSuccess(data) {
       setComment("");
+      if (ws && ws.connected && currentUser?.id !== data.userId) {
+        const request = {
+          userId: data.userId,
+          notificationId: data?.id,
+        };
+        ws.emit("comment", request);
+      } else {
+        console.log("Failed to emit like event", data?.id);
+      }
     },
   });
 
@@ -42,9 +58,14 @@ export function Comments({ postId }: { postId: number; }) {
             <p>Be the first to comment</p>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto max-h-[60vh] md:max-h-[73vh]">
+          <div className="flex-1 overflow-y-auto max-h-[60vh] md:max-h-[73vh] no-scrollbar">
             {comments?.data?.comments?.map((comment: any) => (
-              <CommentItem key={comment.id} comment={comment} />
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                activeCommentId={activeCommentId}
+                onToggleCommentInput={handleToggleCommentInput}
+              />
             ))}
           </div>
         )}

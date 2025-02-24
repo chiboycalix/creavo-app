@@ -3,7 +3,7 @@ import { baseUrl } from "@/utils/constant";
 
 export function useUserProfile(userId: string | undefined) {
   return useQuery({
-    queryKey: ["profile", userId],
+    queryKey: ["user-profile", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
       const response = await fetch(`${baseUrl}/profiles/${userId}`);

@@ -109,7 +109,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                 <ProfileErrorCode
                   // icon={"/assets/icons/file-error.svg"}
                   username={
-                    isCurrentUser ? user.username : "Welcome to stridez"
+                    isCurrentUser ? user.username : "Welcome to crevoe"
                   }
                   errorMessage={
                     isCurrentUser
@@ -173,7 +173,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
               <div className="col-span-6 text-center">
                 <ProfileErrorCode
                   icon={"/assets/icons/file-error.svg"}
-                  username={user ? user.username : "Join stridez"}
+                  username={user ? user.username : "Join crevoe"}
                   errorMessage="This page is empty because you haven't started uploading any reel. Start uploading lessons to populate this page."
                   buttonText="Start Uploading"
                   href="/upload"
@@ -198,7 +198,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                 <div className="col-span-6 text-center">
                   <ProfileErrorCode
                     icon={"/assets/icons/file-error.svg"}
-                    username={user ? user.username : "Join stridez"}
+                    username={user ? user.username : "Join crevoe"}
                     errorMessage="This page is empty because you haven't started learning any courses yet. Start learning to populate this page."
                     buttonText="Start Exploring"
                     href="/upload"

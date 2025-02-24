@@ -11,7 +11,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { PostProvider } from "@/context/PostContext";
 import { WebSocketProvider } from "@/context/WebSocket";
 import { VideoConferencingProvider } from "@/context/VideoConferencingContext";
-import { CommentProvider } from "@/context/CommentsContext";
 import { MarketProvider } from "@/context/MarketContext";
 
 const manrope = Manrope({
@@ -20,8 +19,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Creavo",
-  description: "Creavo",
+  title: "Crevoe",
+  description: "Crevoe",
 };
 
 export default function RootLayout({

@@ -13,7 +13,6 @@ interface Post {
   comments: Comment[];
 }
 
-// context/CommentContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface CommentContextType {
@@ -35,7 +34,7 @@ export function CommentProvider({ children, posts }: { children: ReactNode; post
 
   const toggleComments = (postId: number) => {
     setActivePostId(postId);
-    setShowComments(true);
+    setShowComments(!showComments);
   };
 
   return (

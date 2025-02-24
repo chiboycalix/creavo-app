@@ -5,7 +5,6 @@ export { default as FollowingIcon } from "./icons/followingicon.png";
 export { default as LockIcon } from "./icons/lock.svg";
 
 export { default as TeamPeople } from "./team.png";
-export { default as LivePhoto } from "./Live.jpeg";
 export { default as ChatEmpty } from "./ChatEmpty.svg";
 
 export { default as BackgroundOne } from "./virtualBackgrounds/backgroundOne.jpg";

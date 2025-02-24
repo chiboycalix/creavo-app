@@ -2,25 +2,25 @@
 import SocialFeed from "@/components/socials/explore/SocialFeed";
 import { CommentProvider } from "@/context/CommentsContext";
 import { generalHelpers } from "@/helpers";
-import { useFetchPosts } from "@/hooks/useFetchPosts";
+import { useFetchInfinitePosts } from "@/hooks/posts/useFetchInfinitePosts";
 
 export default function ExplorePage() {
-  const { data: posts, isPending: isFetcingPosts } = useFetchPosts()
+  const { data, isFetching } = useFetchInfinitePosts()
 
   const result = generalHelpers.processPostsData({
-    posts: posts?.data.posts,
-    likedStatuses: posts?.data.likedStatuses,
-    followStatuses: posts?.data.followStatuses
+    posts: data?.pages[0]?.data.posts,
+    likedStatuses: data?.pages[0]?.data.likedStatuses,
+    followStatuses: data?.pages[0]?.data.followStatuses,
   });
 
   return (
     <CommentProvider
-      posts={posts}
+      posts={data?.pages[0]}
     >
       <SocialFeed
-        posts={posts}
+        initialPosts={data?.pages[0]}
         result={result}
-        isFetcingPosts={isFetcingPosts}
+        isFetcingPosts={isFetching}
       />
     </CommentProvider>
   );

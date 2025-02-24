@@ -53,7 +53,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   ]
 
   return (
-    <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full sm:mb-10 mb-0">
+    <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0">
       {/* Main Post Container */}
       <div className="bg-black text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
         <div className="relative">
@@ -130,19 +130,18 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       </div>
 
       {/* Metrics - Desktop */}
-      <div className="hidden lg:flex flex-col gap-4 h-full justify-between">
-        <div className="flex-1 relative z-50">
-          {
-            Number(post.userId) !== currId &&
+      <div className="hidden lg:flex flex-col h-full justify-end">
+        <div className="flex flex-col gap-4 mt-auto">
+          {Number(post.userId) !== currId && (
             <FollowButton
               followedId={post?.userId}
               avatar={post?.user_profile_avatar || "/assets/display.jpg"}
               initialFollowStatus={post?.followed}
             />
-          }
+          )}
 
           {metrics.map((metric, index) => (
-            <div key={index} className="flex flex-col items-center mb-4">
+            <div key={index} className="flex flex-col items-center mb-0">
               <div className="text-sm rounded-full cursor-pointer transition-colors">
                 {metric.icon}
               </div>
@@ -151,6 +150,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           ))}
         </div>
       </div>
+
     </div>
   )
 }

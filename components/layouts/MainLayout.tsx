@@ -92,7 +92,17 @@ export default function MainLayout({
           ]
         },
         { title: 'Calendar', href: '/studio/schedule', icon: Calendar },
-        { title: 'Classroom & webinar', href: '/studio/meeting', icon: Video },
+        {
+          title: 'Event', href: '/studio/meeting', icon: Video,
+          children: [
+            {
+              title: 'Classroom', href: '/studio/event/classroom',
+            },
+            {
+              title: 'Video conference', href: '/studio/event/meeting',
+            },
+          ]
+        },
         {
           title: "Analytics",
           href: "/studio/analytics",

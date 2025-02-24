@@ -6,7 +6,7 @@ import NotificationsPopover from '@/components/notifications';
 import { Input } from '@/components/Input';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { User, Search, ChevronDown, X, Menu } from 'lucide-react';
+import { User, Search, ChevronDown, X, Menu, Grip } from 'lucide-react';
 import { HeaderButton, NavItem } from '@/types/navigation';
 import { useSidebar } from '@/context/SidebarContext';
 import { useAuth } from '@/context/AuthContext';
@@ -22,6 +22,7 @@ import { Fragment } from 'react';
 import { FaUser, FaCog, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa';
 import { BsPlusCircle } from 'react-icons/bs';
 import { Button } from '@/components/ui/button';
+import QuickActions from '@/components/quickactions';
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;
@@ -116,6 +117,8 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
               <>
                 {/* Notification Button */}
                 <NotificationsPopover />
+
+                <QuickActions />
 
                 {/* User Menu */}
                 <NavMenu as="div" className="relative">
@@ -227,7 +230,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                               className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <span className="mr-3 h-4 w-4 text-gray-500">📱</span>
-                              Get Stridez App
+                              Get Crevoe App
                             </Link>
                           )}
                         </MenuItem>
