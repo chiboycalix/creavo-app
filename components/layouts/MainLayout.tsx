@@ -101,7 +101,7 @@ export default function MainLayout({
               title: 'Webinar', href: '/studio/event/webinar',
             },
             {
-              title: 'classroom', href: '/studio/event/classroom',
+              title: 'Classroom', href: '/studio/event/classroom',
             },
 
           ]
