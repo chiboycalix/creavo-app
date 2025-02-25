@@ -11,6 +11,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserCourses } from "@/hooks/useUserCourses";
 import { useUserPosts } from "@/hooks/posts/useUserPosts";
 import { useUserLearning } from "@/hooks/useUserLearning";
+import { generalHelpers } from "@/helpers";
 
 const Profile = () => {
   const router = useRouter();
@@ -52,6 +53,11 @@ const Profile = () => {
       </div>
     );
   }
+  const result = generalHelpers.processPostsData({
+    posts: postsData?.data.posts,
+    likedStatuses: postsData?.data.likedStatuses,
+    followStatuses: postsData?.data?.followStatuses,
+  })
 
   return (
     <ProtectedRoute
@@ -59,7 +65,7 @@ const Profile = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className="w-full flex flex-col bg-white my-px min-h-[83vh] p-3">
+      <div className="w-full flex flex-col my-px min-h-[83vh] p-3">
         <ProfileHeader
           userProfile={profileData?.data}
           isCurrentUser={isCurrentUser}
@@ -68,7 +74,7 @@ const Profile = () => {
         <ProfileTabs
           isCurrentUser={isCurrentUser}
           courses={coursesData?.data?.courses}
-          posts={postsData?.data?.posts}
+          posts={result}
           myLearning={learningData?.data}
           user={currentUser}
           loadingCourses={false}

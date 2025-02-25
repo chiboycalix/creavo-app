@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useState } from "react";
-import { BsPencil } from "react-icons/bs";
-import { BiShare } from "react-icons/bi";
 import EditUserInputModal from "./EditUserInputModal";
 import FollowButton from "@/components/FollowButton";
 import FollowLink from "./FollowLink";
 import Image from "next/image";
+import { BsPencil } from "react-icons/bs";
+import { BiShare } from "react-icons/bi";
+import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 
 interface Profile {
   firstName: string;
@@ -37,22 +39,22 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="flex items-center">
-        <Image
-          width={96}
-          height={96}
-          className="w-24 h-24 rounded-full bg-gray-400 object-cover"
-          src={
-            userProfile?.profile?.avatar ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              userProfile?.username
-            )}&background=random`
-          }
-          alt={`${userProfile?.username || "User"}'s profile avatar`}
-        />
-        <div className="ml-4">
-          <h1 className="text-2xl font-semibold">
+    <div className="flex flex-col items-center w-full p-4">
+      <Image
+        width={96}
+        height={96}
+        className="w-24 h-24 rounded-full bg-gray-400 object-cover"
+        src={
+          userProfile?.profile?.avatar ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            userProfile?.username
+          )}&background=random`
+        }
+        alt={`${userProfile?.username || "User"}'s profile avatar`}
+      />
+      <div className="mt-2">
+        <div className="flex itcms-center gap-3">
+          <h1 className="text-sm font-semibold">
             {userProfile?.profile?.firstName &&
               userProfile?.profile?.lastName === "None"
               ? userProfile?.username
@@ -60,27 +62,32 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 }`.trim()}
           </h1>
           <p className="text-sm">@{userProfile?.username}</p>
-          <div className="flex gap-2 mt-2">
-            {isCurrentUser ? (
-              <button
-                onClick={() => setShowModal(true)}
-                aria-label="Edit your profile"
-                className="flex items-center rounded-md py-1.5 px-3.5 text-[15px] font-medium border hover:bg-gray-100"
-              >
-                <BsPencil className="mr-1" />
-                Edit
-              </button>
-            ) : (
-              <FollowButton followedId={Number(userProfile?.id)} />
-            )}
-            <button
-              className="flex items-center rounded-md py-1.5 px-3.5 text-[15px] font-medium border hover:bg-gray-100"
-              aria-label="Share this profile"
+        </div>
+        <div className="flex gap-2 mt-2">
+          {isCurrentUser ? (
+            <Button
+              onClick={() => setShowModal(true)}
+              aria-label="Edit your profile"
+              className="flex text-sm items-center rounded-md w-8/12 font-medium border hover:bg-primary-600"
             >
-              <BiShare className="mr-1" />
-              Share
-            </button>
-          </div>
+              <BsPencil className="mr-1" />
+              <span className="text-xs">Edit Profile</span>
+            </Button>
+          ) : (
+            <FollowButton followedId={Number(userProfile?.id)} />
+          )}
+          <span
+            className="flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
+            aria-label="Share this profile"
+          >
+            <BiShare />
+          </span>
+          <span
+            className="flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
+            aria-label="Share this profile"
+          >
+            <Settings />
+          </span>
         </div>
       </div>
       <div className="flex space-x-4 mt-3">
@@ -109,7 +116,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </FollowLink>
         </div>
       </div>
-
+      <div>
+        <p className="text-sm text-gray-500 mt-2">
+          {userProfile?.profile?.bio || "No bio available"}
+        </p>
+      </div>
       {/* Modal for editing user information */}
       {showModal && (
         <EditUserInputModal

@@ -7,11 +7,14 @@ export function useUserPosts(userId: string | undefined) {
     queryKey: ["user-posts", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
-      const response = await fetch(`${baseUrl}/users/${userId}/posts`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("accessToken")}`,
-        },
-      });
+      const response = await fetch(
+        `${baseUrl}/users/${userId}/posts?page=1&limit=10`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
+          },
+        }
+      );
       return response.json();
     },
     refetchInterval: 500,

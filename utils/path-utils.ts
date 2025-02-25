@@ -24,6 +24,8 @@ export const LAYOUT_PATHS = [
   "/socials/profile",
   "/socials/watchlist",
   "/socials/uploads",
+  "/socials/edit-post",
+  "/socials/edit-post/?*",
 
   "/studio",
   "/studio/create-course",
@@ -33,6 +35,9 @@ export const LAYOUT_PATHS = [
   "/studio/event/meeting/*",
   "/studio/event/webinar",
   "/studio/event/webinar/*",
+  "/studio/event/classroom",
+  "/studio/event/classroom/*",
+  "/studio/calendar",
   "/studio/schedule",
   "/studio/cohort/*",
   "/studio/analytics/*",
@@ -44,7 +49,6 @@ export const LAYOUT_PATHS = [
   "/market/seller-dashboard",
   "/market/your-listings",
   "/market/insight",
-  
 ].filter((path) => !path.startsWith("/auth"));
 
 export const shouldUseMainLayout = (pathname: string): boolean => {

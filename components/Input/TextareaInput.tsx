@@ -1,8 +1,8 @@
+// src/components/TextareaInput.tsx
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
-import { Textarea } from "../ui/textarea"; // Assuming Textarea is a custom component
 
-type TextareaInputProps = {
+export type TextareaInputProps = {
   label?: ReactNode;
   errorMessage?: string | false;
   className?: string;
@@ -17,10 +17,10 @@ type TextareaInputProps = {
   maxRows?: number;
   minRows?: number;
   resize?: "none" | "vertical" | "horizontal" | "both";
-  maxLength?: number; // Add maxLength prop
-  value?: string; // Ensure value is controlled
-  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void; // Ensure onChange is typed correctly
-} & React.ComponentProps<'textarea'>;
+  maxLength?: number;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+} & React.ComponentProps<"textarea">;
 
 export const TextareaInput = ({
   label,
@@ -33,12 +33,12 @@ export const TextareaInput = ({
   rightIconClassName,
   onLeftIconClick,
   onRightIconClick,
-  rows,
+  rows = 4,
   maxRows,
   minRows,
   resize = "vertical",
   maxLength,
-  value = "", // Default to empty string
+  value = "",
   onChange,
   ...rest
 }: TextareaInputProps) => {
@@ -52,31 +52,23 @@ export const TextareaInput = ({
         </label>
       )}
       <div className="relative">
-        {icon && (
+        {(icon || leftIcon) && (
           <div
-            className={cn("absolute left-0 top-3 pl-3", leftIconClassName)}
+            className={cn(
+              "absolute inset-y-0 left-0 pl-3 flex items-start pt-3",
+              leftIconClassName
+            )}
             onClick={onLeftIconClick}
           >
-            {icon}
+            {icon || leftIcon}
           </div>
         )}
-        {leftIcon && (
-          <div
-            className={cn("absolute left-0 top-3 pl-3", leftIconClassName)}
-            onClick={onLeftIconClick}
-          >
-            {leftIcon}
-          </div>
-        )}
-        <Textarea
+        <textarea
           className={cn(
-            "flex min-h-[80px] w-full rounded-md border border-primary-100 bg-primary-50/25 px-3 py-2 text-base",
-            "placeholder:text-neutral-500 focus-visible:outline-none outline-none focus-visible:border-none",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            "md:text-sm outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2",
-            (icon || leftIcon) && "pl-10",
-            rightIcon && "pr-10",
-            errorMessage && "border-red-500 focus-visible:ring-red-500",
+            "outline-none focus:ring-0 border-primary-100 border-2 rounded py-3 text-gray-800 text-sm w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
+            (icon || leftIcon) ? "pl-10" : "pl-3",
+            rightIcon ? "pr-10" : "pr-3",
+            errorMessage ? "bg-red-100" : "bg-primary-50/25",
             resize === "none" && "resize-none",
             resize === "vertical" && "resize-y",
             resize === "horizontal" && "resize-x",
@@ -84,14 +76,17 @@ export const TextareaInput = ({
             className
           )}
           rows={rows}
+          maxLength={maxLength}
           value={value}
           onChange={onChange}
-          maxLength={maxLength}
           {...rest}
         />
         {rightIcon && (
           <div
-            className={cn("absolute right-0 top-3 pr-3", rightIconClassName)}
+            className={cn(
+              "absolute inset-y-0 right-0 pr-3 flex items-start pt-3",
+              rightIconClassName
+            )}
             onClick={onRightIconClick}
           >
             {rightIcon}

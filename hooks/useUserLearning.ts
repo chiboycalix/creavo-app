@@ -11,7 +11,7 @@ export function useUserLearning(
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
       const response = await fetch(
-        `${baseUrl}/users/${userId}/learnings?page=1&limit=10`,
+        `${baseUrl}/users/${userId}/posts?page=1&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
