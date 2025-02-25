@@ -90,16 +90,20 @@ export default function MainLayout({
             { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
           ]
         },
-        { title: 'Calendar', href: '/studio/schedule', icon: Calendar },
+        { title: 'Calendar', href: '/studio/calendar', icon: Calendar },
         {
           title: 'Event', href: '/studio/meeting', icon: Video,
           children: [
             {
+              title: 'Video conference', href: '/studio/event/meeting',
+            },
+            {
               title: 'Webinar', href: '/studio/event/webinar',
             },
             {
-              title: 'Video conference', href: '/studio/event/meeting',
+              title: 'classroom', href: '/studio/event/classroom',
             },
+
           ]
         },
         {
@@ -129,7 +133,7 @@ export default function MainLayout({
           icon: BellIcon,
         },
         { title: "Create Listing", href: "/market/create-listing", icon: PlusSquareIcon },
-      ], 
+      ],
       dashboardItems: [
         { title: "Seller dashboard", href: "/market/seller-dashboard", icon: LayoutDashboardIcon },
         { title: "Your Listings", href: "/market/your-listings", icon: TagIcon },
