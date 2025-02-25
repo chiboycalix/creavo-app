@@ -2,12 +2,11 @@ import { apiClient } from "@/lib/apiClient";
 
 export interface CreateCourseForm {
   title: string;
-  categoryId: number;
   description: string;
-  level: string;
-  price: number;
-  thumbnailUrl: string;
-  language: string;
+  difficultyLevel: string | undefined;
+  amount?: string;
+  currency?: string;
+  thumbnailUrl?: string;
   isPaid: boolean;
   tags: string[];
 }

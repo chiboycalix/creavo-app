@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import NotificationsPopover from '@/components/notifications';
+import QuickActions from '@/components/quickactions';
 import { Input } from '@/components/Input';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -22,7 +23,6 @@ import { Fragment } from 'react';
 import { FaUser, FaCog, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa';
 import { BsPlusCircle } from 'react-icons/bs';
 import { Button } from '@/components/ui/button';
-import QuickActions from '@/components/quickactions';
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;

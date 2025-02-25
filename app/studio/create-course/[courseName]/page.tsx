@@ -1,12 +1,12 @@
 "use client";
-import React, { useState } from 'react'
-import { generalHelpers } from '@/helpers';
-import { useParams } from 'next/navigation';
-import { PenBox } from 'lucide-react';
+import React from 'react'
 import CustomTab from '@/components/CustomTab';
 import Curriculum from '@/components/studio/create-course/curriculum';
 import Quiz from '@/components/studio/create-course/quiz';
 import Grade from '@/components/studio/create-course/grade';
+import { generalHelpers } from '@/helpers';
+import { useParams } from 'next/navigation';
+import { PenBox } from 'lucide-react';
 
 const CourseName = () => {
   const { courseName } = useParams();

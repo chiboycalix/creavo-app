@@ -4,14 +4,13 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 const initialState = {
   createCourseForm: {
     title: "",
-    categoryId: 0,
     description: "",
-    level: "",
-    price: 0,
+    difficultyLevel: "",
     thumbnailUrl: "",
     tags: [],
     isPaid: false,
-    language: "",
+    currency: "",
+    amount: "",
   } as CreateCourseForm,
 };
 

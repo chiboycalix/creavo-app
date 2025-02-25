@@ -1,18 +1,7 @@
+import { useAppSelector } from "@/hooks/useStore.hook";
 import { CreateCourseForm } from "@/services/course.service";
 import { useState } from "react";
 import { z } from "zod";
-
-const CreateCourseShema = z.object({
-  title: z.string().min(1, { message: "Course title is required" }),
-  categoryId: z.number().min(1, { message: "Category is required" }),
-  description: z.string().min(1, { message: "Description is required" }),
-  level: z.string().min(1, { message: "Level is required" }),
-  price: z.number().min(0, { message: "Price is required" }),
-  thumbnailUrl: z.string().min(1, { message: "Thumbnail is required" }),
-  language: z.string().min(1, { message: "Language is required" }),
-  isPaid: z.boolean(),
-  tags: z.array(z.string()),
-});
 
 type HookProps = {
   store: CreateCourseForm;
@@ -22,6 +11,26 @@ const useCreateCourseFormValidator = ({ store }: HookProps) => {
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreateCourseForm, string>>
   >({});
+  const { createCourseForm: createCourseStateValues } = useAppSelector(
+    (store) => store.courseStore
+  );
+
+  const CreateCourseShema = z.object({
+    title: z.string().min(1, { message: "Course title is required" }),
+    description: z.string().min(1, { message: "Description is required" }),
+    difficultyLevel: z
+      .string()
+      .min(1, { message: "Difficulty Level is required" }),
+    isPaid: z.boolean(),
+    tags: z.array(z.string()),
+    amount: createCourseStateValues?.isPaid
+      ? z.string().trim().min(1, { message: "Amount is required" })
+      : z.string().optional(),
+    currency: createCourseStateValues?.isPaid
+      ? z.string().min(1, { message: "Currency is required" })
+      : z.string().optional(),
+    thumbnailUrl: z.string().optional(),
+  });
 
   const validate = async (_callback?: () => void) => {
     const result = CreateCourseShema.safeParse(store);

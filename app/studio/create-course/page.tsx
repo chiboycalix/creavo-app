@@ -1,32 +1,99 @@
 "use client"
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/Input'
-import { Switch } from '@/components/ui/switch'
+import { Switch } from '@headlessui/react';
 import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { generalHelpers } from '@/helpers'
 import { CreateCourseForm, createCourseService } from '@/services/course.service'
 import { useMutation } from '@tanstack/react-query'
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
+import { updatCreateCourseForm } from '@/redux/slices/course.slice';
+import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCourse.validator';
+import { Loader2 } from 'lucide-react';
+import { useToast } from "@/context/ToastContext";
+
+const currencies = [
+  {
+    label: 'USD',
+    value: 'USD',
+  },
+  {
+    label: 'EUR',
+    value: 'EUR',
+  },
+  {
+    label: 'GBP',
+    value: 'GBP',
+  },
+  {
+    label: 'JPY',
+    value: 'JPY',
+  },
+  {
+    label: 'CAD',
+    value: 'CAD',
+  },
+  {
+    label: 'AUD',
+    value: 'AUD',
+  },
+  {
+    label: 'CHF',
+    value: 'CHF',
+  },
+  {
+    label: 'CNY',
+    value: 'CNY',
+  },
+  {
+    label: 'SEK',
+    value: 'SEK',
+  },
+  {
+    label: 'NZD',
+    value: 'NZD',
+  },
+  {
+    label: 'NGN',
+    value: 'NGN',
+  },
+];
 
 const CreateCourse = () => {
-  const [course, setCourse] = useState("")
-  const [description, setDescription] = useState("")
-  const [files, setFiles] = useState<File[]>([]);
   const router = useRouter()
+  const { showToast } = useToast();
+  const dispatch = useAppDispatch();
+  const { createCourseForm: createCourseStateValues } = useAppSelector((store) => store.courseStore);
+  const { validate, errors, validateField } = useCreateCourseFormValidator({ store: createCourseStateValues });
+  const updateCreateCourse = (payload: Partial<CreateCourseForm>) => dispatch(updatCreateCourseForm(payload));
 
-  const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
+  const { mutate: handleCreateCourse, isPending: isCreatingCourse } = useMutation({
     mutationFn: (payload: CreateCourseForm) => createCourseService(payload),
-    onSuccess: async (data) => { },
-    onError: (error: any) => { },
+    onSuccess: async (data) => {
+      showToast('success', 'success', "Course created successfully");
+      const slugTitle = generalHelpers?.convertToSlug(data?.title)
+      router.push(`/studio/create-course/${slugTitle}`)
+    },
+    onError: (error: any) => {
+      showToast('error', 'Failed to create course', error.data[0]);
+    },
   });
-
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    const slugTitle = generalHelpers?.convertToSlug(course)
-    router.push(`/studio/create-course/${slugTitle}`)
+    validate(() => handleCreateCourse({
+      title: createCourseStateValues.title,
+      description: createCourseStateValues.description,
+      difficultyLevel: createCourseStateValues.difficultyLevel,
+      tags: createCourseStateValues.tags,
+      amount: createCourseStateValues.amount?.toString(),
+      isPaid: createCourseStateValues.isPaid,
+      currency: createCourseStateValues.currency,
+      thumbnailUrl: createCourseStateValues.thumbnailUrl
+    }))
   }
 
   return (
@@ -42,8 +109,12 @@ const CreateCourse = () => {
               label="Course Name"
               maxLength={54}
               placeholder="Enter course title"
-              value={course}
-              onChange={(e) => setCourse(e.target.value)}
+              value={createCourseStateValues.title}
+              onChange={(e) => {
+                validateField("title", e.target.value)
+                updateCreateCourse({ title: e.target.value });
+              }}
+              errorMessage={errors.title}
             />
             <p className='text-sm mt-1'>You can always change this later</p>
           </div>
@@ -54,8 +125,12 @@ const CreateCourse = () => {
               label="Course Description"
               maxLength={365}
               placeholder="Enter your course description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={createCourseStateValues.description}
+              onChange={(e) => {
+                validateField("description", e.target.value)
+                updateCreateCourse({ description: e.target.value });
+              }}
+              errorMessage={errors.description}
               rows={10}
             />
           </div>
@@ -64,50 +139,96 @@ const CreateCourse = () => {
               <Input
                 label="Difficulty level"
                 variant='select'
+                value={createCourseStateValues.difficultyLevel?.toString()}
+                onSelect={(value) => {
+                  validateField("difficultyLevel", value.toString())
+                  updateCreateCourse({ difficultyLevel: value?.toString() });
+                }}
                 placeholder='Select course difficulty'
                 options={[
                   {
-                    value: "Easy",
-                    label: "Easy"
+                    value: "beginner",
+                    label: "Beginner"
+                  },
+                  {
+                    value: "intermediate",
+                    label: "Intermediate"
+                  },
+                  {
+                    value: "hard",
+                    label: "Hard"
                   }
                 ]}
+                errorMessage={errors.difficultyLevel}
               />
             </div>
             <div className='flex-1'>
-              <Input
-                label="Category"
-                variant='select'
-                placeholder='Select course category'
-                options={[
-                  {
-                    value: "Easy",
-                    label: "Easy"
-                  }
-                ]}
-              />
+
             </div>
           </div>
           <div className='flex gap-2 items-center mb-8'>
-            <Switch />
+            <Switch
+              checked={createCourseStateValues.isPaid}
+              onChange={(checked) => {
+                console.log({ checked })
+                updateCreateCourse({ isPaid: checked });
+              }}
+              className={`${createCourseStateValues.isPaid ? 'bg-primary-600' : 'bg-gray-200'} relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none`}
+            >
+              <span
+                className={`${createCourseStateValues.isPaid ? 'translate-x-5' : 'translate-x-1'} inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
+              />
+            </Switch>
             <p>Add payment</p>
           </div>
+          {
+            createCourseStateValues.isPaid && <div className='flex items-center justify-between gap-4 mb-8'>
+              <div className='basis-1/2'>
+                <Input
+                  label="Currency"
+                  variant='select'
+                  placeholder='Select currency'
+                  options={currencies}
+                  value={createCourseStateValues.currency}
+                  className='w-full'
+                  onSelect={(value) => {
+                    updateCreateCourse({ currency: value?.toString() });
+                  }}
+                  errorMessage={errors.currency}
+                />
+              </div>
+
+              <div className='flex-1'>
+                <Input
+                  label="Amount"
+                  placeholder='Enter amount'
+                  className='w-full'
+                  value={createCourseStateValues.amount?.toString()}
+                  type='number'
+                  onChange={(e) => {
+                    updateCreateCourse({ amount: e.target.value });
+                  }}
+                />
+              </div>
+            </div>
+          }
 
           <div>
             <UploadInput
               label="Promotional video/images"
               accept="video/*,image/*"
               maxFiles={50}
-              errorMessage={files.length > 50 ? "You can only upload up to 50 files." : undefined}
             // nextPath=''
             />
           </div>
           <div className='w-full mt-12'>
             <Button
-              type="submit"
-              disabled={!course}
+              // type="submit"
               className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
             >
-              Continue
+              {
+                isCreatingCourse ? <Loader2 /> : "Continue"
+              }
             </Button>
           </div>
         </form>
