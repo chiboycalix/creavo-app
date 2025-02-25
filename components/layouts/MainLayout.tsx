@@ -83,10 +83,10 @@ export default function MainLayout({
         { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
         { title: 'Module Management', href: '/studio/module-management', icon: PlusSquareIcon },
         {
-          title: 'Trainee', href: '/studio/trainee', icon: User,
+          title: 'Cohort', href: '/studio/cohort', icon: User,
           children: [
-            { title: 'All Trainee', href: '/studio/trainee/all-trainee', icon: Calendar },
-            { title: 'Trainee Progress', href: '/studio/trainee/progress', icon: Video },
+            { title: 'Subscribers', href: '/studio/cohort/all-subscribers', icon: Calendar },
+            { title: 'Subscribers Progress', href: '/studio/cohort/subscriber-progress', icon: Video },
             { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
           ]
         },

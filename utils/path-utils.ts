@@ -34,6 +34,7 @@ export const LAYOUT_PATHS = [
   "/studio/event/webinar",
   "/studio/event/webinar/*",
   "/studio/schedule",
+  "/studio/cohort/*",
   "/studio/analytics/*",
 
   "/market",
