@@ -40,7 +40,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
       `posts (${posts && posts?.length || 0})`,
       `courses (${courses?.length || 0})`,
     ];
-    if (isCurrentUser) baseTabs.push(`Learning (${myLearning?.length || 0})`);
+    if (isCurrentUser) baseTabs.push(`saved videos (${myLearning?.length || 0})`);
     return baseTabs;
   }, [isCurrentUser, courses, posts, myLearning]);
 
@@ -67,7 +67,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           <Tab
             key={index}
             className={({ selected }) =>
-              `w-28 text-center py-1.5 text-[16px] font-medium capitalize
+              `w-28 text-center py-1.5 text-[14px] font-medium capitalize
               ${selected
                 ? "border-b-4 rounded-b-sm outline-none border-primary font-semibold text-primary"
                 : "text-gray-500 hover:text-black"

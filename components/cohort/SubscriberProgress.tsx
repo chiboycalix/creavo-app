@@ -42,7 +42,7 @@ export function SubscriberProgress() {
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold">Subcribers Progress</h1>
+        <h1 className="text-xl font-semibold">Learners Progress</h1>
         <div className="flex items-center gap-4">
           <div className="relative">
             <input

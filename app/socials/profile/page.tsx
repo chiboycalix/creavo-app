@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ProfileHeader from "./_components/ProfileHeader";
 import ProfileTabs from "./_components/ProfileTabs";
 import Loading from "@/components/Loading";
@@ -17,6 +17,7 @@ const Profile = () => {
   const router = useRouter();
   const { getAuth, getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
+  
   const {
     data: profileData,
     isLoading: profileLoading,
@@ -28,11 +29,24 @@ const Profile = () => {
   const isCurrentUser = currentUser?.id === profileData?.data?.id;
   const { data: learningData } = useUserLearning(currentUser?.id, isCurrentUser);
 
+  const [userProfile, setUserProfile] = useState(profileData?.data);
+
+  useEffect(() => {
+    if (profileData?.data && profileData.data !== userProfile) {
+      setUserProfile(profileData.data);
+    }
+  }, [profileData]);
+  
+
   const handleFollow = () => {
     if (!getAuth()) {
       router.push('/auth');
       return;
     }
+  };
+
+  const handleProfileUpdate = (updatedProfile: any) => {
+    setUserProfile(updatedProfile);
   };
 
   if (profileError) {
@@ -53,11 +67,12 @@ const Profile = () => {
       </div>
     );
   }
+
   const result = generalHelpers.processPostsData({
     posts: postsData?.data.posts,
     likedStatuses: postsData?.data.likedStatuses,
     followStatuses: postsData?.data?.followStatuses,
-  })
+  });
 
   return (
     <ProtectedRoute
@@ -67,9 +82,11 @@ const Profile = () => {
     >
       <div className="w-full flex flex-col my-px min-h-[83vh] p-3">
         <ProfileHeader
-          userProfile={profileData?.data}
+        key={userProfile?.id} 
+          userProfile={userProfile} 
           isCurrentUser={isCurrentUser}
           onFollow={handleFollow}
+          onProfileUpdate={handleProfileUpdate} // Pass update function
         />
         <ProfileTabs
           isCurrentUser={isCurrentUser}
@@ -85,4 +102,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;          
+export default Profile;
