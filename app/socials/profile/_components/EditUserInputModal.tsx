@@ -264,6 +264,21 @@ const EditUserInputModal: React.FC<EditUserInputModalProps> = ({
                   className="w-full px-3 py-2 border rounded focus:outline-none"
                 />
               </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setUsername(e.target.value);
+                  }}
+                  className="w-full px-3 py-2 border rounded focus:outline-none"
+                />
+                {username && <Socket username={username} />}
+              </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">

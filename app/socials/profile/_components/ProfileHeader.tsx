@@ -50,7 +50,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   
   return (
     <div className="flex flex-col items-center w-full p-4">
-      <Image
+       <Image
         width={96}
         height={96}
         className="w-24 h-24 rounded-full bg-gray-400 object-cover"
