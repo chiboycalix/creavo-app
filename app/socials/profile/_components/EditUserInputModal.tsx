@@ -8,6 +8,7 @@ import { AUTH_API } from "@/lib/api";
 import { STATUS_CODES } from "@/constants/statusCodes";
 import Toastify from "@/components/Toastify";
 import { cloudinaryCloudName, cloudinaryUploadPreset } from "@/utils/constant";
+import { useWebSocket } from "@/context/WebSocket";
 
 interface UserProfile {
   id: number;
@@ -23,11 +24,13 @@ interface UserProfile {
 interface EditUserInputModalProps {
   userProfile: UserProfile & { profile?: UserProfile["profile"] };
   onClose?: () => void;
+  onProfileUpdate?: (updatedProfile: UserProfile) => void; 
 }
 
 const EditUserInputModal: React.FC<EditUserInputModalProps> = ({
   userProfile,
   onClose,
+  onProfileUpdate
 }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +43,7 @@ const EditUserInputModal: React.FC<EditUserInputModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [alert, setAlert] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const ws = useWebSocket();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -71,12 +75,13 @@ const EditUserInputModal: React.FC<EditUserInputModalProps> = ({
         onClose?.();
       }
     };
+    setUser(userProfile);
 
     window.addEventListener("keydown", handleEsc);
     return () => {
       window.removeEventListener("keydown", handleEsc);
     };
-  }, [fetchUser, onClose]);
+  }, [fetchUser, onClose, userProfile]);
 
   const uploadImageToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -101,13 +106,13 @@ const EditUserInputModal: React.FC<EditUserInputModalProps> = ({
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       let imageUrl = user?.profile.avatar;
       if (selectedImage) {
         imageUrl = await uploadImageToCloudinary(selectedImage);
       }
-
+  
       const updatedUserData = {
         avatar: imageUrl,
         firstName,
@@ -115,47 +120,89 @@ const EditUserInputModal: React.FC<EditUserInputModalProps> = ({
         username,
         bio,
       };
-
+  
       const response = (await AUTH_API.updateProfile(updatedUserData)) as any;
       if (response.code !== STATUS_CODES.OK) {
         return;
       }
-
-      fetchUser();
+  
       setAlert("Update was successful");
       setLoading(false);
+
+      setUser((prev) => {
+        if (!prev) return null;
+        return {
+          id: prev.id,
+          username: username,
+          profile: {
+            firstName: firstName,
+            lastName: lastName,
+            avatar: imageUrl || prev.profile.avatar,
+            bio: bio
+          }
+        };
+      });
+
       setOpen(false);
+  
+      ws?.emit("profileUpdated", updatedUserData);
+  
+      if (onProfileUpdate && user) {
+        onProfileUpdate({
+          id: user.id,
+          username: username,
+          profile: {
+            firstName: firstName,
+            lastName: lastName,
+            avatar: imageUrl || user.profile.avatar,
+            bio: bio
+          }
+        });
+      }
+  
     } catch (error) {
-      console.log("Error updating user data:", error);
+      console.error("Error updating user data:", error);
+      setLoading(false);
     }
   };
 
   return (
-    <AnimatePresence>
-      <Toastify message={alert} />
+    <AnimatePresence mode="wait">
       {open && (
-      
+        <>
+   
           <motion.div
-            key={`user?.id + 1`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white p-6 rounded-xl shadow-lg relative w-full max-w-md"
-            onClick={(e) => e.stopPropagation()}
+            key="modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed mx-auto inset-0 h-screen bg-black bg-opacity-50 z-40"
+            onClick={() => {
+              setOpen(false);
+              onClose?.();
+            }}
+          />
+          <motion.div
+            key="modal-content"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            className="fixed left-1/2  top-10 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50"
           >
-            <button
-              onClick={() => {
-                setOpen(false);
-                onClose?.();
-              }}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <X size={24} />
-            </button>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Edit Profile
-            </h3>
-            <form onSubmit={handleUpdateUser} className="space-y-4">
+            <div className="bg-white max-h-[90vh] px-5 overflow-y-auto p-6 rounded-xl shadow-xl mx-4">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  onClose?.();
+                }}
+                className="absolute top-4 right-10 text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <X size={24} />
+              </button>
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+                Edit Profile
+              </h3>
+              <form onSubmit={handleUpdateUser} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700">
                   Avatar
@@ -218,43 +265,31 @@ const EditUserInputModal: React.FC<EditUserInputModalProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-gray-700">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => {
-                    e.preventDefault();
-                    setUsername(e.target.value);
-                  }}
-                  className="w-full px-3 py-2 border rounded focus:outline-none"
-                />
-                {username && <Socket username={username} />}
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Bio
+                  </label>
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow resize-none"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs font-medium text-gray-700">
-                  Bio
-                </label>
-                <textarea
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  className="w-full px-3 py-2 border rounded focus:outline-none"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full py-2 bg-primary text-white rounded hover:bg-primary/85 focus:outline-none"
-                disabled={loading}
-              >
-                {loading ? "Updating..." : "Save Changes"}
-              </Button>
-            </form>
+                <Button
+                  type="submit"
+                  className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={loading}
+                >
+                  {loading ? "Updating..." : "Save Changes"}
+                </Button>
+              </form>
+            </div>
           </motion.div>
+        </>
       )}
+      {alert && <Toastify key="toast" message={alert} />}
     </AnimatePresence>
   );
 };

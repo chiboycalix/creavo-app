@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import EditUserInputModal from "./EditUserInputModal";
 import FollowButton from "@/components/FollowButton";
 import FollowLink from "./FollowLink";
@@ -29,15 +29,25 @@ interface ProfileHeaderProps {
   userProfile: UserProfile;
   isCurrentUser: boolean;
   onFollow: () => void;
+  onProfileUpdate: (updatedProfile: UserProfile) => void;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userProfile,
   isCurrentUser,
+  onProfileUpdate
   // onFollow,
 }: any) => {
   const [showModal, setShowModal] = useState(false);
-
+  const toggleModal = () => {
+    setShowModal(false);
+  
+    setTimeout(() => {
+      setShowModal(true);
+      console.log("Modal state:", true); 
+    }, 500); 
+  };
+  
   return (
     <div className="flex flex-col items-center w-full p-4">
       <Image
@@ -66,7 +76,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="flex gap-2 mt-2">
           {isCurrentUser ? (
             <Button
-              onClick={() => setShowModal(true)}
+              onClick={toggleModal}
               aria-label="Edit your profile"
               className="flex text-sm items-center rounded-md w-8/12 font-medium border hover:bg-primary-600"
             >
@@ -125,8 +135,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {showModal && (
         <EditUserInputModal
           userProfile={userProfile}
-          onClose={() => setShowModal(false)}
+          onClose={()=>setShowModal(false)}
           aria-label="Edit user profile modal"
+          onProfileUpdate={onProfileUpdate}
         />
       )}
     </div>
