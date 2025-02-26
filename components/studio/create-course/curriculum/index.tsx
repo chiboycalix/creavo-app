@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { FormEvent, useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
@@ -20,10 +21,10 @@ import {
 import { Input } from "@/components/Input";
 import { UploadInput } from "@/components/Input/UploadInput";
 import { addModuleService } from "@/services/module.service";
-import { useMutation } from "@tanstack/react-query";
-import { updatCreateModuleForm } from "@/redux/slices/module.slice";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import { resetCreateModuleForm, updatCreateModuleForm } from "@/redux/slices/module.slice";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook";
-import { CreateModuleForm } from "@/types";
+import { CreateModuleForm, ModuleForm } from "@/types";
 import { useCreateModuleFormValidator } from "@/helpers/validators/useCreateModule.validator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { generalHelpers } from "@/helpers";
@@ -33,99 +34,87 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { fetctCourseService } from "@/services/course.service";
 
 const Curriculum = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const [modules, setModules] = useState<
-    { id: string; name: string; slug: string; content?: any }[]
-  >([]);
   const [showCreateModule, setShowCreateModule] = useState(false);
-  const [selectedModule, setSelectedModule] = useState<{
-    id: string;
-    name: string;
-    slug: string;
-    content?: any[];
-  }>({ id: "", slug: "", name: "", content: [] });
+  const [selectedModule, setSelectedModule] = useState({}) as any;
   const [newModule, setNewModule] = useState("")
-  const [files, setFiles] = useState<File[]>([]);
   const searchParams = useSearchParams();
   const currentModule = searchParams.get("module");
-  const updateCreateModule = (payload: Partial<CreateModuleForm>) =>
+  const updateCreateModule = (payload: Partial<ModuleForm>) =>
     dispatch(updatCreateModuleForm(payload));
   const { createModuleForm: createModuleStateValues } = useAppSelector(
     (store) => store.moduleStore
+  );
+  const { courseData: courseDataStateValues } = useAppSelector(
+    (store) => store.courseStore
   );
   const { validate, errors, validateField } = useCreateModuleFormValidator({
     store: createModuleStateValues,
   });
 
+  const { data: courseData } = useQuery({
+    queryKey: ['courseData'],
+    queryFn: async () => {
+      const userData = await fetctCourseService({
+        courseId: courseDataStateValues?.courseId,
+      });
+      return userData as any;
+    },
+    refetchInterval: 500,
+    enabled: !!courseDataStateValues?.courseId,
+    placeholderData: keepPreviousData,
+  });
+
   const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
     mutationFn: (payload: CreateModuleForm) => addModuleService(payload),
-    onSuccess: async (data) => { },
+    onSuccess: async (data) => {
+      console.log({ data })
+    },
     onError: (error: any) => { },
   });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    validate(() => { });
+    validate(() => handleAddModule({
+      courseId: courseDataStateValues?.courseId,
+      modules: [
+        {
+          difficultyLevel: courseDataStateValues?.difficultyLevel,
+          title: createModuleStateValues?.title,
+          description: createModuleStateValues?.description
+        }
+      ]
+    }));
+    dispatch(resetCreateModuleForm())
   };
 
-  const handleClickModule = (module: {
-    id: string;
-    name: string;
-    slug: string;
-    content?: any;
-  }) => {
+  const handleClickModule = (module: any) => {
     setShowCreateModule(false);
-    router.push(`?module=${generalHelpers.convertToSlug(module?.name)}`);
     setSelectedModule(module);
+    router.push(`?module=${generalHelpers.convertToSlug(selectedModule?.title)}`);
   };
 
   useEffect(() => {
-    setModules([
-      {
-        id: "1",
-        name: "Introductory Video",
-        slug: "introductory-video",
-        content: [
-          {
-            id: 1,
-            title: "Introduction to programming",
-          },
-          {
-            id: 2,
-            title: "How does the browser works",
-          },
-        ],
-      },
-      {
-        id: "2",
-        name: "What is Javascript",
-        content: [],
-        slug: "what-is-javascript",
-      },
-    ]);
-  }, []);
+    const path = selectedModule?.title ? `=${generalHelpers.convertToSlug(selectedModule?.title || createModuleStateValues?.title)}` : ""
+    router.push(`?module${path}`);
+  }, [selectedModule?.title, router, createModuleStateValues?.title])
 
   useEffect(() => {
-    router.push(`?module=introductory-video`);
-    setSelectedModule({
-      id: "1",
-      name: "Introductory Video",
-      slug: "introductory-video",
-      content: [
-        {
-          id: 1,
-          title: "Introduction to programming",
-        },
-        {
-          id: 2,
-          title: "How does the browser works",
-        },
-      ],
-    })
-  }, [router])
+    if (courseDataStateValues?.difficultyLevel) {
+      updateCreateModule({ difficultyLevel: courseDataStateValues?.difficultyLevel });
+    }
+
+  }, [courseDataStateValues?.difficultyLevel])
+
+  useEffect(() => {
+    if (courseData?.modules?.length > 0) {
+      setSelectedModule(courseData?.modules[0])
+    }
+  }, [courseData?.modules])
 
   return (
     <div className="flex gap-4 w-full">
@@ -134,7 +123,7 @@ const Curriculum = () => {
           <CardTitle></CardTitle>
           <CardContent className="px-0 min-h-[58vh]">
             <aside className="h-full">
-              {modules.length === 0 ? (
+              {courseData?.modules.length === 0 ? (
                 <div className="h-full text-sm mb-4 flex flex-col justify-center items-center mt-28">
                   <Clipboard />
                   <p className="text-xl font-regular mt-4 font-semibold">
@@ -143,22 +132,22 @@ const Curriculum = () => {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {modules.map((module, index) => {
-                    const isActive = currentModule === module?.slug;
+                  {courseData?.modules.map((module: any, index: number) => {
+                    const isActive = generalHelpers.convertFromSlug(currentModule! || courseData?.modules[0]?.title || "") === generalHelpers.capitalizeWords(module?.title)
                     return (
                       <div
                         onClick={() => handleClickModule(module)}
                         key={module.id}
                         className={`w-full flex items-center border cursor-pointer rounded-sm 
-                        ${isActive ? "border-primary-400" : "border-primary-100"
-                          }`}
+                          ${isActive ? "border-primary-400" : "border-primary-100"}
+                        `}
                       >
                         <div className="p-3 flex items-center gap-2 text-left text-sm">
                           <GripVertical />
                           Module {index + 1}:
                         </div>
                         <div>
-                          <p className="text-sm">{module.name}</p>
+                          <p className="text-sm">{module?.title}</p>
                         </div>
                       </div>
                     );
@@ -170,7 +159,10 @@ const Curriculum = () => {
           <CardFooter className="px-0 py-0 border-t">
             <Button
               variant={"outline"}
-              onClick={() => setShowCreateModule(true)}
+              onClick={() => {
+                // dispatch(resetCreateModuleForm())
+                setShowCreateModule(true)
+              }}
               className="w-full mt-2"
             >
               <Plus size={16} /> Add New Module
@@ -194,12 +186,28 @@ const Curriculum = () => {
                       label="Title"
                       maxLength={54}
                       placeholder="Enter module title"
-                      value={createModuleStateValues.moduleTitle}
+                      value={createModuleStateValues.title}
                       onChange={(e) => {
-                        updateCreateModule({ moduleTitle: e.target.value });
-                        validateField("moduleTitle", e.target.value);
+                        updateCreateModule({ title: e.target.value });
+                        validateField("title", e.target.value);
                       }}
-                      errorMessage={errors.moduleTitle}
+                      errorMessage={errors.title}
+                    />
+                  </div>
+
+                  <div className='mb-8'>
+                    <Input
+                      variant="textarea"
+                      label="Module Description"
+                      maxLength={365}
+                      placeholder="Enter your module description"
+                      value={createModuleStateValues.description}
+                      onChange={(e) => {
+                        validateField("description", e.target.value)
+                        updateCreateModule({ description: e.target.value });
+                      }}
+                      errorMessage={errors.description}
+                      rows={10}
                     />
                   </div>
 
@@ -226,7 +234,7 @@ const Curriculum = () => {
                       </div>
                       <div className="flex-1">
                         <AccordionTrigger className="px-4 border w-full rounded-sm text-sm">
-                          <p className="flex items-center gap-2">{selectedModule.name} <PenBox size={16} /></p>
+                          <p className="flex items-center gap-2">{selectedModule.title} <PenBox size={16} /></p>
                         </AccordionTrigger>
                       </div>
                       <div className="basis-[5%] ml-1">
@@ -235,12 +243,12 @@ const Curriculum = () => {
                     </div>
                     <AccordionContent className="px-10 mt-5 w-full mx-auto">
                       {
-                        selectedModule?.content?.length === 0 && <div className="w-full mx-auto flex flex-col items-center mt-6">
+                        selectedModule?.metadata?.length === undefined && <div className="w-full mx-auto flex flex-col items-center mt-6">
                           <Video size={30} />
                           <p className="text-lg">Add content to your module</p>
                         </div>
                       }
-                      {selectedModule?.content?.map((moduleContent, index) => {
+                      {selectedModule?.metadata?.map((moduleContent: any, index: number) => {
                         return (
                           <div key={moduleContent.id} className="flex items-center mb-4 gap-2">
                             <div className="">
@@ -285,8 +293,7 @@ const Curriculum = () => {
                             label="Upload Videos"
                             accept="video/*"
                             maxFiles={50}
-                            // onFilesChange={(files) => setFiles(files)}
-                            errorMessage={files.length > 50 ? "You can only upload up to 50 files." : undefined}
+                          // errorMessage={files.length > 50 ? "You can only upload up to 50 files." : undefined}
                           />
                         </div>
                         <br />

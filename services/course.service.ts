@@ -21,3 +21,18 @@ export const createCourseService = async (payload: CreateCourseForm) => {
     throw error;
   }
 };
+
+export const fetctCourseService = async ({
+  courseId,
+}: {
+  courseId: string;
+}) => {
+  try {
+    const { data } = await apiClient.get(
+      `/courses/${courseId}/list-modules?page=1&limit=10`
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

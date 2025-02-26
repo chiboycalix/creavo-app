@@ -1,4 +1,3 @@
-// src/components/TagsInput.tsx
 "use client";
 
 import { cn } from "@/lib/utils";

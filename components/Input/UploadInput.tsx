@@ -6,8 +6,7 @@ import { ReactNode, useState, useRef, useEffect } from "react";
 import { MdOutlineCloudUpload } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { useAppDispatch } from "@/hooks/useStore.hook";
-import { updatUploadPostFileForm, UploadFile } from "@/redux/slices/upload.slice";
+import { useToast } from "@/context/ToastContext";
 
 const FullPageLoader = () => (
   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
@@ -22,6 +21,7 @@ type UploadInputProps = {
   accept?: string;
   maxFiles?: number;
   nextPath?: string;
+  onChange?: any
 } & React.ComponentProps<"div">;
 
 type UploadProgress = {
@@ -40,6 +40,7 @@ export const UploadInput = ({
   accept = "video/*,image/*",
   maxFiles = 5,
   nextPath,
+  onChange,
   ...rest
 }: UploadInputProps) => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
@@ -47,10 +48,7 @@ export const UploadInput = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const router = useRouter();
-  const dispatch = useAppDispatch();
-
-  const updatUploadPostFile = (payload: Partial<UploadFile>) =>
-    dispatch(updatUploadPostFileForm(payload));
+  const { showToast } = useToast();
 
   const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
   const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -84,15 +82,12 @@ export const UploadInput = ({
           );
         },
       });
-      updatUploadPostFile({
-        mimeType: response.data?.resource_type,
-        secureUrl: response.data.secure_url,
-      });
       const url = response.data.secure_url;
+      onChange(url)
       setUploads((prev) =>
         prev.map((upload) =>
           upload.file === file ? { ...upload, url, uploading: false } : upload
-        )
+        ),
       );
       return url;
     } catch (error) {
@@ -108,7 +103,7 @@ export const UploadInput = ({
 
   const handleFiles = async (newFiles: File[]) => {
     if (uploads.length + newFiles.length > maxFiles) {
-      alert(`You can only upload up to ${maxFiles} files per post.`);
+      showToast('error', 'Failed to upload file', errorMessage || `You can only upload up to ${maxFiles} files per post.`);
       return;
     }
 
@@ -120,7 +115,6 @@ export const UploadInput = ({
       type: file.type.startsWith("image/") ? "image" : "video",
     }));
     setUploads((prev) => [...prev, ...newUploads]);
-
     await Promise.all(newFiles.map((file) => uploadToCloudinary(file)));
   };
 

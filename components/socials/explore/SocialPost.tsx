@@ -9,6 +9,7 @@ import { RiShareForwardFill } from "react-icons/ri";
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
+import BookmarkButton from "./BookmarkButton"
 
 interface SocialMetric {
   icon: React.ReactNode
@@ -47,6 +48,11 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     },
     {
       icon: <BookmarkIcon className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.bookmarkCount
+      // icon: <BookmarkButton
+      //   postId={8}
+      //   initialIsBookmarked={false}
+      //   bookmarkId={11}
+      // />, count: post?.bookmarkCount
     },
     { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
     { icon: <RiShareForwardFill className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.sharesCount },

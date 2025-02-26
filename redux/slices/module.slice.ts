@@ -1,10 +1,20 @@
-import { CreateModuleForm } from "@/types";
+import { ModuleForm } from "@/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   createModuleForm: {
-    moduleTitle: "",
-  } as CreateModuleForm,
+    title: "",
+    description: "",
+    difficultyLevel: "",
+    media: [
+      {
+        url: "",
+        title: "",
+        description: "",
+        mimeType: "",
+      },
+    ],
+  },
 };
 
 const moduleStore = createSlice({
@@ -13,11 +23,14 @@ const moduleStore = createSlice({
   reducers: {
     updatCreateModuleForm: (
       state,
-      action: PayloadAction<Partial<CreateModuleForm>>
+      action: PayloadAction<Partial<ModuleForm>>
     ) => {
       state.createModuleForm = {
         ...state.createModuleForm,
         ...action.payload,
+        media: Array.isArray(action.payload.media)
+          ? action.payload.media
+          : state.createModuleForm.media,
       };
     },
     resetCreateModuleForm: (state) => {
