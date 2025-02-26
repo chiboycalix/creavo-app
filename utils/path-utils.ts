@@ -30,6 +30,8 @@ export const LAYOUT_PATHS = [
   "/studio",
   "/studio/create-course",
   "/studio/create-course/*",
+  "/studio/create-course/long-course",
+  "/studio/create-course/long-course/*",
   "/studio/module-management",
   "/studio/event/meeting",
   "/studio/event/meeting/*",

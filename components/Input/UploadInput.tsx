@@ -168,7 +168,7 @@ export const UploadInput = ({
 
   return (
     <div className="leading-3">
-      {isLoading && <FullPageLoader />} {/* Render loader when navigating */}
+      {isLoading && <FullPageLoader />}
       {label && (
         <label className="flex items-center text-gray-900 font-medium text-sm gap-x-2 mb-1">
           {label}

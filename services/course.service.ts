@@ -15,6 +15,7 @@ export const createCourseService = async (payload: CreateCourseForm) => {
   try {
     const { data } = await apiClient.post("/courses", {
       ...payload,
+      amount: Number(payload.amount),
     });
     return data;
   } catch (error) {

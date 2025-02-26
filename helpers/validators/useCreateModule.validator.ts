@@ -1,33 +1,32 @@
-import { ModuleForm } from "@/types";
+import { CreateModuleForm } from "@/types";
 import { useState } from "react";
 import { z } from "zod";
 
 const CreateModuleShema = z.object({
+  courseId: z.number().optional(),
   title: z.string().min(1, { message: "Module name is required" }),
-  difficultyLevel: z
-    .string()
-    .min(1, { message: "Difficulty level is required" }),
+  difficultyLevel: z.string().optional(),
   description: z.string().min(1, { message: "Module description is required" }),
   media: z.array(z.object({})).optional(),
 });
 
 type HookProps = {
-  store: ModuleForm;
+  store: CreateModuleForm;
 };
 
 const useCreateModuleFormValidator = ({ store }: HookProps) => {
   const [errors, setErrors] = useState<
-    Partial<Record<keyof ModuleForm, string>>
+    Partial<Record<keyof CreateModuleForm, string>>
   >({});
 
   const validate = async (_callback?: () => void) => {
     const result = CreateModuleShema.safeParse(store);
 
     if (!result.success) {
-      const tempErrors: Partial<Record<keyof ModuleForm, string>> = {};
+      const tempErrors: Partial<Record<keyof CreateModuleForm, string>> = {};
       result.error.errors.forEach((error) => {
         if (error.path[0]) {
-          tempErrors[error.path[0] as keyof ModuleForm] = error.message;
+          tempErrors[error.path[0] as keyof CreateModuleForm] = error.message;
         }
       });
       setErrors(tempErrors);
@@ -37,7 +36,7 @@ const useCreateModuleFormValidator = ({ store }: HookProps) => {
     }
   };
 
-  const validateField = (field: keyof ModuleForm, value: string) => {
+  const validateField = (field: keyof CreateModuleForm, value: string) => {
     const fieldSchema = z.object({ [field]: CreateModuleShema.shape[field] });
     const result = fieldSchema.safeParse({ [field]: value });
 

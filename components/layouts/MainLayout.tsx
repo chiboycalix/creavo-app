@@ -27,7 +27,8 @@ import {
   TagIcon,
   BellIcon,
   Bookmark,
-  ChartSplineIcon
+  ChartSplineIcon,
+  BoxesIcon
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -81,7 +82,7 @@ export default function MainLayout({
       navItems: [
         { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill size={20} /> },
         { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
-        { title: 'Module Management', href: '/studio/module-management', icon: PlusSquareIcon },
+        { title: 'Module Management', href: '/studio/module-management', icon: BoxesIcon },
         {
           title: 'Cohort', href: '/studio/cohort', icon: User,
           children: [

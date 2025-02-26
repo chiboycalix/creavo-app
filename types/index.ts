@@ -37,10 +37,6 @@ export enum KEYS {
 }
 export interface CreateModuleForm {
   courseId: string;
-  modules?: ModuleForm[];
-}
-
-export interface ModuleForm {
   title: string;
   description: string;
   difficultyLevel?: string;
@@ -49,5 +45,23 @@ export interface ModuleForm {
     title: string;
     description: string;
     mimeType: string;
+  }>;
+}
+
+export interface CreateModuleForm {
+  title: string;
+  description: string;
+  difficultyLevel?: string;
+}
+
+export interface AddMediaToModule {
+  courseId: string;
+  moduleId: string;
+  media?: Array<{
+    url: string;
+    title: string;
+    description: string;
+    mimeType: string;
+    mediaLength: number;
   }>;
 }
