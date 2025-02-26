@@ -3,7 +3,11 @@ import { useState } from "react";
 import { z } from "zod";
 
 const CreateModuleShema = z.object({
-  moduleTitle: z.string().min(1, { message: "Module name is required" }),
+  courseId: z.number().optional(),
+  title: z.string().min(1, { message: "Module name is required" }),
+  difficultyLevel: z.string().optional(),
+  description: z.string().min(1, { message: "Module description is required" }),
+  media: z.array(z.object({})).optional(),
 });
 
 type HookProps = {

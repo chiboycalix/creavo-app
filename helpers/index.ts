@@ -15,8 +15,6 @@ export const generalHelpers = {
 
   processPostsData: (data: any) => {
     const { posts, likedStatuses, followStatuses } = data;
-
-    // Create lookup maps for faster access
     const likesMap = new Map(
       likedStatuses?.map((status: any) => [status?.postId, status?.liked])
     );
@@ -25,11 +23,24 @@ export const generalHelpers = {
       followStatuses?.map((status: any) => [status?.userId, status?.followed])
     );
 
-    // Map over posts and add liked and followed properties
     return posts?.map((post: any) => ({
       ...post,
       liked: likesMap.get(post.id) ?? false,
-      followed: followsMap.get(post.userId) ?? false
+      followed: followsMap.get(post.userId) ?? false,
     }));
-  }
+  },
+
+  capitalizeWords(sentence: string) {
+    if (!sentence || typeof sentence !== "string") {
+      return sentence;
+    }
+
+    return sentence
+      .split(" ")
+      .map((word) => {
+        if (word.length === 0) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(" ");
+  },
 };

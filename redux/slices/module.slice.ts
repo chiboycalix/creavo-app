@@ -1,10 +1,21 @@
-import { CreateModuleForm } from "@/types";
+import { AddMediaToModule, CreateModuleForm } from "@/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   createModuleForm: {
-    moduleTitle: "",
-  } as CreateModuleForm,
+    courseId: "",
+    title: "",
+    description: "",
+    difficultyLevel: "",
+  },
+  selectedModuleData: {} as any,
+  addMediaToModuleForm: {
+    url: "",
+    title: "",
+    description: "",
+    mimeType: "",
+    mediaLength: 0,
+  },
 };
 
 const moduleStore = createSlice({
@@ -23,9 +34,38 @@ const moduleStore = createSlice({
     resetCreateModuleForm: (state) => {
       state.createModuleForm = initialState.createModuleForm;
     },
+
+    updateAddMediaToModuleForm: (
+      state,
+      action: PayloadAction<Partial<any>>
+    ) => {
+      state.addMediaToModuleForm = {
+        ...state.addMediaToModuleForm,
+        ...action.payload,
+      };
+    },
+    resetAddMediaToModuleForm: (state) => {
+      state.addMediaToModuleForm = initialState.addMediaToModuleForm;
+    },
+
+    updateSelectedModuleData: (state, action: PayloadAction<Partial<any>>) => {
+      state.selectedModuleData = {
+        ...state.selectedModuleData,
+        ...action.payload,
+      };
+    },
+    resetSelectedModuleData: (state) => {
+      state.selectedModuleData = initialState.selectedModuleData;
+    },
   },
 });
 
-export const { updatCreateModuleForm, resetCreateModuleForm } =
-  moduleStore.actions;
+export const {
+  updatCreateModuleForm,
+  resetCreateModuleForm,
+  updateAddMediaToModuleForm,
+  resetAddMediaToModuleForm,
+  updateSelectedModuleData,
+  resetSelectedModuleData,
+} = moduleStore.actions;
 export default moduleStore.reducer;
