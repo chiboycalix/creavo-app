@@ -21,3 +21,15 @@ export const createCourseService = async (payload: CreateCourseForm) => {
     throw error;
   }
 };
+
+export const getUserCourses = async (userId: number, limit = 10, page = 1) => {
+  try {
+    const response = await apiClient.get(`/users/${userId}/courses`, {
+      params: { limit, page, category: 'SIMPLE' },
+    });
+    return response;
+  } catch (error: any) {
+    console.error("Fetching user courses failed:", error.message);
+    return Promise.reject(error?.response?.data || "An error occurred");
+  }
+};
