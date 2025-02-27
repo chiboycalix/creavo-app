@@ -136,7 +136,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       </div>
 
       {/* Metrics - Desktop */}
-      <div className="hidden lg:flex flex-col h-full justify-end">
+      <div className="hidden lg:flex flex-col h-full justify-center mb-10">
         <div className="flex flex-col gap-4 mt-auto">
           {Number(post.userId) !== currId && (
             <FollowButton
