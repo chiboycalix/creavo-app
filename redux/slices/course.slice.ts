@@ -1,6 +1,15 @@
 import { CreateCourseForm } from "@/services/course.service";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
+export type CourseData = {
+  courseId: string;
+  isPaid: boolean;
+  description: string;
+  difficultyLevel: string;
+  tags: string[];
+  title: string;
+};
+
 const initialState = {
   createCourseForm: {
     title: "",
@@ -12,6 +21,14 @@ const initialState = {
     currency: "",
     amount: "",
   } as CreateCourseForm,
+  courseData: {
+    courseId: "",
+    title: "",
+    isPaid: false,
+    description: "",
+    difficultyLevel: "",
+    tags: [],
+  } as CourseData,
 };
 
 const courseStore = createSlice({
@@ -30,9 +47,24 @@ const courseStore = createSlice({
     resetCreateCourseForm: (state) => {
       state.createCourseForm = initialState.createCourseForm;
     },
+
+    updateCourseData: (state, action: PayloadAction<Partial<CourseData>>) => {
+      state.courseData = {
+        ...state.courseData,
+        ...action.payload,
+      };
+    },
+
+    resetUpdateCourseData: (state) => {
+      state.courseData = initialState.courseData;
+    },
   },
 });
 
-export const { updatCreateCourseForm, resetCreateCourseForm } =
-  courseStore.actions;
+export const {
+  updatCreateCourseForm,
+  resetCreateCourseForm,
+  updateCourseData,
+  resetUpdateCourseData,
+} = courseStore.actions;
 export default courseStore.reducer;

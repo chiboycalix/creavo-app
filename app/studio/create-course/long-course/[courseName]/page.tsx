@@ -4,6 +4,7 @@ import CustomTab from '@/components/CustomTab';
 import Curriculum from '@/components/studio/create-course/curriculum';
 import Quiz from '@/components/studio/create-course/quiz';
 import Grade from '@/components/studio/create-course/grade';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { generalHelpers } from '@/helpers';
 import { useParams } from 'next/navigation';
 import { PenBox } from 'lucide-react';
@@ -30,18 +31,24 @@ const CourseName = () => {
     },
   ]
   return (
-    <div className='w-full py-4'>
-      <div className='flex items-center gap-3'>
-        <h2 className='font-semibold'>{fromSlug}</h2>
-        <PenBox size={20} className='cursor-pointer' />
-      </div>
+    <ProtectedRoute
+      requireAuth={true}
+      requireVerification={true}
+      requireProfileSetup={false}
+    >
+      <div className='w-full py-4'>
+        <div className='flex items-center gap-3'>
+          <h2 className='font-semibold'>{fromSlug}</h2>
+          <PenBox size={20} className='cursor-pointer' />
+        </div>
 
-      <div>
-        <div className='mt-4 w-full'>
-          <CustomTab tabs={tabs} defaultValue="curriculum" />
+        <div>
+          <div className='mt-4 w-full'>
+            <CustomTab tabs={tabs} defaultValue="curriculum" />
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   )
 }
 

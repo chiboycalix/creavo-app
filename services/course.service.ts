@@ -15,6 +15,7 @@ export const createCourseService = async (payload: CreateCourseForm) => {
   try {
     const { data } = await apiClient.post("/courses", {
       ...payload,
+      amount: Number(payload.amount),
     });
     return data;
   } catch (error) {
@@ -31,5 +32,20 @@ export const getUserCourses = async (userId: number, limit = 10, page = 1) => {
   } catch (error: any) {
     console.error("Fetching user courses failed:", error.message);
     return Promise.reject(error?.response?.data || "An error occurred");
+  }
+};
+
+export const fetctCourseService = async ({
+  courseId,
+}: {
+  courseId: string;
+}) => {
+  try {
+    const { data } = await apiClient.get(
+      `/courses/${courseId}/list-modules?page=1&limit=10`
+    );
+    return data;
+  } catch (error) {
+    throw error;
   }
 };

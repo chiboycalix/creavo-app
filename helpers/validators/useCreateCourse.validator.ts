@@ -22,7 +22,9 @@ const useCreateCourseFormValidator = ({ store }: HookProps) => {
       .string()
       .min(1, { message: "Difficulty Level is required" }),
     isPaid: z.boolean(),
-    tags: z.array(z.string()),
+    tags: z
+      .array(z.string().min(1, { message: "Please add at least one tag" }))
+      .min(1, { message: "Please add at least one tag" }),
     amount: createCourseStateValues?.isPaid
       ? z.string().trim().min(1, { message: "Amount is required" })
       : z.string().optional(),
