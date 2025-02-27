@@ -22,7 +22,7 @@ export const useFetchInfinitePosts = (options = {}) => {
       const result = await response.json();
       return result;
     },
-    refetchInterval: 1000,
+    refetchInterval: 3000,
     placeholderData: keepPreviousData,
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.posts?.length < 10) {
