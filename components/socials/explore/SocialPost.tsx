@@ -11,7 +11,6 @@ import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
 
-
 interface SocialMetric {
   icon: React.ReactNode
   count?: string
@@ -21,7 +20,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const [showAllTags, setShowAllTags] = useState(false)
   const { getCurrentUser } = useAuth();
   const { toggleComments } = useComments()
-  const currId = getCurrentUser()?.id;
+  const currentUserId = getCurrentUser()?.id;
 
   const tags = [
     "fyp",
@@ -56,7 +55,6 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       // />, count: post?.bookmarkCount
     },
     { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
-    // { icon: <RiShareForwardFill className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.sharesCount },
     {
       icon: <ShareButton
         postId={post.id}
@@ -83,7 +81,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           {/* Metrics - Mobile & Tablet */}
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
             {
-              Number(post.userId) !== currId &&
+              Number(post.userId) !== currentUserId &&
               <FollowButton
                 followedId={post?.userId}
                 avatar={post?.user_profile_avatar || "/assets/display.jpg"}
@@ -145,7 +143,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       {/* Metrics - Desktop */}
       <div className="hidden lg:flex flex-col h-full justify-center mb-10">
         <div className="flex flex-col gap-4 mt-auto">
-          {Number(post.userId) !== currId && (
+          {Number(post.userId) !== currentUserId && (
             <FollowButton
               followedId={post?.userId}
               avatar={post?.user_profile_avatar || "/assets/display.jpg"}

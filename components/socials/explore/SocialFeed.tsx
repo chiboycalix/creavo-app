@@ -21,7 +21,8 @@ const SocialFeed = ({ initialPosts }: any) => {
   const containerRef = useRef<HTMLDivElement>(null) as any
   const isFetchingRef = useRef(false)
   const postHeightRef = useRef(0)
-
+  const { showComments, setShowComments, activePostId } =
+    useComments();
   const {
     data,
     isFetching,
@@ -230,7 +231,9 @@ const SocialFeed = ({ initialPosts }: any) => {
 
         {/* Comments Section - Hidden on mobile by default, can be toggled */}
         <div className={`${isMobileView ? 'hidden' : 'md:flex-1'}`}>
-          <CommentCard />
+          {
+            showComments && <CommentCard />
+          }
         </div>
       </div>
     </div>
