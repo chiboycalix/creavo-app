@@ -1,15 +1,16 @@
+import type React from "react"
 import MediaWrapper from "../../post/MediaWrapper"
 import LikeButton from "./LikeButton"
 import FollowButton from "./FollowButton"
-import type React from "react"
+import BookmarkButton from "./BookmarkButton"
+import ShareButton from "./ShareButton"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { useState } from "react"
 import { ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon } from "@heroicons/react/24/solid"
-import { RiShareForwardFill } from "react-icons/ri";
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
-import BookmarkButton from "./BookmarkButton"
+
 
 interface SocialMetric {
   icon: React.ReactNode
@@ -55,7 +56,13 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       // />, count: post?.bookmarkCount
     },
     { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
-    { icon: <RiShareForwardFill className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.sharesCount },
+    // { icon: <RiShareForwardFill className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.sharesCount },
+    {
+      icon: <ShareButton
+        postId={post.id}
+        initialShareCount={post?.sharesCount}
+      />
+    },
   ]
 
   return (
