@@ -24,7 +24,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [courses, setCourses] = useState<Course[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -94,11 +94,11 @@ function App() {
           </div>
         ) : (
           <div className="bg-gray-50 gap-2 flex flex-col rounded-lg shadow overflow-hidden">
-            {filteredCourses.map(course => (
+            {filteredCourses.map((course,i) => (
               <div key={course.id} className="p-6 hover:bg-white shadow transition-colors">
                 <div className="flex items-center space-x-6">
                   <div className="flex w-8 text-gray-400 font-medium">
-                    {String(course.id).padStart(2, '0')}
+                    {String(i + 1).padStart(2, '0')}
                   </div>
                   <div className="grid grid-cols-4 items-start space-x-4">
                     <div className='flex items-center gap-5'>
@@ -135,7 +135,6 @@ function App() {
           </div>
         )}
 
-        {/* Pagination */}
         {filteredCourses.length > 0 && (
           <div className="mt-6 flex items-center justify-between">
             <div className="flex items-center">
