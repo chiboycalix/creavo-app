@@ -38,7 +38,7 @@ const CourseName = () => {
 
         <div>
           <div className='mt-4 w-full'>
-            <CustomTab tabs={tabs} defaultValue="curriculum" />
+            <CustomTab tabs={tabs} defaultValue="content" />
           </div>
         </div>
       </div>

@@ -286,7 +286,7 @@ const Curriculum = () => {
                                         {moduleContent?.description}
                                       </p>
                                     </div>
-                                    <Video size={40} />
+                                    <Video size={30} />
                                   </div>
                                 </div>
                                 <div className="basis-1/12 ml-1">
@@ -300,7 +300,9 @@ const Curriculum = () => {
                       </AccordionItem>
                     </Accordion>
 
-                    <UploadMedia />
+                    <UploadMedia
+                      description="Upload your existing content to automatically create a new lesson in this module"
+                    />
                   </>
                 )}
               </div>

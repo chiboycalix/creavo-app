@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { resetAddMediaToModuleForm, updateAddMediaToModuleForm } from "@/redux/slices/module.slice";
 import { getMimeTypeFromCloudinaryUrl } from "@/utils";
 
-const UploadMedia = () => {
+const UploadMedia = ({ description }: { description: string }) => {
   const dispatch = useAppDispatch();
   const { longCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
   const { selectedModuleData, addMediaToModuleForm: addMediaToModuleStateValues } = useAppSelector((store) => store.moduleStore);
@@ -54,8 +54,7 @@ const UploadMedia = () => {
   return (
     <div className="bg-primary-100 mt-5 p-4 rounded-sm flex items-start justify-between">
       <p className="text-xs basis-6/12 leading-5">
-        Upload your existing content to automatically create a
-        new lesson in this module
+        {description}
       </p>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="bg-primary border-0 p-2 text-sm cursor-pointer rounded-lg text-white basis-3/12 font-medium leading-6">
