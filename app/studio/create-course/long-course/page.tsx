@@ -127,7 +127,7 @@ const CreateLongCourse = () => {
                 label="Course Name"
                 maxLength={54}
                 placeholder="Enter course title"
-                value={createCourseStateValues.title}
+                value={createCourseStateValues?.title}
                 onChange={(e) => {
                   validateField("title", e.target.value)
                   updateCreateCourse({ title: e.target.value });
@@ -143,7 +143,7 @@ const CreateLongCourse = () => {
                 label="Course Description"
                 maxLength={365}
                 placeholder="Enter your course description"
-                value={createCourseStateValues.description}
+                value={createCourseStateValues?.description}
                 onChange={(e) => {
                   validateField("description", e.target.value)
                   updateCreateCourse({ description: e.target.value });
@@ -155,7 +155,7 @@ const CreateLongCourse = () => {
             <div className='mb-4'>
               <TagsInput
                 label="Tags"
-                value={createCourseStateValues.tags}
+                value={createCourseStateValues?.tags}
                 onChange={(newTags: any) => {
                   validateField("tags", newTags)
                   updateCreateCourse({ tags: newTags });
@@ -170,7 +170,7 @@ const CreateLongCourse = () => {
                 <Input
                   label="Difficulty level"
                   variant='select'
-                  value={createCourseStateValues.difficultyLevel?.toString()}
+                  value={createCourseStateValues?.difficultyLevel?.toString()}
                   onSelect={(value) => {
                     validateField("difficultyLevel", value.toString())
                     updateCreateCourse({ difficultyLevel: value?.toString() });
@@ -199,27 +199,27 @@ const CreateLongCourse = () => {
             </div>
             <div className='flex gap-2 items-center mb-8'>
               <Switch
-                checked={createCourseStateValues.isPaid}
+                checked={createCourseStateValues?.isPaid}
                 onChange={(checked) => {
                   updateCreateCourse({ isPaid: checked });
                 }}
-                className={`${createCourseStateValues.isPaid ? 'bg-primary-600' : 'bg-gray-200'} relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none`}
+                className={`${createCourseStateValues?.isPaid ? 'bg-primary-600' : 'bg-gray-200'} relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none`}
               >
                 <span
-                  className={`${createCourseStateValues.isPaid ? 'translate-x-5' : 'translate-x-1'} inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
+                  className={`${createCourseStateValues?.isPaid ? 'translate-x-5' : 'translate-x-1'} inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
                 />
               </Switch>
               <p>Add payment</p>
             </div>
             {
-              createCourseStateValues.isPaid && <div className='flex items-center justify-between gap-4 mb-8'>
+              createCourseStateValues?.isPaid && <div className='flex items-center justify-between gap-4 mb-8'>
                 <div className='basis-1/2'>
                   <Input
                     label="Currency"
                     variant='select'
                     placeholder='Select currency'
                     options={currencies}
-                    value={createCourseStateValues.currency}
+                    value={createCourseStateValues?.currency}
                     className='w-full'
                     onSelect={(value) => {
                       validateField("currency", value?.toString())
@@ -234,7 +234,7 @@ const CreateLongCourse = () => {
                     label="Amount"
                     placeholder='Enter amount'
                     className='w-full'
-                    value={createCourseStateValues.amount?.toString()}
+                    value={createCourseStateValues?.amount?.toString()}
                     type='number'
                     onChange={(e) => {
                       validateField("amount", e.target.value)
