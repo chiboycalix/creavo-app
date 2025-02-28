@@ -1,10 +1,10 @@
 import React from "react";
 import Cookies from "js-cookie";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
-import { ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon } from "@heroicons/react/24/solid"
+import { BookmarkIcon } from "@heroicons/react/24/solid"
 
 interface BookmarkButtonProps {
   postId: number;
@@ -14,33 +14,14 @@ interface BookmarkButtonProps {
 
 const BookmarkButton: React.FC<BookmarkButtonProps> = ({
   postId,
-  initialIsBookmarked,
+  initialIsBookmarked: isBookmarked,
   bookmarkId: initialBookmarkId,
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
 
-  const { data: bookmarkStatus } = useQuery({
-    queryKey: ["bookmarkStatus", postId],
-    queryFn: async () => {
-      if (!getAuth()) return { data: { bookmarked: initialIsBookmarked, bookmarkId: initialBookmarkId } };
-
-      const response = await fetch(`${baseUrl}/posts/${postId}/bookmark-status`, {
-        headers: { Authorization: `Bearer ${Cookies.get("accessToken")}` },
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch bookmark status");
-      return response.json();
-    },
-    enabled: !!getAuth(),
-    staleTime: 0,
-    refetchInterval: 500,
-    placeholderData: { data: { bookmarked: initialIsBookmarked, bookmarkId: initialBookmarkId } },
-  });
-
-  const isBookmarked = bookmarkStatus?.data?.bookmarked ?? initialIsBookmarked;
-  const currentBookmarkId = bookmarkStatus?.data?.bookmarkId ?? initialBookmarkId;
+  const currentBookmarkId = initialBookmarkId;
 
   // Bookmark post mutation
   const bookmarkPostMutation = useMutation({
@@ -79,7 +60,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
         return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
       });
 
-      return { previousBookmarked: initialIsBookmarked };
+      return { previousBookmarked: isBookmarked };
     },
     onError: () => {
       queryClient.setQueryData(["bookmarkStatus", postId], {
@@ -133,7 +114,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
         return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
       });
 
-      return { previousBookmarked: initialIsBookmarked };
+      return { previousBookmarked: isBookmarked };
     },
     onError: () => {
       queryClient.setQueryData(["bookmarkStatus", postId], {
@@ -178,8 +159,8 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
         <BookmarkIcon
           className={`w-8 h-8 transition-colors duration-200 
             ${isBookmarked
-              ? "fill-blue-500 stroke-blue-500"
-              : "md:hover:stroke-blue-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-blue-500"
+              ? "fill-primary-500 stroke-primary-500"
+              : "md:hover:stroke-primary-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-primary-500"
             }`}
         />
       </button>

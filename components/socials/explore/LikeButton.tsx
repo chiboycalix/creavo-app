@@ -1,7 +1,7 @@
 import React from "react";
 import Cookies from "js-cookie";
 import { Heart } from "lucide-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
@@ -17,33 +17,13 @@ interface LikeButtonProps {
 const LikeButton: React.FC<LikeButtonProps> = ({
   postId,
   initialLikesCount,
-  initialIsLiked,
+  initialIsLiked: isLiked,
   likedId,
 }) => {
   const queryClient = useQueryClient();
-  const { getAuth, getCurrentUser } = useAuth();
+  const { getAuth } = useAuth();
   const router = useRouter();
   const ws = useWebSocket();
-  const currentUser = getCurrentUser();
-  // Fetch like status
-  const { data: likeStatus } = useQuery({
-    queryKey: ['likeStatus', postId],
-    queryFn: async () => {
-      if (!getAuth()) return { data: { liked: initialIsLiked } };
-
-      const response = await fetch(`${baseUrl}/posts/${postId}/like-status`, {
-        headers: { Authorization: `Bearer ${Cookies.get("accessToken")}` },
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch like status");
-      return response.json();
-    },
-    enabled: !!getAuth(),
-    staleTime: 0,
-    placeholderData: { data: { liked: initialIsLiked } }, // Prevent flicker
-  });
-
-  const isLiked = likeStatus?.data?.liked ?? initialIsLiked;
 
   const likePostMutation = useMutation({
     mutationFn: async () => {
