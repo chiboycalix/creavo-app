@@ -105,7 +105,7 @@ const CreateCourse = () => {
       amount: createCourseStateValues.amount,
       isPaid: createCourseStateValues.isPaid,
       currency: createCourseStateValues.currency,
-      thumbnailUrl: createCourseStateValues.thumbnailUrl
+      promotionalUrl: createCourseStateValues?.promotionalUrl
     }))
   }
 
@@ -253,7 +253,7 @@ const CreateCourse = () => {
                 accept="video/*,image/*"
                 maxFiles={maxFiles}
                 onChange={(uploads: any) => {
-                  updateCreateCourse({ thumbnailUrl: uploads })
+                  updateCreateCourse({ promotionalUrl: uploads })
                 }}
               />
             </div>

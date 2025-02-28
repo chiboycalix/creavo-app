@@ -15,7 +15,7 @@ const initialState = {
     title: "",
     description: "",
     difficultyLevel: "",
-    thumbnailUrl: "",
+    promotionalUrl: "",
     tags: [],
     isPaid: false,
     currency: "",

@@ -18,6 +18,7 @@ export interface Course {
     incomplete: number;
   };
   totalMinutesWatched: number;
+  promotionalUrl: string;
 }
 
 function App() {
@@ -37,7 +38,7 @@ function App() {
         const courseData = response.data.courses.map((course: any) => ({
           id: course.id,
           title: course.title || 'Untitled Course',
-          image: course.image || '/assets/thumbnail.png', // Default image
+          image: course?.promotionalUrl || '/assets/thumbnail.png',
           difficulty: course.difficultyLevel || 'Unknown',
           uploadDate: course.createdAt || new Date().toISOString(),
           completions: course.completions || 0,
@@ -89,12 +90,12 @@ function App() {
           <p className="text-center text-gray-500 text-sm py-10">Loading courses...</p>
         ) : filteredCourses.length === 0 ? (
           <div className='flex  items-center justify-center flex-col my-20 '>
-          <p className="text-center text-black font-semibold text-lg ">No courses available yet.</p>
-          <p>Once you publish your course, come here to learn about your course engagement.</p>
+            <p className="text-center text-black font-semibold text-lg ">No courses available yet.</p>
+            <p>Once you publish your course, come here to learn about your course engagement.</p>
           </div>
         ) : (
           <div className="bg-gray-50 gap-2 flex flex-col rounded-lg shadow overflow-hidden">
-            {filteredCourses.map((course,i) => (
+            {filteredCourses.map((course, i) => (
               <div key={course.id} className="p-6 hover:bg-white shadow transition-colors">
                 <div className="flex items-center space-x-6">
                   <div className="flex w-8 text-gray-400 font-medium">
@@ -104,8 +105,8 @@ function App() {
                     <div className='flex items-center gap-5'>
                       <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                         <img
-                          src={course.image}
-                          alt={course.title}
+                          src={course?.image}
+                          alt={course?.title}
                           className="object-cover w-full h-full"
                         />
                       </div>
@@ -122,7 +123,7 @@ function App() {
                       <p className="font-semibold text-xs text-gray-900">{course.completions}</p>
                       <p className="text-xs text-gray-500">Completions Count</p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setSelectedCourse(course)}
                       className="px-2 py-3 text-xs font-medium bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
                     >
@@ -139,8 +140,8 @@ function App() {
           <div className="mt-6 flex items-center justify-between">
             <div className="flex items-center">
               <span className="text-sm text-gray-700 mr-2">Rows per page:</span>
-              <select 
-                value={rowsPerPage} 
+              <select
+                value={rowsPerPage}
                 onChange={(e) => setRowsPerPage(Number(e.target.value))}
                 className="border border-gray-300 rounded-md text-sm p-1"
               >
@@ -149,22 +150,22 @@ function App() {
                 <option value={20}>20</option>
               </select>
             </div>
-            
+
             <div className="flex items-center space-x-2">
-              <button 
-                onClick={handlePrevPage} 
+              <button
+                onClick={handlePrevPage}
                 disabled={currentPage === 1}
                 className={`p-2 rounded-full ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'}`}
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              
+
               <span className="text-sm font-medium text-gray-700">
                 Page {currentPage} of {totalPages}
               </span>
-              
-              <button 
-                onClick={handleNextPage} 
+
+              <button
+                onClick={handleNextPage}
                 disabled={currentPage === totalPages}
                 className={`p-2 rounded-full ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'}`}
               >

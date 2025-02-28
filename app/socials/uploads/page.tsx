@@ -30,6 +30,9 @@ export default function Upload() {
                   accept="image/*,video/*"
                   className="mb-6"
                   nextPath="/socials/edit-post"
+                  onChange={(upload) => {
+                    console.log({ upload })
+                  }}
                 />
               </CardContent>
             </CardHeader>
