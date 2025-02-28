@@ -80,7 +80,7 @@ const Profile = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className="w-full flex flex-col my-px min-h-[83vh] p-3">
+      <div className="w-full flex-col my-px min-h-[83vh] flex  p-3">
         <ProfileHeader
           key={userProfile?.id}
           userProfile={userProfile}
