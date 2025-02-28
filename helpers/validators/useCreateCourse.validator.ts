@@ -11,7 +11,7 @@ const useCreateCourseFormValidator = ({ store }: HookProps) => {
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreateCourseForm, string>>
   >({});
-  const { createCourseForm: createCourseStateValues } = useAppSelector(
+  const { createLongCourseForm: createCourseStateValues } = useAppSelector(
     (store) => store.courseStore
   );
 

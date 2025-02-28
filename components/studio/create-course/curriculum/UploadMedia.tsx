@@ -16,8 +16,8 @@ import { getMimeTypeFromCloudinaryUrl } from "@/utils";
 
 const UploadMedia = () => {
   const dispatch = useAppDispatch();
-  const { courseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
-  const { selectedModuleData, createModuleForm: createModuleStateValues, addMediaToModuleForm: addMediaToModuleStateValues } = useAppSelector((store) => store.moduleStore);
+  const { longCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
+  const { selectedModuleData, addMediaToModuleForm: addMediaToModuleStateValues } = useAppSelector((store) => store.moduleStore);
   const updateAddMediaToModule = (payload: Partial<any>) => dispatch(updateAddMediaToModuleForm(payload));
   const [duration, setDuration] = useState(0)
   const [open, setOpen] = useState<boolean>(false);

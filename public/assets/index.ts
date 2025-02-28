@@ -12,3 +12,6 @@ export { default as BackgroundTwo } from "./virtualBackgrounds/backgroundTwo.jpg
 export { default as NotificationGif } from "./NotificationIcon.gif";
 export { default as CrevoeLogo } from "./crevoe.svg";
 export { default as Thumbnail } from "./thumbnail.png";
+
+export { default as ShortCourse } from "./short-course.png";
+export { default as Longcourse } from "./long-course.png";

@@ -27,7 +27,7 @@ const Curriculum = () => {
   const currentModule = searchParams.get("module");
   const updateCreateModule = (payload: Partial<CreateModuleForm>) => dispatch(updatCreateModuleForm(payload));
   const { createModuleForm: createModuleStateValues, selectedModuleData } = useAppSelector((store) => store.moduleStore);
-  const { courseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
+  const { longCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
   const { validate, errors, validateField } = useCreateModuleFormValidator({ store: { ...createModuleStateValues, courseId: courseDataStateValues?.courseId } });
   const updateSelectedModule = (payload: Partial<any>) => dispatch(updateSelectedModuleData(payload));
 
