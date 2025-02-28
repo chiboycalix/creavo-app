@@ -20,7 +20,7 @@ export const createPostService = async (payload: CreatePostPayload) => {
   try {
     const { data } = await apiClient.post("/posts", {
       ...payload,
-      hashTag: payload.tags,
+      hashtag: payload.tags.join(","),
     });
     return data;
   } catch (error) {

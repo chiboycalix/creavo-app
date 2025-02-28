@@ -17,7 +17,7 @@ const Profile = () => {
   const router = useRouter();
   const { getAuth, getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
-  
+
   const {
     data: profileData,
     isLoading: profileLoading,
@@ -36,7 +36,7 @@ const Profile = () => {
       setUserProfile(profileData.data);
     }
   }, [profileData]);
-  
+
 
   const handleFollow = () => {
     if (!getAuth()) {
@@ -82,8 +82,8 @@ const Profile = () => {
     >
       <div className="w-full flex flex-col my-px min-h-[83vh] p-3">
         <ProfileHeader
-        key={userProfile?.id} 
-          userProfile={userProfile} 
+          key={userProfile?.id}
+          userProfile={userProfile}
           isCurrentUser={isCurrentUser}
           onFollow={handleFollow}
           onProfileUpdate={handleProfileUpdate} // Pass update function
