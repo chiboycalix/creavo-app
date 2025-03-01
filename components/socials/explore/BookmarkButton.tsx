@@ -4,26 +4,29 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
-import { BookmarkIcon } from "@heroicons/react/24/solid"
+import { BookmarkIcon } from "@heroicons/react/24/solid";
 
 interface BookmarkButtonProps {
   postId: number;
+  initialBookmarkCount: number;
   initialIsBookmarked: boolean;
   bookmarkId?: number;
 }
 
 const BookmarkButton: React.FC<BookmarkButtonProps> = ({
   postId,
-  initialIsBookmarked: isBookmarked,
+  initialBookmarkCount,
+  initialIsBookmarked,
   bookmarkId: initialBookmarkId,
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
 
-  const currentBookmarkId = initialBookmarkId;
+  const [isBookmarked, setIsBookmarked] = React.useState(initialIsBookmarked);
+  const [bookmarkCount, setBookmarkCount] = React.useState(initialBookmarkCount);
+  const [bookmarkId, setBookmarkId] = React.useState(initialBookmarkId);
 
-  // Bookmark post mutation
   const bookmarkPostMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`${baseUrl}/bookmark`, {
@@ -38,101 +41,136 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to bookmark post");
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || "Failed to bookmark post");
+      }
       return response.json();
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["bookmarkStatus", postId] });
+      await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
 
-      // Optimistically update the bookmark status
-      const newBookmarkId = currentBookmarkId || Date.now(); // Temporary ID if none exists
-      queryClient.setQueryData(["bookmarkStatus", postId], {
-        data: { bookmarked: true, bookmarkId: newBookmarkId },
+      const previousData = queryClient.getQueryData(["infinite-posts"]);
+
+      queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+
+        const updatedPages = oldData.pages.map((page: any) => ({
+          ...page,
+          posts: page.posts.map((post: any) =>
+            post.id === postId
+              ? {
+                ...post,
+                bookmarked: true,
+                bookmarkCount: (post.bookmarkCount || 0) + 1,
+                bookmarkId: post.bookmarkId
+              }
+              : post
+          ),
+        }));
+
+        return { ...oldData, pages: updatedPages };
       });
 
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
+      setIsBookmarked(true);
+      setBookmarkCount((prev) => prev + 1);
 
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, bookmarked: true } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
-      });
-
-      return { previousBookmarked: isBookmarked };
+      return { previousData };
     },
-    onError: () => {
-      queryClient.setQueryData(["bookmarkStatus", postId], {
-        data: { bookmarked: false, bookmarkId: initialBookmarkId },
-      });
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
-
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, bookmarked: false } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
-      });
+    onSuccess: (result) => {
+      const newBookmarkId = result?.data?.id;
+      if (newBookmarkId) {
+        setBookmarkId(newBookmarkId);
+        queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
+          if (!oldData?.pages) return oldData;
+          const updatedPages = oldData.pages.map((page: any) => ({
+            ...page,
+            posts: page.posts.map((post: any) =>
+              post.id === postId
+                ? { ...post, bookmarkId: newBookmarkId }
+                : post
+            ),
+          }));
+          return { ...oldData, pages: updatedPages };
+        });
+      }
+      console.log("Bookmarked successfully:", { postId, newBookmarkId });
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookmarkStatus", postId] });
+    onError: (err, _, context) => {
+      queryClient.setQueryData(["infinite-posts"], context?.previousData);
+      setIsBookmarked(initialIsBookmarked);
+      setBookmarkCount(initialBookmarkCount);
+      setBookmarkId(initialBookmarkId);
+      console.error("Bookmark error:", err.message);
     },
+    retry: false,
   });
 
-  // Unbookmark post mutation
   const unbookmarkPostMutation = useMutation({
     mutationFn: async () => {
-      if (!currentBookmarkId) throw new Error("No bookmark ID available");
+      const url = bookmarkId
+        ? `${baseUrl}/bookmark/${bookmarkId}`
+        : `${baseUrl}/bookmark/delete-post-bookmark/${postId}`;
 
-      const response = await fetch(`${baseUrl}/bookmark/${currentBookmarkId}`, {
+      const response = await fetch(url, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
+          "Content-Type": "application/json",
         },
       });
 
-      if (!response.ok) throw new Error("Failed to unbookmark post");
-      return response.json();
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || "Failed to unbookmark post");
+      }
+
+      if (response.status !== 204 && response.body) {
+        return response.json();
+      }
+      return null;
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["bookmarkStatus", postId] });
+      await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
 
-      // Optimistically update the bookmark status
-      queryClient.setQueryData(["bookmarkStatus", postId], {
-        data: { bookmarked: false, bookmarkId: null },
+      const previousData = queryClient.getQueryData(["infinite-posts"]);
+      queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+
+        const updatedPages = oldData.pages.map((page: any) => ({
+          ...page,
+          posts: page.posts.map((post: any) =>
+            post.id === postId
+              ? {
+                ...post,
+                bookmarked: false,
+                bookmarkCount: Math.max((post.bookmarkCount || 0) - 1, 0),
+                bookmarkId: undefined
+              }
+              : post
+          ),
+        }));
+
+        return { ...oldData, pages: updatedPages };
       });
 
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
+      setIsBookmarked(false);
+      setBookmarkCount((prev) => Math.max(prev - 1, 0));
+      setBookmarkId(undefined);
 
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, bookmarked: false } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
-      });
-
-      return { previousBookmarked: isBookmarked };
+      return { previousData };
     },
-    onError: () => {
-      queryClient.setQueryData(["bookmarkStatus", postId], {
-        data: { bookmarked: true, bookmarkId: currentBookmarkId },
-      });
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
-
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, bookmarked: true } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
-      });
+    onError: (err, _, context) => {
+      queryClient.setQueryData(["infinite-posts"], context?.previousData);
+      setIsBookmarked(initialIsBookmarked);
+      setBookmarkCount(initialBookmarkCount);
+      setBookmarkId(initialBookmarkId);
+      console.error("Unbookmark error:", err.message);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookmarkStatus", postId] });
+    onSuccess: () => {
+      console.log("Unbookmarked successfully:", { postId });
     },
+    retry: false,
   });
 
   const handleToggleBookmark = () => {
@@ -142,8 +180,10 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
     }
 
     if (isBookmarked) {
+      console.log("Attempting to unbookmark:", { postId, bookmarkId });
       unbookmarkPostMutation.mutate();
     } else {
+      console.log("Attempting to bookmark:", { postId });
       bookmarkPostMutation.mutate();
     }
   };
@@ -164,6 +204,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
             }`}
         />
       </button>
+      <span className="text-xs font-semibold">{bookmarkCount}</span>
     </div>
   );
 };

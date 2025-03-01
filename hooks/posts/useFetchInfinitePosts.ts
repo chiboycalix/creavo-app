@@ -61,6 +61,7 @@ export const useFetchInfinitePosts = (options = {}) => {
         posts: data.posts,
         likedStatuses: data.likedStatuses,
         followStatuses: data?.followStatuses,
+        bookmarkStatuses: data?.bookmarkStatuses,
         nextPage: data.meta.page + 1,
         hasMore: data.meta.page < data.meta.totalPage,
       };

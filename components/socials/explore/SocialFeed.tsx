@@ -32,7 +32,7 @@ const SocialFeed = ({ initialPosts }: any) => {
   } = useFetchInfinitePosts({
     initialData: {
       pages: [{
-        data: initialPosts?.data || { posts: [], likedStatuses: [], followStatuses: [] }
+        data: initialPosts?.data || { posts: [], likedStatuses: [], followStatuses: [], bookmarkStatuses: [] }
       }],
       pageParams: [1]
     }
@@ -185,7 +185,7 @@ const SocialFeed = ({ initialPosts }: any) => {
                   posts: page?.posts,
                   likedStatuses: page?.likedStatuses,
                   followStatuses: page?.followStatuses,
-
+                  bookmarkStatuses: page?.bookmarkStatuses,
                 })
 
                 return (
