@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import {Input} from "@/components/Input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/Input";
+import { Checkbox } from "@/components/ui/check-box";
 import { Switch } from "@/components/ui/switch";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
