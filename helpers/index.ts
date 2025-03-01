@@ -19,11 +19,12 @@ export const generalHelpers = {
       likedStatuses?.map((status: any) => [status?.postId, status?.liked])
     );
 
+    const bookmarkMap = new Map(
+      bookmarkStatuses?.map((status: any) => [status?.postId, status?.bookmarked])
+    );
+
     const followsMap = new Map(
       followStatuses?.map((status: any) => [status?.userId, status?.followed])
-    );
-    const bookmarkMap = new Map(
-      bookmarkStatuses?.map((status: any) => [status?.userId, status?.bookmarked])
     );
 
     return posts?.map((post: any) => ({

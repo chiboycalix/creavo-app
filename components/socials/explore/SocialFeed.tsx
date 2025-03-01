@@ -33,7 +33,7 @@ const SocialFeed = ({ initialPosts }: any) => {
   } = useFetchInfinitePosts({
     initialData: {
       pages: [{
-        data: initialPosts?.data || { posts: [], likedStatuses: [], followStatuses: [] }
+        data: initialPosts?.data || { posts: [], likedStatuses: [], followStatuses: [], bookmarkStatuses: [] }
       }],
       pageParams: [1]
     }
@@ -186,7 +186,8 @@ const SocialFeed = ({ initialPosts }: any) => {
                   posts: page?.data.posts,
                   likedStatuses: page?.data.likedStatuses,
                   followStatuses: page?.data?.followStatuses,
-                  bookmarkStatuses: page?.data?.bookmarkStatuses
+                  bookmarkStatuses: page?.data?.bookmarkStatuses,
+
                 })
                 return (
                   <React.Fragment key={pageIndex}>

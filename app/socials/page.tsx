@@ -11,6 +11,7 @@ export default function ExplorePage() {
     posts: data?.pages[0]?.data.posts,
     likedStatuses: data?.pages[0]?.data.likedStatuses,
     followStatuses: data?.pages[0]?.data.followStatuses,
+    bookmarkStatuses: data?.pages[0]?.data.bookmarkStatuses,
   });
 
   return (

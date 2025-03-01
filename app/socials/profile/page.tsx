@@ -72,6 +72,7 @@ const Profile = () => {
     posts: postsData?.data.posts,
     likedStatuses: postsData?.data.likedStatuses,
     followStatuses: postsData?.data?.followStatuses,
+    bookmarkStatuses: postsData?.data?.bookmarkStatuses,
   });
 
   return (
