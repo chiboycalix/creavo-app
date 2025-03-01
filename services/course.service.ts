@@ -58,6 +58,7 @@ export const getUserShortCourses = async (
     const response = await apiClient.get(`/users/${userId}/courses`, {
       params: { limit, page, category: COURSE_CATEGORY.SIMPLE },
     });
+    console.log(response)
     return response;
   } catch (error: any) {
     console.error("Fetching user courses failed:", error.message);
