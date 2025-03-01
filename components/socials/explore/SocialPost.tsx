@@ -36,7 +36,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         postId={post.id}
         likedId={post.userId}
         initialLikesCount={post.likesCount}
-        initialIsLiked={post.liked}
+        initialIsLiked={post.liked || false}
       />,
       // count: post?.likesCount
     },
@@ -54,7 +54,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         initialBookmarkCount={post?.bookmarkCount}
         initialIsBookmarked={post.bookmarked}
       />,
-      count: post?.bookmarkCount
+      // count: post?.bookmarkCount
     },
     { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
     {

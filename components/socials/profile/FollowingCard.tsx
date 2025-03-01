@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect } from 'react'
+import FollowerSkeleton from '@/components/sketetons/FollowerSkeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { SearchInput } from '@/components/Input/SearchInput';
@@ -47,9 +48,9 @@ const FollowingCard = ({ isOpen, onClose, anchorRect, userId }: FollowersProps) 
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (isLoading) return <div>Loading...</div>;
+  // if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {(error as Error).message}</div>;
-
+  console.log(data?.pages[0].followers.length, "data?.pages[0].followers.length")
   if (!anchorRect) return null;
   return (
     <AnimatePresence>
@@ -86,37 +87,44 @@ const FollowingCard = ({ isOpen, onClose, anchorRect, userId }: FollowersProps) 
               <SearchInput placeholder='Search' className='rounded-lg' />
             </div>
             <div className='mt-4'>
-              {data?.pages.map((page, i) => (
-                <div key={i}>
-                  {page.followers.map((follower: Follower) => (
-                    <div key={follower.id} className='flex items-center gap-2'>
-                      <img
-                        src={follower.avatar}
-                        alt={`${follower.username}'s avatar`}
-                        style={{ width: '30px', height: '30px', borderRadius: '50%' }}
-                      />
-                      <div className='flex flex-col'>
-                        <span className='text-sm inline-block'>
-                          {follower.firstname} {follower.lastName}
-                        </span>
-                        <span className='text-xs inline-block'>
-                          @{follower.username}
-                        </span>
+              {
+                isLoading || isFetchingNextPage ? <FollowerSkeleton
+                  count={data?.pages[0].followers.length}
+                /> : data?.pages.map((page, i) => (
+                  <div key={i}>
+                    {page.followers.map((follower: Follower) => (
+                      <div key={follower.id} className='flex items-center gap-2 mb-4'>
+                        <img
+                          src={follower.avatar}
+                          alt={`${follower.username}'s avatar`}
+                          style={{ width: '30px', height: '30px', borderRadius: '50%' }}
+                        />
+                        <div className='flex flex-col'>
+                          <span className='text-sm inline-block'>
+                            {follower.firstname} {follower.lastName}
+                          </span>
+                          <span className='text-xs inline-block'>
+                            @{follower.username}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ))}
+                    ))}
+                  </div>
+                ))
+              }
             </div>
-            <div ref={ref} className='p-8 text-center text-sm'>
-              {isFetchingNextPage ? (
-                'Loading more...'
-              ) : hasNextPage ? (
-                'Load More'
-              ) : (
-                'No more following'
-              )}
-            </div>
+            {
+              !isLoading && <div ref={ref} className='p-8 text-center text-sm'>
+                {isFetchingNextPage ? (
+                  'Loading more...'
+                ) : hasNextPage ? (
+                  'Load More'
+                ) : (
+                  'No more following'
+                )}
+              </div>
+            }
+
           </motion.div>
         </>
       )}
