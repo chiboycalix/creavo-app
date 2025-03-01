@@ -30,6 +30,7 @@ export const getUserCourses = async (userId: number, limit = 10, page = 1) => {
     const response = await apiClient.get(`/users/${userId}/courses`, {
       params: { limit, page, category: 'STANDARD' },
     });
+    console.log(response)
     return response;
   } catch (error: any) {
     console.error("Fetching user courses failed:", error.message);

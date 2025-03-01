@@ -1,72 +1,97 @@
-import type React from "react"
-import MediaWrapper from "../../post/MediaWrapper"
-import LikeButton from "./LikeButton"
-import FollowButton from "./FollowButton"
-import BookmarkButton from "./BookmarkButton"
-import ShareButton from "./ShareButton"
-import { ChevronDown, ChevronUp } from "lucide-react"
-import { useState } from "react"
-import { ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon } from "@heroicons/react/24/solid"
+import type React from "react";
+import MediaWrapper from "../../post/MediaWrapper";
+import LikeButton from "./LikeButton";
+import FollowButton from "./FollowButton";
+// import BookmarkButton from "./BookmarkButton";
+import ShareButton from "./ShareButton";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
+import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { VscEye } from "react-icons/vsc";
-import { useAuth } from "@/context/AuthContext"
-import { useComments } from "@/context/CommentsContext"
-
+import { useAuth } from "@/context/AuthContext";
+import { useComments } from "@/context/CommentsContext";
+import BookmarkButton from "./BookmarkIcon";
 
 interface SocialMetric {
-  icon: React.ReactNode
-  count?: string
+  icon: React.ReactNode;
+  count?: string;
 }
 
 export default function SocialPost({ post, ref }: { post: any; ref: any }) {
-  const [showAllTags, setShowAllTags] = useState(false)
+  const [showAllTags, setShowAllTags] = useState(false);
   const { getCurrentUser } = useAuth();
-  const { toggleComments } = useComments()
+  const { toggleComments } = useComments();
   const currId = getCurrentUser()?.id;
 
   const tags = [
     "fyp",
-    "biker", "bikergirlsof", "bikerboys",
-    "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
-    "bikergirlsof", "bikerboys", "bikerboysof",
-    "bikersof", "bikerchick"
-  ]
+    "biker",
+    "bikergirlsof",
+    "bikerboys",
+    "bikerboysof",
+    "bikersof",
+    "bikerchick",
+    "fyp",
+    "biker",
+    "bikergirlsof",
+    "bikerboys",
+    "bikerboysof",
+    "bikersof",
+    "bikerchick",
+  ];
 
   const metrics: SocialMetric[] = [
     {
-      icon: <LikeButton
-        postId={post.id}
-        likedId={post.userId}
-        initialLikesCount={post.likesCount}
-        initialIsLiked={post.liked}
-      />,
+      icon: (
+        <LikeButton
+          postId={post.id}
+          likedId={post.userId}
+          initialLikesCount={post.likesCount}
+          initialIsLiked={post.liked}
+        />
+      ),
     },
     {
-      icon: <ChatBubbleOvalLeftEllipsisIcon
-        className="w-8 h-8 text-white sm:text-[#BFBFBF]"
-        onClick={() => toggleComments(post?.id)}
-      />,
-      count: post?.commentsCount
+      icon: (
+        <ChatBubbleOvalLeftEllipsisIcon
+          className="w-8 h-8 text-white sm:text-[#BFBFBF]"
+          onClick={() => toggleComments(post?.id)}
+        />
+      ),
+      count: post?.commentsCount,
     },
     {
-      icon: <BookmarkIcon className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.bookmarkCount
+      icon: <BookmarkButton 
+      postId={post.id}
+      initialIsBookmarked={post.isBookmarked || false} 
+      bookmarkCount={post.bookmarkCount ?? 0}
+      // bookmarkId={post.userId}
+
+    />    
       // icon: <BookmarkButton
       //   postId={8}
       //   initialIsBookmarked={false}
       //   bookmarkId={11}
       // />, count: post?.bookmarkCount
     },
-    { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
+    {
+      icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />,
+      count: post?.viewsCount,
+    },
     // { icon: <RiShareForwardFill className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.sharesCount },
     {
-      icon: <ShareButton
-        postId={post.id}
-        initialShareCount={post?.sharesCount}
-      />
+      icon: (
+        <ShareButton postId={post.id} initialShareCount={post?.sharesCount} />
+      ),
     },
-  ]
+  ];
 
   return (
-    <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0">
+    <div
+      data-post-id={post.id}
+      ref={ref}
+      className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0"
+    >
       {/* Main Post Container */}
       <div className="bg-black text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
         <div className="relative">
@@ -82,14 +107,13 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
 
           {/* Metrics - Mobile & Tablet */}
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
-            {
-              Number(post.userId) !== currId &&
+            {Number(post.userId) !== currId && (
               <FollowButton
                 followedId={post?.userId}
                 avatar={post?.user_profile_avatar || "/assets/display.jpg"}
                 initialFollowStatus={post?.followed}
               />
-            }
+            )}
             {metrics.map((metric, index) => (
               <div key={index} className="flex flex-col items-center mb-4">
                 <div className="text-sm rounded-full cursor-pointer">
@@ -108,13 +132,19 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
                   <h3 className="font-semibold">{post?.user_username}</h3>
                 </div>
                 <div className="relative w-full">
-
-                  <div className={`flex flex-wrap gap-2 mt-1 ${!showAllTags && 'max-h-[1.6rem]'} overflow-hidden transition-all duration-300`}>
+                  <div
+                    className={`flex flex-wrap gap-2 mt-1 ${
+                      !showAllTags && "max-h-[1.6rem]"
+                    } overflow-hidden transition-all duration-300`}
+                  >
                     <div>
                       <p className="text-xs leading-6">{post.body}</p>
                     </div>
                     {tags.map((tag, index) => (
-                      <span key={index} className="text-gray-400 text-xs leading-6">
+                      <span
+                        key={index}
+                        className="text-gray-400 text-xs leading-6"
+                      >
                         #{tag}
                       </span>
                     ))}
@@ -158,12 +188,13 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
               <div className="text-sm rounded-full cursor-pointer transition-colors">
                 {metric.icon}
               </div>
-              <span className="text-xs text-gray-800 font-semibold">{metric.count}</span>
+              <span className="text-xs text-gray-800 font-semibold">
+                {metric.count}
+              </span>
             </div>
           ))}
         </div>
       </div>
-
     </div>
-  )
+  );
 }
