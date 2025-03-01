@@ -8,21 +8,22 @@ import { BookmarkIcon } from "@heroicons/react/24/solid"
 
 interface BookmarkButtonProps {
   postId: number;
+  initialBookmarkCount: number;
   initialIsBookmarked: boolean;
   bookmarkId?: number;
 }
 
 const BookmarkButton: React.FC<BookmarkButtonProps> = ({
   postId,
+  initialBookmarkCount,
   initialIsBookmarked: isBookmarked,
-  bookmarkId: initialBookmarkId,
+  bookmarkId,
 }) => {
   const queryClient = useQueryClient();
-  const { getAuth } = useAuth();
+  const { getAuth, currentUser } = useAuth();
   const router = useRouter();
 
-  const currentBookmarkId = initialBookmarkId;
-
+  const newBookmarkId = currentUser?.id
   // Bookmark post mutation
   const bookmarkPostMutation = useMutation({
     mutationFn: async () => {
@@ -41,40 +42,41 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
       if (!response.ok) throw new Error("Failed to bookmark post");
       return response.json();
     },
+
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["bookmarkStatus", postId] });
 
-      // Optimistically update the bookmark status
-      const newBookmarkId = currentBookmarkId || Date.now(); // Temporary ID if none exists
-      queryClient.setQueryData(["bookmarkStatus", postId], {
-        data: { bookmarked: true, bookmarkId: newBookmarkId },
-      });
+      queryClient.setQueryData(['bookmarkStatus', postId], { data: { bookmarked: true } });
 
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
+      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
         if (!oldData?.data?.posts) return oldData;
 
         const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, bookmarked: true } : post
+          post.id === postId ? { ...post, bookmarked: true, bookmarkCount: post.bookmarkCount + 1 } : post
         );
 
         return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
       });
 
-      return { previousBookmarked: isBookmarked };
+      return { previousBookmarkCount: initialBookmarkCount };
+
     },
-    onError: () => {
+
+    onError: (_, __, context) => {
       queryClient.setQueryData(["bookmarkStatus", postId], {
-        data: { bookmarked: false, bookmarkId: initialBookmarkId },
+        data: { bookmarked: false },
       });
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
+
+      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
         if (!oldData?.data?.posts) return oldData;
 
         const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, bookmarked: false } : post
+          post.id === postId ? { ...post, bookmarked: false, bookmarkCount: context?.previousBookmarkCount } : post
         );
 
         return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
       });
+
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["bookmarkStatus", postId] });
@@ -84,9 +86,9 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
   // Unbookmark post mutation
   const unbookmarkPostMutation = useMutation({
     mutationFn: async () => {
-      if (!currentBookmarkId) throw new Error("No bookmark ID available");
+      if (!bookmarkId) throw new Error("No bookmark ID available");
 
-      const response = await fetch(`${baseUrl}/bookmark/${currentBookmarkId}`, {
+      const response = await fetch(`${baseUrl}/bookmark/delete-post-bookmark/${postId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
@@ -118,7 +120,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
     },
     onError: () => {
       queryClient.setQueryData(["bookmarkStatus", postId], {
-        data: { bookmarked: true, bookmarkId: currentBookmarkId },
+        data: { bookmarked: true, bookmarkId: newBookmarkId },
       });
       queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
         if (!oldData?.data?.posts) return oldData;
@@ -147,6 +149,8 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
       bookmarkPostMutation.mutate();
     }
   };
+
+  console.log("explore.....*****", { isBookmarked, bookmarkId, postId })
 
   return (
     <div className="flex flex-col items-center gap-2">
