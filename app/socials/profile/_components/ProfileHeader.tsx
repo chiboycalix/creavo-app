@@ -10,7 +10,8 @@ import { BsPencil } from "react-icons/bs";
 import { BiShare } from "react-icons/bi";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
-import FollowingCard from "@/components/socials/profile/Following";
+import FollowingCard from "@/components/socials/profile/FollowingCard";
+import FollowersCard from "@/components/socials/profile/FollowersCard";
 
 interface Profile {
   firstName: string;
@@ -41,19 +42,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   // onFollow,
 }: any) => {
   const [showModal, setShowModal] = useState(false);
+  const [showFollowersCard, setShowFollowersCard] = useState(false)
   const [showFollowingCard, setShowFollowingCard] = useState(false)
 
-  const toggleModal = () => {
-    setShowModal(false);
+  const [followingAnchorRect, setfollowingAnchorRect] = useState<DOMRect | null>(null);
+  const [followersAnchorRect, setfollowersAnchorRect] = useState<DOMRect | null>(null);
 
-    setTimeout(() => {
-      setShowModal(true);
-      console.log("Modal state:", true);
-    }, 500);
+  const handleFollowersClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setfollowersAnchorRect(buttonRect);
+    setShowFollowersCard(true);
   };
-  const [followingAnchorRect, setfollowingAnchorRect] = useState<DOMRect | null>(
-    null
-  );
 
   const handleFollowingClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const buttonRect = event.currentTarget.getBoundingClientRect();
@@ -61,6 +60,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     setShowFollowingCard(true);
   };
 
+
+  const toggleModal = () => {
+    setShowModal(false);
+
+    setTimeout(() => {
+      setShowModal(true);
+    }, 500);
+  };
 
   return (
     <div className="flex flex-col items-center w-full p-4 relative">
@@ -115,21 +122,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
       <div className="flex space-x-4 mt-3">
+        <div className="cursor-pointer flex items-center gap-1" onClick={handleFollowersClick}>
+          <span className="font-bold">{userProfile?.followers}</span>
+          <span>Followers</span>
+        </div>
         <div className="cursor-pointer flex items-center gap-1" onClick={handleFollowingClick}>
           <span className="font-bold inline-block">{userProfile?.following}</span>
           <span className="inline-block">Following</span>
-        </div>
-        <div>
-          <span className="font-bold">{userProfile?.followers}</span>
-          <FollowLink
-            id={userProfile?.id}
-            type="followers"
-            className="text-gray-500 text-sm"
-            aria-label={`${userProfile?.followers} followers`}
-          >
-            {" "}
-            Followers
-          </FollowLink>
         </div>
       </div>
       <div>
@@ -137,7 +136,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           {userProfile?.profile?.bio || "No bio available"}
         </p>
       </div>
-      {/* Modal for editing user information */}
+
+
       {showModal && (
         <EditUserInputModal
           userProfile={userProfile}
@@ -147,11 +147,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         />
       )}
 
-      <FollowingCard
+      {showFollowingCard && <FollowingCard
         isOpen={showFollowingCard}
         onClose={() => setShowFollowingCard(false)}
         anchorRect={followingAnchorRect}
-      />
+        userId={userProfile?.id}
+      />}
+      {
+        showFollowersCard && <FollowersCard
+          isOpen={showFollowersCard}
+          onClose={() => setShowFollowersCard(false)}
+          anchorRect={followersAnchorRect}
+          userId={userProfile?.id}
+        />
+      }
+
     </div>
   );
 };

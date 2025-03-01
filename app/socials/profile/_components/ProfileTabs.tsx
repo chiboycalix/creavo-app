@@ -59,7 +59,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
     router.push(`?tab=${tab}`);
     setSelectedTab(index);
   };
-  console.log({ posts })
+
   return (
     <TabGroup selectedIndex={selectedTab} onChange={handleTabChange}>
       <TabList className="w-full flex items-center justify-center pt-4">

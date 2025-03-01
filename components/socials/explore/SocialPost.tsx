@@ -38,6 +38,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         initialLikesCount={post.likesCount}
         initialIsLiked={post.liked}
       />,
+      // count: post?.likesCount
     },
     {
       icon: <ChatBubbleOvalLeftEllipsisIcon
@@ -53,6 +54,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         initialBookmarkCount={post?.bookmarkCount}
         initialIsBookmarked={post.bookmarked}
       />,
+      count: post?.bookmarkCount
     },
     { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
     {

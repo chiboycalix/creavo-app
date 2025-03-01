@@ -1,52 +1,45 @@
 "use client";
-import React, { FormEvent, useEffect, useState } from "react";
-import Spinner from "@/components/Spinner";
-import { Clipboard, GripVertical, PenBox, Plus, Trash, Video } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/Input";
-import { addModuleService, fetchModuleDetailsService } from "@/services/module.service";
-import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
-import { resetCreateModuleForm, updatCreateModuleForm, updateSelectedModuleData } from "@/redux/slices/module.slice";
-import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook";
-import { CreateModuleForm } from "@/types";
-import { useCreateModuleFormValidator } from "@/helpers/validators/useCreateModule.validator";
-import { useRouter, useSearchParams } from "next/navigation";
-import { generalHelpers } from "@/helpers";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { fetctCourseService } from "@/services/course.service";
-import { toast } from "sonner";
-import UploadMedia from "../curriculum/UploadMedia";
+import React from "react";
+import UploadShortCourseMedia from "./UploadShortCourse";
+import { GripVertical, Trash, Video } from "lucide-react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useAppSelector } from "@/hooks/useStore.hook";
+import { fetchShortCourseService } from "@/services/course.service";
 
-const courses = {
-  videos: [
-    {
-      id: 1,
-      url: "",
-      mimeType: "",
-      title: "Video one",
-      description: "description of videos"
-    }
-  ]
-}
 const Content = () => {
-  const dispatch = useAppDispatch();
-  const router = useRouter();
+  const { shortCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
+
+  const { data: courseData } = useQuery({
+    queryKey: ["shortcourseData"],
+    queryFn: async () => {
+      const courseData = await fetchShortCourseService({
+        courseId: courseDataStateValues?.courseId,
+      });
+      return courseData as any;
+    },
+    enabled: !!courseDataStateValues?.courseId,
+    refetchInterval: 300,
+    placeholderData: keepPreviousData,
+  });
 
   return (
     <div>
       {
-        courses?.videos.length === 0 ? (
-          <div className="w-full mt-40 mx-auto flex flex-col items-center justify-center">
+        courseData?.course?.media.length === 0 ? (
+          <div className="w-full mt-20 mx-auto flex flex-col items-center justify-center">
             <Video size={30} />
             <p className="text-xl tracking-wide">
               Add content to your course
             </p>
             <p className="text-sm mt-2">Add new video</p>
+
+            <UploadShortCourseMedia
+              description="Upload your existing content to automatically create a new lesson"
+            />
           </div>
         ) : (
           <>
-            {courses?.videos?.map((video: any) => {
+            {courseData?.course?.media?.map((video: any) => {
               return (
                 <div
                   key={video?.id}
@@ -56,7 +49,7 @@ const Content = () => {
                     <GripVertical />
                   </div>
                   <div className="flex-1 flex items-center border cursor-pointer rounded-sm px-2">
-                    <div className="w-16 h-14 flex-shrink-0">
+                    <div className="w-16 h-12 flex-shrink-0">
                       {video?.mimeType === "image/*" ? (
                         <img
                           src={video?.url || video?.previewUrl}
@@ -92,7 +85,7 @@ const Content = () => {
               );
             }
             )}
-            <UploadMedia
+            <UploadShortCourseMedia
               description="Upload your existing content to automatically create a new lesson"
             />
           </>

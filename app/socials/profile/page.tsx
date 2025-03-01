@@ -35,7 +35,7 @@ const Profile = () => {
     if (profileData?.data && profileData.data !== userProfile) {
       setUserProfile(profileData.data);
     }
-  }, [profileData]);
+  }, [profileData, userProfile]);
 
 
   const handleFollow = () => {
@@ -87,7 +87,7 @@ const Profile = () => {
           userProfile={userProfile}
           isCurrentUser={isCurrentUser}
           onFollow={handleFollow}
-          onProfileUpdate={handleProfileUpdate} // Pass update function
+          onProfileUpdate={handleProfileUpdate}
         />
         <ProfileTabs
           isCurrentUser={isCurrentUser}
