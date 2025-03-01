@@ -47,12 +47,12 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       count: post?.commentsCount
     },
     {
-      icon: <BookmarkIcon className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.bookmarkCount
-      // icon: <BookmarkButton
-      //   postId={8}
-      //   initialIsBookmarked={false}
-      //   bookmarkId={11}
-      // />, count: post?.bookmarkCount
+      icon: <BookmarkButton
+        postId={post.id}
+        bookmarkId={post.userId}
+        initialBookmarkCount={post?.bookmarkCount}
+        initialIsBookmarked={post.bookmarked}
+      />,
     },
     { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
     {
