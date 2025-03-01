@@ -1,8 +1,19 @@
 "use client"
-import React from 'react'
+import SocialFeed from "@/components/socials/explore/SocialFeed";
+import { CommentProvider } from "@/context/CommentsContext";
+import { useFetchInfinitePosts } from "@/hooks/posts/useFetchInfinitePosts";
 
-const Analytics = () => {
-  return <div>Following</div>
+export default function Followings() {
+  const { data, isFetching } = useFetchInfinitePosts()
+
+  return (
+    <CommentProvider
+      posts={data?.pages[0]}
+    >
+      <SocialFeed
+        initialPosts={data?.pages[0]}
+        isFetcingPosts={isFetching}
+      />
+    </CommentProvider>
+  );
 }
-
-export default Analytics
