@@ -26,9 +26,9 @@ export const TagsInput = ({
   const tagInputRef = useRef<HTMLInputElement>(null);
 
   // Sync external value changes
-  React.useEffect(() => {
-    setTags(value);
-  }, [value]);
+  // React.useEffect(() => {
+  //   setTags(value);
+  // }, [value]);
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const { key } = e;

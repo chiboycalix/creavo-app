@@ -1,5 +1,5 @@
 "use client"
-import React, { FormEvent, useEffect } from 'react'
+import React, { FormEvent } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/Input'
@@ -11,7 +11,7 @@ import { generalHelpers } from '@/helpers'
 import { CreateCourseForm, createCourseService } from '@/services/course.service'
 import { useMutation } from '@tanstack/react-query'
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
-import { CourseData, updatCreateLongCourseForm, updateLongCourseData } from '@/redux/slices/course.slice';
+import { CourseData, updatCreateShortCourseForm, updateShortCourseData } from '@/redux/slices/course.slice';
 import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCourse.validator';
 import { Loader2 } from 'lucide-react';
 import { useToast } from "@/context/ToastContext";
@@ -64,14 +64,14 @@ const currencies = [
   },
 ];
 
-const CreateLongCourse = () => {
+const CreateShortCourse = () => {
   const router = useRouter()
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
-  const { createLongCourseForm: createCourseStateValues } = useAppSelector((store) => store.courseStore);
+  const { createShortCourseForm: createCourseStateValues } = useAppSelector((store) => store.courseStore);
   const { validate, errors, validateField } = useCreateCourseFormValidator({ store: createCourseStateValues });
-  const updateCreateCourse = (payload: Partial<CreateCourseForm>) => dispatch(updatCreateLongCourseForm(payload));
-  const updateCourse = (payload: Partial<CourseData>) => dispatch(updateLongCourseData(payload));
+  const updateCreateShortCourse = (payload: Partial<CreateCourseForm>) => dispatch(updatCreateShortCourseForm(payload));
+  const updateCourse = (payload: Partial<CourseData>) => dispatch(updateShortCourseData(payload));
   const maxFiles = 1;
 
   const { mutate: handleCreateCourse, isPending: isCreatingCourse } = useMutation({
@@ -87,7 +87,7 @@ const CreateLongCourse = () => {
       })
       showToast('success', 'success', "Course created successfully");
       const slugTitle = generalHelpers?.convertToSlug(data?.title)
-      router.push(`/studio/create-course/long-course/${slugTitle}`)
+      router.push(`/studio/create-course/short-course/${slugTitle}`)
     },
     onError: (error: any) => {
       showToast('error', 'Failed to create course', error.data[0]);
@@ -107,7 +107,6 @@ const CreateLongCourse = () => {
       promotionalUrl: createCourseStateValues?.promotionalUrl
     }))
   }
-
 
   return (
     <ProtectedRoute
@@ -130,7 +129,7 @@ const CreateLongCourse = () => {
                 value={createCourseStateValues?.title}
                 onChange={(e) => {
                   validateField("title", e.target.value)
-                  updateCreateCourse({ title: e.target.value });
+                  updateCreateShortCourse({ title: e.target.value });
                 }}
                 errorMessage={errors.title}
               />
@@ -146,7 +145,7 @@ const CreateLongCourse = () => {
                 value={createCourseStateValues?.description}
                 onChange={(e) => {
                   validateField("description", e.target.value)
-                  updateCreateCourse({ description: e.target.value });
+                  updateCreateShortCourse({ description: e.target.value });
                 }}
                 errorMessage={errors.description}
                 rows={10}
@@ -158,7 +157,7 @@ const CreateLongCourse = () => {
                 value={createCourseStateValues?.tags}
                 onChange={(newTags: any) => {
                   validateField("tags", newTags)
-                  updateCreateCourse({ tags: newTags });
+                  updateCreateShortCourse({ tags: newTags });
                 }}
                 placeholder="#fun #tiktok #post"
                 errorMessage={errors.tags}
@@ -173,7 +172,7 @@ const CreateLongCourse = () => {
                   value={createCourseStateValues?.difficultyLevel?.toString()}
                   onSelect={(value) => {
                     validateField("difficultyLevel", value.toString())
-                    updateCreateCourse({ difficultyLevel: value?.toString() });
+                    updateCreateShortCourse({ difficultyLevel: value?.toString() });
                   }}
                   placeholder='Select course difficulty'
                   options={[
@@ -201,7 +200,7 @@ const CreateLongCourse = () => {
               <Switch
                 checked={createCourseStateValues?.isPaid}
                 onChange={(checked) => {
-                  updateCreateCourse({ isPaid: checked });
+                  updateCreateShortCourse({ isPaid: checked });
                 }}
                 className={`${createCourseStateValues?.isPaid ? 'bg-primary-600' : 'bg-gray-200'} relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none`}
               >
@@ -223,7 +222,7 @@ const CreateLongCourse = () => {
                     className='w-full'
                     onSelect={(value) => {
                       validateField("currency", value?.toString())
-                      updateCreateCourse({ currency: value?.toString() });
+                      updateCreateShortCourse({ currency: value?.toString() });
                     }}
                     errorMessage={errors.currency}
                   />
@@ -238,7 +237,7 @@ const CreateLongCourse = () => {
                     type='number'
                     onChange={(e) => {
                       validateField("amount", e.target.value)
-                      updateCreateCourse({ amount: e.target.value });
+                      updateCreateShortCourse({ amount: e.target.value });
                     }}
                     errorMessage={errors.amount}
                   />
@@ -252,13 +251,12 @@ const CreateLongCourse = () => {
                 accept="video/*,image/*"
                 maxFiles={maxFiles}
                 onChange={(uploads: any) => {
-                  updateCreateCourse({ promotionalUrl: uploads })
+                  updateCreateShortCourse({ promotionalUrl: uploads })
                 }}
               />
             </div>
             <div className='w-full mt-12'>
               <Button
-                // type="submit"
                 className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
               >
                 {
@@ -273,4 +271,4 @@ const CreateLongCourse = () => {
   )
 }
 
-export default CreateLongCourse
+export default CreateShortCourse

@@ -6,7 +6,7 @@ export interface CreateCourseForm {
   difficultyLevel: string | undefined;
   amount?: string;
   currency?: string;
-  thumbnailUrl?: string;
+  promotionalUrl?: string;
   isPaid: boolean;
   tags: string[];
 }
@@ -16,8 +16,7 @@ export const createCourseService = async (payload: CreateCourseForm) => {
     const { data } = await apiClient.post("/courses", {
       ...payload,
       amount: Number(payload.amount),
-      category: 'STANDARD',
-
+      category: "STANDARD",
     });
     return data;
   } catch (error) {
@@ -28,7 +27,7 @@ export const createCourseService = async (payload: CreateCourseForm) => {
 export const getUserCourses = async (userId: number, limit = 10, page = 1) => {
   try {
     const response = await apiClient.get(`/users/${userId}/courses`, {
-      params: { limit, page, category: 'STANDARD' },
+      params: { limit, page, category: "STANDARD" },
     });
     console.log(response)
     return response;

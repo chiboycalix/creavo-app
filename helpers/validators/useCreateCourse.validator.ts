@@ -11,7 +11,7 @@ const useCreateCourseFormValidator = ({ store }: HookProps) => {
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreateCourseForm, string>>
   >({});
-  const { createCourseForm: createCourseStateValues } = useAppSelector(
+  const { createLongCourseForm: createCourseStateValues } = useAppSelector(
     (store) => store.courseStore
   );
 
@@ -31,7 +31,7 @@ const useCreateCourseFormValidator = ({ store }: HookProps) => {
     currency: createCourseStateValues?.isPaid
       ? z.string().min(1, { message: "Currency is required" })
       : z.string().optional(),
-    thumbnailUrl: z.string().optional(),
+    promotionalUrl: z.string().optional(),
   });
 
   const validate = async (_callback?: () => void) => {

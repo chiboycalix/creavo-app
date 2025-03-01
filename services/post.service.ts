@@ -4,7 +4,7 @@ export type CreatePostPayload = {
   title: string;
   body: string;
   thumbnailUrl: string;
-  tags: string[];
+  hashtags: string[];
   media: {
     url: string;
     title: string;
@@ -20,6 +20,7 @@ export const createPostService = async (payload: CreatePostPayload) => {
   try {
     const { data } = await apiClient.post("/posts", {
       ...payload,
+      hashtag: payload.hashtags.join(","),
     });
     return data;
   } catch (error) {

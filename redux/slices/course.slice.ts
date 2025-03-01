@@ -11,17 +11,38 @@ export type CourseData = {
 };
 
 const initialState = {
-  createCourseForm: {
+  createLongCourseForm: {
     title: "",
     description: "",
     difficultyLevel: "",
-    thumbnailUrl: "",
+    promotionalUrl: "",
     tags: [],
     isPaid: false,
     currency: "",
     amount: "",
   } as CreateCourseForm,
-  courseData: {
+
+  longCourseData: {
+    courseId: "",
+    title: "",
+    isPaid: false,
+    description: "",
+    difficultyLevel: "",
+    tags: [],
+  } as CourseData,
+
+  createShortCourseForm: {
+    title: "",
+    description: "",
+    difficultyLevel: "",
+    promotionalUrl: "",
+    tags: [],
+    isPaid: false,
+    currency: "",
+    amount: "",
+  } as CreateCourseForm,
+
+  shortCourseData: {
     courseId: "",
     title: "",
     isPaid: false,
@@ -35,36 +56,69 @@ const courseStore = createSlice({
   name: "courseStore",
   initialState,
   reducers: {
-    updatCreateCourseForm: (
+    updatCreateLongCourseForm: (
       state,
       action: PayloadAction<Partial<CreateCourseForm>>
     ) => {
-      state.createCourseForm = {
-        ...state.createCourseForm,
+      state.createLongCourseForm = {
+        ...state.createLongCourseForm,
         ...action.payload,
       };
     },
-    resetCreateCourseForm: (state) => {
-      state.createCourseForm = initialState.createCourseForm;
+    resetCreateLongCourseForm: (state) => {
+      state.createLongCourseForm = initialState.createLongCourseForm;
     },
 
-    updateCourseData: (state, action: PayloadAction<Partial<CourseData>>) => {
-      state.courseData = {
-        ...state.courseData,
+    updateLongCourseData: (
+      state,
+      action: PayloadAction<Partial<CourseData>>
+    ) => {
+      state.longCourseData = {
+        ...state.longCourseData,
+        ...action.payload,
+      };
+    },
+    resetLongCourseData: (state) => {
+      state.longCourseData = initialState.longCourseData;
+    },
+
+    updatCreateShortCourseForm: (
+      state,
+      action: PayloadAction<Partial<CreateCourseForm>>
+    ) => {
+      state.createShortCourseForm = {
+        ...state.createShortCourseForm,
+        ...action.payload,
+      };
+    },
+    resetCreateShortCourseForm: (state) => {
+      state.createShortCourseForm = initialState.createShortCourseForm;
+    },
+
+    updateShortCourseData: (
+      state,
+      action: PayloadAction<Partial<CourseData>>
+    ) => {
+      state.shortCourseData = {
+        ...state.shortCourseData,
         ...action.payload,
       };
     },
 
-    resetUpdateCourseData: (state) => {
-      state.courseData = initialState.courseData;
+    resetShortCourseData: (state) => {
+      state.shortCourseData = initialState.shortCourseData;
     },
   },
 });
 
 export const {
-  updatCreateCourseForm,
-  resetCreateCourseForm,
-  updateCourseData,
-  resetUpdateCourseData,
+  updatCreateLongCourseForm,
+  resetCreateLongCourseForm,
+  updateLongCourseData,
+  resetLongCourseData,
+  updatCreateShortCourseForm,
+  resetCreateShortCourseForm,
+  updateShortCourseData,
+  resetShortCourseData,
 } = courseStore.actions;
 export default courseStore.reducer;

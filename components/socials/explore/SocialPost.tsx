@@ -6,11 +6,10 @@ import FollowButton from "./FollowButton";
 import ShareButton from "./ShareButton";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
+import { ChatBubbleOvalLeftEllipsisIcon,  BookmarkIcon } from "@heroicons/react/24/solid";
 import { VscEye } from "react-icons/vsc";
-import { useAuth } from "@/context/AuthContext";
-import { useComments } from "@/context/CommentsContext";
-import BookmarkButton from "./BookmarkIcon";
+import { useAuth } from "@/context/AuthContext"
+import { useComments } from "@/context/CommentsContext"
 
 interface SocialMetric {
   icon: React.ReactNode;
@@ -20,8 +19,8 @@ interface SocialMetric {
 export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const [showAllTags, setShowAllTags] = useState(false);
   const { getCurrentUser } = useAuth();
-  const { toggleComments } = useComments();
-  const currId = getCurrentUser()?.id;
+  const { toggleComments } = useComments()
+  const currentUserId = getCurrentUser()?.id;
 
   const tags = [
     "fyp",
@@ -61,24 +60,15 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       count: post?.commentsCount,
     },
     {
-      icon: <BookmarkButton 
-      postId={post.id}
-      initialIsBookmarked={post.isBookmarked || false} 
-      bookmarkCount={post.bookmarkCount ?? 0}
-      // bookmarkId={post.userId}
-
-    />    
+      icon: <BookmarkIcon className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.bookmarkCount
+      // icon: <BookmarkButton  
       // icon: <BookmarkButton
       //   postId={8}
       //   initialIsBookmarked={false}
       //   bookmarkId={11}
       // />, count: post?.bookmarkCount
     },
-    {
-      icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />,
-      count: post?.viewsCount,
-    },
-    // { icon: <RiShareForwardFill className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.sharesCount },
+    { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
     {
       icon: (
         <ShareButton postId={post.id} initialShareCount={post?.sharesCount} />
@@ -107,13 +97,14 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
 
           {/* Metrics - Mobile & Tablet */}
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
-            {Number(post.userId) !== currId && (
+          {
+              Number(post.userId) !== currentUserId &&
               <FollowButton
                 followedId={post?.userId}
                 avatar={post?.user_profile_avatar || "/assets/display.jpg"}
                 initialFollowStatus={post?.followed}
               />
-            )}
+            }
             {metrics.map((metric, index) => (
               <div key={index} className="flex flex-col items-center mb-4">
                 <div className="text-sm rounded-full cursor-pointer">
@@ -175,7 +166,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       {/* Metrics - Desktop */}
       <div className="hidden lg:flex flex-col h-full justify-center mb-10">
         <div className="flex flex-col gap-4 mt-auto">
-          {Number(post.userId) !== currId && (
+          {Number(post.userId) !== currentUserId && (
             <FollowButton
               followedId={post?.userId}
               avatar={post?.user_profile_avatar || "/assets/display.jpg"}

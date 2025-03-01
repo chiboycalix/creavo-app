@@ -2,15 +2,11 @@ import React from "react";
 import Cookies from "js-cookie";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Check } from "lucide-react";
 import { baseUrl } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface FollowButtonProps {
   followedId: number | string;
@@ -21,31 +17,12 @@ interface FollowButtonProps {
 const FollowButton: React.FC<FollowButtonProps> = ({
   followedId,
   avatar,
-  initialFollowStatus = false,
+  initialFollowStatus: isFollowing = false,
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
   const ws = useWebSocket();
-
-  const { data: followStatus } = useQuery({
-    queryKey: ['followStatus', followedId],
-    queryFn: async () => {
-      if (!getAuth()) return { data: { followed: initialFollowStatus } };
-
-      const response = await fetch(`${baseUrl}/users/${followedId}/follows/status`, {
-        headers: { Authorization: `Bearer ${Cookies.get("accessToken")}` },
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch follow status");
-      return response.json();
-    },
-    enabled: !!getAuth(),
-    staleTime: 0,
-    initialData: { data: { followed: initialFollowStatus } },
-  });
-
-  const isFollowing = followStatus?.data?.followed ?? initialFollowStatus;
 
   const followMutation = useMutation({
     mutationFn: async () => {
