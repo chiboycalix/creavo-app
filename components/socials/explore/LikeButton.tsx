@@ -18,13 +18,16 @@ interface LikeButtonProps {
 const LikeButton: React.FC<LikeButtonProps> = ({
   postId,
   initialLikesCount,
-  initialIsLiked: isLiked,
+  initialIsLiked,
   likedId,
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
   const ws = useWebSocket();
+
+  const [isLiked, setIsLiked] = React.useState(initialIsLiked);
+  const [likesCount, setLikesCount] = React.useState(initialLikesCount);
 
   const likePostMutation = useMutation({
     mutationFn: async () => {
@@ -38,7 +41,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
       if (!response.ok) throw new Error("Failed to like post");
       const result = await response.json();
-      // Emit WebSocket event
+
       if (ws && ws.connected) {
         const request = {
           userId: likedId,
@@ -52,42 +55,36 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       return result;
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["likeStatus", postId] });
+      await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
 
-      // Optimistically update the like status and likes count
-      queryClient.setQueryData(['likeStatus', postId], { data: { liked: true } });
+      const previousData = queryClient.getQueryData(["infinite-posts"]);
+      queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
+        if (!oldData?.pages) return oldData;
 
-      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
+        const updatedPages = oldData.pages.map((page: any) => ({
+          ...page,
+          posts: page.posts.map((post: any) =>
+            post.id === postId
+              ? { ...post, likesCount: post.likesCount + 1, liked: true }
+              : post
+          ),
+        }));
 
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, liked: true, likesCount: post.likesCount + 1 } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
+        return { ...oldData, pages: updatedPages };
       });
 
-      return { previousLikesCount: initialLikesCount };
-    },
-    onError: (_, __, context) => {
-      // Revert to the previous likes count on error
-      queryClient.setQueryData(['likeStatus', postId], { data: { liked: false } });
-      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
+      setIsLiked(true);
+      setLikesCount((prev) => prev + 1);
 
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, liked: false, likesCount: context?.previousLikesCount } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
-      });
+      return { previousData };
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['likeStatus', postId] });
+    onError: (err, _, context) => {
+      queryClient.setQueryData(["infinite-posts"], context?.previousData);
+      setIsLiked(initialIsLiked);
+      setLikesCount(initialLikesCount);
     },
   });
 
-  // Unlike post mutation
   const unlikePostMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`${baseUrl}/posts/${postId}/unlike-post`, {
@@ -102,38 +99,33 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       return response.json();
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["likeStatus", postId] });
+      await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
 
-      // Optimistically update the like status and likes count
-      queryClient.setQueryData(['likeStatus', postId], { data: { liked: false } });
+      const previousData = queryClient.getQueryData(["infinite-posts"]);
+      queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
+        if (!oldData?.pages) return oldData;
 
-      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
+        const updatedPages = oldData.pages.map((page: any) => ({
+          ...page,
+          posts: page.posts.map((post: any) =>
+            post.id === postId
+              ? { ...post, likesCount: post.likesCount - 1, liked: false }
+              : post
+          ),
+        }));
 
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, liked: false, likesCount: post.likesCount - 1 } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
+        return { ...oldData, pages: updatedPages };
       });
 
-      return { previousLikesCount: initialLikesCount };
-    },
-    onError: (_, __, context) => {
-      // Revert to the previous likes count on error
-      queryClient.setQueryData(['likeStatus', postId], { data: { liked: true } });
-      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
+      setIsLiked(false);
+      setLikesCount((prev) => prev - 1);
 
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId ? { ...post, liked: true, likesCount: context?.previousLikesCount } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
-      });
+      return { previousData };
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['likeStatus', postId] });
+    onError: (err, _, context) => {
+      queryClient.setQueryData(["infinite-posts"], context?.previousData);
+      setIsLiked(initialIsLiked);
+      setLikesCount(initialLikesCount);
     },
   });
 
@@ -149,9 +141,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       likePostMutation.mutate();
     }
   };
-
-  // Get the current likes count from the cache or use the initial value
-  const currentLikesCount = (queryClient.getQueryData<{ data: { posts: { id: number; likesCount: number }[] } }>(['posts'])?.data?.posts.find((post) => post.id === postId)?.likesCount) ?? initialLikesCount;
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -169,9 +158,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
             }`}
         />
       </button>
-      <span className="text-xs font-semibold">
-        {currentLikesCount}
-      </span>
+      <span className="text-xs font-semibold">{likesCount}</span>
     </div>
   );
 };

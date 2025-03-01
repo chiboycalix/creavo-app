@@ -38,7 +38,7 @@ const SocialFeed = ({ initialPosts }: any) => {
       pageParams: [1]
     }
   })
-
+  console.log({ data })
   // Handle window resize for responsive layout
   useEffect(() => {
     const handleResize = () => {
@@ -130,7 +130,7 @@ const SocialFeed = ({ initialPosts }: any) => {
     }
   }, [inView, debouncedFetchNextPage])
 
-  const isEmpty = !data?.pages[0]?.data?.posts?.length
+  const isEmpty = !data?.pages[0]?.posts?.length
 
   const getPostHeight = () => {
     if (typeof window !== 'undefined') {
@@ -183,11 +183,10 @@ const SocialFeed = ({ initialPosts }: any) => {
             ) : (
               data?.pages.map((page, pageIndex) => {
                 const result = generalHelpers.processPostsData({
-                  posts: page?.data.posts,
-                  likedStatuses: page?.data.likedStatuses,
-                  followStatuses: page?.data?.followStatuses,
-                  bookmarkStatuses: page?.data?.bookmarkStatuses,
-
+                  posts: page?.posts,
+                  likedStatuses: page?.likedStatuses,
+                  followStatuses: page?.followStatuses,
+                  bookmarkStatuses: page?.bookmarkStatuses,
                 })
                 return (
                   <React.Fragment key={pageIndex}>

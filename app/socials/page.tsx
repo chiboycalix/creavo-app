@@ -7,20 +7,12 @@ import { useFetchInfinitePosts } from "@/hooks/posts/useFetchInfinitePosts";
 export default function ExplorePage() {
   const { data, isFetching } = useFetchInfinitePosts()
 
-  const result = generalHelpers.processPostsData({
-    posts: data?.pages[0]?.data.posts,
-    likedStatuses: data?.pages[0]?.data.likedStatuses,
-    followStatuses: data?.pages[0]?.data.followStatuses,
-    bookmarkStatuses: data?.pages[0]?.data.bookmarkStatuses,
-  });
-
   return (
     <CommentProvider
       posts={data?.pages[0]}
     >
       <SocialFeed
         initialPosts={data?.pages[0]}
-        result={result}
         isFetcingPosts={isFetching}
       />
     </CommentProvider>
