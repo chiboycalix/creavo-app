@@ -36,7 +36,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         postId={post.id}
         likedId={post.userId}
         initialLikesCount={post.likesCount}
-        initialIsLiked={post.liked}
+        initialIsLiked={post.liked || false}
       />,
     },
     {
