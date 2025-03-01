@@ -10,6 +10,7 @@ import { ChatBubbleOvalLeftEllipsisIcon,  BookmarkIcon } from "@heroicons/react/
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
+import BookmarkButton from "./BookmarkIcon";
 
 interface SocialMetric {
   icon: React.ReactNode;
@@ -60,9 +61,14 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       count: post?.commentsCount,
     },
     {
-      icon: <BookmarkIcon className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.bookmarkCount
-      // icon: <BookmarkButton  
-      // icon: <BookmarkButton
+      icon: 
+      <BookmarkButton
+      postId={post.id}
+      initialBookmarksCount={post.bookmarkCount ?? 0}
+      initialIsBookmarked={post.bookmarked || false}
+      bookmarkedId={post.userId}
+    />
+      // <BookmarkButton
       //   postId={8}
       //   initialIsBookmarked={false}
       //   bookmarkId={11}

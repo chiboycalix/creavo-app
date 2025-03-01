@@ -14,7 +14,7 @@ export const generalHelpers = {
   },
 
   processPostsData: (data: any) => {
-    const { posts, likedStatuses, followStatuses } = data;
+    const { posts, likedStatuses, followStatuses, bookmarkStatuses } = data;
     const likesMap = new Map(
       likedStatuses?.map((status: any) => [status?.postId, status?.liked])
     );
@@ -22,11 +22,15 @@ export const generalHelpers = {
     const followsMap = new Map(
       followStatuses?.map((status: any) => [status?.userId, status?.followed])
     );
+    const bookmarkMap = new Map(
+      bookmarkStatuses?.map((status: any) => [status?.userId, status?.bookmarked])
+    );
 
     return posts?.map((post: any) => ({
       ...post,
       liked: likesMap.get(post.id) ?? false,
       followed: followsMap.get(post.userId) ?? false,
+      bookmarked: bookmarkMap.get(post.userId) ?? false,
     }));
   },
 

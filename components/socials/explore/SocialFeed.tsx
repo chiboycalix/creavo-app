@@ -188,7 +188,6 @@ const SocialFeed = ({ initialPosts }: any) => {
                   followStatuses: page?.data?.followStatuses,
                   bookmarkStatuses: page?.data?.bookmarkStatuses
                 })
-
                 return (
                   <React.Fragment key={pageIndex}>
                     {result?.map((post: any, postIndex: number) => {
