@@ -11,6 +11,7 @@ import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
 import { CommentPayload } from "@/types";
 import { useWebSocket } from "@/context/WebSocket";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export function Comments({ postId }: { postId: number; }) {
   const { data: comments, isPending: isFetchingComments } = useFetchComments(postId);
@@ -19,6 +20,12 @@ export function Comments({ postId }: { postId: number; }) {
   const [comment, setComment] = useState("");
   const ws = useWebSocket();
   const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
+
+  const {
+    data: profileData,
+    isLoading: profileLoading,
+    error: profileError
+  } = useUserProfile(currentUser?.id);
 
   const handleToggleCommentInput = (commentId: string) => {
     setActiveCommentId((prev) => (prev === commentId ? null : commentId));
@@ -46,7 +53,7 @@ export function Comments({ postId }: { postId: number; }) {
       postId
     });
   };
-
+  console.log({ profileData })
   return (
     <div className="relative h-full w-full">
       <div className="">
@@ -75,9 +82,9 @@ export function Comments({ postId }: { postId: number; }) {
           {currentUser ? (
             <div className="flex items-center justify-between gap-2 w-full">
               <div className="basis-1.5/12">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={currentUser?.avatar} alt="User avatar" />
-                  <AvatarFallback>.</AvatarFallback>
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={profileData?.data?.profile?.avatar} alt="User avatar" />
+                  <AvatarFallback>😂</AvatarFallback>
                 </Avatar>
               </div>
               <div className="flex-1">
