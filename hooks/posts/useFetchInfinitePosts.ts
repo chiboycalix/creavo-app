@@ -71,6 +71,8 @@ export const useFetchInfinitePosts = (options = {}) => {
     },
     initialPageParam: 1,
     ...options,
-    refetchInterval: 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 5 * 60 * 1000,
   });
 };

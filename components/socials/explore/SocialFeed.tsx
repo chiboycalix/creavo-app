@@ -21,8 +21,7 @@ const SocialFeed = ({ initialPosts }: any) => {
   const containerRef = useRef<HTMLDivElement>(null) as any
   const isFetchingRef = useRef(false)
   const postHeightRef = useRef(0)
-  const { showComments, setShowComments, activePostId } =
-    useComments();
+  const { showComments } = useComments();
   const {
     data,
     isFetching,
@@ -140,6 +139,16 @@ const SocialFeed = ({ initialPosts }: any) => {
     }
     return 'calc(100vh - 4rem)' // Default fallback
   }
+
+  // if (queryIsFetchingNextPage) {
+  //   return (
+  //     <div style={{ padding: "20px", textAlign: "center" }}>
+  //       {Array.from({ length: 3 }).map((_, i) => (
+  //         <div key={i} className="animate-pulse bg-gray-200 h-32 mb-4" />
+  //       ))}
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="w-full min-h-screen">
