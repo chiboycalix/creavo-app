@@ -159,7 +159,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                         <MenuItem>
                           {({ active }) => (
                             <Link
-                              href="/profile"
+                              href={"/socials/profile"}
                               className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <FaUser className="mr-3 h-4 w-4 text-gray-500" />
@@ -167,7 +167,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                             </Link>
                           )}
                         </MenuItem>
-                        <MenuItem>
+                        {/* <MenuItem>
                           {({ active }) => (
                             <Link
                               href="/profile/new"
@@ -177,8 +177,8 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                               Add New Profile
                             </Link>
                           )}
-                        </MenuItem>
-                        <MenuItem>
+                        </MenuItem> */}
+                        {/* <MenuItem>
                           {({ active }) => (
                             <Link
                               href="/settings"
@@ -188,11 +188,11 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                               Settings
                             </Link>
                           )}
-                        </MenuItem>
+                        </MenuItem> */}
                         <MenuItem>
                           {({ active }) => (
                             <Link
-                              href="/saved"
+                              href={"/socials/profile?tab=saved videos"}
                               className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <FaBookmark className="mr-3 h-4 w-4 text-gray-500" />
@@ -226,7 +226,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                         <MenuItem>
                           {({ active }) => (
                             <Link
-                              href="/app"
+                              href="#"
                               className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <span className="mr-3 h-4 w-4 text-gray-500">📱</span>

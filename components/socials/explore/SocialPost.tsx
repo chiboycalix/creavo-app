@@ -1,16 +1,17 @@
 import type React from "react"
 import MediaWrapper from "../../post/MediaWrapper"
-import LikeButton from "./LikeButton"
-import FollowButton from "./FollowButton"
-import BookmarkButton from "./BookmarkButton"
 import ShareButton from "./ShareButton"
+import dynamic from "next/dynamic"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { useState } from "react"
-import { ChatBubbleOvalLeftEllipsisIcon, BookmarkIcon } from "@heroicons/react/24/solid"
+import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid"
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
 
+const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
+const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
+const FollowButton = dynamic(() => import("./FollowButton"), { ssr: false });
 interface SocialMetric {
   icon: React.ReactNode
   count?: string
@@ -38,7 +39,6 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         initialLikesCount={post.likesCount}
         initialIsLiked={post.liked || false}
       />,
-      // count: post?.likesCount
     },
     {
       icon: <ChatBubbleOvalLeftEllipsisIcon
@@ -54,7 +54,6 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         initialBookmarkCount={post?.bookmarkCount}
         initialIsBookmarked={post.bookmarked}
       />,
-      // count: post?.bookmarkCount
     },
     { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
     {

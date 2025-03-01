@@ -1,17 +1,23 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import EditUserInputModal from "./EditUserInputModal";
+import React, { useState } from "react";
 import FollowButton from "@/components/FollowButton";
-import FollowLink from "./FollowLink";
 import Image from "next/image";
+import FollowingCard from "@/components/socials/profile/FollowingCard";
+import FollowersCard from "@/components/socials/profile/FollowersCard";
+import EditUserProfileModal from "./EditUserInputModal";
 import { BsPencil } from "react-icons/bs";
 import { BiShare } from "react-icons/bi";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
-import FollowingCard from "@/components/socials/profile/FollowingCard";
-import FollowersCard from "@/components/socials/profile/FollowersCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface Profile {
   firstName: string;
@@ -39,7 +45,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userProfile,
   isCurrentUser,
   onProfileUpdate
-  // onFollow,
 }: any) => {
   const [showModal, setShowModal] = useState(false);
   const [showFollowersCard, setShowFollowersCard] = useState(false)
@@ -60,15 +65,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     setShowFollowingCard(true);
   };
 
-
-  const toggleModal = () => {
-    setShowModal(false);
-
-    setTimeout(() => {
-      setShowModal(true);
-    }, 500);
-  };
-
   return (
     <div className="flex flex-col items-center w-full p-4 relative">
       <Image
@@ -84,7 +80,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         alt={`${userProfile?.username || "User"}'s profile avatar`}
       />
       <div className="mt-2">
-        <div className="flex itcms-center gap-3">
+        <div className="flex justify-center items-center gap-3">
           <h1 className="text-sm font-semibold">
             {userProfile?.profile?.firstName &&
               userProfile?.profile?.lastName === "None"
@@ -96,14 +92,25 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
         <div className="flex gap-2 mt-2">
           {isCurrentUser ? (
-            <Button
-              onClick={toggleModal}
-              aria-label="Edit your profile"
-              className="flex text-sm items-center rounded-md w-8/12 font-medium border hover:bg-primary-600"
-            >
-              <BsPencil className="mr-1" />
-              <span className="text-xs">Edit Profile</span>
-            </Button>
+            <Dialog>
+              <DialogTrigger className="bg-primary-700 px-6 py-2.5 text-white flex text-sm items-center rounded-md w-8/12 font-medium border hover:bg-primary-600">
+                <BsPencil className="mr-1" />
+                <span className="text-xs">Edit Profile</span>
+              </DialogTrigger>
+              <DialogContent className="bg-primary-50 max-w-xl">
+                <DialogHeader>
+                  <DialogTitle>Edit Profile</DialogTitle>
+                  <DialogDescription>
+                    <EditUserProfileModal
+                      userProfile={userProfile}
+                      aria-label="Edit user profile modal"
+                      onProfileUpdate={onProfileUpdate}
+                    />
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+
           ) : (
             <FollowButton followedId={Number(userProfile?.id)} />
           )}
@@ -132,20 +139,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
       <div>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-sm text-gray-500 mt-2 max-w-md text-center">
           {userProfile?.profile?.bio || "No bio available"}
         </p>
       </div>
-
-
-      {showModal && (
-        <EditUserInputModal
-          userProfile={userProfile}
-          onClose={() => setShowModal(false)}
-          aria-label="Edit user profile modal"
-          onProfileUpdate={onProfileUpdate}
-        />
-      )}
 
       {showFollowingCard && <FollowingCard
         isOpen={showFollowingCard}
@@ -161,7 +158,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           userId={userProfile?.id}
         />
       }
-
     </div>
   );
 };
