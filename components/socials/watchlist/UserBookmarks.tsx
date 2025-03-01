@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useCallback } from "react"
 import { getUserBookmarks } from "@/services/bookmark.service"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { baseUrl } from "@/utils/constant"
 import { toast } from "sonner"
 import { toggleBookmark } from "@/services/bookmark.service"
+import MediaWrapper from "../../post/MediaWrapper"
 
 interface BookmarksResponse {
   data: {
@@ -84,14 +83,13 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
     }
   }, [])
 
-  // Initialize userId from props or fetch from API
   useEffect(() => {
     const initUserId = async () => {
       if (userId !== undefined) {
         setCurrentUserId(userId)
       } else {
         const fetchedUserId = await fetchUserIdFromPosts()
-        setCurrentUserId(fetchedUserId || 1) // Default to 1 if not found
+        setCurrentUserId(fetchedUserId || 1) 
       }
     }
 
@@ -104,9 +102,6 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
       setLoading(true)
       setError(null)
       const response = await getUserBookmarks(currentUserId, page, limit)
-
-      // Log the response to debug
-      console.log("Bookmarks response:", response)
 
       if (response && response.data && Array.isArray(response.data.posts)) {
         setBookmarks(response.data.posts)
@@ -157,9 +152,8 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
       console.error("Error removing bookmark:", err)
       setError("Failed to remove bookmark. Please try again.")
 
-      // Use toast for error
       toast.error("Bookmark error", {
-        description: "Fail to  remove.",
+        description: "Fail to remove.",
       })
     }
   }
@@ -175,7 +169,7 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h2 className=" font-bold">Your Bookmarks</h2>
+        <h2 className="font-bold">Your Bookmarks</h2>
         <Badge variant="outline" className="px-3 py-1">
           <Bookmark className="w-4 h-4 mr-2" />
           {loading ? "..." : bookmarks.length} saved
@@ -212,14 +206,14 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
         <Card className="w-full text-center p-8">
           <div className="flex flex-col items-center gap-2">
             <Bookmark className="h-12 w-12 text-muted-foreground" />
-            <h3 className=" font-semibold mt-2">No bookmarks found</h3>
+            <h3 className="font-semibold mt-2">No bookmarks found</h3>
             <p className="text-muted-foreground">
               You haven&apos;t saved any posts yet. Start bookmarking content you want to revisit later.
             </p>
           </div>
         </Card>
       ) : (
-        <div className=" grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-3 gap-5">
           {bookmarks.map((bookmark) => (
             <Card key={bookmark.id} className="w-full hover:shadow-md transition-shadow">
               <CardHeader className="pb-2">
@@ -248,34 +242,12 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
                     {bookmark.hashtag}
                   </Badge>
                 )}
-                {bookmark.media && bookmark.media.length > 0 && (
-                  <div className="mt-3">
-                    {bookmark.media[0].mimeType.startsWith("video") ? (
-                      <div className="relative">
-                        <video
-                          controls
-                          poster={
-                            bookmark.media[0].thumbnailUrl !== "None" ? bookmark.media[0].thumbnailUrl : undefined
-                          }
-                          className="w-full h-auto rounded-md max-h-96"
-                        >
-                          <source src={bookmark.media[0].url} type={bookmark.media[0].mimeType} />
-                        </video>
-                      </div>
-                    ) : bookmark.media[0].mimeType.startsWith("image") ? (
-                      <img
-                        src={bookmark.media[0].url || "/placeholder.svg"}
-                        alt={bookmark.media[0].title || "Post media"}
-                        className="w-full h-auto rounded-md object-cover max-h-64"
-                      />
-                    ) : (
-                      <div className="bg-muted rounded-md p-4 text-center">
-                        <ExternalLink className="h-8 w-8 mx-auto mb-2" />
-                        <p>{bookmark.media[0].title || "Media attachment"}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <MediaWrapper
+                  postId={bookmark.id}
+                  title={bookmark.body}
+                  size="object-cover"
+                  postMedia={bookmark.media}
+                />
               </CardContent>
               <CardFooter className="flex justify-between pt-2">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -293,4 +265,3 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
     </div>
   )
 }
-
