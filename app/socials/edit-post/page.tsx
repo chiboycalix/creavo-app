@@ -65,7 +65,7 @@ const PostEditPage = () => {
     mutationFn: (payload: CreatePostPayload) => createPostService(payload),
     onSuccess: async (data) => {
       toast.success("Post created successfully")
-      // router.push("/socials")
+      router.push("/socials")
     },
     onError: (error: any) => {
       toast.error("Error creating post")
@@ -83,11 +83,11 @@ const PostEditPage = () => {
         mimeType: mimeType!
       }
     });
-    await handleCreatePosts({
+    handleCreatePosts({
       title: title,
       body: caption,
       thumbnailUrl: "None",
-      tags: hashtags,
+      hashtags: hashtags,
       media: media,
       status: "ACTIVE",
       location: JSON.stringify(location),
