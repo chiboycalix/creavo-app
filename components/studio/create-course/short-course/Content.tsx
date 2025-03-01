@@ -26,12 +26,16 @@ const Content = () => {
     <div>
       {
         courseData?.course?.media.length === 0 ? (
-          <div className="w-full mt-40 mx-auto flex flex-col items-center justify-center">
+          <div className="w-full mt-20 mx-auto flex flex-col items-center justify-center">
             <Video size={30} />
             <p className="text-xl tracking-wide">
               Add content to your course
             </p>
             <p className="text-sm mt-2">Add new video</p>
+
+            <UploadShortCourseMedia
+              description="Upload your existing content to automatically create a new lesson"
+            />
           </div>
         ) : (
           <>
