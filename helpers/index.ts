@@ -31,7 +31,7 @@ export const generalHelpers = {
       ...post,
       liked: likesMap.get(post.id) ?? false,
       followed: followsMap.get(post.userId) ?? false,
-      bookmarked: bookmarkMap.get(post.userId) ?? false,
+      bookmarked: bookmarkMap.get(post.id) ?? false,
     }));
   },
 
