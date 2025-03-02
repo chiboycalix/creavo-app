@@ -155,24 +155,38 @@ export async function POST(request: NextRequest) {
       const duration = await getVideoDuration(inputPath);
       console.log(`Video duration: ${duration} seconds`);
 
+      // Define positions
+      const playbackWatermarkX = `w-${WATERMARK_WIDTH}-${PADDING}`; // Bottom-right during playback
+      const playbackWatermarkY = `0.75*h-${WATERMARK_HEIGHT / 2}`;
+      const endWatermarkX = `(w-${WATERMARK_WIDTH})/2`; // Center at end
+      const endWatermarkY = `(h-${WATERMARK_HEIGHT})/2`;
+
+      const playbackTextX = `${USERNAME_WIDTH}-${PADDING}`;
+      const playbackTextY = `0.75*h-${USERNAME_HEIGHT / 2}`;
+      const endTextX = `(w-text_w)/2`;
+      const endTextY = `(h-${USERNAME_HEIGHT})/2+${WATERMARK_HEIGHT + GAP}`;
+
+      // Extend video by 2 seconds
+      const endDuration = 2;
+
       await new Promise((resolve, reject) => {
-        const proc = ffmpeg(inputPath); // Define proc here
+        const proc = ffmpeg(inputPath);
 
         proc
-          .input(resizedWatermarkPath) // Explicitly chain methods on proc
+          .input(resizedWatermarkPath)
           .complexFilter([
-            `[0:v][1:v]overlay=x='w-${WATERMARK_WIDTH}-${PADDING}':y='0.75*h-${
-              WATERMARK_HEIGHT / 2
-            }'[v_with_watermark]`,
-            // Username text position: Below the watermark
-            `[v_with_watermark]drawtext=text='@${username}':fontfile='/assets/fonts/manrope/Manrope-Bold.ttf':fontcolor=white:fontsize=18:y='0.75*h-${
-              USERNAME_HEIGHT / 2
-            }':x='${USERNAME_WIDTH}-${PADDING}'[outv]`,
+            // Overlay with dynamic positioning based on time
+            `[0:v][1:v]overlay=x='if(lte(t,${duration}),${playbackWatermarkX},${endWatermarkX})':y='if(lte(t,${duration}),${playbackWatermarkY},${endWatermarkY})'[v_with_watermark]`,
+            // Drawtext with dynamic positioning
+            `[v_with_watermark]drawtext=text='@${username}':fontfile='/assets/fonts/manrope/Manrope-Bold.ttf':fontcolor=white:fontsize=18:x='if(lte(t,${duration}),${playbackTextX},${endTextX})':y='if(lte(t,${duration}),${playbackTextY},${endTextY})'[v_with_text]`,
+            // Extend video with last frame frozen
+            `[v_with_text]tpad=stop_mode=clone:stop_duration=${endDuration}[outv]`,
           ])
           .outputOptions("-map [outv]")
-          .outputOptions("-map 0:a?")
+          .outputOptions("-map 0:a?") // Include audio if present
           .outputOptions("-c:v libx264")
           .outputOptions("-preset fast")
+          .outputOptions(`-t ${duration + endDuration}`) // Total duration
           .on("start", (commandLine) => {
             console.log("FFmpeg command:", commandLine);
           })
