@@ -9,7 +9,6 @@ import { useComments } from '@/context/CommentsContext'
 import { useFetchInfinitePosts } from '@/hooks/posts/useFetchInfinitePosts'
 import { generalHelpers } from '@/helpers'
 import { useInView } from 'react-intersection-observer'
-import { result } from 'lodash'
 
 const SocialFeed = ({ initialPosts }: any) => {
   const { ref, inView } = useInView({ rootMargin: "400px" })

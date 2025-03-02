@@ -2,7 +2,7 @@ import type React from "react"
 import MediaWrapper from "../../post/MediaWrapper"
 import ShareButton from "./ShareButton"
 import dynamic from "next/dynamic"
-import { ChevronDown, ChevronUp, Download } from "lucide-react"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import { useState } from "react"
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid"
 import { VscEye } from "react-icons/vsc";
@@ -106,9 +106,9 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         initialShareCount={post?.sharesCount}
       />
     },
-    {
-      icon: <Download onClick={handleDownload} />
-    },
+    // {
+    //   icon: <Download onClick={handleDownload} />
+    // },
   ]
 
 
