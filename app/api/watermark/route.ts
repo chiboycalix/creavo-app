@@ -53,13 +53,13 @@ export async function POST(request: NextRequest) {
     const mediaBuffer = Buffer.from(await mediaResponse.arrayBuffer());
     await fs.writeFile(inputPath, mediaBuffer);
 
-    const WATERMARK_WIDTH = 1000;
+    const WATERMARK_WIDTH = 240;
     const WATERMARK_HEIGHT = 930;
-    const USERNAME_HEIGHT = 120;
-    const USERNAME_WIDTH = 5;
+    const USERNAME_HEIGHT = WATERMARK_HEIGHT - 940;
+    const USERNAME_WIDTH = WATERMARK_WIDTH - 200;
     const TEXT_HEIGHT = 30;
     const PADDING = 20;
-    const GAP = 5; // Tight spacing between watermark and username
+    const GAP = 5;
 
     if (mediaType === "image") {
       const metadata = await sharp(inputPath).metadata();
@@ -165,7 +165,9 @@ export async function POST(request: NextRequest) {
               WATERMARK_HEIGHT / 2
             }'[v_with_watermark]`,
             // Username text position: Below the watermark
-            `[v_with_watermark]drawtext=text='@${username}':fontfile='/assets/fonts/manrope/Manrope-Bold.ttf':fontcolor=white:fontsize=18:x='w-${USERNAME_HEIGHT}-${PADDING}':y='0.75*h+${USERNAME_WIDTH}'[outv]`,
+            `[v_with_watermark]drawtext=text='@${username}':fontfile='/assets/fonts/manrope/Manrope-Bold.ttf':fontcolor=white:fontsize=18:y='0.75*h-${
+              USERNAME_HEIGHT / 2
+            }':x='${USERNAME_WIDTH}-${PADDING}'[outv]`,
           ])
           .outputOptions("-map [outv]")
           .outputOptions("-map 0:a?")
