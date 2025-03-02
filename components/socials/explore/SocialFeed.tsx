@@ -38,13 +38,11 @@ const SocialFeed = ({ initialPosts }: any) => {
     }
   })
 
-  // Handle window resize for responsive layout
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768)
     }
 
-    // Set initial value
     handleResize()
 
     window.addEventListener('resize', handleResize)
