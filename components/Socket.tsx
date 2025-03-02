@@ -54,7 +54,7 @@ const Socket: React.FC<SocketProps> = ({ username }) => {
   }, [username]);
 
   return (
-    <div className="px-3 pt-2">
+    <div className="px-3 pt-2 max-w-md">
       {loading ? (
         <p className="text-sm">Loading...</p>
       ) : (
@@ -65,11 +65,11 @@ const Socket: React.FC<SocketProps> = ({ username }) => {
             <p className="text-sm text-[#37169C] font-medium">
               {response.message}
             </p>
-            <span className="text-sm italic">
+            <p className="text-sm italic text-wrap max-w-md">
               {suggestedUsernames &&
                 suggestedUsernames.length > 0 &&
                 Array(suggestedUsernames)?.join(", ")}
-            </span>
+            </p>
           </div>
         )
       )}

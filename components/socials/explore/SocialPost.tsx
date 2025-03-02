@@ -8,6 +8,7 @@ import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid"
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
+import Cookies from "js-cookie"
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
@@ -31,6 +32,49 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     "bikersof", "bikerchick"
   ]
 
+
+  console.log({ post })
+
+  const handleDownload = async () => {
+    const media = post.media[0];
+    if (!media) return;
+
+    const token = Cookies.get("accessToken");
+
+    if (!token) {
+      console.error("No access token found");
+      return;
+    }
+
+    const response = await fetch("/api/watermark", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Send token in headers
+      },
+      body: JSON.stringify({
+        postId: post.id,
+        mediaUrl: media.url,
+        mediaType: media.mimeType.startsWith("image") ? "image" : "video",
+        username: post.user_username,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Download failed:", await response.text());
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `post-${post.id}.${media.mimeType.startsWith("image") ? "jpg" : "mp4"}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
   const metrics: SocialMetric[] = [
     {
       icon: <LikeButton
@@ -62,7 +106,11 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         initialShareCount={post?.sharesCount}
       />
     },
+    // {
+    //   icon: <Download onClick={handleDownload} />
+    // },
   ]
+
 
   return (
     <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0">

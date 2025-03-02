@@ -11,7 +11,7 @@ export default function BookmarkApp() {
     const fetchUserId = async () => {
       try {
         const response = await apiClient.get("/auth/me")
-        if ( response.data?.id) {
+        if (response.data?.id) {
           setUserId(response.data.id)
           console.log("User ID:", response.data.id)
         } else {
@@ -27,9 +27,9 @@ export default function BookmarkApp() {
   }, [])
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="mx-auto py-8 px-4">
 
-      <div className="w-full max-w-4xl mx-auto">
+      <div className="w-full mx-auto">
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : userId ? (

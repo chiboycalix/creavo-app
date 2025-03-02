@@ -233,7 +233,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
                 className="w-full"
               />
 
-              {username && <Socket username={username} />}
+              {/* {username && <Socket username={username} />} */}
             </div>
             <div className="mb-8">
               <TextareaInput

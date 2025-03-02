@@ -90,10 +90,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </h1>
           <p className="text-sm">@{userProfile?.username}</p>
         </div>
-        <div className="flex gap-2 mt-2">
+        <div className="flex items-center justify-center gap-2 mt-2 mx-auto">
           {isCurrentUser ? (
             <Dialog>
-              <DialogTrigger className="bg-primary-700 px-6 py-2.5 text-white flex text-sm items-center rounded-md w-8/12 font-medium border hover:bg-primary-600">
+              <DialogTrigger className="bg-primary-700 px-6 py-2.5 text-white flex text-sm items-center rounded-md max-w-8/12 font-medium border hover:bg-primary-600">
                 <BsPencil className="mr-1" />
                 <span className="text-xs">Edit Profile</span>
               </DialogTrigger>
@@ -115,16 +115,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <FollowButton followedId={Number(userProfile?.id)} />
           )}
           <span
-            className="flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
+            className="inline-flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
           >
-            <BiShare />
+            <BiShare size={26} />
           </span>
           <span
-            className="flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
+            className="inline-flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
           >
-            <Settings />
+            <Settings size={26} />
           </span>
         </div>
       </div>

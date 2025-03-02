@@ -167,7 +167,7 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-bold">Your Bookmarks</h2>
         <Badge variant="outline" className="px-3 py-1">
