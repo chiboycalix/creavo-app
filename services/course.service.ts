@@ -40,7 +40,7 @@ export const createCourseService = async (
 export const getUserCourses = async (userId: number, limit = 10, page = 1) => {
   try {
     const response = await apiClient.get(`/users/${userId}/courses`, {
-      params: { limit, page, category: COURSE_CATEGORY.STANDARD },
+      params: { limit, page, category: COURSE_CATEGORY.SIMPLE },
     });
     return response;
   } catch (error: any) {
@@ -91,5 +91,29 @@ export const fetchShortCourseService = async ({
     return data;
   } catch (error) {
     throw error;
+  }
+};
+
+
+export const fetchLearnerEngagement = async (courseId: string) => {
+  try {
+    const { data } = await apiClient.get(`/courses/${courseId}/learner-course-engagement`);
+    console.log("Learner Engagement :", data);
+    return data;
+  } catch (error: any) {
+    console.error("Fetching learner engagement details failed:", error.message);
+    return Promise.reject(error?.response?.data || "An error occurred");
+  }
+};
+
+
+export const fetchLearnerEngagementDetails = async (courseId: string) => {
+  try {
+    const { data } = await apiClient.get(`/courses/${courseId}/learner-course-engagement-details`);
+    console.log("Learner Engagement Details:", data);
+    return data;
+  } catch (error: any) {
+    console.error("Fetching learner engagement details failed:", error.message);
+    return Promise.reject(error?.response?.data || "An error occurred");
   }
 };

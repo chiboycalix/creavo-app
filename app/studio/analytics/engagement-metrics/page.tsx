@@ -49,6 +49,7 @@ function App() {
         }));
 
         setCourses(courseData);
+        console.log(courseData)
         setTotalPages(response.data.meta.totalPages || 1);
       } catch (error) {
         console.error('Error fetching courses:', error);
