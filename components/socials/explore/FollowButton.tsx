@@ -6,23 +6,28 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Check } from "lucide-react";
 import { baseUrl } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface FollowButtonProps {
   followedId: number | string;
   avatar: string;
   initialFollowStatus?: boolean;
+  isMyPost: boolean;
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({
   followedId,
   avatar,
-  initialFollowStatus: isFollowing = false,
+  isMyPost,
+  initialFollowStatus = false,
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
   const ws = useWebSocket();
+
+  const [isFollowing, setIsFollowing] = React.useState(initialFollowStatus);
 
   const followMutation = useMutation({
     mutationFn: async () => {
@@ -53,26 +58,46 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       return result;
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['followStatus', followedId] });
+      await queryClient.cancelQueries({ queryKey: ["user-followers"] });
+      await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
 
-      queryClient.setQueryData(['followStatus', followedId], { data: { followed: true } });
-
-      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
-
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.userId === followedId ? { ...post, followed: true } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
+      const previousFollowersData = queryClient.getQueryData(["user-followers", followedId]);
+      queryClient.setQueryData(["user-followers", followedId], (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+        const updatedPages = oldData.pages.map((page: any) => ({
+          ...page,
+          followers: page.followers.map((follower: any) =>
+            follower.userId === followedId ? { ...follower, followed: true } : follower
+          ),
+        }));
+        return { ...oldData, pages: updatedPages };
       });
+
+      // Optimistically update posts data
+      const previousPostsData = queryClient.getQueryData(["infinite-posts"]);
+      queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+        const updatedPages = oldData.pages.map((page: any) => ({
+          ...page,
+          posts: page.posts.map((post: any) =>
+            post.userId === followedId ? { ...post, followed: true } : post
+          ),
+        }));
+        return { ...oldData, pages: updatedPages };
+      });
+
+      // Update local state
+      setIsFollowing(true);
+
+      return { previousFollowersData, previousPostsData };
     },
-    onError: () => {
-      queryClient.setQueryData(['followStatus', followedId], { data: { followed: false } });
+    onError: (err, _, context) => {
+      // Revert on error
+      queryClient.setQueryData(["user-followers", followedId], context?.previousFollowersData);
+      queryClient.setQueryData(["infinite-posts"], context?.previousPostsData);
+      setIsFollowing(initialFollowStatus);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['followStatus', followedId] });
-    },
+    // No onSettled invalidation to prevent refetch
   });
 
   const unfollowMutation = useMutation({
@@ -89,23 +114,44 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       return response.json();
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['followStatus', followedId] });
-      queryClient.setQueryData(['followStatus', followedId], { data: { followed: false } });
-      queryClient.setQueriesData({ queryKey: ['posts'] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["user-followers"] });
+      await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
 
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.userId === followedId ? { ...post, followed: false } : post
-        );
-
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
+      // Optimistically update followers data
+      const previousFollowersData = queryClient.getQueryData(["user-followers", followedId]);
+      queryClient.setQueryData(["user-followers", followedId], (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+        const updatedPages = oldData.pages.map((page: any) => ({
+          ...page,
+          followers: page.followers.map((follower: any) =>
+            follower.userId === followedId ? { ...follower, followed: false } : follower
+          ),
+        }));
+        return { ...oldData, pages: updatedPages };
       });
+
+      // Optimistically update posts data
+      const previousPostsData = queryClient.getQueryData(["infinite-posts"]);
+      queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
+        if (!oldData?.pages) return oldData;
+        const updatedPages = oldData.pages.map((page: any) => ({
+          ...page,
+          posts: page.posts.map((post: any) =>
+            post.userId === followedId ? { ...post, followed: false } : post
+          ),
+        }));
+        return { ...oldData, pages: updatedPages };
+      });
+
+      setIsFollowing(false);
+
+      return { previousFollowersData, previousPostsData };
     },
-    onError: () => {
-      queryClient.setQueryData(['followStatus', followedId], { data: { followed: true } });
-    },
-    onSettled: () => {
-      queryClient.setQueryData(['followStatus', followedId], { data: { followed: false } });
+    onError: (err, _, context) => {
+      queryClient.setQueryData(["user-followers", followedId], context?.previousFollowersData);
+      queryClient.setQueryData(["infinite-posts"], context?.previousPostsData);
+      setIsFollowing(initialFollowStatus);
     },
   });
 
@@ -123,23 +169,26 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   };
 
   return (
-    <div className="relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center mb-6">
+    <div className={cn("relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center", isMyPost ? "mb-0" : "mb-4")}>
       <Avatar className="w-12 h-12">
-        <AvatarImage src={avatar} alt="Post author avatar" />
+        <AvatarImage src={avatar} alt="User avatar" />
         <AvatarFallback>.</AvatarFallback>
       </Avatar>
+      {
+        !isMyPost && <button
+          onClick={handleToggleFollow}
+          aria-label={isFollowing ? "Unfollow this user" : "Follow this user"}
+          disabled={followMutation.isPending || unfollowMutation.isPending}
+          className="bg-primary-700 absolute -bottom-3 left-3 rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 hover:bg-primary-800 disabled:opacity-50"
+        >
+          {isFollowing ? (
+            <Check className="text-sm text-white w-5 h-5" />
+          ) : (
+            <Plus className="text-sm text-white w-5 h-5" />
+          )}
+        </button>
+      }
 
-      <button
-        onClick={handleToggleFollow}
-        aria-label={isFollowing ? "Unfollow this user" : "Follow this user"}
-        className="bg-primary-700 absolute -bottom-3 left-3 rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 hover:bg-primary-800"
-      >
-        {isFollowing ? (
-          <Check className="text-sm text-white w-5 h-5" />
-        ) : (
-          <Plus className="text-sm text-white w-5 h-5" />
-        )}
-      </button>
     </div>
   );
 };

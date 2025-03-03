@@ -8,7 +8,7 @@ import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { generalHelpers } from '@/helpers'
-import { CreateCourseForm, createCourseService } from '@/services/course.service'
+import { COURSE_CATEGORY, CreateCourseForm, createCourseService } from '@/services/course.service'
 import { useMutation } from '@tanstack/react-query'
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
 import { CourseData, updatCreateShortCourseForm, updateShortCourseData } from '@/redux/slices/course.slice';
@@ -75,7 +75,7 @@ const CreateShortCourse = () => {
   const maxFiles = 1;
 
   const { mutate: handleCreateCourse, isPending: isCreatingCourse } = useMutation({
-    mutationFn: (payload: CreateCourseForm) => createCourseService(payload),
+    mutationFn: (payload: CreateCourseForm) => createCourseService(payload, COURSE_CATEGORY.SIMPLE),
     onSuccess: async (data) => {
       updateCourse({
         courseId: data?.id,

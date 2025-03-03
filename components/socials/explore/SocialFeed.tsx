@@ -21,8 +21,7 @@ const SocialFeed = ({ initialPosts }: any) => {
   const containerRef = useRef<HTMLDivElement>(null) as any
   const isFetchingRef = useRef(false)
   const postHeightRef = useRef(0)
-  const { showComments, setShowComments, activePostId } =
-    useComments();
+  const { showComments } = useComments();
   const {
     data,
     isFetching,
@@ -32,19 +31,17 @@ const SocialFeed = ({ initialPosts }: any) => {
   } = useFetchInfinitePosts({
     initialData: {
       pages: [{
-        data: initialPosts?.data || { posts: [], likedStatuses: [], followStatuses: [] }
+        data: initialPosts?.data || { posts: [], likedStatuses: [], followStatuses: [], bookmarkStatuses: [] }
       }],
       pageParams: [1]
     }
   })
 
-  // Handle window resize for responsive layout
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768)
     }
 
-    // Set initial value
     handleResize()
 
     window.addEventListener('resize', handleResize)
@@ -129,7 +126,7 @@ const SocialFeed = ({ initialPosts }: any) => {
     }
   }, [inView, debouncedFetchNextPage])
 
-  const isEmpty = !data?.pages[0]?.data?.posts?.length
+  const isEmpty = !data?.pages[0]?.posts?.length
 
   const getPostHeight = () => {
     if (typeof window !== 'undefined') {
@@ -182,11 +179,11 @@ const SocialFeed = ({ initialPosts }: any) => {
             ) : (
               data?.pages.map((page, pageIndex) => {
                 const result = generalHelpers.processPostsData({
-                  posts: page?.data.posts,
-                  likedStatuses: page?.data.likedStatuses,
-                  followStatuses: page?.data?.followStatuses,
+                  posts: page?.posts,
+                  likedStatuses: page?.likedStatuses,
+                  followStatuses: page?.followStatuses,
+                  bookmarkStatuses: page?.bookmarkStatuses,
                 })
-
                 return (
                   <React.Fragment key={pageIndex}>
                     {result?.map((post: any, postIndex: number) => {

@@ -35,7 +35,7 @@ const Profile = () => {
     if (profileData?.data && profileData.data !== userProfile) {
       setUserProfile(profileData.data);
     }
-  }, [profileData]);
+  }, [profileData, userProfile]);
 
 
   const handleFollow = () => {
@@ -72,6 +72,7 @@ const Profile = () => {
     posts: postsData?.data.posts,
     likedStatuses: postsData?.data.likedStatuses,
     followStatuses: postsData?.data?.followStatuses,
+    bookmarkStatuses: postsData?.data?.bookmarkStatuses,
   });
 
   return (
@@ -80,13 +81,13 @@ const Profile = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className="w-full flex flex-col my-px min-h-[83vh] p-3">
+      <div className="w-full flex-col min-h-[83vh] flex my-px p-3">
         <ProfileHeader
           key={userProfile?.id}
           userProfile={userProfile}
           isCurrentUser={isCurrentUser}
           onFollow={handleFollow}
-          onProfileUpdate={handleProfileUpdate} // Pass update function
+          onProfileUpdate={handleProfileUpdate}
         />
         <ProfileTabs
           isCurrentUser={isCurrentUser}

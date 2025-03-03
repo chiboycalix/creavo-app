@@ -15,9 +15,24 @@ export const addModuleService = async (payload: CreateModuleForm) => {
   }
 };
 
-export const addMediaToModuleService = async (payload: AddMediaToModule) => {
+export const addMediaToModuleService = async (
+  payload: Partial<AddMediaToModule>
+) => {
   try {
     const { data } = await apiClient.put("/modules/add-media", {
+      ...payload,
+    });
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addMediaToCourseService = async (
+  payload: Partial<AddMediaToModule>
+) => {
+  try {
+    const { data } = await apiClient.put("/courses/add-media", {
       ...payload,
     });
     return data;

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { STATUS_CODES } from "@/constants/statusCodes";
 import { useToast } from "@/context/ToastContext";
 import Spinner from "@/components/Spinner";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/check-box";
 
 export default function SignInForm() {
   const router = useRouter();

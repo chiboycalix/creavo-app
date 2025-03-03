@@ -34,6 +34,7 @@ import { shouldUseMainLayout } from "@/utils/path-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 import { RiHome8Fill } from "react-icons/ri";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export default function MainLayout({
   children,
@@ -42,6 +43,12 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const { loading, currentUser } = useAuth();
+  const {
+    data: profileData,
+  } = useUserProfile(currentUser?.id);
+
+  console.log({ profileData })
+
   const headerButtons: HeaderButton[] = React.useMemo(() => [
     {
       id: "socials",
@@ -63,8 +70,8 @@ export default function MainLayout({
             <Avatar className="w-1 h-1">
               <AvatarImage
                 src={
-                  currentUser
-                    ? currentUser?.avatar
+                  profileData?.data
+                    ? profileData?.data?.profile?.avatar
                     : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"
                 }
                 sizes="sm"

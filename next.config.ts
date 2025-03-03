@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 /** @type {NextConfig} */
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [];
+  },
   reactStrictMode: true,
   output: "standalone",
   images: {

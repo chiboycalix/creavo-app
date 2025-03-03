@@ -7,9 +7,8 @@ import ProfileErrorCode from "@/components/ProfileErrorCode";
 import PostLink from "@/components/post/PostLink";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, FolderIcon } from "lucide-react";
+import { FolderIcon } from "lucide-react";
 import { Course, MyLearning, Post, UserProfile } from "@/types/courses";
-import { BsEye } from "react-icons/bs";
 import { EyeIcon } from "@heroicons/react/24/solid";
 import { formatCommentDate } from "@/utils";
 
@@ -39,10 +38,10 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
     const baseTabs = [
       `posts (${posts && posts?.length || 0})`,
       `courses (${courses?.length || 0})`,
+      `saved videos (${myLearning?.length || 0})`
     ];
-    if (isCurrentUser) baseTabs.push(`saved videos (${myLearning?.length || 0})`);
     return baseTabs;
-  }, [isCurrentUser, courses, posts, myLearning]);
+  }, [courses, posts, myLearning]);
 
   const initialTab = (searchParams.get("tab") as string) || tabs[0];
   const [selectedTab, setSelectedTab] = useState(tabs.indexOf(initialTab));
@@ -59,7 +58,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
     router.push(`?tab=${tab}`);
     setSelectedTab(index);
   };
-  console.log({ posts })
+
   return (
     <TabGroup selectedIndex={selectedTab} onChange={handleTabChange}>
       <TabList className="w-full flex items-center justify-center pt-4">
@@ -67,7 +66,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           <Tab
             key={index}
             className={({ selected }) =>
-              `w-28 text-center py-1.5 text-[14px] font-medium capitalize
+              `w-36 text-center py-1.5 text-[14px] font-medium capitalize
               ${selected
                 ? "border-b-4 rounded-b-sm outline-none border-primary font-semibold text-primary"
                 : "text-gray-500 hover:text-black"
@@ -91,7 +90,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   {post?.media && post?.media?.length > 0 && (
                     <div>
                       {(() => {
-                        const media = post.media[0]; // Access the first item
+                        const media = post.media[0];
                         const isVideo = media.mimeType.startsWith("video/") || media.url.endsWith(".mp4");
 
                         return (

@@ -22,7 +22,7 @@ export function AuthForm() {
   };
 
   const OrSeparator = () => (
-    <div className="flex items-center gap-x-4 w-full mx-auto px-1.5 text-sm text-gray-400">
+    <div className="flex items-center  w-full gap-x-4 mx-auto px-1.5 text-sm text-gray-400">
       <div className="h-[0.1rem] w-full bg-gray-300" />
       <div>OR</div>
       <div className="h-[0.1rem] w-full bg-gray-300" />

@@ -5,7 +5,7 @@ import { Input } from '@/components/Input';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LockIcon, Mail } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/components/ui/check-box';
 import { AUTH_API } from '@/lib/api';
 import { ROUTES } from '@/constants/routes';
 import { useToast } from '@/context/ToastContext';

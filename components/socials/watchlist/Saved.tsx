@@ -1,26 +1,44 @@
-import React from 'react'
-import Playlist from './Playlist'
+"use client"
+import { useState, useEffect } from "react"
+import UserBookmarks from "./UserBookmarks"
+import { apiClient } from "@/lib/apiClient"
 
-const Saved = () => {
+export default function BookmarkApp() {
+  const [userId, setUserId] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const response = await apiClient.get("/auth/me")
+        if (response.data?.id) {
+          setUserId(response.data.id)
+          console.log("User ID:", response.data.id)
+        } else {
+          throw new Error("Invalid user data response")
+        }
+      } catch (err) {
+        console.error("Error fetching user ID:", err)
+        setError("Failed to load user data. Please try again.")
+      }
+    }
+
+    fetchUserId()
+  }, [])
+
   return (
-    <div className='grid grid-cols-4 gap-4'>
-      <Playlist
-        value={34} />
-      <Playlist value={25} />
-      <Playlist value={18} />
-      <Playlist value={51} />
-      <Playlist
-        value={31} />
-      <Playlist value={85} />
-      <Playlist value={18} />
-      <Playlist value={51} />
-      <Playlist
-        value={64} />
-      <Playlist value={100} />
-      <Playlist value={18} />
-      <Playlist value={8} />
+    <div className="mx-auto py-8 px-4">
+
+      <div className="w-full mx-auto">
+        {error ? (
+          <p className="text-red-500 text-center">{error}</p>
+        ) : userId ? (
+          <UserBookmarks userId={userId} initialLimit={20} />
+        ) : (
+          <p className="text-gray-500 text-center">Loading...</p>
+        )}
+      </div>
     </div>
   )
 }
 
-export default Saved

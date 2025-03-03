@@ -83,11 +83,11 @@ const PostEditPage = () => {
         mimeType: mimeType!
       }
     });
-    await handleCreatePosts({
+    handleCreatePosts({
       title: title,
       body: caption,
       thumbnailUrl: "None",
-      tags: hashtags,
+      hashtags: hashtags,
       media: media,
       status: "ACTIVE",
       location: JSON.stringify(location),
