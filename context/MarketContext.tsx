@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 
-interface Product {
+export interface Product {
   id: number;
   name: string;
   price: number;
@@ -267,7 +267,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
 
   const fetchSingleProduct = (id: any) => {
     const course = fetchProducts()?.find((item) => id === item.id);
-    return course
+    return course;
   };
 
   const fetchPopularCourses = () => {
