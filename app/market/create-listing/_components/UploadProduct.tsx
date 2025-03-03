@@ -121,7 +121,7 @@ const UploadProduct: React.FC<UploadProductProps> = ({
 
         {/* Modal Content */}
         <div>
-          <h3 className="text-base font-medium text-gray-900">Upload File</h3>
+          <h3 className="text-base font-medium text-gray-900">Upload Image File</h3>
           <p className="text-xs">Add your product image here</p>
         </div>
 

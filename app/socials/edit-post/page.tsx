@@ -65,7 +65,7 @@ const PostEditPage = () => {
     mutationFn: (payload: CreatePostPayload) => createPostService(payload),
     onSuccess: async (data) => {
       toast.success("Post created successfully")
-      // router.push("/socials")
+      router.push("/socials")
     },
     onError: (error: any) => {
       toast.error("Error creating post")

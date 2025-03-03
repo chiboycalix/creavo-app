@@ -34,6 +34,7 @@ interface MarketContextType {
   setIsSaved: (isSaved: boolean) => void;
   searchRoom: boolean;
   setSearchRoom: (searchRoom: boolean) => void;
+  fetchSingleProduct: (id: any) => void
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -64,7 +65,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "A complete UI/UX design template pack.",
         price: 29,
         rating: 4.5,
-        category: "Digital Products",
+        category: "E-Books",
         seller: {
           id: "101",
           name: "Designer Pro",
@@ -77,7 +78,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Fully responsive website template.",
         price: 49,
         rating: 4.8,
-        category: "Digital Products",
+        category: "E-Books",
         seller: {
           id: "102",
           name: "Web Solutions",
@@ -90,7 +91,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Custom social media icons for brands.",
         price: 19,
         rating: 4.2,
-        category: "Digital Products",
+        category: "E-Books",
         seller: {
           id: "103",
           name: "Graphic Master",
@@ -264,6 +265,11 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     ];
   };
 
+  const fetchSingleProduct = (id: any) => {
+    const course = fetchProducts()?.find((item) => id === item.id);
+    return course
+  };
+
   const fetchPopularCourses = () => {
     return [
       {
@@ -272,7 +278,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "A complete UI/UX design course for beginners.",
         price: 0,
         numberOfParticipants: 205,
-        category: "Digital Products",
+        category: "E-Books",
         seller: {
           id: "101",
           name: "Designer Pro",
@@ -386,7 +392,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "A complete UI/UX design template pack.",
         price: 29,
         rating: 4.5,
-        category: "Digital Products",
+        category: "E-Books",
         seller: {
           id: "101",
           name: "Designer Pro",
@@ -481,6 +487,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
       value={{
         products,
         fetchProducts,
+        fetchSingleProduct,
         fetchPopularCourses,
         fetchPopularEvents,
         fetchMyListings,
