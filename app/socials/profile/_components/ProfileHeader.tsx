@@ -8,7 +8,6 @@ import FollowersCard from "@/components/socials/profile/FollowersCard";
 import EditUserProfileModal from "./EditUserInputModal";
 import { BsPencil } from "react-icons/bs";
 import { BiShare } from "react-icons/bi";
-import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import {
   Dialog,
@@ -46,7 +45,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isCurrentUser,
   onProfileUpdate
 }: any) => {
-  const [showModal, setShowModal] = useState(false);
   const [showFollowersCard, setShowFollowersCard] = useState(false)
   const [showFollowingCard, setShowFollowingCard] = useState(false)
 

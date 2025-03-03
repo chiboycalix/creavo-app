@@ -179,9 +179,9 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
                 alt="Profile Preview"
                 className="rounded-full object-cover w-12 h-12"
               />
-              <div>
-                <p className="font-semibold text-black">{userProfile?.profile?.firstName} {userProfile?.profile?.lastName}</p>
-                <p className="text-sm text-gray-600">@{username}</p>
+              <div className="flex flex-col">
+                <span className="font-semibold text-black">{userProfile?.profile?.firstName} {userProfile?.profile?.lastName}</span>
+                <span className="text-sm text-gray-600">@{username}</span>
               </div>
             </div>
 

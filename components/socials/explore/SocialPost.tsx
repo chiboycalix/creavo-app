@@ -32,9 +32,6 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     "bikersof", "bikerchick"
   ]
 
-
-  console.log({ post })
-
   const handleDownload = async () => {
     const media = post.media[0];
     if (!media) return;
@@ -129,14 +126,12 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
 
           {/* Metrics - Mobile & Tablet */}
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
-            {
-              Number(post.userId) !== currentUserId &&
-              <FollowButton
-                followedId={post?.userId}
-                avatar={post?.user_profile_avatar || "/assets/display.jpg"}
-                initialFollowStatus={post?.followed}
-              />
-            }
+            <FollowButton
+              followedId={post?.userId}
+              avatar={post?.user_profile_avatar || "/assets/display.jpg"}
+              initialFollowStatus={post?.followed}
+              isMyPost={Number(post.userId) === currentUserId}
+            />
             {metrics.map((metric, index) => (
               <div key={index} className="flex flex-col items-center mb-4">
                 <div className="text-sm rounded-full cursor-pointer">
@@ -192,13 +187,12 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       {/* Metrics - Desktop */}
       <div className="hidden lg:flex flex-col h-full justify-center mb-10">
         <div className="flex flex-col gap-4 mt-auto">
-          {Number(post.userId) !== currentUserId && (
-            <FollowButton
-              followedId={post?.userId}
-              avatar={post?.user_profile_avatar || "/assets/display.jpg"}
-              initialFollowStatus={post?.followed}
-            />
-          )}
+          <FollowButton
+            followedId={post?.userId}
+            avatar={post?.user_profile_avatar || "/assets/display.jpg"}
+            initialFollowStatus={post?.followed}
+            isMyPost={Number(post.userId) === currentUserId}
+          />
 
           {metrics.map((metric, index) => (
             <div key={index} className="flex flex-col items-center mb-0">
