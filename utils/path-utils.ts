@@ -44,7 +44,7 @@ export const LAYOUT_PATHS = [
   "/studio/learners/*",
   "/studio/analytics/*",
 
-  "/market",
+  "/market/*",
   "/market/saved",
   "/market/notifications",
   "/market/create-listing",

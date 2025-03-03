@@ -185,7 +185,7 @@ const PostUploadModal: React.FC<PostUploadModalProps> = ({
                 </button>
                 <div>
                   <h3 className="text-base font-medium text-gray-900">
-                    Upload File
+                    Upload Image or Video
                   </h3>
                   <p className="text-xs">Add your videos & pictures here</p>
                 </div>
