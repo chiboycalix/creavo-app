@@ -1,37 +1,60 @@
 "use client";
-import React, { Fragment, useState } from "react";
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, PlusCircle } from "lucide-react";
+import React, { useState } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import SelectedEventCard from "@/components/studio/calendar/SelectedEventCard";
+import AddEventCard from "@/components/studio/calendar/AddEventCard";
+import { ChevronLeft, ChevronRight, Menu, PlusCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import { SelectInput } from "@/components/Input/SelectInput";
+
+const dummyEvents = [
+  // January 1, 2025 (existing events)
+  { id: 1, title: "Onboarding new staff", date: new Date(2025, 0, 1), startTime: "08:00", endTime: "09:00", color: "bg-green-200" },
+  { id: 2, title: "Budget Review Class", date: new Date(2025, 0, 1), startTime: "09:00", endTime: "10:00", color: "bg-red-200" },
+  { id: 3, title: "Ore Aisha", date: new Date(2025, 0, 1), startTime: "10:00", endTime: "12:00", color: "bg-yellow-200" },
+  { id: 4, title: "Daily Standup", date: new Date(2025, 0, 1), startTime: "13:00", endTime: "14:00", color: "bg-purple-200" },
+
+  // February 1–7, 2025 (5 events spread across the week)
+  { id: 5, title: "Team Strategy Meeting", date: new Date(2025, 1, 1), startTime: "09:00", endTime: "10:30", color: "bg-blue-200" },
+  { id: 6, title: "Product Launch Prep", date: new Date(2025, 1, 2), startTime: "10:00", endTime: "11:00", color: "bg-indigo-200" },
+  { id: 7, title: "Client Feedback Session", date: new Date(2025, 1, 3), startTime: "14:00", endTime: "15:30", color: "bg-teal-200" },
+  { id: 8, title: "Training Workshop", date: new Date(2025, 1, 5), startTime: "08:00", endTime: "09:30", color: "bg-orange-200" },
+  { id: 9, title: "Weekly Review", date: new Date(2025, 1, 7), startTime: "15:00", endTime: "16:00", color: "bg-pink-200" },
+
+  // March 1–14, 2025 (5 events spread across two weeks)
+  { id: 10, title: "Q1 Performance Review", date: new Date(2025, 2, 1), startTime: "09:00", endTime: "10:30", color: "bg-green-200" },
+  { id: 11, title: "Design Sprint Kickoff", date: new Date(2025, 2, 3), startTime: "10:00", endTime: "12:00", color: "bg-red-200" },
+  { id: 12, title: "Marketing Campaign Planning", date: new Date(2025, 2, 7), startTime: "13:00", endTime: "14:30", color: "bg-yellow-200" },
+  { id: 13, title: "Tech Infrastructure Update", date: new Date(2025, 2, 10), startTime: "11:00", endTime: "12:30", color: "bg-purple-200" },
+  { id: 14, title: "User Testing Session", date: new Date(2025, 2, 14), startTime: "14:00", endTime: "15:00", color: "bg-blue-200" },
+];
+
+const currentYear = 2025;
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(0);
-  const currentYear = 2025;
   const [selectedDay, setSelectedDay] = useState(2);
 
-  const dummyEvents = [
-    // January 1, 2025 (existing events)
-    { id: 1, title: "Onboarding new staff", date: new Date(2025, 0, 1), startTime: "08:00", endTime: "09:00", color: "bg-green-200" },
-    { id: 2, title: "Budget Review Class", date: new Date(2025, 0, 1), startTime: "09:00", endTime: "10:00", color: "bg-red-200" },
-    { id: 3, title: "Ore Aisha", date: new Date(2025, 0, 1), startTime: "10:00", endTime: "12:00", color: "bg-yellow-200" },
-    { id: 4, title: "Daily Standup", date: new Date(2025, 0, 1), startTime: "13:00", endTime: "14:00", color: "bg-purple-200" },
+  const [selectedEventForTime, setSelectedEventForTime] = useState({})
+  const [showEventsDetailsCard, setShowEventsDetailsCard] = useState(false)
+  const [eventsDetailsAnchorRect, setEventsDetailsAnchorRect] = useState<DOMRect | null>(null);
 
-    // February 1–7, 2025 (5 events spread across the week)
-    { id: 5, title: "Team Strategy Meeting", date: new Date(2025, 1, 1), startTime: "09:00", endTime: "10:30", color: "bg-blue-200" },
-    { id: 6, title: "Product Launch Prep", date: new Date(2025, 1, 2), startTime: "10:00", endTime: "11:00", color: "bg-indigo-200" },
-    { id: 7, title: "Client Feedback Session", date: new Date(2025, 1, 3), startTime: "14:00", endTime: "15:30", color: "bg-teal-200" },
-    { id: 8, title: "Training Workshop", date: new Date(2025, 1, 5), startTime: "08:00", endTime: "09:30", color: "bg-orange-200" },
-    { id: 9, title: "Weekly Review", date: new Date(2025, 1, 7), startTime: "15:00", endTime: "16:00", color: "bg-pink-200" },
+  const [addEventAnchorRect, setAddEventAnchorRect] = useState<DOMRect | null>(null);
+  const [showAddEventCard, setShowAddEventCard] = useState(false)
 
-    // March 1–14, 2025 (5 events spread across two weeks)
-    { id: 10, title: "Q1 Performance Review", date: new Date(2025, 2, 1), startTime: "09:00", endTime: "10:30", color: "bg-green-200" },
-    { id: 11, title: "Design Sprint Kickoff", date: new Date(2025, 2, 3), startTime: "10:00", endTime: "12:00", color: "bg-red-200" },
-    { id: 12, title: "Marketing Campaign Planning", date: new Date(2025, 2, 7), startTime: "13:00", endTime: "14:30", color: "bg-yellow-200" },
-    { id: 13, title: "Tech Infrastructure Update", date: new Date(2025, 2, 10), startTime: "11:00", endTime: "12:30", color: "bg-purple-200" },
-    { id: 14, title: "User Testing Session", date: new Date(2025, 2, 14), startTime: "14:00", endTime: "15:00", color: "bg-blue-200" },
-  ];
+  const handleSetSelectdEvent = (event: React.MouseEvent<HTMLDivElement>, eventForTime: any) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setEventsDetailsAnchorRect(buttonRect);
+    setShowEventsDetailsCard(true);
+    setSelectedEventForTime(eventForTime)
+  };
+
+  const handleAddEvent = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setAddEventAnchorRect(buttonRect);
+    setShowAddEventCard(true);
+  }
 
   const daysOfWeek = ["m", "t", "w", "t", "f", "s", "s"];
 
@@ -84,7 +107,7 @@ const Calendar = () => {
 
     const nextMonthDays = [];
     const totalDaysDisplayed = prevMonthDays.length + currentMonthDays.length;
-    const remainingCells = 42 - totalDaysDisplayed; // 6 rows * 7 columns = 42 cells
+    const remainingCells = 42 - totalDaysDisplayed;
 
     for (let i = 1; i <= remainingCells; i++) {
       nextMonthDays.push({
@@ -97,7 +120,6 @@ const Calendar = () => {
     return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
   };
 
-  // Get month name
   const getMonthName = (month: number) => {
     const months = [
       "January",
@@ -116,12 +138,10 @@ const Calendar = () => {
     return months[month];
   };
 
-  // Format day display for the header
   const formatDayDisplay = (day: number) => {
     return `${day} ${getMonthName(currentMonth)} ${currentYear}`;
   };
 
-  // Time slots for the day view with 24-hour clock in 1-hour intervals
   const timeSlots = Array.from({ length: 24 }, (_, i) =>
     `${i.toString().padStart(2, "0")}:00`
   );
@@ -170,7 +190,10 @@ const Calendar = () => {
           <div className="flex items-center gap-2">
             <span className="">Calendar</span>
           </div>
-          <Button className="bg-primary-600 text-white flex items-center gap-1 px-6 py-1 rounded-md">
+          <Button
+            className="bg-primary-600 text-white flex items-center gap-1 px-6 py-1 rounded-md"
+            onClick={handleAddEvent}
+          >
             <span>Add Event</span>
             <PlusCircle className="h-4 w-4" />
           </Button>
@@ -178,7 +201,7 @@ const Calendar = () => {
 
         <div className="flex flex-1 bg-white">
           {/* Left Sidebar */}
-          <div className="w-[300px] border-r border-gray-200 p-6">
+          <div className="w-[350px] border-r border-gray-200 p-6">
             {/* Month selection header */}
             <div className="flex items-center justify-between mb-6">
               <button
@@ -237,7 +260,7 @@ const Calendar = () => {
                   onChange={(value) => setCurrentMonth(Number(value))}
                   options={Array.from({ length: 12 }, (_, i) => ({
                     label: `${getMonthName(i)} ${currentYear}`,
-                    value: i.toString() // or just `i` if the component accepts numbers
+                    value: i.toString()
                   }))}
                 />
               </div>
@@ -295,7 +318,8 @@ const Calendar = () => {
                     <div className="flex-1 h-16 border-l border-gray-200">
                       {eventForTime && (
                         <div
-                          className={`h-full ${eventForTime.color} p-2 text-sm text-gray-800`}
+                          className={`h-full ${eventForTime.color} p-2 text-sm text-gray-800 cursor-pointer`}
+                          onClick={(e) => handleSetSelectdEvent(e, eventForTime)}
                         >
                           {eventForTime.title}
                           <br />
@@ -307,6 +331,18 @@ const Calendar = () => {
                 );
               })}
             </div>
+
+            {showAddEventCard && <AddEventCard
+              isOpen={showAddEventCard}
+              onClose={() => setShowAddEventCard(false)}
+              anchorRect={addEventAnchorRect}
+            />}
+            {showEventsDetailsCard && <SelectedEventCard
+              isOpen={showEventsDetailsCard}
+              onClose={() => setShowEventsDetailsCard(false)}
+              anchorRect={eventsDetailsAnchorRect}
+              data={selectedEventForTime}
+            />}
           </div>
         </div>
       </div>

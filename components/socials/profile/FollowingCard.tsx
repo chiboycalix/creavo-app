@@ -50,8 +50,8 @@ const FollowingCard = ({ isOpen, onClose, anchorRect, userId }: FollowersProps) 
 
   // if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {(error as Error).message}</div>;
-  console.log(data?.pages[0].followers.length, "data?.pages[0].followers.length")
   if (!anchorRect) return null;
+
   return (
     <AnimatePresence>
       {isOpen && (

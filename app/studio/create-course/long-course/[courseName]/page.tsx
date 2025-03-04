@@ -1,13 +1,13 @@
 "use client";
 import React from 'react'
 import CustomTab from '@/components/CustomTab';
-import Curriculum from '@/components/studio/create-course/curriculum';
-import Quiz from '@/components/studio/create-course/quiz';
-import Grade from '@/components/studio/create-course/grade';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { generalHelpers } from '@/helpers';
 import { useParams } from 'next/navigation';
 import { PenBox } from 'lucide-react';
+import Content from '@/components/studio/create-course/long-course/Content';
+import Quiz from '@/components/studio/create-course/long-course/Quiz';
+import Publish from '@/components/studio/create-course/long-course/Publish';
 
 const CourseName = () => {
   const { courseName } = useParams();
@@ -16,8 +16,8 @@ const CourseName = () => {
   const tabs = [
     {
       id: 1,
-      title: "Curriculum",
-      content: (<Curriculum />)
+      title: "Content",
+      content: (<Content />)
     },
     {
       id: 2,
@@ -26,8 +26,8 @@ const CourseName = () => {
     },
     {
       id: 3,
-      title: "Grade",
-      content: (<Grade />)
+      title: "Publish",
+      content: (<Publish />)
     },
   ]
   return (
@@ -44,7 +44,7 @@ const CourseName = () => {
 
         <div>
           <div className='mt-4 w-full'>
-            <CustomTab tabs={tabs} defaultValue="curriculum" />
+            <CustomTab tabs={tabs} defaultValue="content" />
           </div>
         </div>
       </div>

@@ -1,4 +1,27 @@
-export const generalHelpers = {
+interface GeneralHelpers {
+  convertToSlug: (sentence: string) => string;
+  convertFromSlug: (slug: string) => string;
+  processPostsData: (data: any) => any;
+  capitalizeWords: (sentence: string) => string;
+  currencySymbols: {
+    USD: string;
+    EUR: string;
+    GBP: string;
+    JPY: string;
+    CAD: string;
+    AUD: string;
+    CHF: string;
+    CNY: string;
+    SEK: string;
+    NZD: string;
+    NGN: string;
+  };
+  getCurrencySymbol: (
+    currencyCode: keyof GeneralHelpers["currencySymbols"]
+  ) => string;
+}
+
+export const generalHelpers: GeneralHelpers = {
   convertToSlug: (sentence: string) => {
     return sentence
       .toLowerCase()
@@ -20,7 +43,10 @@ export const generalHelpers = {
     );
 
     const bookmarkMap = new Map(
-      bookmarkStatuses?.map((status: any) => [status?.postId, status?.bookmarked])
+      bookmarkStatuses?.map((status: any) => [
+        status?.postId,
+        status?.bookmarked,
+      ])
     );
 
     const followsMap = new Map(
@@ -47,5 +73,25 @@ export const generalHelpers = {
         return word.charAt(0).toUpperCase() + word.slice(1);
       })
       .join(" ");
+  },
+
+  currencySymbols: {
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+    JPY: "¥",
+    CAD: "C$",
+    AUD: "A$",
+    CHF: "CHF",
+    CNY: "¥",
+    SEK: "kr",
+    NZD: "NZ$",
+    NGN: "₦",
+  } as const,
+
+  getCurrencySymbol: (
+    currencyCode: keyof typeof generalHelpers.currencySymbols
+  ): string => {
+    return generalHelpers.currencySymbols[currencyCode] || currencyCode;
   },
 };
