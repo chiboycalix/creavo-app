@@ -28,7 +28,9 @@ import {
   BellIcon,
   Bookmark,
   ChartSplineIcon,
-  BoxesIcon
+  BoxesIcon,
+  ShoppingCartIcon,
+  NotepadTextIcon
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -135,6 +137,9 @@ export default function MainLayout({
       navItems: [
         { title: "Explore", href: "/market", icon: CompassIcon },
         { title: "Saved", href: "/market/saved", icon: Bookmark },
+        { title: "Orders", href: "/market/orders", icon: NotepadTextIcon },
+        { title: "Cart", href: "/market/cart", icon: ShoppingCartIcon },
+
         {
           title: "Notifications",
           href: "/market/notifications",
