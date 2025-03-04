@@ -200,7 +200,7 @@ export const UploadInput = ({
           <p className="text-gray-500 mb-4">
             Drag & Drop files or <span className="text-primary">browse</span>
           </p>
-          <p className="text-gray-400">Max {maxFiles} files per post</p>
+          <p className="text-gray-400">Max {maxFiles} files per upload</p>
         </div>
       </div>
       <p className="mt-4 text-sm">Supports MP4, MOV, FLV videos and common image formats</p>

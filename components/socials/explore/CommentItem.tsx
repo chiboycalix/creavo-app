@@ -68,7 +68,7 @@ const CommentItem = ({
     },
     onError: () => { },
   });
-
+  console.log({ replies })
   const { mutate: handleReplyComment, isPending: isReplyingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => replyCommentService(payload),
     onSuccess(data) {
@@ -203,13 +203,13 @@ const CommentItem = ({
         replies?.data?.comments?.map((reply: any) => {
           return (
             <CommentItem
-              key={reply.id}
+              key={reply?.id}
               comment={{
-                id: reply.id.toString(),
-                _user: reply._user,
-                body: reply.body,
-                createdAt: reply.createdAt,
-                likes: reply.metadata.likesCount,
+                id: reply?.id?.toString(),
+                _user: reply?._user,
+                body: reply?.body,
+                createdAt: reply?.createdAt,
+                likes: reply?.likesCount,
               }}
               depth={depth + 1}
               activeCommentId={activeCommentId}

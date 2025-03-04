@@ -14,8 +14,8 @@ type Props = {
   label?: string | ReactNode;
   errorMessage?: string;
   className?: string;
-  options?: Array<{ value: string; label: string|ReactNode }>;
-  onSelect?: (value: string) => void;
+  options?: Array<{ value: string; label: string | ReactNode }>;
+  onSelect?: (value: string | string[]) => void;
   leftIcon?: React.ReactNode;
   leftIconClassName?: string;
   dropdownClass?: string;

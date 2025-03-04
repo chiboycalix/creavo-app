@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CourseModal } from '@/components/analytics/CourseModal';
-import { getUserCourses } from '@/services/course.service';
+import { getUserLongCourses } from '@/services/course.service';
 
 export interface Course {
   id: number;
@@ -34,7 +34,7 @@ function App() {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const response = await getUserCourses(10001, rowsPerPage, currentPage);
+        const response = await getUserLongCourses(10001, rowsPerPage, currentPage);
         const courseData = response.data.courses.map((course: any) => ({
           id: course.id,
           title: course.title || 'Untitled Course',

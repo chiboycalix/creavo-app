@@ -11,7 +11,7 @@ import { generalHelpers } from '@/helpers'
 import { COURSE_CATEGORY, CreateCourseForm, createCourseService } from '@/services/course.service'
 import { useMutation } from '@tanstack/react-query'
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
-import { CourseData, updatCreateLongCourseForm, updateLongCourseData } from '@/redux/slices/course.slice';
+import { CourseData, resetCreateLongCourseForm, updatCreateLongCourseForm, updateLongCourseData } from '@/redux/slices/course.slice';
 import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCourse.validator';
 import { Loader2 } from 'lucide-react';
 import { useToast } from "@/context/ToastContext";
@@ -88,6 +88,7 @@ const CreateLongCourse = () => {
       showToast('success', 'success', "Course created successfully");
       const slugTitle = generalHelpers?.convertToSlug(data?.title)
       router.push(`/studio/create-course/long-course/${slugTitle}`)
+      dispatch(resetCreateLongCourseForm())
     },
     onError: (error: any) => {
       showToast('error', 'Failed to create course', error.data[0]);
