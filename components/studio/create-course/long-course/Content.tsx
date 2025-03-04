@@ -3,7 +3,7 @@ import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "rea
 import Spinner from "@/components/Spinner";
 import UploadMedia from "./UploadMedia";
 import { Clipboard, GripVertical, PenBox, Plus, Trash, Video } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/Input";
 import { addModuleService, fetchModuleDetailsService } from "@/services/module.service";
@@ -24,10 +24,14 @@ interface CourseData {
   modules: any[];
 }
 
-const Curriculum: React.FC = () => {
+interface ModuleData {
+  module: any & { media: any[] };
+}
+
+const Content: React.FC = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const queryClient = useQueryClient(); // Added QueryClient
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const currentModule = searchParams.get("module");
   const [showCreateModule, setShowCreateModule] = useState(false);
@@ -39,7 +43,6 @@ const Curriculum: React.FC = () => {
     store: { ...createModuleStateValues, courseId: courseDataStateValues?.courseId },
   });
 
-  // Query for course data
   const { data: courseData, isLoading: isCourseLoading } = useQuery<CourseData>({
     queryKey: ["courseData", courseDataStateValues?.courseId],
     queryFn: async () => {
@@ -48,33 +51,29 @@ const Curriculum: React.FC = () => {
     },
     enabled: !!courseDataStateValues?.courseId,
     placeholderData: keepPreviousData,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Query for module data
-  const { data: moduleData, isLoading: isModuleLoading } = useQuery({
+  const { data: moduleData, isLoading: isModuleLoading } = useQuery<ModuleData>({
     queryKey: ["moduleData", selectedModuleData?.id],
     queryFn: async () => {
       const data = await fetchModuleDetailsService({
         courseId: courseDataStateValues?.courseId,
         moduleId: selectedModuleData?.id,
       });
-      return data as any;
+      return data as ModuleData;
     },
     enabled: !!courseDataStateValues?.courseId && !!selectedModuleData?.id,
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
 
-  // Mutation for adding module
   const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
     mutationFn: (payload: CreateModuleForm) => addModuleService(payload),
     onSuccess: (newModule) => {
       toast.success("Module created");
       dispatch(resetCreateModuleForm());
       setShowCreateModule(false);
-
-      // Optimistically update the courseData cache
       queryClient.setQueryData<CourseData>(["courseData", courseDataStateValues?.courseId], (oldData) => {
         if (!oldData) return oldData;
         return {
@@ -82,8 +81,6 @@ const Curriculum: React.FC = () => {
           modules: [...oldData.modules, newModule],
         };
       });
-
-      // Set the newly created module as selected
       setSelectedModule(newModule);
       router.push(`?module=${generalHelpers.convertToSlug(newModule.title)}`);
     },
@@ -92,7 +89,6 @@ const Curriculum: React.FC = () => {
     },
   });
 
-  // Memoized handlers
   const updateCreateModule = useCallback(
     (payload: Partial<CreateModuleForm>) => dispatch(updatCreateModuleForm(payload)),
     [dispatch]
@@ -127,7 +123,6 @@ const Curriculum: React.FC = () => {
     [router]
   );
 
-  // Handle initial module selection
   useEffect(() => {
     if (!courseData?.modules?.length || selectedModule) return;
 
@@ -136,16 +131,14 @@ const Curriculum: React.FC = () => {
     router.push(`?module=${generalHelpers.convertToSlug(initialModule.title)}`);
   }, [courseData?.modules, router, selectedModule]);
 
-  // Sync selected module with Redux
   useEffect(() => {
     if (selectedModule) {
       updateSelectedModule(selectedModule);
     }
   }, [selectedModule, updateSelectedModule]);
 
-  // Memoized render functions
   const renderModulesList = useMemo(() => {
-    if (isCourseLoading) return <Spinner />;
+    if (isCourseLoading) return <div className="h-screen flex flex-col items-center justify-center"><Spinner /></div>;
     if (!courseData?.modules?.length) {
       return (
         <div className="h-full text-sm mb-4 flex flex-col justify-center items-center mt-28">
@@ -295,7 +288,11 @@ const Curriculum: React.FC = () => {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-        <UploadMedia description="Upload your existing content to automatically create a new lesson in this module" />
+        <UploadMedia
+          description="Upload your existing content to automatically create a new lesson in this module"
+          queryClient={queryClient}
+          moduleId={selectedModuleData?.id}
+        />
       </>
     );
   }, [
@@ -311,6 +308,8 @@ const Curriculum: React.FC = () => {
     moduleData,
     isCourseLoading,
     isModuleLoading,
+    queryClient, // Added to dependencies
+    selectedModuleData?.id,
   ]);
 
   return (
@@ -336,4 +335,4 @@ const Curriculum: React.FC = () => {
   );
 };
 
-export default Curriculum;
+export default Content;

@@ -9,8 +9,17 @@ const Playlist = ({ course }: { value: number, course: any }) => {
   console.log({ course })
   return (
     <div className='w-64 relative'>
-      <div className='absolute top-2 text-sm left-2 bg-red-600 text-white px-2 py-1 rounded-bl-md rounded-tr-md'>
-        Basic
+      <div
+        className={`absolute top-2 text-sm left-2 text-white px-2 py-1 rounded-bl-md rounded-tr-md ${course?.difficultyLevel === "beginner"
+            ? "bg-green-600"
+            : course?.difficultyLevel === "intermediate"
+              ? "bg-yellow-600"
+              : course?.difficultyLevel === "hard"
+                ? "bg-red-600"
+                : "bg-gray-600" // Fallback for unexpected values
+          }`}
+      >
+        {generalHelpers.capitalizeWords(course?.difficultyLevel)}
       </div>
       {
         course?.promotionalUrl ? <Image src={course?.promotionalUrl} alt="Thumbnail" width={384} height={160} className='rounded-md max-h-44' /> :

@@ -2,12 +2,12 @@
 import React from 'react'
 import CustomTab from '@/components/CustomTab';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { generalHelpers } from '@/helpers';
-import { useParams } from 'next/navigation';
-import { PenBox } from 'lucide-react';
 import Content from '@/components/studio/create-course/long-course/Content';
 import Quiz from '@/components/studio/create-course/long-course/Quiz';
 import Publish from '@/components/studio/create-course/long-course/Publish';
+import { generalHelpers } from '@/helpers';
+import { useParams } from 'next/navigation';
+import { PenBox } from 'lucide-react';
 
 const CourseName = () => {
   const { courseName } = useParams();
