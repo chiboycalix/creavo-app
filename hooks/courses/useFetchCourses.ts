@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { baseUrl } from "@/utils/constant";
 
 export function useFetchCourses(userId: string | undefined) {
@@ -18,5 +18,6 @@ export function useFetchCourses(userId: string | undefined) {
       return response.json();
     },
     enabled: !!userId,
+    placeholderData: keepPreviousData,
   });
 }
