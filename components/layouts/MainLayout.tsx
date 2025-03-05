@@ -99,6 +99,7 @@ export default function MainLayout({
         //     { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
         //   ]
         // },
+        
         { title: 'Calendar', href: '/studio/calendar', icon: Calendar },
         {
           title: 'Event', href: '/studio/meeting', icon: Video,
