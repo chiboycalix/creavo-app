@@ -135,7 +135,7 @@ export default function MainLayout({
       label: "Marketplace",
       icon: Store,
       navItems: [
-        { title: "Explore", href: "/market", icon: CompassIcon },
+        { title: "Browse Marketplace", href: "/market", icon: CompassIcon },
         { title: "Saved", href: "/market/saved", icon: Bookmark },
         { title: "Orders", href: "/market/orders", icon: NotepadTextIcon },
         { title: "Cart", href: "/market/cart", icon: ShoppingCartIcon },

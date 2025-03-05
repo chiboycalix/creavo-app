@@ -1,15 +1,16 @@
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import React from 'react'
 
-const Item = ({ icon, title, description, className }: { icon: any, title: string; description: string, className?: string }) => {
+const Item = ({ icon, title, description, className, link }: { icon: any, title: string; description: string, className?: string, link: string }) => {
   return (
-    <div className={cn(`flex items-start space-x-4`, className)}>
+    <Link href={link} className={cn(`flex items-start space-x-4 p-0.5 hover:shadow-md`, className)}>
       <div className='p-1.5 bg-gray-200 rounded-full'>{icon}</div>
       <div>
         <h2 className='text-sm font-semibold text-gray-700'>{title}</h2>
         <p className='text-sm text-gray-600'>{description}</p>
       </div>
-    </div>
+    </Link>
   )
 }
 
