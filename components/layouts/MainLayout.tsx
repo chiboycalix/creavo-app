@@ -30,7 +30,7 @@ import {
   ChartSplineIcon,
   BoxesIcon,
   ShoppingCartIcon,
-  NotepadTextIcon
+  NotepadTextIcon,
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -45,11 +45,9 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const { loading, currentUser } = useAuth();
-  const {
-    data: profileData,
-  } = useUserProfile(currentUser?.id);
+  const { data: profileData } = useUserProfile(currentUser?.id);
 
-  console.log({ profileData })
+  console.log({ profileData });
 
   const headerButtons: HeaderButton[] = React.useMemo(() => [
     {
@@ -92,14 +90,15 @@ export default function MainLayout({
         { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill size={20} /> },
         { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
         { title: 'Course Management', href: '/studio/course-management', icon: BoxesIcon },
-        {
-          title: 'Learners', href: '/studio/learners', icon: User,
-          children: [
-            { title: 'All Learners', href: '/studio/learners/all-learners', icon: Calendar },
-            { title: 'Learners Progress', href: '/studio/learners/learners-progress', icon: Video },
-            { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
-          ]
-        },
+        { title: 'Learners', href: '/studio/learners', icon: User },
+        // {
+        //   title: 'Learners', href: '/studio/learners', icon: User,
+        //   children: [
+        //     { title: 'All Learners', href: '/studio/learners/all-learners', icon: Calendar },
+        //     { title: 'Learners Progress', href: '/studio/learners/learners-progress', icon: Video },
+        //     { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
+        //   ]
+        // },
         { title: 'Calendar', href: '/studio/calendar', icon: Calendar },
         {
           title: 'Event', href: '/studio/meeting', icon: Video,
@@ -140,21 +139,34 @@ export default function MainLayout({
         { title: "Orders", href: "/market/orders", icon: NotepadTextIcon },
         { title: "Cart", href: "/market/cart", icon: ShoppingCartIcon },
 
-        {
-          title: "Notifications",
-          href: "/market/notifications",
-          icon: BellIcon,
-        },
-        { title: "Create Listing", href: "/market/create-listing", icon: PlusSquareIcon },
-      ],
-      dashboardItems: [
-        { title: "Seller dashboard", href: "/market/seller-dashboard", icon: LayoutDashboardIcon },
-        { title: "Your Listings", href: "/market/your-listings", icon: TagIcon },
-        { title: "Insight", href: "/market/insight", icon: ChartSplineIcon },
-
-      ]
-    }
-  ], [currentUser]);
+          {
+            title: "Notifications",
+            href: "/market/notifications",
+            icon: BellIcon,
+          },
+          {
+            title: "Create Listing",
+            href: "/market/create-listing",
+            icon: PlusSquareIcon,
+          },
+        ],
+        dashboardItems: [
+          {
+            title: "Seller dashboard",
+            href: "/market/seller-dashboard",
+            icon: LayoutDashboardIcon,
+          },
+          {
+            title: "Your Listings",
+            href: "/market/your-listings",
+            icon: TagIcon,
+          },
+          { title: "Insight", href: "/market/insight", icon: ChartSplineIcon },
+        ],
+      },
+    ],
+    [currentUser]
+  );
 
   const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(
     headerButtons[0].navItems
@@ -164,33 +176,34 @@ export default function MainLayout({
     headerButtons[2]?.dashboardItems || []
   );
 
+  const findNavItemsForPath = React.useCallback(
+    (path: string) => {
+      for (const button of headerButtons) {
+        // Check main nav items
+        const matchingNavItem = button.navItems.find((item) => {
+          // Check if the current path starts with the nav item's href
+          if (path.startsWith(item.href)) {
+            return true;
+          }
 
-  const findNavItemsForPath = React.useCallback((path: string) => {
-    for (const button of headerButtons) {
+          // Check children if they exist
+          if (item.children) {
+            return item.children.some((child) => path.startsWith(child.href));
+          }
 
-      // Check main nav items
-      const matchingNavItem = button.navItems.find(item => {
-        // Check if the current path starts with the nav item's href
-        if (path.startsWith(item.href)) {
-          return true;
+          return false;
+        });
+
+        if (matchingNavItem) {
+          // If the matching item has children and the path matches a child route,
+          // we still want to show the parent's nav items
+          return button.navItems;
         }
-
-        // Check children if they exist
-        if (item.children) {
-          return item.children.some(child => path.startsWith(child.href));
-        }
-
-        return false;
-      });
-
-      if (matchingNavItem) {
-        // If the matching item has children and the path matches a child route,
-        // we still want to show the parent's nav items
-        return button.navItems;
       }
-    }
-    return headerButtons[0].navItems;
-  }, [headerButtons]);
+      return headerButtons[0].navItems;
+    },
+    [headerButtons]
+  );
 
   useEffect(() => {
     const navItems = findNavItemsForPath(pathname);
@@ -215,8 +228,14 @@ export default function MainLayout({
     <SidebarProvider>
       <div className="flex h-screen bg-gray-50 pb-14 overflow-hidden">
         <aside className="fixed left-0 top-0 h-full z-50">
-
-          {loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} dashboardItems={currentDashboardItems} />}
+          {loading ? (
+            <SidebarSkeleton />
+          ) : (
+            <Sidebar
+              navItems={currentNavItems}
+              dashboardItems={currentDashboardItems}
+            />
+          )}
         </aside>
 
         <div className="flex-1 lg:ml-72">
