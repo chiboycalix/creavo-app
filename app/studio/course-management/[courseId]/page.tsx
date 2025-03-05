@@ -5,14 +5,29 @@ import CourseDetailsSkeleton from '@/components/sketetons/CourseDetailsSkeleton'
 import ShortCourseDetails from '@/components/studio/course-management/ShortCourseDetails';
 import LongCourseDetails from '@/components/studio/course-management/LongCourseDetails';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Thumbnail } from '@/public/assets'
 import { useParams, useRouter } from 'next/navigation';
 import { generalHelpers } from '@/helpers';
 import { formatDate } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { ShareIcon, Trash } from 'lucide-react';
+import { Loader2, ShareIcon, Trash, TriangleAlertIcon } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
+import { useMutation } from '@tanstack/react-query';
+import { deleteCourseService } from '@/services/course.service';
+import { toast } from 'sonner';
 
 const Course = () => {
   const router = useRouter()
@@ -22,6 +37,22 @@ const Course = () => {
 
   const courseType = courseData?.data?.course?.category === "STANDARD" ? "long-course" : "short-course";
   const courseSlug = generalHelpers.convertToSlug(courseData?.data?.course?.title || "")
+
+
+  const { mutate: handleCourseDelete, isPending: isDeletingCourse } = useMutation({
+    mutationFn: (payload: { courseId: string }) => deleteCourseService(payload),
+    onSuccess: async (data) => {
+      toast.success("Course deleted successfully")
+      router.push("/studio/course-management")
+    },
+    onError: (error: any) => {
+      toast.error("Error creating post")
+    },
+  });
+
+  const handleDeleteCourse = async () => {
+    handleCourseDelete({ courseId: courseId?.toString() || '' })
+  }
 
   return (
     <ProtectedRoute
@@ -68,7 +99,31 @@ const Course = () => {
                       <ShareIcon size={16} />
                     </div>
                     <div className='border basis-1/12 flex items-center justify-center rounded-md cursor-pointer'>
-                      <Trash size={16} />
+                      <AlertDialog>
+                        <AlertDialogTrigger>
+                          <Trash size={16} />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className='flex flex-col items-center justify-center'>
+                          <AlertDialogHeader className='w-full inline-flex flex-col items-center justify-center'>
+                            <AlertDialogTitle className='flex items-center justify-center text-center'>
+                              <TriangleAlertIcon className='text-red-500' size={40} />
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className='font-semibold text-center'>
+                              Are you sure you want to delete this course?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleDeleteCourse}
+                              className='bg-red-600 text-white' disabled={isDeletingCourse}>
+                              {
+                                isDeletingCourse ? <Loader2 className='text-white animate-spin' /> : "Delete"
+                              }
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 </CardContent>
