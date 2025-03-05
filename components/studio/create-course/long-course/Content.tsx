@@ -6,7 +6,7 @@ import { Clipboard, GripVertical, PenBox, Plus, Trash, Video } from "lucide-reac
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/Input";
-import { addModuleService, fetchModuleDetailsService } from "@/services/module.service";
+import { addModuleService, fetchCourseDetailsService } from "@/services/module.service";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { resetCreateModuleForm, updatCreateModuleForm, updateSelectedModuleData } from "@/redux/slices/module.slice";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook";
@@ -19,9 +19,11 @@ import { fetctCourseService } from "@/services/course.service";
 import { toast } from "sonner";
 
 interface CourseData {
-  courseId: string;
-  difficultyLevel: string;
-  modules: any[];
+  course: {
+    courseId: string;
+    difficultyLevel: string;
+    modules: any[];
+  };
 }
 
 interface ModuleData {
@@ -39,6 +41,7 @@ const Content: React.FC = () => {
 
   const { createModuleForm: createModuleStateValues, selectedModuleData } = useAppSelector((store) => store.moduleStore);
   const { longCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
+
   const { validate, errors, validateField } = useCreateModuleFormValidator({
     store: { ...createModuleStateValues, courseId: courseDataStateValues?.courseId },
   });
@@ -51,13 +54,13 @@ const Content: React.FC = () => {
     },
     enabled: !!courseDataStateValues?.courseId,
     placeholderData: keepPreviousData,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const { data: moduleData, isLoading: isModuleLoading } = useQuery<ModuleData>({
-    queryKey: ["moduleData", selectedModuleData?.id],
+  const { data: courseModulesData, isLoading: isModulesLoading } = useQuery<ModuleData>({
+    queryKey: ["courseModulesData", selectedModuleData?.id],
     queryFn: async () => {
-      const data = await fetchModuleDetailsService({
+      const data = await fetchCourseDetailsService({
         courseId: courseDataStateValues?.courseId,
         moduleId: selectedModuleData?.id,
       });
@@ -65,7 +68,7 @@ const Content: React.FC = () => {
     },
     enabled: !!courseDataStateValues?.courseId && !!selectedModuleData?.id,
     placeholderData: keepPreviousData,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
@@ -74,15 +77,20 @@ const Content: React.FC = () => {
       toast.success("Module created");
       dispatch(resetCreateModuleForm());
       setShowCreateModule(false);
-      queryClient.setQueryData<CourseData>(["courseData", courseDataStateValues?.courseId], (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          modules: [...oldData.modules, newModule],
-        };
-      });
       setSelectedModule(newModule);
       router.push(`?module=${generalHelpers.convertToSlug(newModule.title)}`);
+
+      // Optimistically update courseData cache
+      queryClient.setQueryData<CourseData>(["courseData", courseDataStateValues?.courseId], (oldData) => {
+        if (!oldData?.course) return oldData;
+        return {
+          ...oldData,
+          course: {
+            ...oldData.course,
+            modules: [...oldData.course.modules, newModule],
+          },
+        };
+      });
     },
     onError: (error: any) => {
       toast.error(error?.data?.[0] || "Failed to create module");
@@ -124,12 +132,11 @@ const Content: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!courseData?.modules?.length || selectedModule) return;
-
-    const initialModule = courseData.modules[0];
+    if (!courseData?.course?.modules?.length || selectedModule) return;
+    const initialModule = courseData.course.modules[0];
     setSelectedModule(initialModule);
     router.push(`?module=${generalHelpers.convertToSlug(initialModule.title)}`);
-  }, [courseData?.modules, router, selectedModule]);
+  }, [courseData?.course?.modules, router, selectedModule]);
 
   useEffect(() => {
     if (selectedModule) {
@@ -138,8 +145,8 @@ const Content: React.FC = () => {
   }, [selectedModule, updateSelectedModule]);
 
   const renderModulesList = useMemo(() => {
-    if (isCourseLoading) return <div className="h-screen flex flex-col items-center justify-center"><Spinner /></div>;
-    if (!courseData?.modules?.length) {
+    if (isCourseLoading) return <div className="h-[50vh] flex flex-col items-center justify-center"><Spinner /></div>;
+    if (!courseData?.course?.modules?.length) {
       return (
         <div className="h-full text-sm mb-4 flex flex-col justify-center items-center mt-28">
           <Clipboard />
@@ -148,16 +155,16 @@ const Content: React.FC = () => {
       );
     }
 
-    return courseData.modules.map((module, index) => {
+    return courseData.course.modules.map((module: any, index: number) => {
       const isActive =
-        generalHelpers.convertFromSlug(currentModule || courseData.modules[0]?.title) ===
+        generalHelpers.convertFromSlug(currentModule || courseData?.course?.modules[0]?.title) ===
         generalHelpers.capitalizeWords(module.title);
+
       return (
         <div
           onClick={() => handleClickModule(module)}
           key={module.id}
-          className={`w-full flex items-center border cursor-pointer rounded-sm ${isActive ? "border-primary-400" : "border-primary-100"
-            }`}
+          className={`w-full flex items-center border cursor-pointer rounded-sm ${isActive ? "border-primary-400" : "border-primary-100"}`}
         >
           <div className="p-3 flex items-center gap-2 text-left text-sm">
             <GripVertical />
@@ -169,10 +176,10 @@ const Content: React.FC = () => {
         </div>
       );
     });
-  }, [courseData, currentModule, handleClickModule, isCourseLoading]);
+  }, [courseData?.course?.modules, currentModule, handleClickModule, isCourseLoading]);
 
   const renderContentArea = useMemo(() => {
-    if (isCourseLoading || isModuleLoading) return <Spinner />;
+    if (isCourseLoading || isModulesLoading) return <div className="h-[50vh] flex flex-col items-center justify-center"><Spinner /></div>;
 
     if (showCreateModule) {
       return (
@@ -213,7 +220,7 @@ const Content: React.FC = () => {
       );
     }
 
-    if (!selectedModule || !courseData?.modules.length) {
+    if (!selectedModule || !courseData?.course?.modules?.length) {
       return (
         <div className="w-full mt-40 mx-auto flex flex-col items-center justify-center">
           <Video size={30} />
@@ -243,14 +250,14 @@ const Content: React.FC = () => {
               </div>
             </div>
             <AccordionContent className="px-10 mt-5 w-full mx-auto">
-              {!moduleData?.module?.media?.length ? (
+              {!courseModulesData?.module?.media?.length ? (
                 <div className="w-full mt-6 mx-auto flex flex-col items-center justify-center">
                   <Video size={30} />
                   <p className="text-xl tracking-wide">Add content to your module</p>
                   <p className="text-sm mt-2">Create a new video</p>
                 </div>
               ) : (
-                moduleData.module.media.map((moduleContent: any) => (
+                courseModulesData.module.media.map((moduleContent: any) => (
                   <div key={moduleContent.id} className="flex items-center mb-4 gap-2">
                     <div className="basis-1/12">
                       <GripVertical />
@@ -296,6 +303,8 @@ const Content: React.FC = () => {
       </>
     );
   }, [
+    isCourseLoading,
+    isModulesLoading,
     showCreateModule,
     handleSubmit,
     createModuleStateValues,
@@ -304,11 +313,9 @@ const Content: React.FC = () => {
     validateField,
     isAddingModule,
     selectedModule,
-    courseData,
-    moduleData,
-    isCourseLoading,
-    isModuleLoading,
-    queryClient, // Added to dependencies
+    courseData?.course?.modules,
+    courseModulesData?.module?.media,
+    queryClient,
     selectedModuleData?.id,
   ]);
 
