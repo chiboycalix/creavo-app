@@ -40,7 +40,7 @@ const Playlist = ({ course }: { value: number; course: any }) => {
             {generalHelpers.capitalizeWords(course?.title)}
           </h2>
           <div className="flex items-center justify-between mt-2">
-            <p className="text-sm text-gray-600">12 subscribers</p>
+            <p className="text-sm text-gray-600"></p>
             <p className="text-sm text-primary-700">
               {generalHelpers.getCurrencySymbol(course?.currency)}
               {course?.isPaid ? course.amount : "Free"}

@@ -23,7 +23,6 @@ import {
   Calendar,
   ChartAreaIcon,
   LayoutDashboardIcon,
-  BookMarkedIcon,
   TagIcon,
   BellIcon,
   Bookmark,
@@ -46,8 +45,6 @@ export default function MainLayout({
   const {
     data: profileData,
   } = useUserProfile(currentUser?.id);
-
-  console.log({ profileData })
 
   const headerButtons: HeaderButton[] = React.useMemo(() => [
     {
@@ -162,25 +159,17 @@ export default function MainLayout({
 
   const findNavItemsForPath = React.useCallback((path: string) => {
     for (const button of headerButtons) {
-
-      // Check main nav items
       const matchingNavItem = button.navItems.find(item => {
-        // Check if the current path starts with the nav item's href
         if (path.startsWith(item.href)) {
           return true;
         }
-
-        // Check children if they exist
         if (item.children) {
           return item.children.some(child => path.startsWith(child.href));
         }
-
         return false;
       });
 
       if (matchingNavItem) {
-        // If the matching item has children and the path matches a child route,
-        // we still want to show the parent's nav items
         return button.navItems;
       }
     }

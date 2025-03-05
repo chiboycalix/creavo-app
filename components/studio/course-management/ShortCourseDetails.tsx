@@ -1,6 +1,6 @@
 import React from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Play, PlaySquareIcon, Trash } from 'lucide-react';
+import { PlaySquareIcon } from 'lucide-react';
 import { generalHelpers } from '@/helpers';
 
 const ShortCourseDetails = ({ course }: any) => {

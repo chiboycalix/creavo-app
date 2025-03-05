@@ -7,7 +7,7 @@ import LongCourseDetails from '@/components/studio/course-management/LongCourseD
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Card, CardContent } from '@/components/ui/card';
 import { Thumbnail } from '@/public/assets'
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { generalHelpers } from '@/helpers';
 import { formatDate } from '@/utils';
 import { Button } from '@/components/ui/button';
@@ -15,9 +15,13 @@ import { ShareIcon, Trash } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
 
 const Course = () => {
+  const router = useRouter()
   const params = useParams();
   const courseId = params?.courseId ? parseInt(params.courseId as string, 10) : undefined;
   const { data: courseData, isFetching } = useFetchCourseData(courseId as any);
+
+  const courseType = courseData?.data?.course?.category === "STANDARD" ? "long-course" : "short-course";
+  const courseSlug = generalHelpers.convertToSlug(courseData?.data?.course?.title || "")
 
   return (
     <ProtectedRoute
@@ -47,6 +51,7 @@ const Course = () => {
                     <div className='flex items-center justify-between'>
                       <p className='text-sm font-semibold text-primary-700 mt-3'>{generalHelpers.getCurrencySymbol(courseData?.data?.course?.currency)}{courseData?.data?.course?.isPaid ? courseData?.data?.course.amount : "Free"}</p>
                       <p className='text-sm font-semibold'>{formatDate(courseData?.data?.course?.createdAt)}</p>
+                      {/* <p className='text-sm font-semibold'>{formatDate("2021-03-05T10:02:07.289Z")}</p> */}
                     </div>
                   </div>
                   <hr className='my-4' />
@@ -55,7 +60,7 @@ const Course = () => {
                   </div>
                   <div className='flex gap-2 mt-4'>
                     <div className='flex-1'>
-                      <Button className='w-full'>
+                      <Button className='w-full' onClick={() => router.push(`/studio/create-course/${courseType}/${courseSlug}`)}>
                         Edit course
                       </Button>
                     </div>
