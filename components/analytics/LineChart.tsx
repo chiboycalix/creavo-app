@@ -122,7 +122,7 @@ export function LineChart({
                           cx={props.cx}
                           cy={props.cy}
                           r={6}
-                          fill="#00B5FF"
+                          fill="#0073B4"
                           stroke="white"
                           strokeWidth={2}
                         />

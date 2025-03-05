@@ -8,7 +8,7 @@ interface ChartHeaderProps {
 export function ChartHeader({ title, showCourseFilter = false }: ChartHeaderProps) {
   return (
     <div className="flex items-center justify-between pb-4">
-      <h2 className="text-lg font-semibold">{title}</h2>
+      <h2 className="text-lg ml-10 font-semibold">{title}</h2>
       <div className="flex gap-2">
         {showCourseFilter && (
           <Select defaultValue="all">

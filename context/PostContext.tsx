@@ -31,17 +31,18 @@ export type PostMediaType = {
 
 export type PostType = {
   id: number;
-  firstName: string;
-  lastName: string;
+  user_profile_firstName: string;
+  user_profile_lastName: string;
   userId: number;
   title: string;
-  avatar: string;
+  user_profile_avatar: string;
   mediaResource: PostMediaType[];
   username: string;
   metadata: MetadataType;
   createdAt: string;
   body: string;
   thumbnailUrl?: string;
+  url?:string;
 };
 
 interface PostContextType {
@@ -53,6 +54,7 @@ interface PostContextType {
   followUser: (userId: number) => Promise<void>;
   updateCommentsCount: (postId: number, newCount: number) => void;
   updateViewsCount: (postId: number, newCount: any) => void;
+  fetchPostById:(id: number) => Promise<PostType | null>;
 }
 
 const PostContext = createContext<PostContextType | undefined>(undefined);
@@ -92,6 +94,26 @@ export const PostProvider = ({ children }: PostProviderProps) => {
     fetchPosts();
   }, [fetchPosts]);
 
+ 
+  const fetchPostById = useCallback(async (id: number) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${baseUrl}/posts/${id}`);  // Ensure this is the correct endpoint for posts
+      const data = await response.json();
+      
+      if (response.ok) {
+        return data.data;  // Return the post data
+      }
+    } catch (error) {
+      console.log("Error fetching post by ID:", error);
+    } finally {
+      setLoading(false);
+    }
+    return null;
+  }, []);
+  
+
+
   const fetchPostDetail = useCallback(
     (id: number): PostType | null => {
       try {
@@ -108,9 +130,7 @@ export const PostProvider = ({ children }: PostProviderProps) => {
     [posts]
   );
 
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+  
 
   const handleSetLike = (postId: number, data: any) => {
     const postLike = {
@@ -203,6 +223,7 @@ export const PostProvider = ({ children }: PostProviderProps) => {
         followUser,
         updateCommentsCount,
         updateViewsCount,
+        fetchPostById
       }}
     >
       {children}

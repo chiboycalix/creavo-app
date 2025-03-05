@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import RecentCourses from "@/components/studio/dashboard/RecentCourses";
 import RevenueAndCompletionCharts from "@/components/studio/dashboard/RevenueAndCompletionCharts";
@@ -6,11 +6,14 @@ import DynamicTable from "@/components/table";
 import { StatisticsCard } from "@/components/studio/dashboard/StatisticCard";
 import { File, LayoutDashboard, PlusSquareIcon, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CompletionRate from "@/components/studio/dashboard/CompletionRate";
+import { LineChart } from "@/components/analytics/LineChart";
+import { ChartHeader } from "@/components/analytics/ChatHeaders";
 
 const overviewData = [
   {
     id: 1,
-    title: "Total Sales",
+    title: "Total Revenue",
     count: 2,
     icon: <LayoutDashboard />,
   },
@@ -108,7 +111,7 @@ const tableData = [
     status: "Submitted",
     gradingStatus: "1 attempt",
     grade: 8,
-  }
+  },
 ];
 
 // const tableData = [
@@ -118,6 +121,32 @@ const tableData = [
 const StudioDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const revenueData = [42, 43, 60, 45, 55, 53, 52, 83, 48, 52, 68, 65, 60, 58];
+  const subscribersData = [
+    42, 43, 60, 45, 55, 53, 52, 83, 48, 52, 68, 65, 60, 58,
+  ];
+  const labels = [
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+  ];
+
+  const transformToChartData = (data: number[], labels: string[]) =>
+    data.map((value, index) => ({ x: Number(labels[index]), value }));
+
+  const revenueChartData = transformToChartData(revenueData, labels);
+  const subscribersChartData = transformToChartData(subscribersData, labels);
 
   const columns = [
     {
@@ -125,7 +154,8 @@ const StudioDashboard = () => {
       accessorKey: "id",
     },
     {
-      header: "Name", accessorKey: "name",
+      header: "Name",
+      accessorKey: "name",
     },
     { header: "Attempt Date", accessorKey: "attemptDate" },
     { header: "Status", accessorKey: "status", sortable: true },
@@ -146,17 +176,17 @@ const StudioDashboard = () => {
 
         return (
           <div
-            className={`w-fit px-3 py-1 rounded-full ${grade >= 6
-              ? "bg-green-100 text-green-600"
-              : "bg-red-100 text-red-600"
-              }`}
+            className={`w-fit px-3 py-1 rounded-full ${
+              grade >= 6
+                ? "bg-green-100 text-green-600"
+                : "bg-red-100 text-red-600"
+            }`}
           >
             {grade}/10
           </div>
         );
-      }
-    }
-
+      },
+    },
   ] as any;
 
   return (
@@ -164,7 +194,9 @@ const StudioDashboard = () => {
       <div className="w-full flex items-center justify-between">
         <h2 className="font-bold text-2xl">Hello Chinonso 👋</h2>
 
-        <Button><PlusSquareIcon /> Create Course</Button>
+        <Button>
+          <PlusSquareIcon /> Create Course
+        </Button>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10 w-full mt-6 sm:mt-8 lg:mt-10">
         {overviewData.map((data) => {
@@ -172,8 +204,20 @@ const StudioDashboard = () => {
         })}
       </div>
 
-      <div className="mt-10">
-        <RevenueAndCompletionCharts />
+      <div className="mt-10 flex gap-5 w-full ">
+        {/* <RevenueAndCompletionCharts /> */}
+        <div className="flex-1 bg-white py-3 px-2">
+          <ChartHeader title="Revenue" />
+          <LineChart
+            data={subscribersChartData}
+            highlightIndex={8}
+            highlightValue={83234}
+            title="Total Subscribers"
+          />
+        </div>
+        <div className="w-[30%] ">
+        <CompletionRate  color="#82AFF3" />
+        </div>
       </div>
       <div className="mt-10">
         <RecentCourses />
@@ -188,10 +232,14 @@ const StudioDashboard = () => {
           currentPage={currentPage}
           rowsPerPage={rowsPerPage}
           renderEmptyRecords={
-            (<div className="flex flex-col w-full items-center justify-center h-[300px] mx-auto">
-              <h2 className='text-center font-semibold flex justify-center text-md'>No Information yet!</h2>
-              <p className='text-center text-sm'>You currently don’t have any Subscriber</p>
-            </div>)
+            <div className="flex flex-col w-full items-center justify-center h-[300px] mx-auto">
+              <h2 className="text-center font-semibold flex justify-center text-md">
+                No Information yet!
+              </h2>
+              <p className="text-center text-sm">
+                You currently don’t have any Subscriber
+              </p>
+            </div>
           }
         />
       </div>
