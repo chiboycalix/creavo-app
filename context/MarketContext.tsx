@@ -27,6 +27,7 @@ interface MarketContextType {
   fetchProducts: () => void;
   fetchPopularCourses: () => void;
   fetchPopularEvents: () => void;
+  fetchOrders: () => any;
   fetchMyListings: () => any;
   savedProducts: any;
   handleToggleSave: (product: any) => void;
@@ -34,7 +35,7 @@ interface MarketContextType {
   setIsSaved: (isSaved: boolean) => void;
   searchRoom: boolean;
   setSearchRoom: (searchRoom: boolean) => void;
-  fetchSingleProduct: (id: any) => void
+  fetchSingleProduct: (id: any) => void;
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -456,6 +457,134 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     ];
   };
 
+  const fetchOrders = () => {
+    return [
+      {
+        id: "2",
+        title: "Website Template",
+        description: "Fully responsive website template.",
+        price: 49,
+        rating: 4.8,
+        category: "E-Books",
+        seller: {
+          id: "102",
+          name: "Web Solutions",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      {
+        id: "3",
+        title: "Social Media Icons Pack",
+        description: "Custom social media icons for brands.",
+        price: 19,
+        rating: 4.2,
+        category: "E-Books",
+        seller: {
+          id: "103",
+          name: "Graphic Master",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+
+      // E-Books
+      {
+        id: "4",
+        title: "Digital Marketing Guide",
+        description: "Step-by-step guide to digital marketing.",
+        price: 15,
+        rating: 4.6,
+        category: "E-Books",
+        seller: {
+          id: "104",
+          name: "Marketing Guru",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      // Courses
+      {
+        id: "8",
+        title: "Photography Basics",
+        description: "Improve your photography skills.",
+        price: 50,
+        rating: 4.3,
+        category: "Courses",
+        seller: {
+          id: "108",
+          name: "Photo Academy",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      {
+        id: "9",
+        title: "Business Strategy 101",
+        description: "Learn effective business strategies.",
+        price: 65,
+        rating: 4.6,
+        category: "Courses",
+        seller: {
+          id: "109",
+          name: "Business Coach",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+
+      // Events
+      {
+        id: "10",
+        title: "Tech Conference 2025",
+        description: "Join the biggest tech event of the year.",
+        price: 199,
+        rating: 5.0,
+        category: "Events",
+        seller: {
+          id: "110",
+          name: "Tech Events Ltd.",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      {
+        id: "11",
+        title: "Music Festival Ticket",
+        description: "Experience live music with top artists.",
+        price: 120,
+        rating: 4.7,
+        category: "Events",
+        seller: {
+          id: "111",
+          name: "Music World",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      // Services
+      {
+        id: "13",
+        title: "Logo Design Service",
+        description: "Professional logo design for your brand.",
+        price: 99,
+        rating: 4.8,
+        category: "Services",
+        seller: {
+          id: "113",
+          name: "Creative Studio",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+      {
+        id: "14",
+        title: "SEO Optimization",
+        description: "Boost your website’s ranking.",
+        price: 120,
+        rating: 4.9,
+        category: "Services",
+        seller: {
+          id: "114",
+          name: "SEO Experts",
+          avatar: "/assets/dummyImage.png",
+        },
+      },
+    ];
+  };
+
   const addProduct = (product: Product) => {
     setProducts((prevProducts) => [...prevProducts, product]);
   };
@@ -490,6 +619,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         fetchSingleProduct,
         fetchPopularCourses,
         fetchPopularEvents,
+        fetchOrders,
         fetchMyListings,
         addProduct,
         removeProduct,

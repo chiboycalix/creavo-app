@@ -49,129 +49,94 @@ export default function MainLayout({
 
   console.log({ profileData });
 
-  const headerButtons: HeaderButton[] = React.useMemo(
-    () => [
-      {
-        id: "socials",
-        label: "Explore",
-        icon: CompassIcon,
-        navItems: [
-          { title: "For You", href: "/socials", icon: Compass },
-          {
-            title: "Following",
-            href: "/socials/following",
-            icon: UserPlusIcon,
-          },
-          {
-            title: "Upload Post",
-            href: "/socials/uploads",
-            icon: PlusSquareIcon,
-          },
-          {
-            title: "Watchlist",
-            href: "/socials/watchlist",
-            icon: TvMinimalPlay,
-          },
-          {
-            title: "Profile",
-            href: `/socials/profile`,
-            icon: (
-              <Avatar className="w-1 h-1">
-                <AvatarImage
-                  src={
-                    profileData?.data
-                      ? profileData?.data?.profile?.avatar
-                      : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"
-                  }
-                  sizes="sm"
-                />
-                <AvatarFallback>P</AvatarFallback>
-              </Avatar>
-            ),
-          },
-        ],
-      },
-      {
-        id: "studio",
-        label: "Studio",
-        icon: LightbulbIcon,
-        navItems: [
-          {
-            title: "Dashboard",
-            href: "/studio",
-            icon: <RiHome8Fill size={20} />,
-          },
-          {
-            title: "Create course",
-            href: "/studio/create-course",
-            icon: PlusSquareIcon,
-          },
-          {
-            title: "Course Management",
-            href: "/studio/course-management",
-            icon: BoxesIcon,
-          },
-          { title: "Learners", href: "/studio/learners", icon: User },
-          // {
-          //   title: 'Learners', href: '/studio/learners', icon: User,
-          //   children: [
-          //     { title: 'All Learners', href: '/studio/learners/all-learners', icon: Calendar },
-          //     { title: 'Learners Progress', href: '/studio/learners/learners-progress', icon: Video },
-          //     { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
-          //   ]
-          // },
-          { title: "Calendar", href: "/studio/calendar", icon: Calendar },
-          {
-            title: "Event",
-            href: "/studio/meeting",
-            icon: Video,
-            children: [
-              {
-                title: "Video conference",
-                href: "/studio/event/meeting",
-              },
-              {
-                title: "Webinar",
-                href: "/studio/event/webinar",
-              },
-              {
-                title: "Classroom",
-                href: "/studio/event/classroom",
-              },
-            ],
-          },
-          {
-            title: "Analytics",
-            href: "/studio/analytics",
-            icon: ChartAreaIcon,
-            children: [
-              { title: "Overview", href: "/studio/analytics/overview" },
-              {
-                title: "Sales Metrics",
-                href: "/studio/analytics/sales-metrics",
-              },
-              {
-                title: "Engagement Metrics",
-                href: "/studio/analytics/engagement-metrics",
-              },
-              {
-                title: "Revenue and ROI",
-                href: "/studio/analytics/revenue-and-ROI",
-              },
-              { title: "Feedback", href: "/studio/analytics/feedback" },
-            ],
-          },
-        ],
-      },
-      {
-        id: "market",
-        label: "Marketplace",
-        icon: Store,
-        navItems: [
-          { title: "Explore", href: "/market", icon: CompassIcon },
-          { title: "Saved", href: "/market/saved", icon: Bookmark },
-          { title: "Orders", href: "/market/orders", icon: NotepadTextIcon },
-          { title: "Cart", href: "/market/cart", icon: ShoppingCartIcon },
+  const headerButtons: HeaderButton[] = React.useMemo(() => [
+    {
+      id: "socials",
+      label: "Explore",
+      icon: CompassIcon,
+      navItems: [
+        { title: "For You", href: "/socials", icon: Compass },
+        { title: "Following", href: "/socials/following", icon: UserPlusIcon },
+        {
+          title: "Upload Post",
+          href: "/socials/uploads",
+          icon: PlusSquareIcon,
+        },
+        { title: "Watchlist", href: "/socials/watchlist", icon: TvMinimalPlay },
+        {
+          title: "Profile",
+          href: `/socials/profile`,
+          icon: (
+            <Avatar className="w-1 h-1">
+              <AvatarImage
+                src={
+                  profileData?.data
+                    ? profileData?.data?.profile?.avatar
+                    : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"
+                }
+                sizes="sm"
+              />
+              <AvatarFallback>P</AvatarFallback>
+            </Avatar>
+          ),
+        },
+      ],
+    },
+    {
+      id: "studio",
+      label: "Studio",
+      icon: LightbulbIcon,
+      navItems: [
+        { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill size={20} /> },
+        { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
+        { title: 'Course Management', href: '/studio/course-management', icon: BoxesIcon },
+        {
+          title: 'Learners', href: '/studio/learners', icon: User,
+          children: [
+            { title: 'All Learners', href: '/studio/learners/all-learners', icon: Calendar },
+            { title: 'Learners Progress', href: '/studio/learners/learners-progress', icon: Video },
+            { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
+          ]
+        },
+        { title: 'Calendar', href: '/studio/calendar', icon: Calendar },
+        {
+          title: 'Event', href: '/studio/meeting', icon: Video,
+          children: [
+            {
+              title: 'Video conference', href: '/studio/event/meeting',
+            },
+            {
+              title: 'Webinar', href: '/studio/event/webinar',
+            },
+            {
+              title: 'Classroom', href: '/studio/event/classroom',
+            },
+
+          ]
+        },
+        {
+          title: "Analytics",
+          href: "/studio/analytics",
+          icon: ChartAreaIcon,
+          children: [
+            { title: 'Overview', href: '/studio/analytics/overview' },
+            { title: 'Sales Metrics', href: '/studio/analytics/sales-metrics' },
+            { title: 'Engagement Metrics', href: '/studio/analytics/engagement-metrics' },
+            { title: 'Revenue and ROI', href: '/studio/analytics/revenue-and-ROI' },
+            { title: 'Feedback', href: '/studio/analytics/feedback' },
+          ]
+        }
+      ]
+    },
+    {
+      id: "market",
+      label: "Marketplace",
+      icon: Store,
+      navItems: [
+        { title: "Browse Marketplace", href: "/market", icon: CompassIcon },
+        { title: "Saved", href: "/market/saved", icon: Bookmark },
+        { title: "Orders", href: "/market/orders", icon: NotepadTextIcon },
+        { title: "Cart", href: "/market/cart", icon: ShoppingCartIcon },
 
           {
             title: "Notifications",
