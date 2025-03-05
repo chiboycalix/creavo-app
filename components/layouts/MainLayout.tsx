@@ -83,14 +83,15 @@ export default function MainLayout({
         { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill size={20} /> },
         { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
         { title: 'Module Management', href: '/studio/module-management', icon: BoxesIcon },
-        {
-          title: 'Learners', href: '/studio/learners', icon: User,
-          children: [
-            { title: 'All Learners', href: '/studio/learners/all-learners', icon: Calendar },
-            { title: 'Learners Progress', href: '/studio/learners/learners-progress', icon: Video },
-            { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
-          ]
-        },
+        { title: 'Learners', href: '/studio/learners', icon: User },
+        // {
+        //   title: 'Learners', href: '/studio/learners', icon: User,
+        //   children: [
+        //     { title: 'All Learners', href: '/studio/learners/all-learners', icon: Calendar },
+        //     { title: 'Learners Progress', href: '/studio/learners/learners-progress', icon: Video },
+        //     { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
+        //   ]
+        // },
         { title: 'Calendar', href: '/studio/calendar', icon: Calendar },
         {
           title: 'Event', href: '/studio/meeting', icon: Video,

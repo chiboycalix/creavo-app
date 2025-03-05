@@ -40,7 +40,7 @@ export const createCourseService = async (
 export const getUserCourses = async (userId: number, limit = 10, page = 1) => {
   try {
     const response = await apiClient.get(`/users/${userId}/courses`, {
-      params: { limit, page, category: COURSE_CATEGORY.SIMPLE },
+      params: { limit, page, category: COURSE_CATEGORY.STANDARD },
     });
     return response;
   } catch (error: any) {
@@ -95,9 +95,9 @@ export const fetchShortCourseService = async ({
 };
 
 
-export const fetchLearnerEngagement = async (courseId: string) => {
+export const fetchLearnerEngagement = async (courseId: number) => {
   try {
-    const { data } = await apiClient.get(`/courses/${courseId}/learner-course-engagement`);
+    const { data } = await apiClient.get(`/courses/${courseId}/trainee-progress-list?page=1&limit=10&initial=false`);
     console.log("Learner Engagement :", data);
     return data;
   } catch (error: any) {
@@ -117,3 +117,15 @@ export const fetchLearnerEngagementDetails = async (courseId: string) => {
     return Promise.reject(error?.response?.data || "An error occurred");
   }
 };
+
+export const fetchUserCourses = async (userId: number) => {
+  try {
+    const { data } = await apiClient.get(`/users/${userId}/courses?limit=10&page=1`)
+    console.log("User Courses Raw Response:", data)
+
+    return data
+  } catch (error: any) {
+    console.error("Fetching user courses failed:", error.message)
+    return Promise.reject(error?.response?.data || "An error occurred")
+  }
+}
