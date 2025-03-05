@@ -29,7 +29,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  const shareUrl = `${window.location.origin}/posts/${postId}`;
+  const shareUrl = `${window.location.origin}/socials/posts/${postId}`;
 
   const sharePostMutation = useMutation({
     mutationFn: async () => {

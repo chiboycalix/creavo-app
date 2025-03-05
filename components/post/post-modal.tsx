@@ -92,6 +92,7 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
       );
       const data = await response.json();
       setPostComments(data?.data?.comments);
+      console.log(` post ${post}`)
     } catch (error) {
       console.error("Error fetching post comments:", error);
     }
@@ -281,13 +282,13 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
                     <div className="p-4 border-b">
                       <div className="flex items-center">
                         <Image
-                          src={post?.avatar}
-                          alt={post?.firstName}
+                          src={post?.user_profile_avatar}
+                          alt={post?.user_profile_firstName}
                           width={32}
                           height={32}
                           className="rounded-full"
                         />
-                        <span className="ml-3 font-semibold">{`${post?.firstName} ${post?.lastName}`}</span>
+                        <span className="ml-3 font-semibold">{`${post?.user_profile_firstName} ${post?.user_profile_lastName}`}</span>
                       </div>
                     </div>
                     <div className="flex-grow overflow-y-auto p-4">

@@ -11,7 +11,7 @@ type VideoMediaProps = {
   media: string;
 };
 
-export default function VideoMedia({ postMedia, size }: VideoMediaProps) {
+export default function VideoMedia({ postMedia, size,media }: VideoMediaProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
