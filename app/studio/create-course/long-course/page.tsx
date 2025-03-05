@@ -1,6 +1,5 @@
 "use client"
-import React, { FormEvent, useEffect } from 'react'
-import ProtectedRoute from '@/components/ProtectedRoute';
+import React, { FormEvent } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/Input'
 import { Switch } from '@headlessui/react';

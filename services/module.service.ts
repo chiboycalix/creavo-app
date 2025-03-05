@@ -41,13 +41,13 @@ export const addMediaToCourseService = async (
   }
 };
 
-export const fetchModuleDetailsService = async (payload: {
+export const fetchCourseDetailsService = async (payload: {
   courseId: string;
   moduleId: string;
 }) => {
   try {
     const { data } = await apiClient.get(
-      `/courses/${payload?.courseId}/modules/${payload.moduleId}`
+      `/courses/${payload?.courseId}/modules/${payload?.moduleId}`
     );
     return data;
   } catch (error) {
