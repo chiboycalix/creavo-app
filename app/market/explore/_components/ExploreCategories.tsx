@@ -29,7 +29,7 @@ const ExploreCategories: React.FC<ExploreCategoriesProps> = ({
             <Link
               key={product.category}
               href={`${pathname}?tab=${product.category}`}
-              className={` flex flex-col py-6 gap-3 items-center  p-4 rounded-md ${product.color}`}
+              className={` flex flex-col py-6 gap-3 h-32 items-center  p-4 rounded-md ${product.color}`}
               onClick={() => handleTabChange(product.category as TabValue)}
             >
               <h3>{product.category}</h3>

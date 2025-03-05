@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { isSaved } = useMarketContext();
   return (
     <Link
-      href={"#"}
+      href={`/market/product/${product?.id}`}
       key={product?.id}
       className="relative flex flex-col gap-4 p-1 bg-white rounded-md border-2 justify-between items-center w-[calc(20%-16px)] min-w-[200px] transition-transform transform hover:scale-105 hover:shadow-lg"
     >

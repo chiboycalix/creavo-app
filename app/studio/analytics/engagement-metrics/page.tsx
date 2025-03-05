@@ -1,8 +1,10 @@
-'use client'
-import React, { useState, useEffect } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { CourseModal } from '@/components/analytics/CourseModal';
-import { getUserLongCourses } from '@/services/course.service';
+
+"use client";
+import React, { useState, useEffect } from "react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { CourseModal } from "@/components/analytics/CourseModal";
+import { getUserCourses } from "@/services/course.service";
+import { apiClient } from "@/lib/apiClient";
 
 export interface Course {
   id: number;
@@ -22,24 +24,47 @@ export interface Course {
 }
 
 function App() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [userId, setUserId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [courses, setCourses] = useState<Course[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const response = await apiClient.get("/auth/me");
+        if (response.data?.id) {
+          setUserId(response.data.id);
+          console.log("User ID:", response.data.id);
+        } else {
+          throw new Error("Invalid user data response");
+        }
+      } catch (err) {
+        console.error("Error fetching user ID:", err);
+        setError("Failed to load user data.");
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const response = await getUserLongCourses(10001, rowsPerPage, currentPage);
+        const response = await getUserCourses(userId, rowsPerPage, currentPage);
         const courseData = response.data.courses.map((course: any) => ({
           id: course.id,
-          title: course.title || 'Untitled Course',
-          image: course?.promotionalUrl || '/assets/thumbnail.png',
-          difficulty: course.difficultyLevel || 'Unknown',
+          title: course.title || "Untitled Course",
+          image: course?.promotionalUrl || "/assets/thumbnail.png",
+          difficulty: course.difficultyLevel || "Unknown",
           uploadDate: course.createdAt || new Date().toISOString(),
           completions: course.completions || 0,
           totalEnrollment: course.totalEnrollment || 0,
@@ -49,9 +74,10 @@ function App() {
         }));
 
         setCourses(courseData);
+        console.log("Fetched courses:", courseData);
         setTotalPages(response.data.meta.totalPages || 1);
       } catch (error) {
-        console.error('Error fetching courses:', error);
+        console.error("Error fetching courses:", error);
         setCourses([]);
       } finally {
         setLoading(false);
@@ -59,15 +85,14 @@ function App() {
     };
 
     fetchCourses();
-  }, [currentPage, rowsPerPage]);
+  }, [userId, currentPage, rowsPerPage]);
 
-  const filteredCourses = courses.filter(course =>
+  const filteredCourses = courses.filter((course) =>
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handlePageChange = (pageNumber: number) => setCurrentPage(pageNumber);
-  const handlePrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -86,11 +111,13 @@ function App() {
           </div>
         </div>
 
-        {loading ? (
+        {error ? (
+          <p className="text-red-500 text-center">{error}</p>
+        ) : loading ? (
           <p className="text-center text-gray-500 text-sm py-10">Loading courses...</p>
         ) : filteredCourses.length === 0 ? (
-          <div className='flex  items-center justify-center flex-col my-20 '>
-            <p className="text-center text-black font-semibold text-lg ">No courses available yet.</p>
+          <div className="flex items-center justify-center flex-col my-20">
+            <p className="text-center text-black font-semibold text-lg">No courses available yet.</p>
             <p>Once you publish your course, come here to learn about your course engagement.</p>
           </div>
         ) : (
@@ -99,10 +126,10 @@ function App() {
               <div key={course.id} className="p-6 hover:bg-white shadow transition-colors">
                 <div className="flex items-center space-x-6">
                   <div className="flex w-8 text-gray-400 font-medium">
-                    {String(i + 1).padStart(2, '0')}
+                    {String(i + 1).padStart(2, "0")}
                   </div>
                   <div className="grid grid-cols-4 items-start space-x-4">
-                    <div className='flex items-center gap-5'>
+                    <div className="flex items-center gap-5">
                       <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                         <img
                           src={course?.image}
@@ -116,7 +143,9 @@ function App() {
                       </div>
                     </div>
                     <div className="flex items-center justify-center gap-3 flex-col">
-                      <p className="font-semibold text-xs text-gray-900">{new Date(course.uploadDate).toLocaleDateString()}</p>
+                      <p className="font-semibold text-xs text-gray-900">
+                        {new Date(course.uploadDate).toLocaleDateString()}
+                      </p>
                       <p className="text-xs text-gray-500">Date uploaded</p>
                     </div>
                     <div className="text-start flex gap-3 flex-col items-start">
@@ -150,25 +179,14 @@ function App() {
                 <option value={20}>20</option>
               </select>
             </div>
-
             <div className="flex items-center space-x-2">
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className={`p-2 rounded-full ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'}`}
-              >
+              <button onClick={handlePrevPage} disabled={currentPage === 1} className="p-2 rounded-full">
                 <ChevronLeft className="w-5 h-5" />
               </button>
-
               <span className="text-sm font-medium text-gray-700">
                 Page {currentPage} of {totalPages}
               </span>
-
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className={`p-2 rounded-full ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'}`}
-              >
+              <button onClick={handleNextPage} disabled={currentPage === totalPages} className="p-2 rounded-full">
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
@@ -176,9 +194,7 @@ function App() {
         )}
       </div>
 
-      {selectedCourse && (
-        <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
-      )}
+      {selectedCourse && <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />}
     </div>
   );
 }
