@@ -6,8 +6,6 @@ import { fetchLearnerEngagement, fetchUserCourses } from "@/services/course.serv
 import { apiClient } from "@/lib/apiClient"
 import { LearnerDetails } from "./LearnerDetails"
 
-
-
 export interface QuizAttempt {
   id: number
   title: string
@@ -31,7 +29,6 @@ export interface Learner {
   totalWatchTime: number
   lastUpdated: string
 }
-
 
 interface Course {
   id: number
@@ -99,6 +96,9 @@ export function CohortTable() {
       console.log("Learner Engagement Data:", response)
 
       const trainees = response?.trainees || []
+      if (!response?.trainees) {
+        setLoading(false)
+      }
 
       const learnersWithQuizAttempts = trainees.map((learner: any) => ({
         ...learner,
@@ -161,6 +161,7 @@ export function CohortTable() {
           console.log("Automatically selecting first course:", firstCourse.title, "ID:", firstCourse.id)
           setSelectedCourse(firstCourse)
 
+          // Fetch learner data for the first course
           await fetchLearnerData(firstCourse.id)
         }
       } catch (err) {
@@ -168,6 +169,7 @@ export function CohortTable() {
         setCoursesError("Failed to load courses.")
       } finally {
         setCoursesLoading(false)
+        setLoading(false)
       }
     }
 
@@ -177,13 +179,14 @@ export function CohortTable() {
   useEffect(() => {
     if (!selectedCourse) return
 
-    if (courses.length > 0 && selectedCourse.id === courses[0]?.id && learners.length > 0) {
+    // Only fetch data if this is not the initial load of the first course
+    if (!(courses.length > 0 && selectedCourse.id === courses[0]?.id && learners.length > 0)) {
+      console.log("Fetching learner data for selected course:", selectedCourse.id)
+      fetchLearnerData(selectedCourse.id)
+    } else {
       console.log("Skipping duplicate fetch for first course")
-      return
     }
-
-    fetchLearnerData(selectedCourse.id)
-  }, [selectedCourse, courses, learners])
+  }, [selectedCourse])
 
   const handleSelectAll = () => {
     if (selectAll) {
@@ -206,6 +209,7 @@ export function CohortTable() {
     if (course.id !== selectedCourse?.id) {
       console.log("User selected course:", course.title, "ID:", course.id)
       setSelectedCourse(course)
+      fetchLearnerData(course.id) // Add this line to fetch data when course changes
     }
     setShowCourseDropdown(false)
   }
@@ -221,50 +225,20 @@ export function CohortTable() {
   const paginatedLearners = filteredLearners.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
   const totalPages = paginationMeta.totalPages || Math.ceil(filteredLearners.length / rowsPerPage)
 
-  const displayCourses =
-    courses.length > 0
-      ? courses
-      : [
-          {
-            id: 21,
-            title: "C++",
-            category: "STANDARD",
-            difficultyLevel: "intermediate",
-            tags: ["#code", "#functions", "#enscapulation"],
-            isPublished: false,
-            userId: 10006,
-            currency: "",
-            amount: "0",
-            isPaid: false,
-            promotionalUrl: "https://res.cloudinary.com/dlujwccdb/image/upload/v1741106863/mission_e5xiqd.png",
-            promote: false,
-            description: "C++ programing syntax and all",
-            metadata: null,
-            likesCount: 0,
-            commentsCount: 0,
-            viewsCount: 0,
-            sharesCount: 0,
-            bookmarkCount: 0,
-            totalWatchTime: 0,
-            isDeleted: false,
-            createdAt: "2025-03-04T16:47:45.565Z",
-            updatedAt: "2025-03-04T16:47:45.565Z",
-          },
-        ]
+  const displayCourses = courses
 
-        const handleViewMore = (learner: Learner) => {
-          const learnerWithQuizAttempts = {
-            ...learner,
-            quizAttempts: learner.quizAttempts ?? [], 
-          };
-        
-          setSelectedLearner(learnerWithQuizAttempts);
-          setIsDetailsOpen(true);
-        };
-        
+  const handleViewMore = (learner: Learner) => {
+    const learnerWithQuizAttempts = {
+      ...learner,
+      quizAttempts: learner.quizAttempts ?? [],
+    }
+
+    setSelectedLearner(learnerWithQuizAttempts)
+    setIsDetailsOpen(true)
+  }
 
   return (
-    <div className="w-full flex flex-col relative items-start justify-start">
+    <div className="w-full flex flex-col relative justify-start">
       <div className="flex items-center w-full justify-between mb-4">
         <h1 className="text-lg font-semibold">All Trainee</h1>
         <div className="flex items-center gap-2">
@@ -338,7 +312,7 @@ export function CohortTable() {
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <div className="rounded-lg overflow-hidden border border-gray-200">
-          <table className="w-full text-sm border-collapse">
+          <table className=" w-full text-sm border-collapse">
             <thead className="bg-gray-50 text-xs">
               <tr>
                 <th className="p-3 text-left">
@@ -358,9 +332,8 @@ export function CohortTable() {
                 <th className="p-3 text-left">Action</th>
               </tr>
             </thead>
-
             <tbody className="text-xs">
-              {paginatedLearners.length > 0 ? (
+              {paginatedLearners.length && courses.length > 0 ? (
                 paginatedLearners.map((learner, index) => (
                   <tr key={learner.userId} className="border-b hover:bg-gray-50">
                     <td className="p-3">
