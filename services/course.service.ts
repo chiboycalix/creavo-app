@@ -141,3 +141,16 @@ export const fetchUserCourses = async (userId: number) => {
     return Promise.reject(error?.response?.data || "An error occurred")
   }
 }
+
+
+export const getUserCourses = async (userId: number, limit = 10, page = 1) => {
+  try {
+    const response = await apiClient.get(`/users/${userId}/courses`, {
+      params: { limit, page, category: 'STANDARD' },
+    });
+    return response;
+  } catch (error: any) {
+    console.error("Fetching user courses failed:", error.message);
+    return Promise.reject(error?.response?.data || "An error occurred");
+  }
+};

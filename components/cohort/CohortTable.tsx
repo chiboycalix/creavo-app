@@ -255,7 +255,7 @@ export function CohortTable() {
         const handleViewMore = (learner: Learner) => {
           const learnerWithQuizAttempts = {
             ...learner,
-            quizAttempts: learner.quizAttempts ?? [], // Ensures it's at least an empty array
+            quizAttempts: learner.quizAttempts ?? [], 
           };
         
           setSelectedLearner(learnerWithQuizAttempts);
