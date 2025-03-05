@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useCallback, useState } from "react";
 import VideoPlayer from "./VideoDuration";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,48 +16,93 @@ import { getMimeTypeFromCloudinaryUrl } from "@/utils";
 
 interface UploadMediaProps {
   description: string;
-  queryClient: QueryClient; // Added prop
-  moduleId?: string; // Added prop
+  queryClient: QueryClient;
+  moduleId?: string;
+}
+
+interface ModuleData {
+  module: {
+    id: string;
+    media: any[];
+  };
 }
 
 const UploadMedia = ({ description, queryClient, moduleId }: UploadMediaProps) => {
   const dispatch = useAppDispatch();
   const { longCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
   const { selectedModuleData, addMediaToModuleForm: addMediaToModuleStateValues } = useAppSelector((store) => store.moduleStore);
-  const updateAddMediaToModule = (payload: Partial<any>) => dispatch(updateAddMediaToModuleForm(payload));
   const [duration, setDuration] = useState(0);
   const [open, setOpen] = useState<boolean>(false);
 
+  const updateAddMediaToModule = useCallback(
+    (payload: Partial<any["media"][0]>) => dispatch(updateAddMediaToModuleForm(payload)),
+    [dispatch]
+  );
+
   const { mutate: handleAddMediaToModule, isPending: isAddingMediaToModule } = useMutation({
     mutationFn: (payload: AddMediaToModule) => addMediaToModuleService(payload),
-    onSuccess: async (data) => {
-      console.log({ data })
+    onSuccess: (data) => {
       setOpen(false);
       dispatch(resetAddMediaToModuleForm());
       toast.success("Media added to module");
+
+      // Optimistically update the courseModulesData cache
+      const newMedia = {
+        id: data?.id || Date.now().toString(),
+        url: addMediaToModuleStateValues.url,
+        mimeType: getMimeTypeFromCloudinaryUrl(addMediaToModuleStateValues.url) ?? "",
+        title: addMediaToModuleStateValues.title,
+        description: addMediaToModuleStateValues.description,
+        mediaLength: duration,
+      };
+
+      queryClient.setQueryData<ModuleData>(["courseModulesData", moduleId], (oldData) => {
+        if (!oldData?.module) return oldData;
+        return {
+          ...oldData,
+          module: {
+            ...oldData.module,
+            media: [...oldData.module.media, newMedia],
+          },
+        };
+      });
     },
     onError: (error: any) => {
       toast.error(error?.data?.[0] || "Failed to add media");
     },
   });
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const mimeType = getMimeTypeFromCloudinaryUrl(addMediaToModuleStateValues.url);
-    handleAddMediaToModule({
-      courseId: courseDataStateValues?.courseId,
-      moduleId: selectedModuleData?.id,
-      media: [
-        {
-          url: addMediaToModuleStateValues.url,
-          mimeType: mimeType ?? "",
-          title: addMediaToModuleStateValues.title,
-          description: addMediaToModuleStateValues.description,
-          mediaLength: duration,
-        },
-      ],
-    });
-  };
+  const handleSubmit = useCallback(
+    async (e: FormEvent) => {
+      e.preventDefault();
+      if (!addMediaToModuleStateValues.url || !moduleId) return;
+
+      const mimeType = getMimeTypeFromCloudinaryUrl(addMediaToModuleStateValues.url);
+      handleAddMediaToModule({
+        courseId: courseDataStateValues?.courseId,
+        moduleId: selectedModuleData?.id,
+        media: [
+          {
+            url: addMediaToModuleStateValues.url,
+            mimeType: mimeType ?? "",
+            title: addMediaToModuleStateValues.title,
+            description: addMediaToModuleStateValues.description,
+            mediaLength: duration,
+          },
+        ],
+      });
+    },
+    [
+      addMediaToModuleStateValues.url,
+      addMediaToModuleStateValues.title,
+      addMediaToModuleStateValues.description,
+      courseDataStateValues?.courseId,
+      selectedModuleData?.id,
+      duration,
+      handleAddMediaToModule,
+      moduleId,
+    ]
+  );
 
   return (
     <div className="bg-primary-100 mt-5 p-4 rounded-sm flex items-start justify-between">
@@ -77,9 +122,7 @@ const UploadMedia = ({ description, queryClient, moduleId }: UploadMediaProps) =
                   maxLength={54}
                   placeholder="Enter video title"
                   value={addMediaToModuleStateValues.title}
-                  onChange={(e) => {
-                    updateAddMediaToModule({ title: e.target.value });
-                  }}
+                  onChange={(e) => updateAddMediaToModule({ title: e.target.value })}
                 />
               </div>
               <br />
@@ -90,9 +133,7 @@ const UploadMedia = ({ description, queryClient, moduleId }: UploadMediaProps) =
                   maxLength={365}
                   placeholder="Enter your video description"
                   value={addMediaToModuleStateValues.description}
-                  onChange={(e) => {
-                    updateAddMediaToModule({ description: e.target.value });
-                  }}
+                  onChange={(e) => updateAddMediaToModule({ description: e.target.value })}
                   rows={10}
                 />
               </div>
@@ -101,9 +142,7 @@ const UploadMedia = ({ description, queryClient, moduleId }: UploadMediaProps) =
                   label="Upload Videos"
                   accept="video/*"
                   maxFiles={1}
-                  onChange={(uploads) => {
-                    updateAddMediaToModule({ url: uploads });
-                  }}
+                  onChange={(uploads) => updateAddMediaToModule({ url: uploads })}
                 />
               </div>
               <br />
@@ -117,7 +156,7 @@ const UploadMedia = ({ description, queryClient, moduleId }: UploadMediaProps) =
                 <Button
                   type="submit"
                   className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
-                  disabled={isAddingMediaToModule}
+                  disabled={isAddingMediaToModule || !addMediaToModuleStateValues.url}
                 >
                   {isAddingMediaToModule ? <Loader2 /> : "Continue"}
                 </Button>
