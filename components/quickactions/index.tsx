@@ -26,29 +26,16 @@ const QuickActions = () => {
         <div className="mt-10">
           <div className="flex items-start justify-between space-x-4">
             <Item
-              title="Create video conference"
-              description="Design and easily deploy online teaching software that is custom-branded to your business"
+              link="/studio/create-course"
+              title="Create Course"
+              description="Build and customize your online course with ease. Upload content, set pricing, and engage with learners."
               icon={<GraduationCap className="text-gray-500" />}
-              className="basis-1/2"
+              className="basis-1/2 "
             />
             <Item
-              title="Create a new project"
-              description="Design and easily deploy online teaching software that is custom-branded to your business"
-              icon={<GraduationCap className="text-gray-500" />}
-              className="flex-1"
-            />
-          </div>
-
-          <div className="flex items-start justify-between space-x-4 mt-8">
-            <Item
-              title="Upload courses"
-              description="Design and easily deploy online teaching software that is custom-branded to your business"
-              icon={<GraduationCap className="text-gray-500" />}
-              className="basis-1/2"
-            />
-            <Item
-              title="Community"
-              description="Design and easily deploy online teaching software that is custom-branded to your business"
+              link="/market/create-listing"
+              title="Create Listing"
+              description="Showcase your products or services in a few simple steps. Reach potential buyers effortlessly."
               icon={<GraduationCap className="text-gray-500" />}
               className="flex-1"
             />
@@ -56,14 +43,33 @@ const QuickActions = () => {
 
           <div className="flex items-start justify-between space-x-4 mt-8">
             <Item
-              title="Upload courses"
-              description="Design and easily deploy online teaching software that is custom-branded to your business"
+              link="/studio/analytics/overview"
+              title="Analytics"
+              description="Gain insights into your performance with real-time data on sales, engagement, and trends."
               icon={<GraduationCap className="text-gray-500" />}
               className="basis-1/2"
             />
             <Item
-              title="Community"
-              description="Design and easily deploy online teaching software that is custom-branded to your business"
+              link="/market/seller-dashboard"
+              title="Seller's Dashboard"
+              description="Manage your store, track orders, and optimize sales—all in one place."
+              icon={<GraduationCap className="text-gray-500" />}
+              className="flex-1"
+            />
+          </div>
+
+          <div className="flex items-start justify-between space-x-4 mt-8">
+            <Item
+              link="/studio/calendar"
+              title="Calendar"
+              description="Stay organized with scheduled events, appointments, and reminders at a glance."
+              icon={<GraduationCap className="text-gray-500" />}
+              className="basis-1/2"
+            />
+            <Item
+              link="/studio/event/meeting"
+              title="Video Conferencing"
+              description="Connect and collaborate in real time with high-quality video and seamless communication."
               icon={<GraduationCap className="text-gray-500" />}
               className="flex-1"
             />
