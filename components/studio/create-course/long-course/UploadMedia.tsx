@@ -31,30 +31,10 @@ const UploadMedia = ({ description, queryClient, moduleId }: UploadMediaProps) =
   const { mutate: handleAddMediaToModule, isPending: isAddingMediaToModule } = useMutation({
     mutationFn: (payload: AddMediaToModule) => addMediaToModuleService(payload),
     onSuccess: async (data) => {
+      console.log({ data })
       setOpen(false);
       dispatch(resetAddMediaToModuleForm());
       toast.success("Media added to module");
-
-      // Optimistically update the moduleData cache
-      const newMedia = {
-        url: addMediaToModuleStateValues.url,
-        mimeType: getMimeTypeFromCloudinaryUrl(addMediaToModuleStateValues.url) ?? "",
-        title: addMediaToModuleStateValues.title,
-        description: addMediaToModuleStateValues.description,
-        mediaLength: duration,
-        id: data?.id || `${Date.now()}`, // Fallback ID if API doesn't return one
-      };
-
-      queryClient.setQueryData(["moduleData", moduleId], (oldData: any) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          module: {
-            ...oldData.module,
-            media: [...oldData.module.media, newMedia],
-          },
-        };
-      });
     },
     onError: (error: any) => {
       toast.error(error?.data?.[0] || "Failed to add media");

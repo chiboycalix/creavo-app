@@ -71,7 +71,7 @@ export const fetctCourseService = async ({
 }) => {
   try {
     const { data } = await apiClient.get(
-      `/courses/${courseId}/list-modules?page=1&limit=10`
+      `/courses/${courseId}?page=1&limit=10`
     );
     return data;
   } catch (error) {
