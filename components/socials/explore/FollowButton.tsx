@@ -7,16 +7,19 @@ import { Plus, Check } from "lucide-react";
 import { baseUrl } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface FollowButtonProps {
   followedId: number | string;
   avatar: string;
   initialFollowStatus?: boolean;
+  isMyPost: boolean;
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({
   followedId,
   avatar,
+  isMyPost,
   initialFollowStatus = false,
 }) => {
   const queryClient = useQueryClient();
@@ -166,24 +169,26 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   };
 
   return (
-    <div className="relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center mb-6">
+    <div className={cn("relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center", isMyPost ? "mb-0" : "mb-4")}>
       <Avatar className="w-12 h-12">
         <AvatarImage src={avatar} alt="User avatar" />
         <AvatarFallback>.</AvatarFallback>
       </Avatar>
+      {
+        !isMyPost && <button
+          onClick={handleToggleFollow}
+          aria-label={isFollowing ? "Unfollow this user" : "Follow this user"}
+          disabled={followMutation.isPending || unfollowMutation.isPending}
+          className="bg-primary-700 absolute -bottom-3 left-3 rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 hover:bg-primary-800 disabled:opacity-50"
+        >
+          {isFollowing ? (
+            <Check className="text-sm text-white w-5 h-5" />
+          ) : (
+            <Plus className="text-sm text-white w-5 h-5" />
+          )}
+        </button>
+      }
 
-      <button
-        onClick={handleToggleFollow}
-        aria-label={isFollowing ? "Unfollow this user" : "Follow this user"}
-        disabled={followMutation.isPending || unfollowMutation.isPending}
-        className="bg-primary-700 absolute -bottom-3 left-3 rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 hover:bg-primary-800 disabled:opacity-50"
-      >
-        {isFollowing ? (
-          <Check className="text-sm text-white w-5 h-5" />
-        ) : (
-          <Plus className="text-sm text-white w-5 h-5" />
-        )}
-      </button>
     </div>
   );
 };

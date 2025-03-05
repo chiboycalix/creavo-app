@@ -1,6 +1,6 @@
 "use client";
 import React, { FormEvent, useState } from "react";
-import VideoPlayer from "../curriculum/VideoDuration";
+import VideoPlayer from "../long-course/VideoDuration";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DialogHeader, DialogTitle, Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";

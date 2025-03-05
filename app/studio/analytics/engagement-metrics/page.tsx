@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 "use client";
 import React, { useState, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { CourseModal } from "@/components/analytics/CourseModal";
 import { getUserCourses } from "@/services/course.service";
 import { apiClient } from "@/lib/apiClient";
+=======
+'use client'
+import React, { useState, useEffect } from 'react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CourseModal } from '@/components/analytics/CourseModal';
+import { getUserLongCourses } from '@/services/course.service';
+>>>>>>> 596438928afb436bfa3d5a0376a224afaea94aaa
 
 export interface Course {
   id: number;
@@ -58,7 +66,11 @@ function App() {
     const fetchCourses = async () => {
       setLoading(true);
       try {
+<<<<<<< HEAD
         const response = await getUserCourses(userId, rowsPerPage, currentPage);
+=======
+        const response = await getUserLongCourses(10001, rowsPerPage, currentPage);
+>>>>>>> 596438928afb436bfa3d5a0376a224afaea94aaa
         const courseData = response.data.courses.map((course: any) => ({
           id: course.id,
           title: course.title || "Untitled Course",

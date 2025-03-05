@@ -95,7 +95,7 @@ const Watchlist = () => {
     <div className='py-4'>
       <h2>Watchlist</h2>
       <div className='w-full mt-4'>
-        <CustomTab tabs={tabs} defaultValue="curriculum" />
+        <CustomTab tabs={tabs} defaultValue="watching" />
       </div>
     </div>
   )

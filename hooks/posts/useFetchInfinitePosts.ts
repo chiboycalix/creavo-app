@@ -43,7 +43,8 @@ export const useFetchInfinitePosts = (options = {}) => {
       };
 
       const response = await fetch(
-        `${baseUrl}/posts?page=${pageParam}&limit=10`, // Adjust limit as needed
+        `${baseUrl}/posts?page=${pageParam}&limit=10`,
+        // `${baseUrl}/users/${10}/posts?page=1&limit=10`,
         {
           headers: { ...header },
         }
@@ -71,6 +72,8 @@ export const useFetchInfinitePosts = (options = {}) => {
     },
     initialPageParam: 1,
     ...options,
-    refetchInterval: 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 5 * 60 * 1000,
   });
 };

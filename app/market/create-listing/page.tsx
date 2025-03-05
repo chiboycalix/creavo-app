@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";
-import { BookOpenIcon, XIcon } from "lucide-react";
+import { BookOpenIcon, BoxesIcon, CalendarRangeIcon, NotebookIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Dialog, Transition, TransitionChild } from "@headlessui/react";
@@ -27,7 +27,7 @@ const CreateListing = () => {
   const [step, setStep] = useState(1);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedLink, setSelectedLink] = useState(""); // Stores the selected route
+  const [selectedType, setSelectedType] = useState(""); // Stores the selected route
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [fileType, setFileType] = useState<"image" | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,60 +39,42 @@ const CreateListing = () => {
 
   const pagedata = [
     {
-      icon: BookOpenIcon,
-      title: "Digital Product",
-      description: "Choose the type of product you want to sell",
-      link: "digital-product",
-      color: "blue",
-    },
-    {
-      icon: BookOpenIcon,
-      title: "Courses",
-      description: "Choose the type of product you want to sell",
-      link: "courses",
-      color: "green",
-    },
-    {
-      icon: BookOpenIcon,
+      icon: NotebookIcon,
       title: "Ebooks",
       description: "Choose the type of product you want to sell",
       link: "ebooks",
-      color: "purple",
+      color: "blue",
     },
     {
-      icon: BookOpenIcon,
+      icon: CalendarRangeIcon,
       title: "Events",
       description: "Choose the type of product you want to sell",
       link: "events",
       color: "red",
     },
     {
-      icon: BookOpenIcon,
+      icon: BoxesIcon,
       title: "Services",
       description: "Choose the type of product you want to sell",
       link: "services",
       color: "yellow",
     },
-    {
-      icon: BookOpenIcon,
-      title: "Other",
-      description: "Choose the type of product you want to sell",
-      link: "other",
-      color: "gray",
-    },
   ];
 
   // Function to open modal and set selected link
-  const handleOpenModal = () => {
+  const handleOpenModal = (item: any) => {
     // setSelectedLink(link);
     console.log("I am open");
     setIsModalOpen(true);
+    setSelectedType(item);
     setStep(2);
+    console.log("type", item);
   };
 
   const handleClose = () => {
     console.log("closed");
     setIsModalOpen(false);
+    setSelectedType("");
   };
 
   const handleFileClick = () => {
@@ -229,7 +211,7 @@ const CreateListing = () => {
         {pagedata.map((item, index) => (
           <button
             key={index}
-            onClick={handleOpenModal}
+            onClick={() => handleOpenModal(item.title)}
             className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center text-center transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
           >
             <div className={`mb-3 text-${item.color}-500`}>
@@ -257,7 +239,7 @@ const CreateListing = () => {
                 leave="ease-in duration-200"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
-                className="fixed inset-0 bg-black bg-opacity-50"
+                className="fixed inset-0 bg-slate-200 bg-opacity-50 "
               />
 
               {/* Modal Content */}
@@ -267,10 +249,12 @@ const CreateListing = () => {
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     onSubmit={handleSubmit}
+                    type={selectedType}
                   />
                 </div>
               )}
 
+  
               {step === 3 && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                   <UploadSuccess

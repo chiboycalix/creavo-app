@@ -75,11 +75,6 @@ const MarketPlaceExplore = () => {
   const productCategories = [
     { category: "All", desc: "Explore all products", color: "bg-gray-200" },
     {
-      category: "Digital Products",
-      desc: "Explore digital assets",
-      color: "bg-blue-200",
-    },
-    {
       category: "E-Books",
       desc: "Discover amazing books",
       color: "bg-green-200",
@@ -90,11 +85,7 @@ const MarketPlaceExplore = () => {
       color: "bg-yellow-200",
     },
     { category: "Events", desc: "Find upcoming events", color: "bg-red-200" },
-    {
-      category: "Services",
-      desc: "Find professional services",
-      color: "bg-purple-200",
-    },
+    
   ];
 
   const handleTabChange = useCallback(

@@ -4,6 +4,7 @@ import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
+import Image from 'next/image'
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[]
@@ -86,10 +87,12 @@ const GallerySlider = ({
                 className="h-full"
               >
                 {isImage ? (
-                  <img
+                  <Image
+                    loading="lazy"
+                    width={500}
+                    height={300}
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    // className={`object-cover md:max-h-[87vh] h-[calc(87vh)]`}
                     className={`${isRenderedInComment ? "object-cover h-[calc(79vh)] w-full" : "object-cover md:max-h-[87vh] h-[calc(87vh)]"}`}
                     onLoad={() => setLoaded(true)}
                   />
