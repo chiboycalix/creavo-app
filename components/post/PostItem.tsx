@@ -138,7 +138,7 @@ const PostItem = ({ post }: PostItemType) => {
             <Image
               width={40}
               height={40}
-              src={post.avatar}
+              src={post.user_profile_avatar}
               alt={`${post.username}'s avatar`}
               className="w-10 h-10 rounded-full mr-3"
             />
