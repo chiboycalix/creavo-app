@@ -36,7 +36,7 @@ export enum KEYS {
   REDUX_STORE = "cVYHWVYQhuKE2Rg8FIkm6w==",
 }
 export interface CreateModuleForm {
-  courseId: string;
+  courseId: any;
   title: string;
   description: string;
   difficultyLevel?: string;
@@ -55,8 +55,8 @@ export interface CreateModuleForm {
 }
 
 export interface AddMediaToModule {
-  courseId: string;
-  moduleId: string;
+  courseId: any;
+  moduleId: any;
   media?: Array<{
     url: string;
     title: string;

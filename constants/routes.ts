@@ -17,7 +17,7 @@ export const ROUTES = {
   COURSES: "/courses",
   COURSE_DETAILS: (id: string) => `/courses/${id}`,
   COURSE: (id: string) => `/course/${id}`,
-  CREATE_COURSE: (courseName: string) => `/studio/create-course/${courseName}`,
+  CREATE_COURSE: (courseName: string) => `/studio/course/${courseName}`,
 
   STREAMING: (id: string) => `/streaming/${id}`,
   VIDEO_CONFERENCING: {

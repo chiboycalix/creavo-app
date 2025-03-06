@@ -15,60 +15,39 @@ import { useCreateModuleFormValidator } from "@/helpers/validators/useCreateModu
 import { useRouter, useSearchParams } from "next/navigation";
 import { generalHelpers } from "@/helpers";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { fetctCourseService } from "@/services/course.service";
 import { toast } from "sonner";
+import { useFetchCourseData } from "@/hooks/courses/useFetchCourseData";
 
-interface CourseData {
-  course: {
-    courseId: string;
-    difficultyLevel: string;
-    modules: any[];
-  };
-}
-
-interface ModuleData {
-  module: any & { media: any[] };
-}
-
-const Content: React.FC = () => {
+const Content = ({ courseId: id }: any) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const currentModule = searchParams.get("module");
+  const courseId = searchParams.get("edit");
   const [showCreateModule, setShowCreateModule] = useState(false);
   const [selectedModule, setSelectedModule] = useState<any | null>(null);
 
+  const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
+
   const { createModuleForm: createModuleStateValues, selectedModuleData } = useAppSelector((store) => store.moduleStore);
-  const { longCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
 
   const { validate, errors, validateField } = useCreateModuleFormValidator({
-    store: { ...createModuleStateValues, courseId: courseDataStateValues?.courseId },
+    store: { ...createModuleStateValues, courseId: courseData?.data?.course?.id },
   });
 
-  const { data: courseData, isLoading: isCourseLoading } = useQuery<CourseData>({
-    queryKey: ["courseData", courseDataStateValues?.courseId],
-    queryFn: async () => {
-      const data = await fetctCourseService({ courseId: courseDataStateValues?.courseId });
-      return data as CourseData;
-    },
-    enabled: !!courseDataStateValues?.courseId,
-    placeholderData: keepPreviousData,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  const { data: courseModulesData, isLoading: isModulesLoading } = useQuery<ModuleData>({
+  const { data: courseModulesData, isLoading: isModulesLoading } = useQuery<any>({
     queryKey: ["courseModulesData", selectedModuleData?.id],
     queryFn: async () => {
       const data = await fetchCourseDetailsService({
-        courseId: courseDataStateValues?.courseId,
+        courseId: courseId || courseData?.data?.course?.id,
         moduleId: selectedModuleData?.id,
       });
-      return data as ModuleData;
+      return data;
     },
-    enabled: !!courseDataStateValues?.courseId && !!selectedModuleData?.id,
+    enabled: !!courseData?.data?.course?.id && !!selectedModuleData?.id,
     placeholderData: keepPreviousData,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
   const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
@@ -78,18 +57,30 @@ const Content: React.FC = () => {
       dispatch(resetCreateModuleForm());
       setShowCreateModule(false);
       setSelectedModule(newModule);
-      router.push(`?module=${generalHelpers.convertToSlug(newModule.title)}`);
+      if (!courseId) {
+        router.push(`?module=${generalHelpers.convertToSlug(newModule.title)}`);
+      } else {
+        router.push(`?edit=${courseId}&module=${generalHelpers.convertToSlug(newModule.title)}`);
+      }
 
-      // Optimistically update courseData cache
-      queryClient.setQueryData<CourseData>(["courseData", courseDataStateValues?.courseId], (oldData) => {
-        if (!oldData?.course) return oldData;
+      queryClient.setQueryData(["useFetchCourseData", courseId || courseData?.data?.course?.id], (oldData: any) => {
+        if (!oldData?.data?.course) return oldData;
         return {
           ...oldData,
-          course: {
-            ...oldData.course,
-            modules: [...oldData.course.modules, newModule],
+          data: {
+            ...oldData.data,
+            course: {
+              ...oldData.data.course,
+              modules: [...oldData.data.course.modules, newModule],
+            },
           },
         };
+      });
+
+      // Invalidate related queries to ensure consistency
+      queryClient.invalidateQueries({
+        queryKey: ["useFetchCourseData", courseId || courseData?.data?.course?.id],
+        exact: true
       });
     },
     onError: (error: any) => {
@@ -112,31 +103,39 @@ const Content: React.FC = () => {
       e.preventDefault();
       validate(() =>
         handleAddModule({
-          courseId: courseDataStateValues?.courseId,
-          difficultyLevel: courseDataStateValues?.difficultyLevel,
+          courseId: Number(courseId) || Number(courseData?.data?.course?.id),
+          difficultyLevel: courseModulesData?.module?.course?.difficultyLevel || courseData?.data?.course?.difficultyLevel,
           title: createModuleStateValues?.title,
-          description: createModuleStateValues?.description,
+          description: courseModulesData?.description || createModuleStateValues?.description,
         })
       );
     },
-    [validate, handleAddModule, courseDataStateValues, createModuleStateValues]
+    [validate, handleAddModule, courseId, courseData?.data?.course?.id, courseData?.data?.course?.difficultyLevel, courseModulesData?.module?.course?.difficultyLevel, courseModulesData?.description, createModuleStateValues?.title, createModuleStateValues?.description]
   );
 
   const handleClickModule = useCallback(
     (module: any) => {
       setShowCreateModule(false);
       setSelectedModule(module);
-      router.push(`?module=${generalHelpers.convertToSlug(module.title)}`);
+      if (!courseId) {
+        router.push(`?module=${generalHelpers.convertToSlug(module.title)}`);
+      } else {
+        router.push(`?edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`);
+      }
     },
-    [router]
+    [courseId, router]
   );
 
   useEffect(() => {
-    if (!courseData?.course?.modules?.length || selectedModule) return;
-    const initialModule = courseData.course.modules[0];
+    if (!courseData?.data?.course?.modules?.length || selectedModule || isFetchingCourse) return;
+
+    const initialModule = courseData?.data?.course.modules[0];
     setSelectedModule(initialModule);
-    router.push(`?module=${generalHelpers.convertToSlug(initialModule.title)}`);
-  }, [courseData?.course?.modules, router, selectedModule]);
+    const url = courseId
+      ? `?edit=${courseId}&module=${generalHelpers.convertToSlug(initialModule.title)}`
+      : `?module=${generalHelpers.convertToSlug(initialModule.title)}`;
+    router.push(url);
+  }, [courseId, courseData?.data?.course?.modules, router, selectedModule, isFetchingCourse]);
 
   useEffect(() => {
     if (selectedModule) {
@@ -145,8 +144,8 @@ const Content: React.FC = () => {
   }, [selectedModule, updateSelectedModule]);
 
   const renderModulesList = useMemo(() => {
-    if (isCourseLoading) return <div className="h-[50vh] flex flex-col items-center justify-center"><Spinner /></div>;
-    if (!courseData?.course?.modules?.length) {
+    if (isFetchingCourse) return <div className="h-[50vh] flex flex-col items-center justify-center"><Spinner /></div>;
+    if (!courseData?.data?.course?.modules?.length) {
       return (
         <div className="h-full text-sm mb-4 flex flex-col justify-center items-center mt-28">
           <Clipboard />
@@ -155,9 +154,9 @@ const Content: React.FC = () => {
       );
     }
 
-    return courseData.course.modules.map((module: any, index: number) => {
+    return courseData?.data?.course.modules.map((module: any, index: number) => {
       const isActive =
-        generalHelpers.convertFromSlug(currentModule || courseData?.course?.modules[0]?.title) ===
+        generalHelpers.convertFromSlug(currentModule || courseData?.data?.course?.modules[0]?.title) ===
         generalHelpers.capitalizeWords(module.title);
 
       return (
@@ -176,10 +175,10 @@ const Content: React.FC = () => {
         </div>
       );
     });
-  }, [courseData?.course?.modules, currentModule, handleClickModule, isCourseLoading]);
+  }, [courseData?.data?.course?.modules, currentModule, handleClickModule, isFetchingCourse]);
 
   const renderContentArea = useMemo(() => {
-    if (isCourseLoading || isModulesLoading) return <div className="h-[50vh] flex flex-col items-center justify-center"><Spinner /></div>;
+    if (isModulesLoading) return <div className="h-[50vh] flex flex-col items-center justify-center"><Spinner /></div>;
 
     if (showCreateModule) {
       return (
@@ -220,7 +219,7 @@ const Content: React.FC = () => {
       );
     }
 
-    if (!selectedModule || !courseData?.course?.modules?.length) {
+    if (!selectedModule || !courseData?.data?.course?.modules?.length) {
       return (
         <div className="w-full mt-40 mx-auto flex flex-col items-center justify-center">
           <Video size={30} />
@@ -302,23 +301,8 @@ const Content: React.FC = () => {
         />
       </>
     );
-  }, [
-    isCourseLoading,
-    isModulesLoading,
-    showCreateModule,
-    handleSubmit,
-    createModuleStateValues,
-    updateCreateModule,
-    errors,
-    validateField,
-    isAddingModule,
-    selectedModule,
-    courseData?.course?.modules,
-    courseModulesData?.module?.media,
-    queryClient,
-    selectedModuleData?.id,
-  ]);
-
+  }, [isModulesLoading, showCreateModule, selectedModule, courseData?.data?.course?.modules?.length, courseModulesData?.module?.media, queryClient, selectedModuleData?.id, handleSubmit, createModuleStateValues.title, createModuleStateValues.description, errors.title, errors.description, isAddingModule, updateCreateModule, validateField]);
+  console.log({ courseId })
   return (
     <div className="flex gap-4 w-full">
       <Card className="basis-4/12 border-none px-1">

@@ -11,7 +11,7 @@ import { generalHelpers } from '@/helpers'
 import { COURSE_CATEGORY, CreateCourseForm, createCourseService } from '@/services/course.service'
 import { useMutation } from '@tanstack/react-query'
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
-import { CourseData, updatCreateShortCourseForm, updateShortCourseData } from '@/redux/slices/course.slice';
+import { CourseData, resetCreateShortCourseForm, updatCreateShortCourseForm, updateShortCourseData } from '@/redux/slices/course.slice';
 import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCourse.validator';
 import { Loader2 } from 'lucide-react';
 import { useToast } from "@/context/ToastContext";
@@ -85,9 +85,11 @@ const CreateShortCourse = () => {
         description: data?.description,
         difficultyLevel: data?.difficultyLevel
       })
-      showToast('success', 'success', "Course created successfully");
-      const slugTitle = generalHelpers?.convertToSlug(data?.title)
-      router.push(`/studio/create-course/short-course/${slugTitle}`)
+      showToast('success', 'Success', "Course created successfully");
+
+      // const slugTitle = generalHelpers?.convertToSlug(data?.title)
+      router.push(`/studio/course/short-course/${data?.id}`)
+      dispatch(resetCreateShortCourseForm())
     },
     onError: (error: any) => {
       showToast('error', 'Failed to create course', error.data[0]);
