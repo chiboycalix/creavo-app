@@ -57,18 +57,30 @@ const Content = ({ courseId: id }: any) => {
       dispatch(resetCreateModuleForm());
       setShowCreateModule(false);
       setSelectedModule(newModule);
-      router.push(`?module=${generalHelpers.convertToSlug(newModule.title)}`);
+      if (!courseId) {
+        router.push(`?module=${generalHelpers.convertToSlug(newModule.title)}`);
+      } else {
+        router.push(`?edit=${courseId}&module=${generalHelpers.convertToSlug(newModule.title)}`);
+      }
 
-      // Optimistically update useFetchCourseData cache
-      queryClient.setQueryData<any>(["useFetchCourseData", courseData?.data?.course?.id], (oldData: any) => {
+      queryClient.setQueryData(["useFetchCourseData", courseId || courseData?.data?.course?.id], (oldData: any) => {
         if (!oldData?.data?.course) return oldData;
         return {
-          ...oldData?.data,
-          course: {
-            ...oldData?.data?.course,
-            modules: [...oldData?.data?.course?.modules, newModule],
+          ...oldData,
+          data: {
+            ...oldData.data,
+            course: {
+              ...oldData.data.course,
+              modules: [...oldData.data.course.modules, newModule],
+            },
           },
         };
+      });
+
+      // Invalidate related queries to ensure consistency
+      queryClient.invalidateQueries({
+        queryKey: ["useFetchCourseData", courseId || courseData?.data?.course?.id],
+        exact: true
       });
     },
     onError: (error: any) => {
@@ -91,7 +103,7 @@ const Content = ({ courseId: id }: any) => {
       e.preventDefault();
       validate(() =>
         handleAddModule({
-          courseId: courseId || courseData?.data?.course?.id,
+          courseId: Number(courseId) || Number(courseData?.data?.course?.id),
           difficultyLevel: courseModulesData?.module?.course?.difficultyLevel || courseData?.data?.course?.difficultyLevel,
           title: createModuleStateValues?.title,
           description: courseModulesData?.description || createModuleStateValues?.description,
@@ -115,15 +127,15 @@ const Content = ({ courseId: id }: any) => {
   );
 
   useEffect(() => {
-    if (!courseData?.data?.course?.modules?.length || selectedModule) return;
+    if (!courseData?.data?.course?.modules?.length || selectedModule || isFetchingCourse) return;
+
     const initialModule = courseData?.data?.course.modules[0];
     setSelectedModule(initialModule);
-    if (!courseId) {
-      router.push(`?module=${generalHelpers.convertToSlug(initialModule.title)}`);
-    } else {
-      router.push(`?edit=${courseId}&module=${generalHelpers.convertToSlug(initialModule.title)}`);
-    }
-  }, [courseId, courseData?.data?.course?.modules, router, selectedModule]);
+    const url = courseId
+      ? `?edit=${courseId}&module=${generalHelpers.convertToSlug(initialModule.title)}`
+      : `?module=${generalHelpers.convertToSlug(initialModule.title)}`;
+    router.push(url);
+  }, [courseId, courseData?.data?.course?.modules, router, selectedModule, isFetchingCourse]);
 
   useEffect(() => {
     if (selectedModule) {

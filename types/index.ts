@@ -36,7 +36,7 @@ export enum KEYS {
   REDUX_STORE = "cVYHWVYQhuKE2Rg8FIkm6w==",
 }
 export interface CreateModuleForm {
-  courseId: string;
+  courseId: string | number;
   title: string;
   description: string;
   difficultyLevel?: string;
