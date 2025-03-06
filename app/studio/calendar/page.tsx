@@ -165,7 +165,6 @@ const Calendar = () => {
         members: meeting.participants?.map(p => p.name) || [],
       }));
 
-      // Filter meetings for the selected date only
       const filteredMeetings = formattedMeetings.filter(meeting => {
         const meetingDate = meeting.date;
         return (
