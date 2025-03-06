@@ -38,7 +38,6 @@ const Course = () => {
   const courseType = courseData?.data?.course?.category === "STANDARD" ? "long-course" : "short-course";
   const courseSlug = generalHelpers.convertToSlug(courseData?.data?.course?.title || "")
 
-
   const { mutate: handleCourseDelete, isPending: isDeletingCourse } = useMutation({
     mutationFn: (payload: { courseId: string }) => deleteCourseService(payload),
     onSuccess: async (data) => {
@@ -52,6 +51,13 @@ const Course = () => {
 
   const handleDeleteCourse = async () => {
     handleCourseDelete({ courseId: courseId?.toString() || '' })
+  }
+
+  const handleEdit = () => {
+    const queryParams = new URLSearchParams({
+      "edit": JSON.stringify(courseId),
+    }).toString();
+    router.push(`/studio/course/${courseType}/${courseSlug}?${queryParams}`)
   }
 
   return (
@@ -82,7 +88,6 @@ const Course = () => {
                     <div className='flex items-center justify-between'>
                       <p className='text-sm font-semibold text-primary-700 mt-3'>{generalHelpers.getCurrencySymbol(courseData?.data?.course?.currency)}{courseData?.data?.course?.isPaid ? courseData?.data?.course.amount : "Free"}</p>
                       <p className='text-sm font-semibold'>{formatDate(courseData?.data?.course?.createdAt)}</p>
-                      {/* <p className='text-sm font-semibold'>{formatDate("2021-03-05T10:02:07.289Z")}</p> */}
                     </div>
                   </div>
                   <hr className='my-4' />
@@ -91,7 +96,7 @@ const Course = () => {
                   </div>
                   <div className='flex gap-2 mt-4'>
                     <div className='flex-1'>
-                      <Button className='w-full' onClick={() => router.push(`/studio/create-course/${courseType}/${courseSlug}`)}>
+                      <Button className='w-full' onClick={() => handleEdit()}>
                         Edit course
                       </Button>
                     </div>

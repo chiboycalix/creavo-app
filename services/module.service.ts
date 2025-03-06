@@ -49,6 +49,7 @@ export const fetchCourseDetailsService = async (payload: {
     const { data } = await apiClient.get(
       `/courses/${payload?.courseId}/modules/${payload?.moduleId}`
     );
+    console.log({ data });
     return data;
   } catch (error) {
     throw error;

@@ -1,26 +1,17 @@
 "use client";
 import React from "react";
+import Spinner from "@/components/Spinner";
 import UploadShortCourseMedia from "./UploadShortCourse";
 import { GripVertical, Trash, Video } from "lucide-react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useAppSelector } from "@/hooks/useStore.hook";
-import { fetchShortCourseService } from "@/services/course.service";
+import { useSearchParams } from "next/navigation";
+import { useFetchCourseData } from "@/hooks/courses/useFetchCourseData";
 
-const Content = () => {
-  const { shortCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
+const Content = ({ courseId: id }: any) => {
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get("edit");
+  const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
 
-  const { data: courseData } = useQuery({
-    queryKey: ["shortcourseData"],
-    queryFn: async () => {
-      const courseData = await fetchShortCourseService({
-        courseId: courseDataStateValues?.courseId,
-      });
-      return courseData as any;
-    },
-    enabled: !!courseDataStateValues?.courseId,
-    refetchInterval: 300,
-    placeholderData: keepPreviousData,
-  });
+  if (isFetchingCourse) return <div className="h-[50vh] flex flex-col items-center justify-center"><Spinner /></div>;
 
   return (
     <div>
@@ -39,7 +30,7 @@ const Content = () => {
           </div>
         ) : (
           <>
-            {courseData?.course?.media?.map((video: any) => {
+            {courseData?.data?.course?.media?.map((video: any) => {
               return (
                 <div
                   key={video?.id}

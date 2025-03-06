@@ -85,7 +85,7 @@ export default function MainLayout({
       icon: LightbulbIcon,
       navItems: [
         { title: 'Dashboard', href: '/studio', icon: <RiHome8Fill size={20} /> },
-        { title: 'Create course', href: '/studio/create-course', icon: PlusSquareIcon },
+        { title: 'Create course', href: '/studio/course', icon: PlusSquareIcon },
         { title: 'Course Management', href: '/studio/course-management', icon: BoxesIcon },
         {
           title: 'Learners', href: '/studio/learners', icon: User,
