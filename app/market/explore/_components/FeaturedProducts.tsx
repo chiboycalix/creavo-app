@@ -33,7 +33,6 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
     e.preventDefault();
     const query = e.target.value;
     setSearchQuery(query);
-    
   };
 
   useEffect(() => {
@@ -79,21 +78,21 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
         <TabsContent key={tab.category} value={tab.category}>
           <h2>Featured Products</h2>
           {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"> */}
-            <div className="flex flex-wrap gap-4 justify-start sm:justify-start md:justify-start">
+          <div className="flex flex-wrap gap-4 justify-start sm:justify-start md:justify-start">
             {products
               ?.filter(
-              (product: any) =>
-                tab.category === "All" || product.category === tab.category
+                (product: any) =>
+                  tab.category === "All" || product.category === tab.category
               )
               .map((product: any) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                isSaved={isSaved}
-                handleToggleSave={handleToggleSave}
-              />
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isSaved={isSaved}
+                  handleToggleSave={handleToggleSave}
+                />
               ))}
-            </div>
+          </div>
         </TabsContent>
       ))}
     </Tabs>

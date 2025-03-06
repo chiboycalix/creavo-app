@@ -85,7 +85,6 @@ const MarketPlaceExplore = () => {
       color: "bg-yellow-200",
     },
     { category: "Events", desc: "Find upcoming events", color: "bg-red-200" },
-    
   ];
 
   const handleTabChange = useCallback(
@@ -140,7 +139,7 @@ const MarketPlaceExplore = () => {
   }, [searchParams, activeTab]);
 
   return (
-        <div className="flex gap-4">
+    <div className="flex gap-4">
       {searchRoom && (
         <div className="w-[20%] min-w-[250px] max-w-[300px] flex flex-col gap-4 p-4 border rounded-md bg-white shadow-sm">
           <h1 className="text-lg font-semibold">Categories</h1>
