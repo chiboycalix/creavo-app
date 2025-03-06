@@ -1,73 +1,204 @@
-"use client";
-import React, { useState } from "react";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import SelectedEventCard from "@/components/studio/calendar/SelectedEventCard";
-import AddEventCard from "@/components/studio/calendar/AddEventCard";
-import { ChevronLeft, ChevronRight, Menu, PlusCircle } from "lucide-react";
+'use client'
+import React, { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { SelectInput } from "@/components/Input/SelectInput";
+import AddEventCard from '@/components/studio/calendar/AddEventCard';
+import SelectedEventCard from '@/components/studio/calendar/SelectedEventCard';
+import { Button } from '@/components/ui/button';
+import { baseUrl } from "@/utils/constant";
+import Cookies from 'js-cookie';
 
-const dummyEvents = [
-  // January 1, 2025 (existing events)
-  { id: 1, title: "Onboarding new staff", date: new Date(2025, 0, 1), startTime: "08:00", endTime: "09:00", color: "bg-green-200" },
-  { id: 2, title: "Budget Review Class", date: new Date(2025, 0, 1), startTime: "09:00", endTime: "10:00", color: "bg-red-200" },
-  { id: 3, title: "Ore Aisha", date: new Date(2025, 0, 1), startTime: "10:00", endTime: "12:00", color: "bg-yellow-200" },
-  { id: 4, title: "Daily Standup", date: new Date(2025, 0, 1), startTime: "13:00", endTime: "14:00", color: "bg-purple-200" },
+interface CalendarEvent {
+  id: number;
+  title: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  color: string;
+  description?: string;
+  location?: string;
+  isAllDay?: boolean;
+  isRepeating?: boolean;
+  members?: string[];
+}
 
-  // February 1–7, 2025 (5 events spread across the week)
-  { id: 5, title: "Team Strategy Meeting", date: new Date(2025, 1, 1), startTime: "09:00", endTime: "10:30", color: "bg-blue-200" },
-  { id: 6, title: "Product Launch Prep", date: new Date(2025, 1, 2), startTime: "10:00", endTime: "11:00", color: "bg-indigo-200" },
-  { id: 7, title: "Client Feedback Session", date: new Date(2025, 1, 3), startTime: "14:00", endTime: "15:30", color: "bg-teal-200" },
-  { id: 8, title: "Training Workshop", date: new Date(2025, 1, 5), startTime: "08:00", endTime: "09:30", color: "bg-orange-200" },
-  { id: 9, title: "Weekly Review", date: new Date(2025, 1, 7), startTime: "15:00", endTime: "16:00", color: "bg-pink-200" },
+interface ApiMeeting {
+  id: number;
+  userId: number;
+  timezone: string;
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  isPaid: boolean;
+  amount: number;
+  currency: string | null;
+  repeat: boolean;
+  repeatType: string | null;
+  meetingCode: string | null;
+  participants?: Array<{ name: string }>;
+  startTimeStr?: string;
+  endTimeStr?: string;
+  color?: string;
+  location?: string;
+  isAllDay?: boolean;
+}
 
-  // March 1–14, 2025 (5 events spread across two weeks)
-  { id: 10, title: "Q1 Performance Review", date: new Date(2025, 2, 1), startTime: "09:00", endTime: "10:30", color: "bg-green-200" },
-  { id: 11, title: "Design Sprint Kickoff", date: new Date(2025, 2, 3), startTime: "10:00", endTime: "12:00", color: "bg-red-200" },
-  { id: 12, title: "Marketing Campaign Planning", date: new Date(2025, 2, 7), startTime: "13:00", endTime: "14:30", color: "bg-yellow-200" },
-  { id: 13, title: "Tech Infrastructure Update", date: new Date(2025, 2, 10), startTime: "11:00", endTime: "12:30", color: "bg-purple-200" },
-  { id: 14, title: "User Testing Session", date: new Date(2025, 2, 14), startTime: "14:00", endTime: "15:00", color: "bg-blue-200" },
-];
-
-const currentYear = 2025;
+interface ApiResponse {
+  data: {
+    meetings: ApiMeeting[];
+    meta: {
+      page: number;
+      limit: number;
+      totalRows: number;
+      totalPage: number;
+    }
+  };
+  message: string;
+  code: number;
+  status: string;
+  statusCode: number;
+}
 
 const Calendar = () => {
-  const [currentMonth, setCurrentMonth] = useState(0);
-  const [selectedDay, setSelectedDay] = useState(2);
-
-  const [selectedEventForTime, setSelectedEventForTime] = useState({})
-  const [showEventsDetailsCard, setShowEventsDetailsCard] = useState(false)
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [selectedDay, setSelectedDay] = useState(new Date().getDate());
+  const [selectedEventForTime, setSelectedEventForTime] = useState<CalendarEvent | null>(null);
+  const [showEventsDetailsCard, setShowEventsDetailsCard] = useState(false);
   const [eventsDetailsAnchorRect, setEventsDetailsAnchorRect] = useState<DOMRect | null>(null);
-
   const [addEventAnchorRect, setAddEventAnchorRect] = useState<DOMRect | null>(null);
-  const [showAddEventCard, setShowAddEventCard] = useState(false)
+  const [showAddEventCard, setShowAddEventCard] = useState(false);
+  const [meetings, setMeetings] = useState<CalendarEvent[]>([]);
+  const [monthMeetings, setMonthMeetings] = useState<CalendarEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSetSelectdEvent = (event: React.MouseEvent<HTMLDivElement>, eventForTime: any) => {
-    const buttonRect = event.currentTarget.getBoundingClientRect();
-    setEventsDetailsAnchorRect(buttonRect);
-    setShowEventsDetailsCard(true);
-    setSelectedEventForTime(eventForTime)
+  const currentYear = new Date().getFullYear();
+  const daysOfWeek = ["m", "t", "w", "t", "f", "s", "s"];
+  const timeSlots = Array.from({ length: 24 }, (_, i) => 
+    `${i.toString().padStart(2, '0')}:00`
+  );
+
+  useEffect(() => {
+    fetchMonthMeetings();
+  }, [currentMonth]);
+
+  useEffect(() => {
+    fetchMeetings();
+  }, [selectedDay, currentMonth]);
+
+  const fetchMonthMeetings = async () => {
+    try {
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const lastDay = new Date(currentYear, currentMonth + 1, 0);
+      
+      const response = await fetch(
+        `${baseUrl}/meetings/user-Meetings/list?page=1&limit=100&startDate=${firstDay.toISOString().split('T')[0]}&endDate=${lastDay.toISOString().split('T')[0]}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
+          },
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch meetings');
+      }
+      // console.log(response)
+      
+      const responseData: ApiResponse = await response.json();
+      const meetings = responseData.data.meetings;
+
+      const formattedMeetings = meetings.map((meeting: ApiMeeting) => ({
+        id: meeting.id,
+        title: meeting.title,
+        date: new Date(meeting.startTime),
+        startTime: meeting.startTimeStr || formatTimeFromDate(new Date(meeting.startTime)),
+        endTime: meeting.endTimeStr || formatTimeFromDate(new Date(meeting.endTime)),
+        color: `bg-${meeting.color || "blue"}-200`,
+        description: meeting.description,
+        location: meeting.location,
+        isAllDay: meeting.isAllDay,
+        isRepeating: meeting.repeat,
+        members: meeting.participants?.map(p => p.name) || [],
+      }));
+
+      setMonthMeetings(formattedMeetings);
+    } catch (error) {
+      console.error('Error fetching month meetings:', error);
+      setMonthMeetings([]);
+    }
+  };
+
+  const fetchMeetings = async () => {
+    setIsLoading(true);
+    try {
+      const date = new Date(currentYear, currentMonth, selectedDay);
+      const formattedDate = date.toISOString().split('T')[0];
+      
+      const response = await fetch(
+        `${baseUrl}/meetings/user-Meetings/list?page=1&limit=10&date=${formattedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
+          },
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch meetings');
+      }
+      
+      const responseData: ApiResponse = await response.json();
+      const meetings = responseData.data.meetings;
+
+      const formattedMeetings = meetings.map((meeting: ApiMeeting) => ({
+        id: meeting.id,
+        title: meeting.title,
+        date: new Date(meeting.startTime),
+        startTime: meeting.startTimeStr || formatTimeFromDate(new Date(meeting.startTime)),
+        endTime: meeting.endTimeStr || formatTimeFromDate(new Date(meeting.endTime)),
+        color: `bg-${meeting.color || "red"}-200`,
+        description: meeting.description,
+        location: meeting.location,
+        isAllDay: meeting.isAllDay,
+        isRepeating: meeting.repeat,
+        members: meeting.participants?.map(p => p.name) || [],
+      }));
+
+      const filteredMeetings = formattedMeetings.filter(meeting => {
+        const meetingDate = meeting.date;
+        return (
+          meetingDate.getDate() === selectedDay &&
+          meetingDate.getMonth() === currentMonth &&
+          meetingDate.getFullYear() === currentYear
+        );
+      });
+
+      setMeetings(filteredMeetings);
+    } catch (error) {
+      console.error('Error fetching meetings:', error);
+      setMeetings([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatTimeFromDate = (date: Date): string => {
+    return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
   };
 
   const handleAddEvent = (event: React.MouseEvent<HTMLButtonElement>) => {
     const buttonRect = event.currentTarget.getBoundingClientRect();
     setAddEventAnchorRect(buttonRect);
     setShowAddEventCard(true);
-  }
-
-  const daysOfWeek = ["m", "t", "w", "t", "f", "s", "s"];
+  };
 
   const goToPreviousMonth = () => {
-    if (currentMonth > 0) {
-      setCurrentMonth(currentMonth - 1);
-    }
+    setCurrentMonth(prev => prev === 0 ? 11 : prev - 1);
   };
 
   const goToNextMonth = () => {
-    if (currentMonth < 11) {
-      setCurrentMonth(currentMonth + 1);
-    }
+    setCurrentMonth(prev => prev === 11 ? 0 : prev + 1);
   };
 
   const getDaysInMonth = (month: number, year: number) => {
@@ -82,271 +213,214 @@ const Calendar = () => {
   const generateCalendarDays = () => {
     const daysInMonth = getDaysInMonth(currentMonth, currentYear);
     const firstDayOfMonth = getFirstDayOfMonth(currentMonth, currentYear);
+    const days = [];
 
-    const prevMonthDays = [];
+    // Previous month days
     const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const prevMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-    const daysInPrevMonth = getDaysInMonth(prevMonth, prevMonthYear);
-
+    const prevMonthDays = getDaysInMonth(prevMonth, currentYear);
     for (let i = 0; i < firstDayOfMonth; i++) {
-      prevMonthDays.push({
-        day: daysInPrevMonth - firstDayOfMonth + i + 1,
-        currentMonth: false,
-        nextMonth: false,
+      days.push({
+        day: prevMonthDays - firstDayOfMonth + i + 1,
+        currentMonth: false
       });
     }
 
-    const currentMonthDays = [];
+    // Current month days
     for (let i = 1; i <= daysInMonth; i++) {
-      currentMonthDays.push({
+      days.push({
         day: i,
-        currentMonth: true,
-        nextMonth: false,
+        currentMonth: true
       });
     }
 
-    const nextMonthDays = [];
-    const totalDaysDisplayed = prevMonthDays.length + currentMonthDays.length;
-    const remainingCells = 42 - totalDaysDisplayed;
-
-    for (let i = 1; i <= remainingCells; i++) {
-      nextMonthDays.push({
+    // Next month days
+    const remainingDays = 42 - days.length;
+    for (let i = 1; i <= remainingDays; i++) {
+      days.push({
         day: i,
-        currentMonth: false,
-        nextMonth: true,
+        currentMonth: false
       });
     }
 
-    return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
+    return days;
   };
 
   const getMonthName = (month: number) => {
     const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
     ];
     return months[month];
   };
 
-  const formatDayDisplay = (day: number) => {
-    return `${day} ${getMonthName(currentMonth)} ${currentYear}`;
+  const getMeetingsForTimeSlot = (time: string) => {
+    return meetings.filter(meeting => meeting.startTime.startsWith(time.split(':')[0]));
   };
 
-  const timeSlots = Array.from({ length: 24 }, (_, i) =>
-    `${i.toString().padStart(2, "0")}:00`
-  );
-
-  const days = generateCalendarDays();
-
-  const getEventsForDay = (day: number) => {
-    return dummyEvents.filter(
-      (event) =>
-        event.date.getDate() === day &&
-        event.date.getMonth() === currentMonth &&
-        event.date.getFullYear() === currentYear
-    );
-  };
-
-  const getUpcomingEvents = () => {
-    const today = new Date(currentYear, currentMonth, selectedDay);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-
-    return dummyEvents.filter((event) => {
-      const eventDate = event.date;
+  const hasEventsOnDay = (day: number) => {
+    return monthMeetings.some(meeting => {
+      const meetingDate = meeting.date;
       return (
-        (eventDate.getDate() === today.getDate() &&
-          eventDate.getMonth() === today.getMonth() &&
-          eventDate.getFullYear() === today.getFullYear()) ||
-        (eventDate.getDate() === tomorrow.getDate() &&
-          eventDate.getMonth() === tomorrow.getMonth() &&
-          eventDate.getFullYear() === tomorrow.getFullYear())
+        meetingDate.getDate() === day &&
+        meetingDate.getMonth() === currentMonth &&
+        meetingDate.getFullYear() === currentYear
       );
     });
   };
 
-  const eventsForSelectedDay = getEventsForDay(selectedDay);
-  const upcomingEvents = getUpcomingEvents();
-
   return (
-    <ProtectedRoute
-      requireAuth={true}
-      requireVerification={true}
-      requireProfileSetup={false}
-    >
-      <div className="flex flex-col min-h-screen">
-        {/* Top Navigation */}
-        <header className="border-b border-gray-200 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="">Calendar</span>
-          </div>
-          <Button
-            className="bg-primary-600 text-white flex items-center gap-1 px-6 py-1 rounded-md"
-            onClick={handleAddEvent}
-          >
-            <span>Add Event</span>
-            <PlusCircle className="h-4 w-4" />
-          </Button>
-        </header>
+    <div className="flex flex-col h-screen bg-white">
+      <header className="flex justify-between items-center px-6 py-4 border-b">
+        <h1 className="text-xl font-semibold">Calendar</h1>
+        <Button 
+          onClick={handleAddEvent}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+        >
+          Add Event <PlusCircle className="w-4 h-4" />
+        </Button>
+      </header>
 
-        <div className="flex flex-1 bg-white">
-          {/* Left Sidebar */}
-          <div className="w-[350px] border-r border-gray-200 p-6">
-            {/* Month selection header */}
-            <div className="flex items-center justify-between mb-6">
-              <button
-                onClick={goToPreviousMonth}
-                disabled={currentMonth === 0}
-                className={`p-1 rounded ${currentMonth === 0 ? "text-gray-300" : "text-gray-600 hover:bg-gray-100"}`}
-              >
-                <ChevronLeft className="h-5 w-5" />
+      <div className="flex flex-1">
+        {/* Left sidebar */}
+        <div className="w-[280px] border-r p-6">
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <button onClick={goToPreviousMonth}>
+                <ChevronLeft className="w-5 h-5" />
               </button>
-              <h2 className="text-xl font-semibold">{getMonthName(currentMonth)}</h2>
-              <button
-                onClick={goToNextMonth}
-                disabled={currentMonth === 11}
-                className={`p-1 rounded ${currentMonth === 11 ? "text-gray-300" : "text-gray-600 hover:bg-gray-100"}`}
-              >
-                <ChevronRight className="h-5 w-5" />
+              <h2 className="text-lg font-medium">{getMonthName(currentMonth)}</h2>
+              <button onClick={goToNextMonth}>
+                <ChevronRight className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-7 text-xs text-center mb-2">
-              {daysOfWeek.map((day, index) => (
-                <div key={index} className="uppercase text-gray-500">
+            <div className="grid grid-cols-7 gap-1 text-center mb-2">
+              {daysOfWeek.map((day, i) => (
+                <div key={i} className="text-xs text-gray-500 uppercase">
                   {day}
                 </div>
               ))}
             </div>
+
             <div className="grid grid-cols-7 gap-1">
-              {days.map((day, index) => {
-                const dayEvents = getEventsForDay(day.day);
-                return (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.1 }}
-                    className={`relative w-8 h-8 flex items-center justify-center rounded-full text-sm cursor-pointer ${!day.currentMonth
-                      ? "text-gray-300"
-                      : day.day === selectedDay
-                        ? "bg-primary-600 text-white"
-                        : "hover:bg-gray-100"
-                      }`}
-                    onClick={() => day.currentMonth && setSelectedDay(day.day)}
-                  >
-                    {day.day}
-                    {dayEvents.length > 0 && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-red-500 rounded-full"></div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Month selector dropdown */}
-            <div className="mt-8 mb-6">
-              <div className="relative">
-                <SelectInput
-                  value={currentMonth}
-                  onChange={(value) => setCurrentMonth(Number(value))}
-                  options={Array.from({ length: 12 }, (_, i) => ({
-                    label: `${getMonthName(i)} ${currentYear}`,
-                    value: i.toString()
-                  }))}
-                />
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <h3 className="text-lg font-medium mb-4">Upcoming events</h3>
-              {upcomingEvents.length > 0 ? (
-                upcomingEvents.map((event) => (
-                  <div key={event.id} className="mb-2 p-2 bg-gray-100 rounded">
-                    <p className="text-sm">
-                      {event.title} - {event.startTime} to {event.endTime} ({getMonthName(event.date.getMonth())} {event.date.getDate()})
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <div className="mb-3">
-                    <svg width="46" height="45" viewBox="0 0 46 45" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
-                      <rect x="0.5" width="45" height="45" fill="url(#pattern0_1658_34056)" />
-                      <defs>
-                        <pattern id="pattern0_1658_34056" patternContentUnits="objectBoundingBox" width="1" height="1">
-                          <use xlinkHref="#image0_1658_34056" transform="scale(0.0138889)" />
-                        </pattern>
-                        <image id="image0_1658_34056" width="72" height="72" preserveAspectRatio="none" xlinkHref="data:image/png;base64,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" />
-                      </defs>
-                    </svg>
-
-                  </div>
-                  <p className="text-gray-500 text-sm">No upcoming events</p>
-                </div>
-              )}
+              {generateCalendarDays().map((day, i) => (
+                <motion.button
+                  key={i}
+                  whileHover={{ scale: 1.1 }}
+                  className={`
+                    relative w-8 h-8 rounded-full flex items-center justify-center text-sm
+                    ${day.currentMonth 
+                      ? day.day === selectedDay 
+                        ? 'bg-blue-600 text-white' 
+                        : 'hover:bg-gray-100'
+                      : 'text-gray-300'
+                    }
+                  `}
+                  onClick={() => day.currentMonth && setSelectedDay(day.day)}
+                >
+                  {day.day}
+                  {day.currentMonth && hasEventsOnDay(day.day) && (
+                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-red-500 rounded-full"></div>
+                  )}
+                </motion.button>
+              ))}
             </div>
           </div>
 
-          {/* Main Content */}
-          <div className="flex-1">
-            <div className="p-4 border-b border-gray-200 flex items-center">
-              <div className="flex items-center">
-                <button className="p-1">
-                  <Menu className="h-5 w-5 text-gray-500" />
-                </button>
-                <h2 className="text-xl font-semibold ml-2">{formatDayDisplay(selectedDay)}</h2>
+          <div>
+            <h3 className="text-lg font-medium mb-4">Upcoming events</h3>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
-            </div>
-
-            <div className="overflow-y-auto h-[calc(100vh-160px)]">
-              {timeSlots.map((time, index) => {
-                const eventForTime = eventsForSelectedDay.find(
-                  (event) => event.startTime === time
-                );
-                return (
-                  <div key={index} className="flex border-b border-gray-100">
-                    <div className="w-20 p-2 text-xs text-gray-500 text-right">{time}</div>
-                    <div className="flex-1 h-16 border-l border-gray-200">
-                      {eventForTime && (
-                        <div
-                          className={`h-full ${eventForTime.color} p-2 text-sm text-gray-800 cursor-pointer`}
-                          onClick={(e) => handleSetSelectdEvent(e, eventForTime)}
-                        >
-                          {eventForTime.title}
-                          <br />
-                          {eventForTime.startTime} - {eventForTime.endTime}
-                        </div>
-                      )}
-                    </div>
+            ) : meetings.length > 0 ? (
+              <div className="space-y-3">
+                {meetings.map(meeting => (
+                  <div key={meeting.id} className="p-3 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-sm">{meeting.title}</h4>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {meeting.startTime} - {meeting.endTime}
+                    </p>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8">
+                <img 
+                  src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIwIDEwVjdDMjAgNS44OTU0MyAxOS4xMDQ2IDUgMTggNUg2QzQuODk1NDMgNSA0IDUuODk1NDMgNCA3VjEwTTIwIDEwVjE5QzIwIDIwLjEwNDYgMTkuMTA0NiAyMSAxOCAyMUg2QzQuODk1NDMgMjEgNCAyMC4xMDQ2IDQgMTlWMTBNMjAgMTBINE0xNiAzVjdNOCAzVjdNOCAxNUwxMSAxOE0xMSAxNUw4IDE4IiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=" 
+                  alt="No events" 
+                  className="w-16 h-16 mb-4"
+                />
+                <p className="text-gray-500 text-sm">No upcoming events</p>
+              </div>
+            )}
+          </div>
+        </div>
 
-            {showAddEventCard && <AddEventCard
-              isOpen={showAddEventCard}
-              onClose={() => setShowAddEventCard(false)}
-              anchorRect={addEventAnchorRect}
-            />}
-            {showEventsDetailsCard && <SelectedEventCard
-              isOpen={showEventsDetailsCard}
-              onClose={() => setShowEventsDetailsCard(false)}
-              anchorRect={eventsDetailsAnchorRect}
-              data={selectedEventForTime}
-            />}
+        {/* Main content */}
+        <div className="flex-1 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold">
+              {`${selectedDay} ${getMonthName(currentMonth)} ${currentYear}`}
+            </h2>
+            <button className="text-gray-500 hover:text-gray-700">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {timeSlots.map((time) => {
+              const timeSlotMeetings = getMeetingsForTimeSlot(time);
+              return (
+                <div key={time} className="flex items-center">
+                  <div className="w-16 text-sm text-gray-500">{time}</div>
+                  <div className="flex-1 min-h-[3rem] border-t border-gray-100 relative">
+                    {timeSlotMeetings.map(meeting => (
+                      <div
+                        key={meeting.id}
+                        className={`absolute left-0 right-0 ${meeting.color} rounded p-2 m-1`}
+                        style={{
+                          top: '0',
+                          minHeight: '2.5rem'
+                        }}
+                        onClick={() => {
+                          setSelectedEventForTime(meeting);
+                          setShowEventsDetailsCard(true);
+                        }}
+                      >
+                        <h4 className="text-sm font-medium">{meeting.title}</h4>
+                        <p className="text-xs text-gray-600">
+                          {meeting.startTime} - {meeting.endTime}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+
+      {showAddEventCard && (
+        <AddEventCard
+          isOpen={showAddEventCard}
+          onClose={() => setShowAddEventCard(false)}
+          anchorRect={addEventAnchorRect}
+        />
+      )}
+      
+      {showEventsDetailsCard && selectedEventForTime && (
+        <SelectedEventCard
+          isOpen={showEventsDetailsCard}
+          onClose={() => setShowEventsDetailsCard(false)}
+          anchorRect={eventsDetailsAnchorRect}
+          data={selectedEventForTime}
+        />
+      )}
+    </div>
   );
 };
 

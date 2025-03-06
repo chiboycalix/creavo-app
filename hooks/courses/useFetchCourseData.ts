@@ -17,5 +17,6 @@ export function useFetchCourseData(courseId: string | undefined) {
     },
     enabled: !!courseId,
     placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
   });
 }

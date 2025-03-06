@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { ReactNode, useState } from "react";
@@ -16,16 +17,16 @@ type TimePickerInputProps = {
   onRightIconClick?: () => void;
   onTimeSelect?: (time: string | undefined) => void;
   selectedTime?: string;
-} & React.ComponentProps<'div'>;
+};
 
 const generateTimeOptions = () => {
   const times: string[] = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let minute = 0; minute < 60; minute += 15) {
       const formattedHour = hour % 12 || 12;
-      const period = hour < 12 ? 'AM' : 'PM';
-      const formattedMinute = minute.toString().padStart(2, '0');
-      times.push(`${formattedHour}:${formattedMinute}${period}`);
+      const period = hour < 12 ? "AM" : "PM";
+      const formattedMinute = minute.toString().padStart(2, "0");
+      times.push(`${formattedHour}:${formattedMinute} ${period}`);
     }
   }
   return times;
@@ -43,7 +44,6 @@ export const TimePickerInput = ({
   onRightIconClick,
   onTimeSelect,
   selectedTime,
-  ...rest
 }: TimePickerInputProps) => {
   const [time, setTime] = useState<string>(selectedTime || "");
   const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +51,7 @@ export const TimePickerInput = ({
 
   const handleTimeClick = (selected: string) => {
     setTime(selected);
-    onTimeSelect?.(selected);
+    if (onTimeSelect) onTimeSelect(selected);
     setIsOpen(false);
   };
 
@@ -64,9 +64,10 @@ export const TimePickerInput = ({
       )}
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <div
+          <button
+            type="button"
             className={cn(
-              "relative cursor-pointer bg-white rounded border-2 border-primary-100 py-3",
+              "relative cursor-pointer bg-white rounded border-2 border-primary-100 py-3 w-full text-left",
               leftIcon ? "pl-10" : "pl-3",
               rightIcon ? "pr-10" : "pr-3",
               errorMessage && "bg-red-100",
@@ -80,7 +81,7 @@ export const TimePickerInput = ({
               </span>
               {rightIcon}
             </div>
-          </div>
+          </button>
         </PopoverTrigger>
         <PopoverContent className="w-64 p-0" align="start">
           <div className="max-h-60 overflow-y-auto">
@@ -91,7 +92,7 @@ export const TimePickerInput = ({
                   "px-4 py-2 text-sm cursor-pointer hover:bg-gray-50",
                   time === option && "bg-primary-100 text-primary-700"
                 )}
-                onClick={() => handleTimeClick(option)}
+                onClick={() => handleTimeClick(option)} // Ensure we're passing a string, not an event
               >
                 {option}
               </div>

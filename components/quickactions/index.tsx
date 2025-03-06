@@ -26,7 +26,7 @@ const QuickActions = () => {
         <div className="mt-10">
           <div className="flex items-start justify-between space-x-4">
             <Item
-              link="/studio/create-course"
+              link="/studio/course"
               title="Create Course"
               description="Build and customize your online course with ease. Upload content, set pricing, and engage with learners."
               icon={<GraduationCap className="text-gray-500" />}

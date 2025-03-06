@@ -9,11 +9,11 @@ const CreateCour = () => {
   const router = useRouter()
 
   const handleCreateLongCourse = () => {
-    router.push("/studio/create-course/long-course/")
+    router.push("/studio/course/long-course/")
   }
 
   const handleCreateShortCourse = () => {
-    router.push("/studio/create-course/short-course/")
+    router.push("/studio/course/short-course/")
   }
 
   return (
