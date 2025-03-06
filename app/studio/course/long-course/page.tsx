@@ -85,8 +85,7 @@ const CreateLongCourse = () => {
         difficultyLevel: data?.difficultyLevel
       })
       showToast('success', 'success', "Course created successfully");
-      // const slugTitle = generalHelpers?.convertToSlug(data?.title)
-      router.push(`/studio/course/long-course/${data?.id}`)
+      router.push(`/studio/course/long-course/${data?.id}?tab=content`)
       dispatch(resetCreateLongCourseForm())
     },
     onError: (error: any) => {

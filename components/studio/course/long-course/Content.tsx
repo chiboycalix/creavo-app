@@ -118,9 +118,9 @@ const Content = ({ courseId: id }: any) => {
       setShowCreateModule(false);
       setSelectedModule(module);
       if (!courseId) {
-        router.push(`?module=${generalHelpers.convertToSlug(module.title)}`);
+        router.push(`?tab=content&module=${generalHelpers.convertToSlug(module.title)}`);
       } else {
-        router.push(`?edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`);
+        router.push(`?tab=content&edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`);
       }
     },
     [courseId, router]
@@ -132,8 +132,8 @@ const Content = ({ courseId: id }: any) => {
     const initialModule = courseData?.data?.course.modules[0];
     setSelectedModule(initialModule);
     const url = courseId
-      ? `?edit=${courseId}&module=${generalHelpers.convertToSlug(initialModule.title)}`
-      : `?module=${generalHelpers.convertToSlug(initialModule.title)}`;
+      ? `?tab=content&edit=${courseId}&module=${generalHelpers.convertToSlug(initialModule.title)}`
+      : `?tab=content&module=${generalHelpers.convertToSlug(initialModule.title)}`;
     router.push(url);
   }, [courseId, courseData?.data?.course?.modules, router, selectedModule, isFetchingCourse]);
 
@@ -302,7 +302,7 @@ const Content = ({ courseId: id }: any) => {
       </>
     );
   }, [isModulesLoading, showCreateModule, selectedModule, courseData?.data?.course?.modules?.length, courseModulesData?.module?.media, queryClient, selectedModuleData?.id, handleSubmit, createModuleStateValues.title, createModuleStateValues.description, errors.title, errors.description, isAddingModule, updateCreateModule, validateField]);
-  console.log({ courseId })
+
   return (
     <div className="flex gap-4 w-full">
       <Card className="basis-4/12 border-none px-1">

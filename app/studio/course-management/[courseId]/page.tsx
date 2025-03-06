@@ -57,7 +57,7 @@ const Course = () => {
     const queryParams = new URLSearchParams({
       "edit": JSON.stringify(courseId),
     }).toString();
-    router.push(`/studio/course/${courseType}/${courseSlug}?${queryParams}`)
+    router.push(`/studio/course/${courseType}/${courseSlug}?${queryParams}&tab=content`)
   }
 
   return (

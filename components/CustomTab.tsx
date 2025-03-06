@@ -2,7 +2,7 @@
 import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 type TabsProps = {
   tabs: {
@@ -15,10 +15,17 @@ type TabsProps = {
 const CustomTab = ({ tabs, defaultValue }: TabsProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const activeTab = searchParams.get('tab') || defaultValue;
+  const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+  console.log({ currentUrl })
+
 
   const handleTabChange = (value: string) => {
-    router.push(`?tab=${value}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", value);
+    const newUrl = `${pathname}?${params.toString()}`;
+    router.push(newUrl, { scroll: false });
   };
 
   return (

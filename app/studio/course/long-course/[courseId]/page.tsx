@@ -24,7 +24,9 @@ const CourseName = () => {
     {
       id: 2,
       title: "Quiz",
-      content: (<Quiz />)
+      content: (<Quiz
+        courseId={courseId}
+      />)
     },
     {
       id: 3,
