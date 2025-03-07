@@ -1,19 +1,20 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Spinner from '@/components/Spinner';
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Clipboard, GripVertical } from 'lucide-react';
+import TrueOrFalse from './TrueOrFalse';
+import MutipleChoice from './MutipleChoice';
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Clipboard, GripVertical, Loader2 } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
-import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
-import { fetchCourseDetailsService } from '@/services/module.service';
+import { useAppDispatch } from '@/hooks/useStore.hook';
 import { updateSelectedModuleData } from '@/redux/slices/module.slice';
 import { generalHelpers } from '@/helpers';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import TrueOrFalse from './TrueOrFalse';
-import MutipleChoice from './MutipleChoice';
 import { Button } from "@/components/ui/button";
 import { Input } from '@/components/Input';
+import { toast } from 'sonner';
+import { addQuizToModuleService, fetchQuizService } from '@/services/quiz.service';
 
 type QuestionType = {
   type: "trueFalse" | "multipleChoice";
@@ -23,13 +24,13 @@ type QuestionType = {
 type QuestionData = {
   questionText: string;
   optionValues: string[];
-  selectedOption: number | null; // Single selected option index
+  selectedOption: number | null;
   correctAnswer: "true" | "false" | "";
   allocatedPoint: number;
 };
 
 type QuizData = {
-  moduleId: number;
+  moduleId: number | null;
   title: string;
   description: string;
   allocatedTime: number;
@@ -43,37 +44,21 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
   const searchParams = useSearchParams();
   const currentModule = searchParams.get("module");
   const courseId = searchParams.get("edit");
-  const [showCreateModule, setShowCreateModule] = useState(false);
   const [selectedModule, setSelectedModule] = useState<any | null>(null);
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const [questionData, setQuestionData] = useState<QuestionData[]>([]);
   const [quizTitle, setQuizTitle] = useState("");
   const [quizData, setQuizData] = useState<QuizData>({
-    moduleId: 1,
+    moduleId: null,
     title: "",
     description: "",
-    allocatedTime: 30,
+    allocatedTime: 0,
     totalPoint: 0,
     questions: [],
   });
   const [showQuestionOptions, setShowQuestionOptions] = useState(false);
-  const { createModuleForm: createModuleStateValues, selectedModuleData } = useAppSelector((store) => store.moduleStore);
 
   const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
-
-  const { data: courseModulesData, isLoading: isModulesLoading } = useQuery<any>({
-    queryKey: ["courseModulesData", selectedModuleData?.id],
-    queryFn: async () => {
-      const data = await fetchCourseDetailsService({
-        courseId: courseId || courseData?.data?.course?.id,
-        moduleId: selectedModuleData?.id,
-      });
-      return data;
-    },
-    enabled: !!courseData?.data?.course?.id && !!selectedModuleData?.id,
-    placeholderData: keepPreviousData,
-    staleTime: 5 * 60 * 1000,
-  });
 
   const updateSelectedModule = useCallback(
     (payload: Partial<any>) => dispatch(updateSelectedModuleData(payload)),
@@ -82,7 +67,6 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
 
   const handleClickModule = useCallback(
     (module: any) => {
-      setShowCreateModule(false);
       setSelectedModule(module);
       setQuestions([]);
       setQuestionData([]);
@@ -165,7 +149,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       {
         questionText: "",
         optionValues: type === "multipleChoice" ? ["", "", "", ""] : [],
-        selectedOption: null, // Initialize as null for single selection
+        selectedOption: null,
         correctAnswer: "",
         allocatedPoint: 1,
       },
@@ -180,6 +164,16 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     });
     setQuestionData((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const { mutate: handleAddQuizToModule, isPending: isAddingModule } = useMutation({
+    mutationFn: (payload: any) => addQuizToModuleService(payload),
+    onSuccess: (quiz) => {
+      toast.success("Quiz added successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error?.data?.[0] || "Failed to create quiz");
+    },
+  });
 
   const handleQuizSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,16 +215,24 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       questions: formattedQuestions,
       totalPoint,
     };
-
-    console.log("Sending to backend:", finalQuizData);
-    // Example API call (uncomment and adjust):
-    // await fetch('/api/quiz', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(finalQuizData),
-    // });
+    console.log({ finalQuizData })
+    handleAddQuizToModule({
+      ...finalQuizData
+    })
   };
 
+  const { data: moduleQuizData, isLoading: isModulesLoading } = useQuery<any>({
+    queryKey: ["fetchQuiz"],
+    queryFn: async () => {
+      const data = await fetchQuizService({
+        moduleId: selectedModule?.id,
+      });
+      return data;
+    },
+    enabled: !!selectedModule?.id,
+    placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
+  });
   const renderQuestions = () => {
     return questions.map((question, index) => (
       <div key={index} className="mb-4">
@@ -306,7 +308,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
             <form onSubmit={handleQuizSubmit}>
               <div>
                 <div className="mb-4">
-                  <p className="font-semibold text-sm">{generalHelpers.convertFromSlug(currentModule!)}</p>
+                  <p className="font-semibold text-sm">{generalHelpers?.convertFromSlug(currentModule! || "")}</p>
                 </div>
                 <div className="mb-4">
                   <Input
@@ -349,8 +351,11 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                     Add Question
                   </Button>
                 )}
-                <Button type="submit" variant="default">
-                  Submit Quiz
+                <Button type="submit" variant="default" disabled={isAddingModule}>
+                  {
+                    isAddingModule ? <p className='flex items-center gap-2'><Loader2 className='animate-spin' /> Please wait...</p> : " Submit Quiz"
+                  }
+
                 </Button>
               </div>
             </form>
