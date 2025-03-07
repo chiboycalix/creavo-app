@@ -57,6 +57,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     questions: [],
   });
   const [showQuestionOptions, setShowQuestionOptions] = useState(false);
+  const [titleError, setTitleError] = useState<string | null>(null); // Error state for quiz title
 
   const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
 
@@ -80,6 +81,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
         questions: [],
       });
       setShowQuestionOptions(false);
+      setTitleError(null); // Reset error on module change
       if (!courseId) {
         router.push(`?tab=quiz&module=${generalHelpers.convertToSlug(module.title)}`);
       } else {
@@ -169,6 +171,10 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     mutationFn: (payload: any) => addQuizToModuleService(payload),
     onSuccess: (quiz) => {
       toast.success("Quiz added successfully");
+      setQuestions([]); // Clear questions after success
+      setQuestionData([]);
+      setQuizTitle("");
+      setShowQuestionOptions(false);
     },
     onError: (error: any) => {
       toast.error(error?.data?.[0] || "Failed to create quiz");
@@ -177,6 +183,11 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
 
   const handleQuizSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!quizTitle.trim()) {
+      setTitleError("Quiz title is required.");
+      return;
+    }
+
     const formattedQuestions = questionData.map((data, index) => {
       const question = questions[index];
       if (question.type === "multipleChoice") {
@@ -210,15 +221,16 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     const totalPoint = formattedQuestions.reduce((sum, q) => sum + q.allocatedPoint, 0);
     const finalQuizData = {
       ...quizData,
-      title: quizTitle || "Untitled Quiz",
+      title: quizTitle,
       description: quizData.description || "No description provided",
       questions: formattedQuestions,
       totalPoint,
     };
-    console.log({ finalQuizData })
+    console.log({ finalQuizData });
     handleAddQuizToModule({
-      ...finalQuizData
-    })
+      ...finalQuizData,
+    });
+    setTitleError(null); // Clear error on successful submission attempt
   };
 
   const { data: moduleQuizData, isLoading: isModulesLoading } = useQuery<any>({
@@ -233,6 +245,9 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
+
+  const isSubmitDisabled = !quizTitle.trim() || questions.length === 0 || isAddingModule; // Disable if no title, no questions, or submitting
+
   const renderQuestions = () => {
     return questions.map((question, index) => (
       <div key={index} className="mb-4">
@@ -315,9 +330,15 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                     placeholder="Enter quiz title"
                     label="Quiz Title"
                     value={quizTitle}
-                    onChange={(e) => setQuizTitle(e.target.value)}
+                    onChange={(e) => {
+                      setQuizTitle(e.target.value);
+                      if (e.target.value.trim()) setTitleError(null); // Clear error when typing
+                    }}
                     className="w-full"
                   />
+                  {titleError && (
+                    <p className="text-red-500 text-sm mt-1">{titleError}</p>
+                  )}
                 </div>
                 {renderQuestions()}
               </div>
@@ -351,11 +372,14 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                     Add Question
                   </Button>
                 )}
-                <Button type="submit" variant="default" disabled={isAddingModule}>
-                  {
-                    isAddingModule ? <p className='flex items-center gap-2'><Loader2 className='animate-spin' /> Please wait...</p> : " Submit Quiz"
-                  }
-
+                <Button type="submit" variant="default" disabled={isSubmitDisabled}>
+                  {isAddingModule ? (
+                    <p className="flex items-center gap-2">
+                      <Loader2 className="animate-spin" /> Please wait...
+                    </p>
+                  ) : (
+                    "Submit Quiz"
+                  )}
                 </Button>
               </div>
             </form>
