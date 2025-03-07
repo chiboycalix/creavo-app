@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import { motion } from "framer-motion";
@@ -62,6 +63,7 @@ interface ApiResponse {
 
 const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
   const [selectedEventForTime, setSelectedEventForTime] = useState<CalendarEvent | null>(null);
   const [showEventsDetailsCard, setShowEventsDetailsCard] = useState(false);
@@ -72,7 +74,6 @@ const Calendar = () => {
   const [monthMeetings, setMonthMeetings] = useState<CalendarEvent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const currentYear = new Date().getFullYear();
   const daysOfWeek = ["m", "t", "w", "t", "f", "s", "s"];
   const timeSlots = Array.from({ length: 24 }, (_, i) => 
     `${i.toString().padStart(2, '0')}:00`
@@ -80,11 +81,11 @@ const Calendar = () => {
 
   useEffect(() => {
     fetchMonthMeetings();
-  }, [currentMonth]);
+  }, [currentMonth, currentYear]);
 
   useEffect(() => {
     fetchMeetings();
-  }, [selectedDay, currentMonth]);
+  }, [selectedDay, currentMonth, currentYear]);
 
   const fetchMonthMeetings = async () => {
     try {
@@ -103,7 +104,6 @@ const Calendar = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch meetings');
       }
-      // console.log(response)
       
       const responseData: ApiResponse = await response.json();
       const meetings = responseData.data.meetings;
@@ -132,8 +132,8 @@ const Calendar = () => {
   const fetchMeetings = async () => {
     setIsLoading(true);
     try {
-      const date = new Date(currentYear, currentMonth, selectedDay);
-      const formattedDate = date.toISOString().split('T')[0];
+      const selectedDate = new Date(currentYear, currentMonth, selectedDay);
+      const formattedDate = selectedDate.toISOString().split('T')[0];
       
       const response = await fetch(
         `${baseUrl}/meetings/user-Meetings/list?page=1&limit=10&date=${formattedDate}`,
@@ -150,6 +150,7 @@ const Calendar = () => {
       
       const responseData: ApiResponse = await response.json();
       const meetings = responseData.data.meetings;
+      console.log(meetings)
 
       const formattedMeetings = meetings.map((meeting: ApiMeeting) => ({
         id: meeting.id,
@@ -165,16 +166,7 @@ const Calendar = () => {
         members: meeting.participants?.map(p => p.name) || [],
       }));
 
-      const filteredMeetings = formattedMeetings.filter(meeting => {
-        const meetingDate = meeting.date;
-        return (
-          meetingDate.getDate() === selectedDay &&
-          meetingDate.getMonth() === currentMonth &&
-          meetingDate.getFullYear() === currentYear
-        );
-      });
-
-      setMeetings(filteredMeetings);
+      setMeetings(formattedMeetings);
     } catch (error) {
       console.error('Error fetching meetings:', error);
       setMeetings([]);
@@ -184,7 +176,7 @@ const Calendar = () => {
   };
 
   const formatTimeFromDate = (date: Date): string => {
-    return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
   const handleAddEvent = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -193,12 +185,33 @@ const Calendar = () => {
     setShowAddEventCard(true);
   };
 
+  const handleTimeSlotClick = (event: React.MouseEvent<HTMLDivElement>, time: string) => {
+    const timeSlotMeetings = getMeetingsForTimeSlot(time);
+    
+    if (timeSlotMeetings.length === 0) return; // Prevent clicks if no meetings exist
+  
+    const rect = event.currentTarget.getBoundingClientRect();
+    setEventsDetailsAnchorRect(rect);
+    setSelectedEventForTime(timeSlotMeetings[0]); // Select the first event in the time slot
+    setShowEventsDetailsCard(true);
+  };
+  
   const goToPreviousMonth = () => {
-    setCurrentMonth(prev => prev === 0 ? 11 : prev - 1);
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(prev => prev - 1);
+    } else {
+      setCurrentMonth(prev => prev - 1);
+    }
   };
 
   const goToNextMonth = () => {
-    setCurrentMonth(prev => prev === 11 ? 0 : prev + 1);
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(prev => prev + 1);
+    } else {
+      setCurrentMonth(prev => prev + 1);
+    }
   };
 
   const getDaysInMonth = (month: number, year: number) => {
@@ -217,11 +230,14 @@ const Calendar = () => {
 
     // Previous month days
     const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const prevMonthDays = getDaysInMonth(prevMonth, currentYear);
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const prevMonthDays = getDaysInMonth(prevMonth, prevYear);
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push({
         day: prevMonthDays - firstDayOfMonth + i + 1,
-        currentMonth: false
+        currentMonth: false,
+        month: prevMonth,
+        year: prevYear
       });
     }
 
@@ -229,16 +245,22 @@ const Calendar = () => {
     for (let i = 1; i <= daysInMonth; i++) {
       days.push({
         day: i,
-        currentMonth: true
+        currentMonth: true,
+        month: currentMonth,
+        year: currentYear
       });
     }
 
     // Next month days
+    const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+    const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
     const remainingDays = 42 - days.length;
     for (let i = 1; i <= remainingDays; i++) {
       days.push({
         day: i,
-        currentMonth: false
+        currentMonth: false,
+        month: nextMonth,
+        year: nextYear
       });
     }
 
@@ -254,7 +276,15 @@ const Calendar = () => {
   };
 
   const getMeetingsForTimeSlot = (time: string) => {
-    return meetings.filter(meeting => meeting.startTime.startsWith(time.split(':')[0]));
+    return meetings.filter(meeting => {
+      const meetingDate = meeting.date;
+      return (
+        meeting.startTime.startsWith(time.split(':')[0]) &&
+        meetingDate.getDate() === selectedDay &&
+        meetingDate.getMonth() === currentMonth &&
+        meetingDate.getFullYear() === currentYear
+      );
+    });
   };
 
   const hasEventsOnDay = (day: number) => {
@@ -266,6 +296,14 @@ const Calendar = () => {
         meetingDate.getFullYear() === currentYear
       );
     });
+  };
+
+  const handleDayClick = (day: { day: number; currentMonth: boolean; month: number; year: number }) => {
+    if (!day.currentMonth) {
+      setCurrentMonth(day.month);
+      setCurrentYear(day.year);
+    }
+    setSelectedDay(day.day);
   };
 
   return (
@@ -288,7 +326,7 @@ const Calendar = () => {
               <button onClick={goToPreviousMonth}>
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              <h2 className="text-lg font-medium">{getMonthName(currentMonth)}</h2>
+              <h2 className="text-lg font-medium">{`${getMonthName(currentMonth)} ${currentYear}`}</h2>
               <button onClick={goToNextMonth}>
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -310,16 +348,16 @@ const Calendar = () => {
                   className={`
                     relative w-8 h-8 rounded-full flex items-center justify-center text-sm
                     ${day.currentMonth 
-                      ? day.day === selectedDay 
+                      ? day.day === selectedDay && day.month === currentMonth && day.year === currentYear
                         ? 'bg-blue-600 text-white' 
                         : 'hover:bg-gray-100'
                       : 'text-gray-300'
                     }
                   `}
-                  onClick={() => day.currentMonth && setSelectedDay(day.day)}
+                  onClick={() => handleDayClick(day)}
                 >
                   {day.day}
-                  {day.currentMonth && hasEventsOnDay(day.day) && (
+                  {hasEventsOnDay(day.day) && day.currentMonth && (
                     <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-red-500 rounded-full"></div>
                   )}
                 </motion.button>
@@ -371,35 +409,31 @@ const Calendar = () => {
           </div>
 
           <div className="space-y-4">
-            {timeSlots.map((time) => {
-              const timeSlotMeetings = getMeetingsForTimeSlot(time);
-              return (
-                <div key={time} className="flex items-center">
-                  <div className="w-16 text-sm text-gray-500">{time}</div>
-                  <div className="flex-1 min-h-[3rem] border-t border-gray-100 relative">
-                    {timeSlotMeetings.map(meeting => (
-                      <div
-                        key={meeting.id}
-                        className={`absolute left-0 right-0 ${meeting.color} rounded p-2 m-1`}
-                        style={{
-                          top: '0',
-                          minHeight: '2.5rem'
-                        }}
-                        onClick={() => {
-                          setSelectedEventForTime(meeting);
-                          setShowEventsDetailsCard(true);
-                        }}
-                      >
-                        <h4 className="text-sm font-medium">{meeting.title}</h4>
-                        <p className="text-xs text-gray-600">
-                          {meeting.startTime} - {meeting.endTime}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+          {timeSlots.map((time) => {
+  const timeSlotMeetings = getMeetingsForTimeSlot(time);
+  const hasEvent = timeSlotMeetings.length > 0;
+
+  return (
+    <div key={time} className="flex items-center">
+      <div className="w-16 text-sm text-gray-500">{time}</div>
+      <div 
+        className={`flex-1 min-h-[3rem] border-t border-gray-100 relative ${hasEvent ? "cursor-pointer hover:bg-gray-50" : "cursor-default"}`}
+        onClick={(e) => hasEvent && handleTimeSlotClick(e, time)}
+      >
+        {hasEvent && (
+          <div className="absolute inset-0 bg-blue-200 opacity-50 rounded-md">
+            {timeSlotMeetings.map(meeting => (
+              <div key={meeting.id} className="p-2 text-sm font-medium text-black">
+                {meeting.title}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+})}
+
           </div>
         </div>
       </div>
@@ -412,7 +446,7 @@ const Calendar = () => {
         />
       )}
       
-      {showEventsDetailsCard && selectedEventForTime && (
+      {showEventsDetailsCard && (
         <SelectedEventCard
           isOpen={showEventsDetailsCard}
           onClose={() => setShowEventsDetailsCard(false)}
