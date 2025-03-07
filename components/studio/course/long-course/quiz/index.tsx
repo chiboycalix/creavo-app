@@ -57,7 +57,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     questions: [],
   });
   const [showQuestionOptions, setShowQuestionOptions] = useState(false);
-  const [titleError, setTitleError] = useState<string | null>(null); // Error state for quiz title
+  const [titleError, setTitleError] = useState<string | null>(null);
 
   const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
 
@@ -81,7 +81,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
         questions: [],
       });
       setShowQuestionOptions(false);
-      setTitleError(null); // Reset error on module change
+      setTitleError(null);
       if (!courseId) {
         router.push(`?tab=quiz&module=${generalHelpers.convertToSlug(module.title)}`);
       } else {
@@ -171,7 +171,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     mutationFn: (payload: any) => addQuizToModuleService(payload),
     onSuccess: (quiz) => {
       toast.success("Quiz added successfully");
-      setQuestions([]); // Clear questions after success
+      setQuestions([]);
       setQuestionData([]);
       setQuizTitle("");
       setShowQuestionOptions(false);
@@ -230,7 +230,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     handleAddQuizToModule({
       ...finalQuizData,
     });
-    setTitleError(null); // Clear error on successful submission attempt
+    setTitleError(null);
   };
 
   const { data: moduleQuizData, isLoading: isModulesLoading } = useQuery<any>({
@@ -246,7 +246,26 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const isSubmitDisabled = !quizTitle.trim() || questions.length === 0 || isAddingModule; // Disable if no title, no questions, or submitting
+  // Check if all questions are completely filled
+  const areQuestionsComplete = () => {
+    return questionData.every((data, index) => {
+      const question = questions[index];
+      if (question.type === "trueFalse") {
+        // True/False: questionText must be non-empty and correctAnswer must be "true" or "false"
+        return data.questionText.trim() && (data.correctAnswer === "true" || data.correctAnswer === "false");
+      } else {
+        // Multiple Choice: questionText must be non-empty, all optionValues must be non-empty, and selectedOption must be set
+        return (
+          data.questionText.trim() &&
+          data.optionValues.every((opt) => opt.trim()) &&
+          data.selectedOption !== null
+        );
+      }
+    });
+  };
+
+  const isSubmitDisabled =
+    !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
 
   const renderQuestions = () => {
     return questions.map((question, index) => (
@@ -332,7 +351,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                     value={quizTitle}
                     onChange={(e) => {
                       setQuizTitle(e.target.value);
-                      if (e.target.value.trim()) setTitleError(null); // Clear error when typing
+                      if (e.target.value.trim()) setTitleError(null);
                     }}
                     className="w-full"
                   />
@@ -372,7 +391,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                     Add Question
                   </Button>
                 )}
-                <Button type="submit" variant="default" disabled={isSubmitDisabled}>
+                <Button type="submit" disabled={isSubmitDisabled}>
                   {isAddingModule ? (
                     <p className="flex items-center gap-2">
                       <Loader2 className="animate-spin" /> Please wait...
