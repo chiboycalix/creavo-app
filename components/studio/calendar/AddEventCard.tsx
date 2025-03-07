@@ -1,17 +1,19 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect, useRef } from "react"
-import { X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/check-box"
-import { Label } from "@/components/ui/label"
-import { motion, AnimatePresence } from "framer-motion"
-import { SelectInput } from "@/components/Input/SelectInput"
-import { baseUrl } from "@/utils/constant"
-import Cookies from "js-cookie"
+import type React from "react";
+import { useState, useEffect, useRef } from "react";
+import { Calculator, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/check-box";
+import { Label } from "@/components/ui/label";
+import { motion, AnimatePresence } from "framer-motion";
+import { SelectInput } from "@/components/Input/SelectInput";
+import { baseUrl } from "@/utils/constant";
+import Cookies from "js-cookie";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const colorOptions = [
   { label: "Green", value: "bg-green-200" },
@@ -23,92 +25,100 @@ const colorOptions = [
   { label: "Indigo", value: "bg-indigo-200" },
   { label: "Teal", value: "bg-teal-200" },
   { label: "Orange", value: "bg-orange-200" },
-]
+];
 
 const generateTimeOptions = () => {
-  const options = []
+  const options = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let minute = 0; minute < 60; minute += 30) {
-      const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`
-      options.push({ label: time, value: time })
+      const time = `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`;
+      options.push({ label: time, value: time });
     }
   }
-  return options
-}
+  return options;
+};
 
 const generateDateOptions = () => {
-  const options = []
-  const today = new Date()
+  const options = [];
+  const today = new Date();
   for (let i = 0; i < 30; i++) {
-    const date = new Date(today)
-    date.setDate(today.getDate() + i)
-    const formattedDate = `${date.getDate()} ${date.toLocaleString("default", { month: "long" })} ${date.getFullYear()}`
-    options.push({ label: formattedDate, value: date.toISOString() })
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const formattedDate = `${date.getDate()} ${date.toLocaleString("default", {
+      month: "long",
+    })} ${date.getFullYear()}`;
+    options.push({ label: formattedDate, value: date.toISOString() });
   }
-  return options
-}
+  return options;
+};
 
 interface AddEventCardProps {
-  isOpen: boolean
-  onClose: () => void
-  anchorRect: DOMRect | null
-  eventToEdit?: any
+  isOpen: boolean;
+  onClose: () => void;
+  anchorRect: DOMRect | null;
+  eventToEdit?: any;
 }
 
-const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdit }) => {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [startDate, setStartDate] = useState<Date | null>(null)
-  const [endDate, setEndDate] = useState<Date | null>(null)
-  const [startTime, setStartTime] = useState("")
-  const [endTime, setEndTime] = useState("")
-  const [isAllDay, setIsAllDay] = useState(false)
-  const [isRepeating, setIsRepeating] = useState(false)
-  const [location, setLocation] = useState("")
-  const [color, setColor] = useState("bg-blue-200")
-  const [members, setMembers] = useState<string[]>([])
-  const [selectedMember, setSelectedMember] = useState("")
-  const cardRef = useRef<HTMLDivElement>(null)
-  const timeOptions = generateTimeOptions()
-  const dateOptions = generateDateOptions()
+const AddEventCard: React.FC<AddEventCardProps> = ({
+  isOpen,
+  onClose,
+  eventToEdit,
+}) => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [isAllDay, setIsAllDay] = useState(false);
+  const [isRepeating, setIsRepeating] = useState(false);
+  const [location, setLocation] = useState("");
+  const [color, setColor] = useState("bg-blue-200");
+  const [members, setMembers] = useState<string[]>([]);
+  const [selectedMember, setSelectedMember] = useState("");
+  const cardRef = useRef<HTMLDivElement>(null);
+  const timeOptions = generateTimeOptions();
+  const dateOptions = generateDateOptions();
 
   useEffect(() => {
     if (eventToEdit) {
-      setTitle(eventToEdit.title || "")
-      setDescription(eventToEdit.description || "")
-      setStartDate(eventToEdit.date || null)
-      setEndDate(eventToEdit.date || null)
-      setStartTime(eventToEdit.startTime || "")
-      setEndTime(eventToEdit.endTime || "")
-      setIsAllDay(eventToEdit.isAllDay || false)
-      setIsRepeating(eventToEdit.isRepeating || false)
-      setLocation(eventToEdit.location || "")
-      setColor(eventToEdit.color || "bg-blue-200")
-      setMembers(eventToEdit.members || [])
+      setTitle(eventToEdit.title || "");
+      setDescription(eventToEdit.description || "");
+      setStartDate(eventToEdit.date || null);
+      setEndDate(eventToEdit.date || null);
+      setStartTime(eventToEdit.startTime || "");
+      setEndTime(eventToEdit.endTime || "");
+      setIsAllDay(eventToEdit.isAllDay || false);
+      setIsRepeating(eventToEdit.isRepeating || false);
+      setLocation(eventToEdit.location || "");
+      setColor(eventToEdit.color || "bg-blue-200");
+      setMembers(eventToEdit.members || []);
     }
-  }, [eventToEdit])
+  }, [eventToEdit]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        onClose()
+        onClose();
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [onClose])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
 
   const addMember = () => {
     if (selectedMember && !members.includes(selectedMember)) {
-      setMembers([...members, selectedMember])
-      setSelectedMember("")
+      setMembers([...members, selectedMember]);
+      setSelectedMember("");
     }
-  }
+  };
 
   const handleSubmit = async () => {
     if (!title.trim() || !startDate) {
-      alert("Please enter all required fields.")
-      return
+      alert("Please enter all required fields.");
+      return;
     }
     try {
       const payload = {
@@ -119,16 +129,23 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
         startTimeStr: startTime,
         endTimeStr: endTime,
         isAllDay,
+        color,
         isRepeating,
         location,
         timezone: "WAT",
         isPaid: false,
-        internalParticipant: [{ email: "kennith8@gmail.com", isCoHost: false, isRequiredToPay: true }],
+        internalParticipant: [
+          {
+            email: "kennith8@gmail.com",
+            isCoHost: false,
+            isRequiredToPay: true,
+          },
+        ],
         externalParticipant: ["farex@hotmail.com", "timothyedibo@gmail.com"],
         includeWebinar: false,
         type: "SCHEDULED",
         participants: members.map((member) => ({ name: member })),
-      }
+      };
       const response = await fetch(`${baseUrl}/meetings/`, {
         method: "POST",
         headers: {
@@ -136,14 +153,14 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
         },
         body: JSON.stringify(payload),
-      })
-      if (!response.ok) throw new Error(`Error: ${response.statusText}`)
-      onClose()
+      });
+      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+      onClose();
     } catch (error) {
-      console.error("Failed to create event:", error)
-      alert("Failed to create event. Please try again.")
+      console.error("Failed to create event:", error);
+      alert("Failed to create event. Please try again.");
     }
-  }
+  };
   return (
     <AnimatePresence>
       {isOpen && (
@@ -158,7 +175,10 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
           >
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-xl font-semibold">Add Event</h2>
-              <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
+              <button
+                onClick={onClose}
+                className="p-1 rounded-full hover:bg-gray-100"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -195,13 +215,14 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                 <div className="space-y-2">
                   <Label htmlFor="startDate">Start Date</Label>
                   <div className="grid grid-cols-2 gap-2">
-                    <SelectInput
-                      value={startDate ? startDate.toISOString() : ""}
-                      onChange={(value) => setStartDate(new Date(value))}
-                      options={dateOptions}
-                      selectTextClass="truncate"
-                      className="w-full"
+                    <DatePicker
+                      selected={startDate}
+                      onChange={(date: Date | null) => setStartDate(date)}
+                      dateFormat="dd/MM/yyyy"
+                      className="w-full border-primary-100 border-2  p-2 py-2.5 rounded"
+                      placeholderText="Select Start Date"
                     />
+
                     <SelectInput
                       value={startTime}
                       onChange={setStartTime}
@@ -216,12 +237,12 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                 <div className="space-y-2">
                   <Label htmlFor="endDate">End Date</Label>
                   <div className="grid grid-cols-2 gap-2">
-                    <SelectInput
-                      value={endDate ? endDate.toISOString() : ""}
-                      onChange={(value) => setEndDate(new Date(value))}
-                      options={dateOptions}
-                      selectTextClass="truncate"
-                      className="w-full"
+                    <DatePicker
+                      selected={endDate}
+                      onChange={(date: Date | null) => setEndDate(date)}
+                      dateFormat="dd/MM/yyyy"
+                      className="w-full border-primary-100 border-2  p-2 py-2.5 rounded"
+                      placeholderText="Select End Date"
                     />
                     <SelectInput
                       value={endTime}
@@ -247,7 +268,9 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                   <Checkbox
                     id="repeat"
                     checked={isRepeating}
-                    onCheckedChange={(checked) => setIsRepeating(checked === true)}
+                    onCheckedChange={(checked) =>
+                      setIsRepeating(checked === true)
+                    }
                   />
                   <Label htmlFor="repeat">Repeat Event</Label>
                 </div>
@@ -259,8 +282,12 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                   {colorOptions.map((option) => (
                     <div
                       key={option.value}
-                      className={`w-8 h-8 rounded-full cursor-pointer ${option.value} ${
-                        color === option.value ? "ring-2 ring-primary-600 ring-offset-2" : ""
+                      className={`w-8 h-8 rounded-full cursor-pointer ${
+                        option.value
+                      } ${
+                        color === option.value
+                          ? "ring-2 ring-primary-600 ring-offset-2"
+                          : ""
                       }`}
                       onClick={() => setColor(option.value)}
                     />
@@ -295,7 +322,12 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                       className="w-full"
                     />
                   </div>
-                  <Button type="button" variant="outline" onClick={addMember} disabled={!selectedMember}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addMember}
+                    disabled={!selectedMember}
+                  >
                     Add
                   </Button>
                 </div>
@@ -303,13 +335,18 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                 {members.length > 0 && (
                   <div className="mt-2 space-y-2">
                     {members.map((member, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between bg-gray-50 p-2 rounded"
+                      >
                         <span>{member}</span>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => setMembers(members.filter((_, i) => i !== index))}
+                          onClick={() =>
+                            setMembers(members.filter((_, i) => i !== index))
+                          }
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -321,7 +358,10 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
             </div>
 
             <div className="p-4 border-t border-gray-200">
-              <Button className="w-full bg-primary-600 hover:bg-primary-700 text-white" onClick={handleSubmit}>
+              <Button
+                className="w-full bg-primary-600 hover:bg-primary-700 text-white"
+                onClick={handleSubmit}
+              >
                 SAVE
               </Button>
             </div>
@@ -329,8 +369,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
         </div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default AddEventCard
-
+export default AddEventCard;
