@@ -1,81 +1,63 @@
-import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
-import { TextInput, TextInputProps } from "./TextInput";
+"use client";
+import React from 'react';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Input } from '@/components/Input';
 
-export type QuizOptionInputProps = {
+interface QuizOptionInputProps {
   optionCount: number;
-  values?: string[];
-  onValuesChange?: (values: string[]) => void;
-  selectedOptions?: number[];
-  onSelectionChange?: (selected: number[]) => void;
-  className?: string;
-  errorMessage?: string | false;
-  label?: ReactNode;
-} & Omit<TextInputProps, 'value' | 'onChange' | 'leftIcon' | 'onLeftIconClick'>;
+  values: string[];
+  onValuesChange: (values: string[]) => void;
+  selectedOption: number | null;
+  onSelectionChange: (option: number | null) => void;
+  placeholder?: string;
+}
 
-export const QuizOptionInput = ({
+const QuizOptionInput = ({
   optionCount,
-  values = Array(optionCount).fill(""),
+  values,
   onValuesChange,
-  selectedOptions = [],
+  selectedOption,
   onSelectionChange,
-  className,
-  errorMessage,
-  label,
-  ...rest
+  placeholder = "Enter option text",
 }: QuizOptionInputProps) => {
-  const optionLabels = Array.from(
-    { length: optionCount },
-    (_, i) => String.fromCharCode(65 + i)
-  );
-
-  const handleCheckboxChange = (index: number) => {
-    const newSelected = selectedOptions.includes(index)
-      ? selectedOptions.filter((i) => i !== index)
-      : [...selectedOptions, index];
-    onSelectionChange?.(newSelected);
-  };
-
-  const handleInputChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOptionChange = (index: number, value: string) => {
     const newValues = [...values];
-    newValues[index] = e.target.value;
-    onValuesChange?.(newValues);
+    newValues[index] = value;
+    onValuesChange(newValues);
   };
+
+  const optionLabels = ["A", "B", "C", "D"];
 
   return (
-    <div className={cn("space-y-3 w-full", className)}>
-      {label && (
-        <label className="flex items-center text-gray-900 font-medium text-sm gap-x-2 mb-1">
-          {label}
-        </label>
-      )}
-      {optionLabels.map((label, index) => (
-        <div key={index} className="relative flex items-center w-full">
-          <TextInput
-            value={values[index]}
-            onChange={(e) => handleInputChange(index, e)}
-            leftIcon={
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedOptions.includes(index)}
-                  onChange={() => handleCheckboxChange(index)}
-                  className="h-4 w-4 text-primary-700 bg-white border-none rounded focus:ring-primary-700"
-                />
-                <span className="text-gray-900 font-medium">{label}</span>
-              </div>
-            }
-            leftIconClassName="pl-3"
-            className={cn(
-              "pl-16 w-full bg-white border-none", // Ensure full width
-              selectedOptions.includes(index) && "bg-green-50/50 border"
-            )}
-            errorMessage={errorMessage}
-            {...rest}
+    <RadioGroup
+      value={selectedOption !== null ? selectedOption.toString() : undefined}
+      onValueChange={(value) => onSelectionChange(Number(value))}
+      className="space-y-2"
+    >
+      {Array.from({ length: optionCount }).map((_, index) => (
+        <div key={index} className="flex items-center space-x-2">
+          <RadioGroupItem
+            value={index.toString()}
+            id={`option-${index}`}
+            className="flex-shrink-0"
+          />
+          <Label
+            htmlFor={`option-${index}`}
+            className="text-gray-700 font-medium w-4 flex-shrink-0"
+          >
+            {optionLabels[index]}
+          </Label>
+          <Input
+            value={values[index] || ""}
+            onChange={(e) => handleOptionChange(index, e.target.value)}
+            placeholder={placeholder}
+            className="w-full py-3 border-none rounded-md bg-white"
           />
         </div>
       ))}
-      {errorMessage && <small className="text-red-600 text-sm">{errorMessage}</small>}
-    </div>
+    </RadioGroup>
   );
 };
+
+export default QuizOptionInput;

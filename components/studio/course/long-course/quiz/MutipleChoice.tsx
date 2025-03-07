@@ -1,52 +1,44 @@
 "use client";
 import React from 'react';
-import { Input } from '@/components/Input';
 import { SelectInput } from '@/components/Input/SelectInput';
 import { TextareaInput } from '@/components/Input/TextareaInput';
-import { QuizOptionInput } from '@/components/Input/QuizOptionInput';
+import QuizOptionInput from '@/components/Input/QuizOptionInput';
+import { Trash } from 'lucide-react';
 
 interface MutipleChoiceProps {
   questionNumber: number;
-  title: string;
-  setTitle: (title: string) => void;
   questionText: string;
   setQuestionText: (text: string) => void;
   optionValues: string[];
   setOptionValues: (values: string[]) => void;
-  selectedOptions: number[];
-  setSelectedOptions: (options: number[]) => void;
+  selectedOption: number | null; // Single selected option index
+  setSelectedOption: (option: number | null) => void;
   allocatedPoint: number;
   setAllocatedPoint: (point: number) => void;
+  onDelete: () => void;
 }
 
 const MutipleChoice = ({
   questionNumber,
-  title,
-  setTitle,
   questionText,
   setQuestionText,
   optionValues,
   setOptionValues,
-  selectedOptions,
-  setSelectedOptions,
+  selectedOption,
+  setSelectedOption,
   allocatedPoint,
   setAllocatedPoint,
+  onDelete,
 }: MutipleChoiceProps) => {
   return (
     <div className="w-full">
-      <div>
-        <Input
-          placeholder=""
-          label="Add Quiz Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className=""
-        />
-      </div>
-
       <div className="bg-gray-100 mt-6 p-2 pt-4 rounded-md w-full">
-        <div className="mb-2">
+        <div className="mb-2 flex items-center justify-between">
           <p className="font-semibold text-sm">Question {questionNumber}</p>
+          <Trash
+            className="h-5 w-5 text-red-500 cursor-pointer hover:text-red-700"
+            onClick={onDelete}
+          />
         </div>
         <div className="flex items-start gap-2">
           <div className="basis-9/12">
@@ -79,8 +71,8 @@ const MutipleChoice = ({
             optionCount={4}
             values={optionValues}
             onValuesChange={setOptionValues}
-            selectedOptions={selectedOptions}
-            onSelectionChange={setSelectedOptions}
+            selectedOption={selectedOption}
+            onSelectionChange={setSelectedOption}
             placeholder="Enter option text"
           />
         </div>

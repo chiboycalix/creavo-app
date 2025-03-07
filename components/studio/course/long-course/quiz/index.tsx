@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import TrueOrFalse from './TrueOrFalse';
 import MutipleChoice from './MutipleChoice';
 import { Button } from "@/components/ui/button";
+import { Input } from '@/components/Input';
 
 type QuestionType = {
   type: "trueFalse" | "multipleChoice";
@@ -20,10 +21,9 @@ type QuestionType = {
 };
 
 type QuestionData = {
-  title: string;
   questionText: string;
   optionValues: string[];
-  selectedOptions: number[];
+  selectedOption: number | null; // Single selected option index
   correctAnswer: "true" | "false" | "";
   allocatedPoint: number;
 };
@@ -47,6 +47,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
   const [selectedModule, setSelectedModule] = useState<any | null>(null);
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const [questionData, setQuestionData] = useState<QuestionData[]>([]);
+  const [quizTitle, setQuizTitle] = useState("");
   const [quizData, setQuizData] = useState<QuizData>({
     moduleId: 1,
     title: "",
@@ -85,6 +86,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       setSelectedModule(module);
       setQuestions([]);
       setQuestionData([]);
+      setQuizTitle("");
       setQuizData({
         moduleId: module.id || 1,
         title: "",
@@ -161,15 +163,22 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     setQuestionData((prev) => [
       ...prev,
       {
-        title: "",
         questionText: "",
         optionValues: type === "multipleChoice" ? ["", "", "", ""] : [],
-        selectedOptions: [],
+        selectedOption: null, // Initialize as null for single selection
         correctAnswer: "",
         allocatedPoint: 1,
       },
     ]);
     setShowQuestionOptions(true);
+  };
+
+  const deleteQuestion = (index: number) => {
+    setQuestions((prev) => {
+      const newQuestions = prev.filter((_, i) => i !== index);
+      return newQuestions.map((q, i) => ({ ...q, questionNumber: i + 1 }));
+    });
+    setQuestionData((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleQuizSubmit = async (e: React.FormEvent) => {
@@ -179,9 +188,9 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       if (question.type === "multipleChoice") {
         const options = data.optionValues.map((text, optIndex) => ({
           text,
-          isCorrect: data.selectedOptions.includes(optIndex),
+          isCorrect: data.selectedOption === optIndex,
         }));
-        const correctAnswer = data.optionValues[data.selectedOptions[0]] || "";
+        const correctAnswer = data.selectedOption !== null ? data.optionValues[data.selectedOption] : "";
         return {
           text: data.questionText,
           options,
@@ -207,7 +216,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     const totalPoint = formattedQuestions.reduce((sum, q) => sum + q.allocatedPoint, 0);
     const finalQuizData = {
       ...quizData,
-      title: questionData[0]?.title || "Untitled Quiz", // Use first question's title as quiz title
+      title: quizTitle || "Untitled Quiz",
       description: quizData.description || "No description provided",
       questions: formattedQuestions,
       totalPoint,
@@ -228,12 +237,6 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
         {question.type === "trueFalse" ? (
           <TrueOrFalse
             questionNumber={question.questionNumber}
-            title={questionData[index].title}
-            setTitle={(title) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, title } : q))
-              )
-            }
             questionText={questionData[index].questionText}
             setQuestionText={(text) =>
               setQuestionData((prev) =>
@@ -252,16 +255,11 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                 prev.map((q, i) => (i === index ? { ...q, allocatedPoint: point } : q))
               )
             }
+            onDelete={() => deleteQuestion(index)}
           />
         ) : (
           <MutipleChoice
             questionNumber={question.questionNumber}
-            title={questionData[index].title}
-            setTitle={(title) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, title } : q))
-              )
-            }
             questionText={questionData[index].questionText}
             setQuestionText={(text) =>
               setQuestionData((prev) =>
@@ -274,10 +272,10 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                 prev.map((q, i) => (i === index ? { ...q, optionValues: values } : q))
               )
             }
-            selectedOptions={questionData[index].selectedOptions}
-            setSelectedOptions={(options) =>
+            selectedOption={questionData[index].selectedOption}
+            setSelectedOption={(option) =>
               setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, selectedOptions: options } : q))
+                prev.map((q, i) => (i === index ? { ...q, selectedOption: option } : q))
               )
             }
             allocatedPoint={questionData[index].allocatedPoint}
@@ -286,6 +284,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                 prev.map((q, i) => (i === index ? { ...q, allocatedPoint: point } : q))
               )
             }
+            onDelete={() => deleteQuestion(index)}
           />
         )}
       </div>
@@ -308,6 +307,15 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
               <div>
                 <div className="mb-4">
                   <p className="font-semibold text-sm">{generalHelpers.convertFromSlug(currentModule!)}</p>
+                </div>
+                <div className="mb-4">
+                  <Input
+                    placeholder="Enter quiz title"
+                    label="Quiz Title"
+                    value={quizTitle}
+                    onChange={(e) => setQuizTitle(e.target.value)}
+                    className="w-full"
+                  />
                 </div>
                 {renderQuestions()}
               </div>

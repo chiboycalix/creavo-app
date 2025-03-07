@@ -17,9 +17,6 @@ const CustomTab = ({ tabs, defaultValue }: TabsProps) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const activeTab = searchParams.get('tab') || defaultValue;
-  const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-  console.log({ currentUrl })
-
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
