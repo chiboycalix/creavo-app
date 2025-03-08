@@ -1,19 +1,18 @@
 "use client"
 import React, { FormEvent } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute';
+import ButtonLoader from '@/components/ButtonLoader';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/Input'
 import { Switch } from '@headlessui/react';
 import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { generalHelpers } from '@/helpers'
 import { COURSE_CATEGORY, CreateCourseForm, createCourseService } from '@/services/course.service'
 import { useMutation } from '@tanstack/react-query'
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
 import { CourseData, resetCreateShortCourseForm, updatCreateShortCourseForm, updateShortCourseData } from '@/redux/slices/course.slice';
 import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCourse.validator';
-import { Loader2 } from 'lucide-react';
 import { useToast } from "@/context/ToastContext";
 import { TagsInput } from '@/components/Input/TagsInput';
 
@@ -86,8 +85,6 @@ const CreateShortCourse = () => {
         difficultyLevel: data?.difficultyLevel
       })
       showToast('success', 'Success', "Course created successfully");
-
-      // const slugTitle = generalHelpers?.convertToSlug(data?.title)
       router.push(`/studio/course/short-course/${data?.id}`)
       dispatch(resetCreateShortCourseForm())
     },
@@ -261,9 +258,10 @@ const CreateShortCourse = () => {
               <Button
                 className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
               >
-                {
-                  isCreatingCourse ? <Loader2 /> : "Continue"
-                }
+                <ButtonLoader
+                  isLoading={isCreatingCourse}
+                  caption="Continue"
+                />
               </Button>
             </div>
           </form>

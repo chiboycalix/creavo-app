@@ -22,7 +22,8 @@ export const createCourseService = async (
   try {
     const { data } = await apiClient.post("/courses", {
       ...payload,
-      amount: Number(payload.amount),
+      currency: payload?.isPaid ? payload?.currency : null,
+      amount: payload?.isPaid ? Number(payload.amount) : null,
       category: category,
     });
     return data;
