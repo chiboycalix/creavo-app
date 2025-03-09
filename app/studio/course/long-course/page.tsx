@@ -146,11 +146,11 @@ const CreateLongCourse = () => {
               }}
               placeholder="#fun #tiktok #post"
               errorMessage={errors.tags}
-              className="w-full"
+              className="w-full py-2.5"
             />
           </div>
           <div className='mb-4 flex items-center gap-4'>
-            <div className='basis-1/2'>
+            <div className='w-full'>
               <Input
                 label="Difficulty level"
                 variant='select'
@@ -176,9 +176,6 @@ const CreateLongCourse = () => {
                 ]}
                 errorMessage={errors.difficultyLevel}
               />
-            </div>
-            <div className='flex-1'>
-
             </div>
           </div>
           <div className='flex gap-2 items-center mb-8'>
@@ -240,6 +237,7 @@ const CreateLongCourse = () => {
               }}
             />
           </div>
+
           <div className='w-full mt-12'>
             <Button
               disabled={isCreatingCourse}

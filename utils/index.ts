@@ -82,6 +82,7 @@ export function getMimeTypeFromCloudinaryUrl(url: string): string | null {
       png: "image/*",
       gif: "image/*",
       webp: "image/*",
+      avif: "image/*",
     };
 
     return mimeTypes[extension] || null;

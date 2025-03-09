@@ -1,9 +1,9 @@
 "use client"
 import ProtectedRoute from '@/components/ProtectedRoute'
-import { Longcourse, ShortCourse } from '@/public/assets'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import React from 'react'
+import { Longcourse, ShortCourse } from '@/public/assets'
+import { useRouter } from 'next/navigation'
 
 const CreateCour = () => {
   const router = useRouter()
@@ -30,7 +30,7 @@ const CreateCour = () => {
         <div className='flex items-center justify-center gap-4 w-9/12'>
           <div
             onClick={handleCreateShortCourse}
-            className='bg-white px-4 py-3 rounded-lg hover:shadow-lg cursor-pointer hover:shadow-primary-100 hover:border hover:border-primary-400 basis-6/12'
+            className='bg-white px-4 py-8 rounded-lg hover:shadow-lg cursor-pointer hover:shadow-primary-200 hover:border hover:border-primary-400 basis-6/12'
           >
             <Image
               src={ShortCourse}
@@ -42,7 +42,7 @@ const CreateCour = () => {
           </div>
           <div
             onClick={handleCreateLongCourse}
-            className='bg-white px-4 py-3 rounded-lg hover:shadow-lg cursor-pointer hover:shadow-primary-100 hover:border hover:border-primary-400 basis-6/12'
+            className='bg-white px-4 py-8 rounded-lg hover:shadow-lg cursor-pointer hover:shadow-primary-200 hover:border hover:border-primary-400 basis-6/12'
           >
             <Image
               src={Longcourse}

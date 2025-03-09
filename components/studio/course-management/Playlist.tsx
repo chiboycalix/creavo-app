@@ -4,29 +4,68 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { generalHelpers } from "@/helpers";
 import { Thumbnail } from "@/public/assets";
+import { getMimeTypeFromCloudinaryUrl } from "@/utils";
 
-const Playlist = ({ course }: { value: number; course: any }) => {
+type Course = {
+  id: number;
+  userId: number;
+  difficultyLevel: "beginner" | "intermediate" | "hard";
+  currency: "USD" | "EUR" | "GBP" | "JPY" | "CAD" | "AUD" | "CHF" | "CNY" | "SEK" | "NZD" | "NGN";
+  amount: number | null;
+  isPaid: boolean;
+  promotionalUrl: string;
+  promote: boolean;
+  tags: string[];
+  title: string;
+  category: "SIMPLE" | "STANDARD"; // Add other categories if applicable
+  description: string;
+  metadata: any | null; // Adjust type if metadata has a known structure
+  likesCount: number;
+  commentsCount: number;
+  viewsCount: number;
+  sharesCount: number;
+  bookmarkCount: number;
+  totalWatchTime: number;
+  isPublished: boolean;
+  isDeleted: boolean;
+  createdAt: string; // Consider using Date if parsing is needed
+  updatedAt: string;
+};
+
+const Playlist = ({ course }: { value: number; course: Course }) => {
+  const mimeType = getMimeTypeFromCloudinaryUrl(course?.promotionalUrl)!;
+
   return (
-    <div className="w-full h-[20rem] flex flex-col rounded-md overflow-hidden border">
-      {/* Image Container */}
-      <div className="relative w-full h-48 flex-shrink-0">
-        <Image
-          src={course?.promotionalUrl || Thumbnail}
-          alt="Course Thumbnail"
-          fill
-          className="object-cover rounded-md"
-          sizes="256px"
-        />
+    <div className="w-full h-[23rem] flex flex-col rounded-md overflow-hidden shadow-md">
+      {/* Image/Video Container */}
+      <div className="relative w-full h-60 flex-shrink-0">
+        {mimeType === "image/*" ? (
+          <Image
+            src={course?.promotionalUrl || Thumbnail}
+            alt="Course Thumbnail"
+            fill
+            className="object-cover rounded-t-md"
+          />
+        ) : (
+          <video
+            src={course?.promotionalUrl}
+            controls
+            className="w-full h-full object-cover rounded-t-md"
+          />
+        )}
+
         {course?.difficultyLevel && (
           <div
-            className={`absolute top-2 left-2 text-sm text-white px-2 py-1 rounded-bl-md rounded-tr-md z-10 ${course.difficultyLevel === "beginner"
-              ? "bg-green-600"
-              : course.difficultyLevel === "intermediate"
-                ? "bg-yellow-600"
-                : course.difficultyLevel === "hard"
-                  ? "bg-red-600"
-                  : "bg-gray-600"
-              }`}
+            className={`absolute top-2 left-2 text-sm text-white px-2 py-1 rounded-bl-md rounded-tr-md z-10 
+              ${course.difficultyLevel === "beginner"
+                ? "bg-green-600"
+                : course.difficultyLevel === "intermediate"
+                  ? "bg-yellow-600"
+                  : course.difficultyLevel === "hard"
+                    ? "bg-red-600"
+                    : "bg-gray-600"
+              }
+              `}
           >
             {generalHelpers.capitalizeWords(course.difficultyLevel)}
           </div>
