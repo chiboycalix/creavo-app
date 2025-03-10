@@ -36,7 +36,7 @@ const Content = ({ courseId: id }: any) => {
   const { validate, errors, validateField } = useCreateModuleFormValidator({
     store: { ...createModuleStateValues, courseId: courseData?.data?.course?.id },
   });
-  console.log({ id })
+
   const { data: courseModulesData, isLoading: isModulesLoading } = useQuery<any>({
     queryKey: ["courseModulesData", selectedModuleData?.id],
     queryFn: async () => {
@@ -257,7 +257,7 @@ const Content = ({ courseId: id }: any) => {
                   <p className="text-sm mt-2">Create a new video</p>
                 </div>
               ) : (
-                courseModulesData.module.media.map((moduleContent: any) => (
+                courseModulesData?.module?.media.map((moduleContent: any) => (
                   <div key={moduleContent.id} className="flex items-center mb-4 gap-2">
                     <div className="basis-1/12">
                       <GripVertical />
@@ -303,7 +303,7 @@ const Content = ({ courseId: id }: any) => {
         />
       </>
     );
-  }, [isModulesLoading, showCreateModule, selectedModule, courseData?.data?.course?.modules?.length, courseData?.data?.course?.id, courseModulesData.module.media, queryClient, selectedModuleData?.id, courseId, id, handleSubmit, createModuleStateValues.title, createModuleStateValues.description, errors.title, errors.description, isAddingModule, updateCreateModule, validateField]);
+  }, [isModulesLoading, showCreateModule, selectedModule, courseData?.data?.course?.modules?.length, courseData?.data?.course?.id, courseModulesData?.module?.media, queryClient, selectedModuleData?.id, courseId, id, handleSubmit, createModuleStateValues?.title, createModuleStateValues?.description, errors?.title, errors?.description, isAddingModule, updateCreateModule, validateField]);
 
   return (
     <div className="flex gap-4 w-full">

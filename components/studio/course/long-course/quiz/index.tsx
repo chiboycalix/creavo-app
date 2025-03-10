@@ -5,7 +5,7 @@ import TrueOrFalse from './TrueOrFalse';
 import MutipleChoice from './MutipleChoice';
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Clipboard, GripVertical, Loader2 } from 'lucide-react';
+import { Clipboard, GripVertical, Loader2, Pencil } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
 import { useAppDispatch } from '@/hooks/useStore.hook';
 import { updateSelectedModuleData } from '@/redux/slices/module.slice';
@@ -38,6 +38,36 @@ type QuizData = {
   questions: any[];
 };
 
+const hardcodedQuestions = [
+  {
+    type: "multipleChoice" as const,
+    questionNumber: 1,
+    questionText: "What is the capital of France?",
+    optionValues: ["Paris", "London", "Berlin", "Madrid"],
+    selectedOption: 0, // Paris is correct
+    correctAnswer: "",
+    allocatedPoint: 2,
+  },
+  {
+    type: "trueFalse" as const,
+    questionNumber: 2,
+    questionText: "The Earth is flat.",
+    optionValues: [],
+    selectedOption: null,
+    correctAnswer: "false",
+    allocatedPoint: 1,
+  },
+  {
+    type: "multipleChoice" as const,
+    questionNumber: 3,
+    questionText: "Which planet is the largest?",
+    optionValues: ["Earth", "Jupiter", "Mars", "Venus"],
+    selectedOption: 1, // Jupiter is correct
+    correctAnswer: "",
+    allocatedPoint: 3,
+  },
+];
+
 const Quiz = ({ courseId: id }: { courseId: any }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -58,6 +88,8 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
   });
   const [showQuestionOptions, setShowQuestionOptions] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
+  const [isAddingQuiz, setIsAddingQuiz] = useState(false);
+  const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(null);
 
   const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
 
@@ -82,6 +114,8 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       });
       setShowQuestionOptions(false);
       setTitleError(null);
+      setIsAddingQuiz(false);
+      setEditingQuestionIndex(null);
       if (!courseId) {
         router.push(`?tab=quiz&module=${generalHelpers.convertToSlug(module.title)}`);
       } else {
@@ -174,6 +208,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       setQuestionData([]);
       setQuizTitle("");
       setShowQuestionOptions(false);
+      setIsAddingQuiz(false);
     },
     onError: (error: any) => {
       toast.error(error?.data?.[0] || "Failed to create quiz");
@@ -225,15 +260,27 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       questions: formattedQuestions,
       totalPoint,
     };
-    console.log({ finalQuizData });
-    handleAddQuizToModule({
-      ...finalQuizData,
-    });
+    handleAddQuizToModule(finalQuizData);
     setTitleError(null);
   };
 
-  const { data: moduleQuizData, isLoading: isModulesLoading } = useQuery<any>({
-    queryKey: ["fetchQuiz"],
+  const areQuestionsComplete = () => {
+    return questionData.every((data, index) => {
+      const question = questions[index];
+      if (question.type === "trueFalse") {
+        return data.questionText.trim() && (data.correctAnswer === "true" || data.correctAnswer === "false");
+      } else {
+        return (
+          data.questionText.trim() &&
+          data.optionValues.every((opt) => opt.trim()) &&
+          data.selectedOption !== null
+        );
+      }
+    });
+  };
+
+  const { data: quiz, isLoading: isFetchingQuiz } = useQuery<any>({
+    queryKey: ["quizData", selectedModule?.id],
     queryFn: async () => {
       const data = await fetchQuizService({
         moduleId: selectedModule?.id,
@@ -245,23 +292,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Check if all questions are completely filled
-  const areQuestionsComplete = () => {
-    return questionData.every((data, index) => {
-      const question = questions[index];
-      if (question.type === "trueFalse") {
-        // True/False: questionText must be non-empty and correctAnswer must be "true" or "false"
-        return data.questionText.trim() && (data.correctAnswer === "true" || data.correctAnswer === "false");
-      } else {
-        // Multiple Choice: questionText must be non-empty, all optionValues must be non-empty, and selectedOption must be set
-        return (
-          data.questionText.trim() &&
-          data.optionValues.every((opt) => opt.trim()) &&
-          data.selectedOption !== null
-        );
-      }
-    });
-  };
+  console.log({ quiz, isFetchingQuiz })
 
   const isSubmitDisabled =
     !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
@@ -326,6 +357,65 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     ));
   };
 
+  const renderQuestionList = () => {
+    if (hardcodedQuestions.length === 0) {
+      return (
+        <div className="h-full text-sm mb-4 flex flex-col justify-center items-center mt-10">
+          <Clipboard size={48} />
+          <p className="text-xl font-regular mt-4 font-semibold">No Questions Available</p>
+          <p className="text-sm text-gray-500 mt-2">Add questions to create a quiz!</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {hardcodedQuestions.map((question, index) => (
+          <div
+            key={index}
+            className="p-4 border rounded-md hover:bg-gray-50 flex justify-between items-start"
+          >
+            <div>
+              <p className="font-semibold">Question {question.questionNumber}: {question.questionText}</p>
+              {question.type === "multipleChoice" ? (
+                <ul className="list-disc pl-5 text-sm text-gray-500 mt-2">
+                  {question.optionValues.map((option, optIndex) => (
+                    <li key={optIndex} className={optIndex === question.selectedOption ? "text-green-600" : ""}>
+                      {option} {optIndex === question.selectedOption ? "(Correct)" : ""}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-500 mt-2">
+                  Correct Answer: {question.correctAnswer === "true" ? "True" : "False"}
+                </p>
+              )}
+              <p className="text-sm text-gray-500 mt-1">Points: {question.allocatedPoint}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setIsAddingQuiz(true);
+                setQuestions([question]);
+                setQuestionData([{
+                  questionText: question.questionText,
+                  optionValues: question.optionValues,
+                  selectedOption: question.selectedOption,
+                  correctAnswer: question.correctAnswer as "" | "true" | "false",
+                  allocatedPoint: question.allocatedPoint,
+                }]);
+                setEditingQuestionIndex(index);
+              }}
+            >
+              <Pencil size={16} />
+            </Button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="flex gap-4 w-full">
       <Card className="basis-4/12 border-none px-1 max-h-[74vh] overflow-y-auto">
@@ -338,69 +428,94 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       <Card className="flex-1 border-none px-0 py-0 max-h-[74vh] overflow-y-auto">
         <CardHeader>
           <CardContent className="px-0 py-0 flex flex-col h-full justify-between">
-            <form onSubmit={handleQuizSubmit}>
-              <div>
-                <div className="mb-4">
-                  <p className="font-semibold text-sm">{generalHelpers?.convertFromSlug(currentModule! || "")}</p>
-                </div>
-                <div className="mb-4">
-                  <Input
-                    placeholder="Enter quiz title"
-                    label="Quiz Title"
-                    value={quizTitle}
-                    onChange={(e) => {
-                      setQuizTitle(e.target.value);
-                      if (e.target.value.trim()) setTitleError(null);
-                    }}
-                    className="w-full"
-                  />
-                  {titleError && (
-                    <p className="text-red-500 text-sm mt-1">{titleError}</p>
-                  )}
-                </div>
-                {renderQuestions()}
+            <div>
+              <div className="mb-4">
+                <p className="font-semibold text-sm">{generalHelpers?.convertFromSlug(currentModule! || "")}</p>
               </div>
-              <div className="flex gap-4 mt-4">
-                {showQuestionOptions ? (
-                  <>
+              {!isAddingQuiz ? (
+                <>
+                  {renderQuestionList()}
+                  <div className="flex gap-4 mt-4">
+                    <Button onClick={() => { setIsAddingQuiz(true); setEditingQuestionIndex(null); }} type="button">
+                      Add Quiz
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <form onSubmit={handleQuizSubmit}>
+                  <div className="mb-4">
+                    <Input
+                      placeholder="Enter quiz title"
+                      label="Quiz Title"
+                      value={quizTitle}
+                      onChange={(e) => {
+                        setQuizTitle(e.target.value);
+                        if (e.target.value.trim()) setTitleError(null);
+                      }}
+                      className="w-full"
+                    />
+                    {titleError && (
+                      <p className="text-red-500 text-sm mt-1">{titleError}</p>
+                    )}
+                  </div>
+                  {renderQuestions()}
+                  <div className="flex gap-4 mt-4">
+                    {showQuestionOptions ? (
+                      <>
+                        <Button
+                          onClick={() => addQuestion("multipleChoice")}
+                          variant="outline"
+                          type="button"
+                        >
+                          Multiple Choice
+                        </Button>
+                        <Button
+                          onClick={() => addQuestion("trueFalse")}
+                          variant="outline"
+                          type="button"
+                        >
+                          True/False
+                        </Button>
+                        <Button
+                          onClick={() => setShowQuestionOptions(true)}
+                          variant="default"
+                          type="button"
+                        >
+                          Add Question
+                        </Button>
+                      </>
+                    ) : (
+                      <Button onClick={() => setShowQuestionOptions(true)} type="button">
+                        Add Question
+                      </Button>
+                    )}
+                    <Button type="submit" disabled={isSubmitDisabled}>
+                      {isAddingModule ? (
+                        <p className="flex items-center gap-2">
+                          <Loader2 className="animate-spin" /> Please wait...
+                        </p>
+                      ) : (
+                        "Submit Quiz"
+                      )}
+                    </Button>
                     <Button
-                      onClick={() => addQuestion("multipleChoice")}
+                      onClick={() => {
+                        setIsAddingQuiz(false);
+                        setQuestions([]);
+                        setQuestionData([]);
+                        setQuizTitle("");
+                        setShowQuestionOptions(false);
+                        setEditingQuestionIndex(null);
+                      }}
                       variant="outline"
                       type="button"
                     >
-                      Multiple Choice
+                      Cancel
                     </Button>
-                    <Button
-                      onClick={() => addQuestion("trueFalse")}
-                      variant="outline"
-                      type="button"
-                    >
-                      True/False
-                    </Button>
-                    <Button
-                      onClick={() => setShowQuestionOptions(true)}
-                      variant="default"
-                      type="button"
-                    >
-                      Add Question
-                    </Button>
-                  </>
-                ) : (
-                  <Button onClick={() => setShowQuestionOptions(true)} type="button">
-                    Add Question
-                  </Button>
-                )}
-                <Button type="submit" disabled={isSubmitDisabled}>
-                  {isAddingModule ? (
-                    <p className="flex items-center gap-2">
-                      <Loader2 className="animate-spin" /> Please wait...
-                    </p>
-                  ) : (
-                    "Submit Quiz"
-                  )}
-                </Button>
-              </div>
-            </form>
+                  </div>
+                </form>
+              )}
+            </div>
           </CardContent>
         </CardHeader>
       </Card>
