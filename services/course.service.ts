@@ -13,6 +13,7 @@ export interface CreateCourseForm {
   promotionalUrl?: string;
   isPaid: boolean;
   tags: string[];
+  promote?: boolean;
 }
 
 export const createCourseService = async (

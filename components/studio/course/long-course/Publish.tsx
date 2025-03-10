@@ -1,8 +1,9 @@
+import { Card } from '@/components/ui/card'
 import React from 'react'
 
 const Publish = () => {
   return (
-    <div>Publish</div>
+    <Card>Publish</Card>
   )
 }
 

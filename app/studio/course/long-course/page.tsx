@@ -1,5 +1,5 @@
 "use client"
-import React, { FormEvent } from 'react'
+import React, { FormEvent, useState } from 'react'
 import ButtonLoader from '@/components/ButtonLoader';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/Input'
@@ -71,11 +71,12 @@ const CreateLongCourse = () => {
   const { validate, errors, validateField } = useCreateCourseFormValidator({ store: createCourseStateValues });
   const updateCreateCourse = (payload: Partial<CreateCourseForm>) => dispatch(updatCreateLongCourseForm(payload));
   const maxFiles = 1;
+  const [isSelected, setIsSelected] = useState(false)
 
   const { mutate: handleCreateCourse, isPending: isCreatingCourse } = useMutation({
     mutationFn: (payload: CreateCourseForm) => createCourseService(payload, COURSE_CATEGORY.STANDARD),
     onSuccess: async (data) => {
-      showToast('success', 'success', "Course created successfully");
+      showToast('success', 'Success', "Course created successfully");
       router.push(`/studio/course/long-course/${data?.id}?tab=content`)
       dispatch(resetCreateLongCourseForm())
     },
@@ -94,10 +95,10 @@ const CreateLongCourse = () => {
       amount: createCourseStateValues.amount,
       isPaid: createCourseStateValues.isPaid,
       currency: createCourseStateValues.currency,
-      promotionalUrl: createCourseStateValues?.promotionalUrl
+      promotionalUrl: createCourseStateValues?.promotionalUrl,
+      promote: isSelected
     }))
   }
-
 
   return (
     <Card className='border-none mt-4 max-w-5xl mx-auto'>
@@ -239,9 +240,15 @@ const CreateLongCourse = () => {
             />
           </div>
 
-          <div className='flex flex-col gap-2 mt-4'>
-            <Checkbox label="Upload promotional video/images to Explore" />
-            <Checkbox label="List to marketplace" />
+          <div className='flex flex-col gap-3 mt-4'>
+
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(isChecked: boolean) => setIsSelected(isChecked)}
+              label="Upload promotional video/images to Exploresss"
+              className=""
+            />
+            <Checkbox label="List to marketplace" className="" />
           </div>
 
           <div className='w-full mt-12'>

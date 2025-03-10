@@ -2,8 +2,6 @@ import * as React from "react"
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-// Define additional props interface
 interface CustomCheckboxProps {
   label?: React.ReactNode;
   error?: string;
@@ -12,7 +10,6 @@ interface CustomCheckboxProps {
   checkIconClass?: string;
 }
 
-// Combine custom props with original Radix Checkbox props
 type CheckboxProps = React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & CustomCheckboxProps;
 
 const Checkbox = React.forwardRef<React.ElementRef<typeof CheckboxPrimitive.Root>, CheckboxProps>(
