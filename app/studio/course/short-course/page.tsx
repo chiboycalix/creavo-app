@@ -1,21 +1,21 @@
 "use client"
 import React, { FormEvent } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute';
+import ButtonLoader from '@/components/ButtonLoader';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/Input'
 import { Switch } from '@headlessui/react';
 import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { generalHelpers } from '@/helpers'
 import { COURSE_CATEGORY, CreateCourseForm, createCourseService } from '@/services/course.service'
 import { useMutation } from '@tanstack/react-query'
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
 import { CourseData, resetCreateShortCourseForm, updatCreateShortCourseForm, updateShortCourseData } from '@/redux/slices/course.slice';
 import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCourse.validator';
-import { Loader2 } from 'lucide-react';
 import { useToast } from "@/context/ToastContext";
 import { TagsInput } from '@/components/Input/TagsInput';
+import { Checkbox } from '@/components/ui/check-box';
 
 const currencies = [
   {
@@ -86,8 +86,6 @@ const CreateShortCourse = () => {
         difficultyLevel: data?.difficultyLevel
       })
       showToast('success', 'Success', "Course created successfully");
-
-      // const slugTitle = generalHelpers?.convertToSlug(data?.title)
       router.push(`/studio/course/short-course/${data?.id}`)
       dispatch(resetCreateShortCourseForm())
     },
@@ -163,11 +161,11 @@ const CreateShortCourse = () => {
                 }}
                 placeholder="#fun #tiktok #post"
                 errorMessage={errors.tags}
-                className="w-full"
+                className="w-full py-2.5"
               />
             </div>
             <div className='mb-4 flex items-center gap-4'>
-              <div className='basis-1/2'>
+              <div className='w-full'>
                 <Input
                   label="Difficulty level"
                   variant='select'
@@ -192,11 +190,10 @@ const CreateShortCourse = () => {
                     }
                   ]}
                   errorMessage={errors.difficultyLevel}
+                  className='py-0.5'
                 />
               </div>
-              <div className='flex-1'>
 
-              </div>
             </div>
             <div className='flex gap-2 items-center mb-8'>
               <Switch
@@ -257,13 +254,19 @@ const CreateShortCourse = () => {
                 }}
               />
             </div>
+
+            <div className='flex flex-col gap-2 mt-4'>
+              <Checkbox label="Upload promotional video/images to Explore" />
+              <Checkbox label="List to marketplace" />
+            </div>
             <div className='w-full mt-12'>
               <Button
                 className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
               >
-                {
-                  isCreatingCourse ? <Loader2 /> : "Continue"
-                }
+                <ButtonLoader
+                  isLoading={isCreatingCourse}
+                  caption="Continue"
+                />
               </Button>
             </div>
           </form>

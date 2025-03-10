@@ -93,7 +93,6 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
 
   useEffect(() => {
     if (!courseData?.data?.course?.modules?.length || selectedModule || isFetchingCourse) return;
-
     const initialModule = courseData?.data?.course.modules[0];
     setSelectedModule(initialModule);
     setQuizData((prev) => ({ ...prev, moduleId: initialModule.id || 1 }));
