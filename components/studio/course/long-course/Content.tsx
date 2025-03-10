@@ -12,7 +12,7 @@ import { resetCreateModuleForm, updatCreateModuleForm, updateSelectedModuleData 
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook";
 import { CreateModuleForm } from "@/types";
 import { useCreateModuleFormValidator } from "@/helpers/validators/useCreateModule.validator";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { generalHelpers } from "@/helpers";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ const Content = ({ courseId: id }: any) => {
   const courseId = searchParams.get("edit");
   const [showCreateModule, setShowCreateModule] = useState(false);
   const [selectedModule, setSelectedModule] = useState<any | null>(null);
+  const { courseIdNono } = useParams();
 
   const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
 
@@ -35,17 +36,17 @@ const Content = ({ courseId: id }: any) => {
   const { validate, errors, validateField } = useCreateModuleFormValidator({
     store: { ...createModuleStateValues, courseId: courseData?.data?.course?.id },
   });
-
+  console.log({ id })
   const { data: courseModulesData, isLoading: isModulesLoading } = useQuery<any>({
     queryKey: ["courseModulesData", selectedModuleData?.id],
     queryFn: async () => {
       const data = await fetchCourseDetailsService({
-        courseId: courseId || courseData?.data?.course?.id,
+        courseId: id || courseId || courseData?.data?.course?.id,
         moduleId: selectedModuleData?.id,
       });
       return data;
     },
-    enabled: !!courseData?.data?.course?.id && !!selectedModuleData?.id,
+    enabled: !!id && !!courseData?.data?.course?.id && !!selectedModuleData?.id,
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
@@ -103,14 +104,14 @@ const Content = ({ courseId: id }: any) => {
       e.preventDefault();
       validate(() =>
         handleAddModule({
-          courseId: Number(courseId) || Number(courseData?.data?.course?.id),
+          courseId: Number(courseId) || Number(id) || Number(courseData?.data?.course?.id),
           difficultyLevel: courseModulesData?.module?.course?.difficultyLevel || courseData?.data?.course?.difficultyLevel,
           title: createModuleStateValues?.title,
           description: courseModulesData?.description || createModuleStateValues?.description,
         })
       );
     },
-    [validate, handleAddModule, courseId, courseData?.data?.course?.id, courseData?.data?.course?.difficultyLevel, courseModulesData?.module?.course?.difficultyLevel, courseModulesData?.description, createModuleStateValues?.title, createModuleStateValues?.description]
+    [validate, handleAddModule, id, courseId, courseData?.data?.course?.id, courseData?.data?.course?.difficultyLevel, courseModulesData?.module?.course?.difficultyLevel, courseModulesData?.description, createModuleStateValues?.title, createModuleStateValues?.description]
   );
 
   const handleClickModule = useCallback(
@@ -298,10 +299,11 @@ const Content = ({ courseId: id }: any) => {
           description="Upload your existing content to automatically create a new lesson in this module"
           queryClient={queryClient}
           moduleId={selectedModuleData?.id}
+          courseId={Number(courseId) || Number(id) || Number(courseData?.data?.course?.id)}
         />
       </>
     );
-  }, [isModulesLoading, showCreateModule, selectedModule, courseData?.data?.course?.modules?.length, courseModulesData?.module?.media, queryClient, selectedModuleData?.id, handleSubmit, createModuleStateValues.title, createModuleStateValues.description, errors.title, errors.description, isAddingModule, updateCreateModule, validateField]);
+  }, [isModulesLoading, showCreateModule, selectedModule, courseData?.data?.course?.modules?.length, courseData?.data?.course?.id, courseModulesData.module.media, queryClient, selectedModuleData?.id, courseId, id, handleSubmit, createModuleStateValues.title, createModuleStateValues.description, errors.title, errors.description, isAddingModule, updateCreateModule, validateField]);
 
   return (
     <div className="flex gap-4 w-full">

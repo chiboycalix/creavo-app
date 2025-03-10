@@ -18,6 +18,7 @@ interface UploadMediaProps {
   description: string;
   queryClient: QueryClient;
   moduleId?: string;
+  courseId: string | number;
 }
 
 interface ModuleData {
@@ -27,7 +28,7 @@ interface ModuleData {
   };
 }
 
-const UploadMedia = ({ description, queryClient, moduleId }: UploadMediaProps) => {
+const UploadMedia = ({ description, queryClient, moduleId, courseId }: UploadMediaProps) => {
   const dispatch = useAppDispatch();
   const { longCourseData: courseDataStateValues } = useAppSelector((store) => store.courseStore);
   const { selectedModuleData, addMediaToModuleForm: addMediaToModuleStateValues } = useAppSelector((store) => store.moduleStore);
@@ -79,7 +80,7 @@ const UploadMedia = ({ description, queryClient, moduleId }: UploadMediaProps) =
 
       const mimeType = getMimeTypeFromCloudinaryUrl(addMediaToModuleStateValues.url);
       handleAddMediaToModule({
-        courseId: courseDataStateValues?.courseId,
+        courseId: courseDataStateValues?.courseId || courseId,
         moduleId: selectedModuleData?.id,
         media: [
           {
