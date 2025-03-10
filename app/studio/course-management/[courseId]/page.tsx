@@ -20,7 +20,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Thumbnail } from '@/public/assets'
 import { useParams, useRouter } from 'next/navigation';
 import { generalHelpers } from '@/helpers';
-import { formatDate } from '@/utils';
+import { formatDate, getMimeTypeFromCloudinaryUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { Loader2, ShareIcon, Trash, TriangleAlertIcon } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
@@ -58,6 +58,7 @@ const Course = () => {
     }).toString();
     router.push(`/studio/course/${courseType}/${courseSlug}?${queryParams}&tab=content`)
   }
+  const mimeType = getMimeTypeFromCloudinaryUrl(courseData?.data?.course?.promotionalUrl)!;
 
   return (
     <ProtectedRoute
@@ -74,15 +75,23 @@ const Course = () => {
                 <Card className='border-none shadow-md'>
                   <CardContent className='py-4 px-4 w-full'>
                     <div>
-                      {
-                        courseData?.data?.course?.promotionalUrl && <Image
+                      {mimeType === "image/*" ? (
+                        <Image
                           src={courseData?.data?.course?.promotionalUrl || Thumbnail}
                           alt="Thumbnail"
                           width={384}
                           height={200}
                           className='rounded-md max-h-72 w-full'
                         />
-                      }
+                      ) : (
+                        <video
+                          src={courseData?.data?.course?.promotionalUrl}
+                          controls
+                          width={384}
+                          height={200}
+                          className="w-full max-h-72 object-cover rounded-md"
+                        />
+                      )}
                     </div>
                     <div className='mt-2'>
                       <p className='font-semibold'>{generalHelpers.capitalizeWords(courseData?.data?.course?.title)}</p>

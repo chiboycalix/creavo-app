@@ -5,33 +5,37 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Content from '@/components/studio/course/long-course/Content';
 import Quiz from '@/components/studio/course/long-course/quiz';
 import Publish from '@/components/studio/course/long-course/Publish';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { PenBox } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
 
 const CourseName = () => {
+  const searchParams = useSearchParams();
   const { courseId } = useParams();
-  const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId as any);
+  const id = searchParams.get("edit");
+  const { data: courseData } = useFetchCourseData(id || courseId as any);
 
   const tabs = [
     {
       id: 1,
       title: "Content",
       content: (<Content
-        courseId={courseId}
+        courseId={id ? id : courseId}
       />)
     },
     {
       id: 2,
       title: "Quiz",
       content: (<Quiz
-        courseId={courseId}
+        courseId={id ? id : courseId}
       />)
     },
     {
       id: 3,
       title: "Publish",
-      content: (<Publish />)
+      content: (<Publish
+        courseId={id ? id : courseId}
+      />)
     },
   ]
   return (

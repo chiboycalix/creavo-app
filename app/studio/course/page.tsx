@@ -5,7 +5,7 @@ import React from 'react'
 import { Longcourse, ShortCourse } from '@/public/assets'
 import { useRouter } from 'next/navigation'
 
-const CreateCour = () => {
+const CreateCourse = () => {
   const router = useRouter()
 
   const handleCreateLongCourse = () => {
@@ -58,4 +58,4 @@ const CreateCour = () => {
   )
 }
 
-export default CreateCour
+export default CreateCourse

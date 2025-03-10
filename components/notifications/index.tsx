@@ -72,7 +72,6 @@ const NotificationsPopover = () => {
 
   // Handle WebSocket notifications
   const handleNotification = (newNotification: any) => {
-    console.log({ newNotification })
     const formattedNotification = normalizeNotification(newNotification);
 
     setNotifications((prevNotifications) => {

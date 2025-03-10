@@ -292,8 +292,6 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     staleTime: 5 * 60 * 1000,
   });
 
-  console.log({ quiz, isFetchingQuiz })
-
   const isSubmitDisabled =
     !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
 

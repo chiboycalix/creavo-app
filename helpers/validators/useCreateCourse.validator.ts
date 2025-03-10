@@ -52,7 +52,11 @@ const useCreateCourseFormValidator = ({ store }: HookProps) => {
   };
 
   const validateField = (field: keyof CreateCourseForm, value: string) => {
-    const fieldSchema = z.object({ [field]: CreateCourseShema.shape[field] });
+    const fieldSchema = z.object({
+      [field]: (CreateCourseShema.shape as Record<keyof CreateCourseForm, any>)[
+        field
+      ],
+    });
     const result = fieldSchema.safeParse({ [field]: value });
 
     if (!result.success) {

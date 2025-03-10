@@ -7,8 +7,6 @@ import { toast } from 'sonner';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PlaySquareIcon } from 'lucide-react';
 import { generalHelpers } from '@/helpers';
-import { PiEmptyBold } from 'react-icons/pi';
-import { ChatEmpty } from '@/public/assets';
 
 const LongCourseDetails = ({ course }: any) => {
   const queryClient = useQueryClient();
@@ -86,7 +84,6 @@ const LongCourseDetails = ({ course }: any) => {
           </Accordion>
         })
       }
-
     </>
   )
 }

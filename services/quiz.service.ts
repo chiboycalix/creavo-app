@@ -1,7 +1,6 @@
 import { apiClient } from "@/lib/apiClient";
 
 export const addQuizToModuleService = async (payload: any) => {
-  console.log({ payload });
   try {
     const { data } = await apiClient.post(
       `/modules/${payload?.moduleId}/create-quiz`,

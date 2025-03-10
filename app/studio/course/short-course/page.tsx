@@ -1,5 +1,5 @@
 "use client"
-import React, { FormEvent } from 'react'
+import React, { FormEvent, useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ButtonLoader from '@/components/ButtonLoader';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -68,6 +68,7 @@ const CreateShortCourse = () => {
   const router = useRouter()
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
+  const [isSelected, setIsSelected] = useState(false)
   const { createShortCourseForm: createCourseStateValues } = useAppSelector((store) => store.courseStore);
   const { validate, errors, validateField } = useCreateCourseFormValidator({ store: createCourseStateValues });
   const updateCreateShortCourse = (payload: Partial<CreateCourseForm>) => dispatch(updatCreateShortCourseForm(payload));
@@ -104,7 +105,8 @@ const CreateShortCourse = () => {
       amount: createCourseStateValues.amount,
       isPaid: createCourseStateValues.isPaid,
       currency: createCourseStateValues.currency,
-      promotionalUrl: createCourseStateValues?.promotionalUrl
+      promotionalUrl: createCourseStateValues?.promotionalUrl,
+      promote: isSelected
     }))
   }
 
@@ -255,9 +257,15 @@ const CreateShortCourse = () => {
               />
             </div>
 
-            <div className='flex flex-col gap-2 mt-4'>
-              <Checkbox label="Upload promotional video/images to Explore" />
-              <Checkbox label="List to marketplace" />
+            <div className='flex flex-col gap-3 mt-4'>
+
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={(isChecked: boolean) => setIsSelected(isChecked)}
+                label="Upload promotional video/images to Exploresss"
+                className=""
+              />
+              <Checkbox label="List to marketplace" className="" />
             </div>
             <div className='w-full mt-12'>
               <Button

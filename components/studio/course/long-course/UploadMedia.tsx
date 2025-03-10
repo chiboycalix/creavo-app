@@ -93,16 +93,7 @@ const UploadMedia = ({ description, queryClient, moduleId, courseId }: UploadMed
         ],
       });
     },
-    [
-      addMediaToModuleStateValues.url,
-      addMediaToModuleStateValues.title,
-      addMediaToModuleStateValues.description,
-      courseDataStateValues?.courseId,
-      selectedModuleData?.id,
-      duration,
-      handleAddMediaToModule,
-      moduleId,
-    ]
+    [addMediaToModuleStateValues?.url, addMediaToModuleStateValues?.title, addMediaToModuleStateValues?.description, moduleId, handleAddMediaToModule, courseDataStateValues?.courseId, courseId, selectedModuleData?.id, duration]
   );
 
   return (

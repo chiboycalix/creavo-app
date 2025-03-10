@@ -24,7 +24,7 @@ const CourseManagement = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4 mt-4">
         {courses?.data?.courses?.map((course: any, index: number) => (
           <Playlist key={course.id || index} value={34} course={course} />
         ))}

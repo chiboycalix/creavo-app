@@ -12,7 +12,7 @@ import { resetCreateModuleForm, updatCreateModuleForm, updateSelectedModuleData 
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook";
 import { CreateModuleForm } from "@/types";
 import { useCreateModuleFormValidator } from "@/helpers/validators/useCreateModule.validator";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { generalHelpers } from "@/helpers";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
@@ -27,7 +27,6 @@ const Content = ({ courseId: id }: any) => {
   const courseId = searchParams.get("edit");
   const [showCreateModule, setShowCreateModule] = useState(false);
   const [selectedModule, setSelectedModule] = useState<any | null>(null);
-  const { courseIdNono } = useParams();
 
   const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
 
@@ -41,7 +40,7 @@ const Content = ({ courseId: id }: any) => {
     queryKey: ["courseModulesData", selectedModuleData?.id],
     queryFn: async () => {
       const data = await fetchCourseDetailsService({
-        courseId: id || courseId || courseData?.data?.course?.id,
+        courseId: courseId || id || courseData?.data?.course?.id,
         moduleId: selectedModuleData?.id,
       });
       return data;
@@ -299,7 +298,7 @@ const Content = ({ courseId: id }: any) => {
           description="Upload your existing content to automatically create a new lesson in this module"
           queryClient={queryClient}
           moduleId={selectedModuleData?.id}
-          courseId={Number(courseId) || Number(id) || Number(courseData?.data?.course?.id)}
+          courseId={Number(id) || Number(courseId) || Number(courseData?.data?.course?.id)}
         />
       </>
     );
