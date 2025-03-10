@@ -15,6 +15,7 @@ import { CourseData, resetCreateShortCourseForm, updatCreateShortCourseForm, upd
 import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCourse.validator';
 import { useToast } from "@/context/ToastContext";
 import { TagsInput } from '@/components/Input/TagsInput';
+import { Checkbox } from '@/components/ui/check-box';
 
 const currencies = [
   {
@@ -252,6 +253,11 @@ const CreateShortCourse = () => {
                   updateCreateShortCourse({ promotionalUrl: uploads })
                 }}
               />
+            </div>
+
+            <div className='flex flex-col gap-2 mt-4'>
+              <Checkbox label="Upload promotional video/images to Explore" />
+              <Checkbox label="List to marketplace" />
             </div>
             <div className='w-full mt-12'>
               <Button
