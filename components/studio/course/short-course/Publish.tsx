@@ -22,7 +22,7 @@ const Publish = ({ courseId }: { courseId: any }) => {
     },
   });
 
-  const { data: courseData } = useQuery<any>({
+  const { data: courseData, isFetching } = useQuery<any>({
     queryKey: ["courseData", courseId],
     queryFn: async () => {
       const data = await fetchSingleCourseService({
@@ -48,7 +48,9 @@ const Publish = ({ courseId }: { courseId: any }) => {
     <Card className='max-w-3xl mt-20 mx-auto border-none shadow-md'>
       <CardHeader>
         <CardTitle className='text-base font-semibold'>
-          Course publish status ({isPublished ? <span className='text-primary-700 font-bold text-sm'>Published</span> : <span className='text-red-600 font-bold text-sm'>Not Published</span>})
+          {
+            isFetching ? <div className='h-2 w-1/2 bg-gray-200 rounded-sm animate-pulse'></div> : <> Course publish status ({isPublished ? <span className='text-primary-700 font-bold text-sm'>Published</span> : <span className='text-red-600 font-bold text-sm'>Not Published</span>})</>
+          }
         </CardTitle>
       </CardHeader>
       <CardContent>
