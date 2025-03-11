@@ -62,13 +62,13 @@ export const formatCommentDate = (date: string): string => {
 
 export function getMimeTypeFromCloudinaryUrl(url: string): string | null {
   try {
-    const urlParts = url.split(/[#?]/)[0];
-    const extensionMatch = urlParts.match(/\.([a-zA-Z0-9]+)$/);
-    const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;
+    const urlParts = url?.split(/[#?]/)[0];
+    const extensionMatch = urlParts?.match(/\.([a-zA-Z0-9]+)$/);
+    const extension = extensionMatch ? extensionMatch[1]?.toLowerCase() : null;
 
     if (!extension) {
-      if (url.includes("/video/")) return "video/mp4";
-      if (url.includes("/image/")) return "image/jpeg";
+      if (url?.includes("/video/")) return "video/mp4";
+      if (url?.includes("/image/")) return "image/jpeg";
       return null;
     }
 
@@ -82,6 +82,7 @@ export function getMimeTypeFromCloudinaryUrl(url: string): string | null {
       png: "image/*",
       gif: "image/*",
       webp: "image/*",
+      avif: "image/*",
     };
 
     return mimeTypes[extension] || null;

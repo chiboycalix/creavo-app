@@ -21,7 +21,6 @@ export const addCommentService = async (payload: CommentPayload) => {
 };
 
 export const replyCommentService = async (payload: CommentPayload) => {
-  console.log({ payload });
   try {
     const { data } = await apiClient.post(
       `/posts/${payload?.postId}/create-comment`,

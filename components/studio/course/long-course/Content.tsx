@@ -40,12 +40,12 @@ const Content = ({ courseId: id }: any) => {
     queryKey: ["courseModulesData", selectedModuleData?.id],
     queryFn: async () => {
       const data = await fetchCourseDetailsService({
-        courseId: courseId || courseData?.data?.course?.id,
+        courseId: courseId || id || courseData?.data?.course?.id,
         moduleId: selectedModuleData?.id,
       });
       return data;
     },
-    enabled: !!courseData?.data?.course?.id && !!selectedModuleData?.id,
+    enabled: !!id && !!courseData?.data?.course?.id && !!selectedModuleData?.id,
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
@@ -103,14 +103,14 @@ const Content = ({ courseId: id }: any) => {
       e.preventDefault();
       validate(() =>
         handleAddModule({
-          courseId: Number(courseId) || Number(courseData?.data?.course?.id),
+          courseId: Number(courseId) || Number(id) || Number(courseData?.data?.course?.id),
           difficultyLevel: courseModulesData?.module?.course?.difficultyLevel || courseData?.data?.course?.difficultyLevel,
           title: createModuleStateValues?.title,
           description: courseModulesData?.description || createModuleStateValues?.description,
         })
       );
     },
-    [validate, handleAddModule, courseId, courseData?.data?.course?.id, courseData?.data?.course?.difficultyLevel, courseModulesData?.module?.course?.difficultyLevel, courseModulesData?.description, createModuleStateValues?.title, createModuleStateValues?.description]
+    [validate, handleAddModule, id, courseId, courseData?.data?.course?.id, courseData?.data?.course?.difficultyLevel, courseModulesData?.module?.course?.difficultyLevel, courseModulesData?.description, createModuleStateValues?.title, createModuleStateValues?.description]
   );
 
   const handleClickModule = useCallback(
@@ -256,7 +256,7 @@ const Content = ({ courseId: id }: any) => {
                   <p className="text-sm mt-2">Create a new video</p>
                 </div>
               ) : (
-                courseModulesData.module.media.map((moduleContent: any) => (
+                courseModulesData?.module?.media.map((moduleContent: any) => (
                   <div key={moduleContent.id} className="flex items-center mb-4 gap-2">
                     <div className="basis-1/12">
                       <GripVertical />
@@ -298,10 +298,11 @@ const Content = ({ courseId: id }: any) => {
           description="Upload your existing content to automatically create a new lesson in this module"
           queryClient={queryClient}
           moduleId={selectedModuleData?.id}
+          courseId={Number(id) || Number(courseId) || Number(courseData?.data?.course?.id)}
         />
       </>
     );
-  }, [isModulesLoading, showCreateModule, selectedModule, courseData?.data?.course?.modules?.length, courseModulesData?.module?.media, queryClient, selectedModuleData?.id, handleSubmit, createModuleStateValues.title, createModuleStateValues.description, errors.title, errors.description, isAddingModule, updateCreateModule, validateField]);
+  }, [isModulesLoading, showCreateModule, selectedModule, courseData?.data?.course?.modules?.length, courseData?.data?.course?.id, courseModulesData?.module?.media, queryClient, selectedModuleData?.id, courseId, id, handleSubmit, createModuleStateValues?.title, createModuleStateValues?.description, errors?.title, errors?.description, isAddingModule, updateCreateModule, validateField]);
 
   return (
     <div className="flex gap-4 w-full">

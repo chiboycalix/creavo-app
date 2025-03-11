@@ -68,7 +68,7 @@ const CommentItem = ({
     },
     onError: () => { },
   });
-  console.log({ replies })
+
   const { mutate: handleReplyComment, isPending: isReplyingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => replyCommentService(payload),
     onSuccess(data) {

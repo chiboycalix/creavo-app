@@ -1,20 +1,20 @@
 "use client"
-import React, { FormEvent } from 'react'
+import React, { FormEvent, useState } from 'react'
+import ButtonLoader from '@/components/ButtonLoader';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/Input'
 import { Switch } from '@headlessui/react';
 import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { generalHelpers } from '@/helpers'
 import { COURSE_CATEGORY, CreateCourseForm, createCourseService } from '@/services/course.service'
 import { useMutation } from '@tanstack/react-query'
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore.hook';
-import { CourseData, resetCreateLongCourseForm, updatCreateLongCourseForm, updateLongCourseData } from '@/redux/slices/course.slice';
+import { resetCreateLongCourseForm, updatCreateLongCourseForm } from '@/redux/slices/course.slice';
 import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCourse.validator';
-import { Loader2 } from 'lucide-react';
 import { useToast } from "@/context/ToastContext";
 import { TagsInput } from '@/components/Input/TagsInput';
+import { Checkbox } from '@/components/ui/check-box';
 
 const currencies = [
   {
@@ -70,21 +70,13 @@ const CreateLongCourse = () => {
   const { createLongCourseForm: createCourseStateValues } = useAppSelector((store) => store.courseStore);
   const { validate, errors, validateField } = useCreateCourseFormValidator({ store: createCourseStateValues });
   const updateCreateCourse = (payload: Partial<CreateCourseForm>) => dispatch(updatCreateLongCourseForm(payload));
-  const updateCourse = (payload: Partial<CourseData>) => dispatch(updateLongCourseData(payload));
   const maxFiles = 1;
+  const [isSelected, setIsSelected] = useState(false)
 
   const { mutate: handleCreateCourse, isPending: isCreatingCourse } = useMutation({
     mutationFn: (payload: CreateCourseForm) => createCourseService(payload, COURSE_CATEGORY.STANDARD),
     onSuccess: async (data) => {
-      updateCourse({
-        courseId: data?.id,
-        tags: data?.tags,
-        isPaid: data?.isPaid,
-        title: data?.title,
-        description: data?.description,
-        difficultyLevel: data?.difficultyLevel
-      })
-      showToast('success', 'success', "Course created successfully");
+      showToast('success', 'Success', "Course created successfully");
       router.push(`/studio/course/long-course/${data?.id}?tab=content`)
       dispatch(resetCreateLongCourseForm())
     },
@@ -103,10 +95,10 @@ const CreateLongCourse = () => {
       amount: createCourseStateValues.amount,
       isPaid: createCourseStateValues.isPaid,
       currency: createCourseStateValues.currency,
-      promotionalUrl: createCourseStateValues?.promotionalUrl
+      promotionalUrl: createCourseStateValues?.promotionalUrl,
+      promote: isSelected
     }))
   }
-
 
   return (
     <Card className='border-none mt-4 max-w-5xl mx-auto'>
@@ -156,11 +148,11 @@ const CreateLongCourse = () => {
               }}
               placeholder="#fun #tiktok #post"
               errorMessage={errors.tags}
-              className="w-full"
+              className="w-full py-2.5"
             />
           </div>
           <div className='mb-4 flex items-center gap-4'>
-            <div className='basis-1/2'>
+            <div className='w-full'>
               <Input
                 label="Difficulty level"
                 variant='select'
@@ -186,9 +178,6 @@ const CreateLongCourse = () => {
                 ]}
                 errorMessage={errors.difficultyLevel}
               />
-            </div>
-            <div className='flex-1'>
-
             </div>
           </div>
           <div className='flex gap-2 items-center mb-8'>
@@ -250,14 +239,27 @@ const CreateLongCourse = () => {
               }}
             />
           </div>
+
+          <div className='flex flex-col gap-3 mt-4'>
+
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(isChecked: boolean) => setIsSelected(isChecked)}
+              label="Upload promotional video/images to Exploresss"
+              className=""
+            />
+            <Checkbox label="List to marketplace" className="" />
+          </div>
+
           <div className='w-full mt-12'>
             <Button
-              // type="submit"
+              disabled={isCreatingCourse}
               className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
             >
-              {
-                isCreatingCourse ? <Loader2 /> : "Continue"
-              }
+              <ButtonLoader
+                isLoading={isCreatingCourse}
+                caption="Continue"
+              />
             </Button>
           </div>
         </form>

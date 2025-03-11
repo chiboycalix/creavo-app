@@ -36,7 +36,7 @@ export const TextInput = ({
   const remainingChars = maxLength ? maxLength - value.length : null;
 
   return (
-    <div className="leading-3">
+    <div className="leading-3 w-full">
       {label && (
         <label className="flex items-center text-gray-900 font-medium text-sm gap-x-2 mb-1">
           {label}

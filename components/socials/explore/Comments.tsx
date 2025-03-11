@@ -53,7 +53,7 @@ export function Comments({ postId }: { postId: number; }) {
       postId
     });
   };
-  console.log({ profileData })
+
   return (
     <div className="relative h-full w-full">
       <div className="">

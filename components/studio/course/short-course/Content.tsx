@@ -52,7 +52,7 @@ const Content = ({ courseId: id }: any) => {
           <UploadShortCourseMedia
             description="Upload your existing content to automatically create a new lesson"
             onUploadSuccess={handleVideoUploadSuccess}
-            courseId={courseId}
+            courseId={courseId || id}
           />
         </div>
       ) : (
