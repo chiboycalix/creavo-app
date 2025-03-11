@@ -80,7 +80,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
     return () => {
       window.removeEventListener("keydown", handleEsc);
     };
-  }, [fetchUser, userProfile]);
+  }, [fetchUser, userProfile,]);
 
   const uploadImageToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
