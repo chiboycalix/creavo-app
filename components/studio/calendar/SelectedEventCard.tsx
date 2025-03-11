@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Edit, MoreVertical, Video, X, Plus } from "lucide-react"
+import { Edit, MoreVertical, Video, X, Plus, Copy, ExternalLink } from "lucide-react"
 import Image from "next/image"
 import { baseUrl } from "@/utils/constant"
 import Cookies from "js-cookie"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner";
+import { toast } from "sonner"
 
 type Member = {
   id: string
@@ -77,19 +77,33 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
       hour12: false,
     }
 
-    return `${startTime.toLocaleTimeString("en-US", formatOptions)} - ${endTime.toLocaleTimeString("en-US", formatOptions)} GMT+1`
+    return `${startTime.toLocaleTimeString("en-US", formatOptions)} - ${endTime.toLocaleTimeString("en-US", formatOptions)}`
   }
 
   const copyMeetingLink = () => {
-    if (fetchedData?.meetingLink) {
-      navigator.clipboard.writeText(fetchedData.meetingLink)
-      toast.success("Link copied to clipboard");
+    const codeToCopy = fetchedData?.meetingLink || fetchedData?.meetingCode
+
+    if (codeToCopy) {
+      navigator.clipboard
+        .writeText(codeToCopy)
+        .then(() => {
+          toast.success("Link copied to clipboard")
+        })
+        .catch((err) => {
+          console.error("Failed to copy: ", err)
+          toast.error("Failed to copy meeting link")
+        })
+    } else {
+      toast.error("No meeting link available")
     }
   }
 
   const joinMeeting = () => {
     if (fetchedData?.meetingLink) {
       window.open(fetchedData.meetingLink, "_blank")
+      toast.success("Joining meeting")
+    } else {
+      toast.error("No meeting link available")
     }
   }
 
@@ -188,6 +202,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
                 </span>
               </div>
               <div>
+              <span> Timezone : {fetchedData.timezone} </span>
                 <span>{fetchedData?.recurrence || "One Time"}</span>
               </div>
             </div>
@@ -209,7 +224,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
                       onClick={copyMeetingLink}
                       disabled={!fetchedData?.meetingLink && !fetchedData?.meetingCode}
                     >
-                      Copy Link
+                      <Copy size={14} className="mr-1" /> Copy Link
                     </Button>
                     <Button
                       size="sm"
@@ -217,7 +232,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
                       onClick={joinMeeting}
                       disabled={!fetchedData?.meetingLink}
                     >
-                      Join
+                      <ExternalLink size={14} className="mr-1" /> Join
                     </Button>
                   </div>
                 </div>

@@ -200,6 +200,15 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
         timezone,
         isPaid: false,
         type: "SCHEDULED",
+        includeWebinar: true,
+        internalParticipant: [
+        {
+            "email": "evelyn79@yahoo.com",
+            "isCoHost": false,
+            "isRequiredToPay": true
+        }
+    ],
+    externalParticipant: [],
         participants: members.map((member) => ({ name: member })),
       };
   
