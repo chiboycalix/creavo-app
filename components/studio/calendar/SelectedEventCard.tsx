@@ -201,7 +201,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
                 </span>
               </div>
               <div>
-              <span> Timezone : {fetchedData.timezone} </span>
+                <span> Timezone : {fetchedData?.timezone || "Not specified"} </span>
                 <span>{fetchedData?.recurrence || "One Time"}</span>
               </div>
             </div>
