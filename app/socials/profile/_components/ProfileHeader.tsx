@@ -49,8 +49,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [showFollowersCard, setShowFollowersCard] = useState(false);
   const [showFollowingCard, setShowFollowingCard] = useState(false);
 
-  const [profileSettingsModal, setProfileSettingsModal] = useState(false);
-
   const [followingAnchorRect, setfollowingAnchorRect] =
     useState<DOMRect | null>(null);
   const [followersAnchorRect, setfollowersAnchorRect] =
@@ -67,14 +65,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     setfollowingAnchorRect(buttonRect);
     setShowFollowingCard(true);
   };
-
-  const handleSettingsModal = () => {
-    setProfileSettingsModal(true);
-  };
-
-  const handleClose = () => {
-    setProfileSettingsModal(false)
-  }
 
   return (
     <div className="flex flex-col items-center w-full p-4 relative">
@@ -134,7 +124,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             className="inline-flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
           >
-            <Settings size={26} onClick={handleSettingsModal} />
+            <Settings size={26} />
           </span>
         </div>
       </div>
@@ -157,9 +147,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
       <div>
-        <p className="text-sm text-gray-500 mt-2 max-w-md text-center">
-          {userProfile?.profile?.bio || "No bio available"}
-        </p>
+        <div>
+          <p className="text-sm text-gray-500 mt-2 max-w-md text-center">
+            {userProfile?.profile?.bio || "No bio available"}
+          </p>
+        </div>
       </div>
 
       {showFollowingCard && (

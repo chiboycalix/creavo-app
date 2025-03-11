@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
-import { Calculator, X } from "lucide-react";
+import { X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,11 @@ import { baseUrl } from "@/utils/constant";
 import Cookies from "js-cookie";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
+interface Timezone {
+  name: string;
+  description: string;
+}
 
 const colorOptions = [
   { label: "Green", value: "bg-green-200" },
@@ -40,20 +45,6 @@ const generateTimeOptions = () => {
   return options;
 };
 
-const generateDateOptions = () => {
-  const options = [];
-  const today = new Date();
-  for (let i = 0; i < 30; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
-    const formattedDate = `${date.getDate()} ${date.toLocaleString("default", {
-      month: "long",
-    })} ${date.getFullYear()}`;
-    options.push({ label: formattedDate, value: date.toISOString() });
-  }
-  return options;
-};
-
 interface AddEventCardProps {
   isOpen: boolean;
   onClose: () => void;
@@ -74,27 +65,80 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
   const [endTime, setEndTime] = useState("");
   const [isAllDay, setIsAllDay] = useState(false);
   const [isRepeating, setIsRepeating] = useState(false);
-  const [location, setLocation] = useState("");
+  const [timezone, setTimezone] = useState("");
   const [color, setColor] = useState("bg-blue-200");
   const [members, setMembers] = useState<string[]>([]);
   const [selectedMember, setSelectedMember] = useState("");
+  const [timezones, setTimezones] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const timeOptions = generateTimeOptions();
-  const dateOptions = generateDateOptions();
+
+  useEffect(() => {
+    const fetchTimezones = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`${baseUrl}/meetings/timezones`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch timezones");
+        const responseData = await response.json();
+        
+        // Check if response has data property and it's an array
+        if (responseData.data && Array.isArray(responseData.data)) {
+          // Extract only the name field from each timezone object
+          const timezoneNames = responseData.data.map((tz: Timezone) => tz.name);
+          setTimezones(timezoneNames);
+        } else {
+          setTimezones([]);
+          setError("Invalid timezone data received");
+        }
+      } catch (error) {
+        console.error("Error fetching timezones:", error);
+        setError("Failed to load timezones");
+        setTimezones([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchTimezones();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (eventToEdit) {
       setTitle(eventToEdit.title || "");
       setDescription(eventToEdit.description || "");
-      setStartDate(eventToEdit.date || null);
-      setEndDate(eventToEdit.date || null);
-      setStartTime(eventToEdit.startTime || "");
-      setEndTime(eventToEdit.endTime || "");
+      setStartDate(eventToEdit.startTime ? new Date(eventToEdit.startTime) : null);
+      setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null);
+      setStartTime(
+        eventToEdit.startTime
+          ? new Date(eventToEdit.startTime).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : ""
+      );
+      setEndTime(
+        eventToEdit.endTime
+          ? new Date(eventToEdit.endTime).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : ""
+      );
       setIsAllDay(eventToEdit.isAllDay || false);
       setIsRepeating(eventToEdit.isRepeating || false);
-      setLocation(eventToEdit.location || "");
+      setTimezone(eventToEdit.timezone || "");
       setColor(eventToEdit.color || "bg-blue-200");
-      setMembers(eventToEdit.members || []);
+      setMembers(eventToEdit.participants?.map((p: any) => p.name) || []);
     }
   }, [eventToEdit]);
 
@@ -108,44 +152,66 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
+  const filteredTimezones = searchQuery
+    ? timezones.filter((tz) =>
+        tz.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : timezones;
+
   const addMember = () => {
     if (selectedMember && !members.includes(selectedMember)) {
       setMembers([...members, selectedMember]);
       setSelectedMember("");
     }
   };
-
   const handleSubmit = async () => {
-    if (!title.trim() || !startDate) {
+    if (!title.trim() || !startDate || !timezone) {
       alert("Please enter all required fields.");
       return;
     }
+  
     try {
+      const startDateTime = new Date(startDate);
+      const endDateTime = new Date(endDate ?? startDate); // Default end date to start date if null
+  
+      
+        if (startTime) {
+          const [startHours, startMinutes] = startTime.split(":").map(Number);
+          startDateTime.setHours(startHours, startMinutes, 0, 0);
+        }
+        if (endTime) {
+          const [endHours, endMinutes] = endTime.split(":").map(Number);
+          endDateTime.setHours(endHours, endMinutes, 0, 0);
+        }
+      
+  
+      // Convert to ISO 8601 format for submission
+      const formattedStartTime = startDateTime.toISOString();
+      const formattedEndTime = endDateTime.toISOString();
+  
       const payload = {
         title,
         description,
-        startTime: startDate.toISOString(),
-        endTime: endDate ? endDate.toISOString() : startDate.toISOString(),
-        startTimeStr: startTime,
-        endTimeStr: endTime,
+        startTime: formattedStartTime,
+        endTime: formattedEndTime,
         isAllDay,
         color,
         isRepeating,
-        location,
-        timezone: "WAT",
+        timezone,
         isPaid: false,
-        internalParticipant: [
-          {
-            email: "kennith8@gmail.com",
-            isCoHost: false,
-            isRequiredToPay: true,
-          },
-        ],
-        externalParticipant: ["farex@hotmail.com", "timothyedibo@gmail.com"],
-        includeWebinar: false,
         type: "SCHEDULED",
+        includeWebinar: true,
+        internalParticipant: [
+        {
+            "email": "evelyn79@yahoo.com",
+            "isCoHost": false,
+            "isRequiredToPay": true
+        }
+    ],
+    externalParticipant: [],
         participants: members.map((member) => ({ name: member })),
       };
+  
       const response = await fetch(`${baseUrl}/meetings/`, {
         method: "POST",
         headers: {
@@ -154,13 +220,54 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
         },
         body: JSON.stringify(payload),
       });
+  
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+  
       onClose();
     } catch (error) {
       console.error("Failed to create event:", error);
       alert("Failed to create event. Please try again.");
     }
   };
+  
+  // Fix the time formatting in useEffect when editing an event
+  useEffect(() => {
+    if (eventToEdit) {
+      setTitle(eventToEdit.title || "");
+      setDescription(eventToEdit.description || "");
+      setStartDate(eventToEdit.startTime ? new Date(eventToEdit.startTime) : null);
+      setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null);
+  
+      // Convert stored ISO datetime to `HH:mm` format
+      setStartTime(
+        eventToEdit.startTime
+          ? new Date(eventToEdit.startTime).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+          : ""
+      );
+      setEndTime(
+        eventToEdit.endTime
+          ? new Date(eventToEdit.endTime).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+          : ""
+      );
+  
+      setIsAllDay(eventToEdit.isAllDay || false);
+      setIsRepeating(eventToEdit.isRepeating || false);
+      setTimezone(eventToEdit.timezone || "");
+      setColor(eventToEdit.color || "bg-blue-200");
+      setMembers(eventToEdit.participants?.map((p: any) => p.name) || []);
+    }
+  }, [eventToEdit]);
+  
+  
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -219,7 +326,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                       selected={startDate}
                       onChange={(date: Date | null) => setStartDate(date)}
                       dateFormat="dd/MM/yyyy"
-                      className="w-full border-primary-100 border-2  p-2 py-2.5 rounded"
+                      className="w-full border-primary-100 border-2 p-2 py-2.5 rounded"
                       placeholderText="Select Start Date"
                     />
 
@@ -229,7 +336,6 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                       options={timeOptions}
                       selectTextClass="truncate"
                       className="w-full"
-                      // disabled={isAllDay}
                     />
                   </div>
                 </div>
@@ -241,7 +347,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                       selected={endDate}
                       onChange={(date: Date | null) => setEndDate(date)}
                       dateFormat="dd/MM/yyyy"
-                      className="w-full border-primary-100 border-2  p-2 py-2.5 rounded"
+                      className="w-full border-primary-100 border-2 p-2 py-2.5 rounded"
                       placeholderText="Select End Date"
                     />
                     <SelectInput
@@ -250,8 +356,44 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                       options={timeOptions}
                       selectTextClass="truncate"
                       className="w-full"
-                      // disabled={isAllDay}
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="timezone">Timezone</Label>
+                  <div className="relative">
+                    <div className="relative mb-2">
+                      <Input
+                        type="text"
+                        placeholder="Search timezone..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    </div>
+                    <div className="max-h-40 overflow-y-auto border rounded-md">
+                      {isLoading ? (
+                        <div className="p-2 text-center text-gray-500">Loading timezones...</div>
+                      ) : error ? (
+                        <div className="p-2 text-center text-red-500">{error}</div>
+                      ) : filteredTimezones.length > 0 ? (
+                        filteredTimezones.map((tz) => (
+                          <div
+                            key={tz}
+                            className={`p-2 cursor-pointer hover:bg-gray-100 ${
+                              timezone === tz ? "bg-primary-50 text-primary-600" : ""
+                            }`}
+                            onClick={() => setTimezone(tz)}
+                          >
+                            {tz}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-2 text-center text-gray-500">No timezones found</div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -268,9 +410,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                   <Checkbox
                     id="repeat"
                     checked={isRepeating}
-                    onCheckedChange={(checked) =>
-                      setIsRepeating(checked === true)
-                    }
+                    onCheckedChange={(checked) => setIsRepeating(checked === true)}
                   />
                   <Label htmlFor="repeat">Repeat Event</Label>
                 </div>
@@ -293,16 +433,6 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                     />
                   ))}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="location">Event Location</Label>
-                <Input
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="The location can be a place or a URL"
-                />
               </div>
 
               {/* Add Member */}
