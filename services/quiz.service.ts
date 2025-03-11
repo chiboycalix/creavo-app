@@ -1,13 +1,11 @@
 import { apiClient } from "@/lib/apiClient";
 
 export const addQuizToModuleService = async (payload: any) => {
+  const { moduleId, ...rest } = payload;
   try {
-    const { data } = await apiClient.post(
-      `/modules/${payload?.moduleId}/create-quiz`,
-      {
-        ...payload,
-      }
-    );
+    const { data } = await apiClient.post(`/modules/${moduleId}/create-quiz`, {
+      ...rest,
+    });
     return data;
   } catch (error) {
     throw error;

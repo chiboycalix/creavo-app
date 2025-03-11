@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import ProfileSettings from "./SettingsPage";
 
 interface Profile {
   firstName: string;
@@ -83,10 +84,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="flex justify-center items-center gap-3">
           <h1 className="text-sm font-semibold">
             {userProfile?.profile?.firstName &&
-            userProfile?.profile?.lastName === "None"
+              userProfile?.profile?.lastName === "None"
               ? userProfile?.username
-              : `${userProfile?.profile?.firstName || ""} ${
-                  userProfile?.profile?.lastName || ""
+              : `${userProfile?.profile?.firstName || ""} ${userProfile?.profile?.lastName || ""
                 }`.trim()}
           </h1>
           <p className="text-sm">@{userProfile?.username}</p>
@@ -168,6 +168,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onClose={() => setShowFollowersCard(false)}
           anchorRect={followersAnchorRect}
           userId={userProfile?.id}
+        />
+      )}
+
+      {profileSettingsModal && (
+        <ProfileSettings
+          isModalOpen={profileSettingsModal}
+          handleClose={handleClose}
         />
       )}
     </div>
