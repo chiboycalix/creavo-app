@@ -187,6 +187,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             handleClose={handleClose}
           />
       )}
+
+      {profileSettingsModal && (
+        <ProfileSettings
+          isModalOpen={profileSettingsModal}
+          handleClose={handleClose}
+        />
+      )}
     </div>
   );
 };
