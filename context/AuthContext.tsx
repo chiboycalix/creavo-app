@@ -49,7 +49,7 @@ export type UserType = {
 const hoursToDays = (hours: number): number => hours / 24;
 
 export const COOKIE_OPTIONS: Cookies.CookieAttributes = {
-  expires: hoursToDays(1),
+  expires: hoursToDays(24),
   path: '/',
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'Lax'

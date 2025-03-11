@@ -14,19 +14,30 @@ import Toastify from "@/components/Toastify";
 import Link from "next/link";
 import Spinner from "@/components/Spinner";
 import { useRouter } from "next/navigation";
-import { baseUrl, cloudinaryCloudName, cloudinaryUploadPreset } from "@/utils/constant";
+import {
+  baseUrl,
+  cloudinaryCloudName,
+  cloudinaryUploadPreset,
+} from "@/utils/constant";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { ROUTES } from "@/constants/routes";
 
 const ProfileSetup = () => {
-  const { getAuth, getCurrentUser, setAuth } = useAuth();
-  const user = getCurrentUser();
+  const { getAuth, getCurrentUser, setAuth, currentUser } = useAuth();
+  const user = currentUser;
+  console.log('user here',user)
   const router = useRouter();
-  const [firstName, setFirstName] = useState<string>(user?.profile?.firstName || "");
-  const [lastName, setLastName] = useState<string>(user?.profile?.lastName || "");
+  const [firstName, setFirstName] = useState<string>(
+    user?.profile?.firstName || ""
+  );
+  const [lastName, setLastName] = useState<string>(
+    user?.profile?.lastName || ""
+  );
   const [bio, setBio] = useState<string>(user?.profile?.bio || "");
-  const [profileImage, setProfileImage] = useState<string | null>(user?.profile?.avatar || null);
+  const [profileImage, setProfileImage] = useState<string | null>(
+    user?.profile?.avatar || null
+  );
   const [image, setImage] = useState<File | null>(null);
   const [username, setUsername] = useState<string>(user?.username || "");
   const [alert, setAlert] = useState<string>("");
@@ -37,7 +48,6 @@ const ProfileSetup = () => {
   useEffect(() => {
     if (!getAuth()) router.push("/auth");
   }, [getAuth, router, user]);
-
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -61,14 +71,8 @@ const ProfileSetup = () => {
     try {
       const data = new FormData();
       data.append("file", avatar);
-      data.append(
-        "upload_preset",
-        cloudinaryUploadPreset as string
-      );
-      data.append(
-        "cloud_name",
-        cloudinaryCloudName as string
-      );
+      data.append("upload_preset", cloudinaryUploadPreset as string);
+      data.append("cloud_name", cloudinaryCloudName as string);
       data.append("folder", "Stridez/profile-images");
 
       const response = await fetch(
@@ -170,7 +174,11 @@ const ProfileSetup = () => {
                   <img
                     width={80}
                     height={80}
-                    src={profileImage || "/assets/userpix.png"}
+                    src={
+                      profileImage ||
+                      user?.profile?.avatar ||
+                      "/assets/userpix.png"
+                    }
                     alt="Profile"
                     className="w-20 h-20 rounded-full bg-blue-200"
                   />
@@ -272,6 +280,6 @@ const ProfileSetup = () => {
       </div>
     </>
   );
-}
+};
 
 export default ProfileSetup;
