@@ -133,7 +133,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   username={user ? user.username : "Join crevoe"}
                   errorMessage="This page is empty because you haven't started uploading any reel. Start uploading lessons to populate this page."
                   buttonText="Start Uploading"
-                  href="/upload"
+                  href="/socials/uploads"
 
                 />
               </div>

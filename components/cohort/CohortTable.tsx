@@ -5,6 +5,8 @@ import { Mail, Users, Share, Search, ChevronLeft, ChevronRight, Filter, ChevronD
 import { fetchLearnerEngagement, fetchUserCourses } from "@/services/course.service"
 import { apiClient } from "@/lib/apiClient"
 import { LearnerDetails } from "./LearnerDetails"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+
 
 export interface QuizAttempt {
   id: number
@@ -297,14 +299,36 @@ export function CohortTable() {
         </div>
       </div>
 
+      <TooltipProvider delayDuration={200}>
       <div className="flex ml-3 items-center gap-4 mb-4">
         <div className="flex items-center gap-2">
-          <input type="checkbox" className="rounded  border-gray-300" checked={selectAll} onChange={handleSelectAll} />
+          <input type="checkbox" className="rounded border-gray-300" checked={selectAll} onChange={handleSelectAll} />
         </div>
-        <Mail className="h-3 w-3 text-gray-600 cursor-pointer" />
-        <Users className="h-3 w-3 text-gray-600 cursor-pointer" />
-        <Share className="h-3 w-3 text-gray-600 cursor-pointer" />
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Mail className="h-3 w-3 text-gray-600 cursor-pointer" />
+          </TooltipTrigger>
+          <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Send email</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Users className="h-3 w-3 text-gray-600 cursor-pointer" />
+          </TooltipTrigger>
+          <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">
+            Add to community
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Share className="h-3 w-3 text-gray-600 cursor-pointer" />
+          </TooltipTrigger>
+          <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Share</TooltipContent>
+        </Tooltip>
       </div>
+    </TooltipProvider>
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>

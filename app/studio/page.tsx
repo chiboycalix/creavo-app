@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import RecentCourses from "@/components/studio/dashboard/RecentCourses";
 import RevenueAndCompletionCharts from "@/components/studio/dashboard/RevenueAndCompletionCharts";
 import DynamicTable from "@/components/table";
@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import CompletionRate from "@/components/studio/dashboard/CompletionRate";
 import { LineChart } from "@/components/analytics/LineChart";
 import { ChartHeader } from "@/components/analytics/ChatHeaders";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const overviewData = [
   {
@@ -121,6 +124,12 @@ const tableData = [
 const StudioDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const {  getCurrentUser } = useAuth();
+    const currentUser = getCurrentUser();
+    // console.log(currentUser)
+
+    
+  
   const revenueData = [42, 43, 60, 45, 55, 53, 52, 83, 48, 52, 68, 65, 60, 58];
   const subscribersData = [
     42, 43, 60, 45, 55, 53, 52, 83, 48, 52, 68, 65, 60, 58,
@@ -141,7 +150,8 @@ const StudioDashboard = () => {
     "22",
     "23",
   ];
-
+  
+  
   const transformToChartData = (data: number[], labels: string[]) =>
     data.map((value, index) => ({ x: Number(labels[index]), value }));
 
@@ -192,11 +202,14 @@ const StudioDashboard = () => {
   return (
     <div className="w-full py-8">
       <div className="w-full flex items-center justify-between">
-        <h2 className="font-bold text-2xl">Hello Chinonso 👋</h2>
+        <h2 className="font-bold text-2xl">Hello {currentUser.firstName}  👋</h2>
 
         <Button>
-          <PlusSquareIcon /> Create Course
+          <Link href="/studio/course" className="flex items-center gap-2">
+        <PlusSquareIcon /> Create Course
+          </Link>
         </Button>
+
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10 w-full mt-6 sm:mt-8 lg:mt-10">
         {overviewData.map((data) => {

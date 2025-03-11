@@ -31,7 +31,6 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
   useEffect(() => {
     const fetchEventDetails = async () => {
       if (!data?.id) return
-
       setIsLoading(true)
       try {
         const response = await fetch(`${baseUrl}/meetings/${data.id}`, {

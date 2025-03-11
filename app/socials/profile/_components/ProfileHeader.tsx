@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import FollowButton from "@/components/FollowButton";
@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 interface Profile {
   firstName: string;
@@ -43,13 +43,15 @@ interface ProfileHeaderProps {
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userProfile,
   isCurrentUser,
-  onProfileUpdate
+  onProfileUpdate,
 }: any) => {
-  const [showFollowersCard, setShowFollowersCard] = useState(false)
-  const [showFollowingCard, setShowFollowingCard] = useState(false)
+  const [showFollowersCard, setShowFollowersCard] = useState(false);
+  const [showFollowingCard, setShowFollowingCard] = useState(false);
 
-  const [followingAnchorRect, setfollowingAnchorRect] = useState<DOMRect | null>(null);
-  const [followersAnchorRect, setfollowersAnchorRect] = useState<DOMRect | null>(null);
+  const [followingAnchorRect, setfollowingAnchorRect] =
+    useState<DOMRect | null>(null);
+  const [followersAnchorRect, setfollowersAnchorRect] =
+    useState<DOMRect | null>(null);
 
   const handleFollowersClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const buttonRect = event.currentTarget.getBoundingClientRect();
@@ -81,9 +83,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="flex justify-center items-center gap-3">
           <h1 className="text-sm font-semibold">
             {userProfile?.profile?.firstName &&
-              userProfile?.profile?.lastName === "None"
+            userProfile?.profile?.lastName === "None"
               ? userProfile?.username
-              : `${userProfile?.profile?.firstName || ""} ${userProfile?.profile?.lastName || ""
+              : `${userProfile?.profile?.firstName || ""} ${
+                  userProfile?.profile?.lastName || ""
                 }`.trim()}
           </h1>
           <p className="text-sm">@{userProfile?.username}</p>
@@ -108,7 +111,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </DialogHeader>
               </DialogContent>
             </Dialog>
-
           ) : (
             <FollowButton followedId={Number(userProfile?.id)} />
           )}
@@ -127,35 +129,47 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
       <div className="flex space-x-4 mt-3">
-        <div className="cursor-pointer flex items-center gap-1" onClick={handleFollowersClick}>
+        <div
+          className="cursor-pointer flex items-center gap-1"
+          onClick={handleFollowersClick}
+        >
           <span className="font-bold">{userProfile?.followers}</span>
           <span>Followers</span>
         </div>
-        <div className="cursor-pointer flex items-center gap-1" onClick={handleFollowingClick}>
-          <span className="font-bold inline-block">{userProfile?.following}</span>
+        <div
+          className="cursor-pointer flex items-center gap-1"
+          onClick={handleFollowingClick}
+        >
+          <span className="font-bold inline-block">
+            {userProfile?.following}
+          </span>
           <span className="inline-block">Following</span>
         </div>
       </div>
       <div>
-        <p className="text-sm text-gray-500 mt-2 max-w-md text-center">
-          {userProfile?.profile?.bio || "No bio available"}
-        </p>
+        <div>
+          <p className="text-sm text-gray-500 mt-2 max-w-md text-center">
+            {userProfile?.profile?.bio || "No bio available"}
+          </p>
+        </div>
       </div>
 
-      {showFollowingCard && <FollowingCard
-        isOpen={showFollowingCard}
-        onClose={() => setShowFollowingCard(false)}
-        anchorRect={followingAnchorRect}
-        userId={userProfile?.id}
-      />}
-      {
-        showFollowersCard && <FollowersCard
+      {showFollowingCard && (
+        <FollowingCard
+          isOpen={showFollowingCard}
+          onClose={() => setShowFollowingCard(false)}
+          anchorRect={followingAnchorRect}
+          userId={userProfile?.id}
+        />
+      )}
+      {showFollowersCard && (
+        <FollowersCard
           isOpen={showFollowersCard}
           onClose={() => setShowFollowersCard(false)}
           anchorRect={followersAnchorRect}
           userId={userProfile?.id}
         />
-      }
+      )}
     </div>
   );
 };
