@@ -17,7 +17,6 @@ export function useUserPosts(userId: string | undefined) {
       );
       return response.json();
     },
-    refetchInterval: 500,
     enabled: !!userId,
   });
 }
