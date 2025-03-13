@@ -11,11 +11,11 @@ import { ChevronDown, ChevronUp } from "lucide-react"; // Icon for dropdown arro
 
 export type TabValue =
   | "All"
-  | "Digital Products"
-  | "E-Books"
+  // | "Digital Products"
+  // | "E-Books"
   | "Courses"
-  | "Events"
-  | "Services";
+  // | "Events"
+  // | "Services";
 
 const MarketPlaceExplore = () => {
   const router = useRouter();
@@ -74,17 +74,17 @@ const MarketPlaceExplore = () => {
 
   const productCategories = [
     { category: "All", desc: "Explore all products", color: "bg-gray-200" },
-    {
-      category: "E-Books",
-      desc: "Discover amazing books",
-      color: "bg-green-200",
-    },
+    // {
+    //   category: "E-Books",
+    //   desc: "Discover amazing books",
+    //   color: "bg-green-200",
+    // },
     {
       category: "Courses",
       desc: "Upgrade your skills",
       color: "bg-yellow-200",
     },
-    { category: "Events", desc: "Find upcoming events", color: "bg-red-200" },
+    // { category: "Events", desc: "Find upcoming events", color: "bg-red-200" },
   ];
 
   const handleTabChange = useCallback(

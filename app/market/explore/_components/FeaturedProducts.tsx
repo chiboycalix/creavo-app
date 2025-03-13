@@ -53,7 +53,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
 
   return (
     <Tabs value={activeTab} className="w-auto">
-      <TabsList className="flex justify-between mb-10">
+      <TabsList className="flex justify-start mb-10">
         {productCategories?.map((tab) => (
           <TabsTrigger
             key={tab?.category}

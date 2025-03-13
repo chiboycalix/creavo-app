@@ -36,6 +36,8 @@ interface MarketContextType {
   searchRoom: boolean;
   setSearchRoom: (searchRoom: boolean) => void;
   fetchSingleProduct: (id: any) => void;
+  showCheckoutCard: boolean;
+  setShowCheckoutCard: (showCheckoutCard: boolean) => void;
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -57,6 +59,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
   const [savedProducts, setSavedProducts] = useState<any>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [searchRoom, setSearchRoom] = useState(false);
+  const [showCheckoutCard, setShowCheckoutCard] = useState(false);
 
   const fetchProducts = () => {
     return [
@@ -611,6 +614,8 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     });
   }, []);
 
+
+
   return (
     <MarketContext.Provider
       value={{
@@ -629,6 +634,8 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         setIsSaved,
         searchRoom,
         setSearchRoom,
+        showCheckoutCard,
+        setShowCheckoutCard,
       }}
     >
       {children}

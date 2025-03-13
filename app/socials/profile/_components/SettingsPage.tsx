@@ -20,6 +20,7 @@ import AccountSettings from "./AccountSettings";
 import PrivacySettings from "./PrivacySettings";
 import NotificationSettings from "./NotificationSettings";
 import PaymentSettings from "./PaymentSettings";
+import { useSettings } from "@/context/SettingsContext";
 
 const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
   const tabsMenu = [
@@ -29,8 +30,10 @@ const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
     { title: "Payments", icon: CreditCardIcon },
   ];
   const [activeTab, setActiveTab] = useState<string>(tabsMenu[0].title);
-
   const handleTabChange = (category: string) => setActiveTab(category);
+  const { fetchSettings,  } = useSettings();
+
+  fetchSettings();
 
   return (
     <AnimatePresence>
