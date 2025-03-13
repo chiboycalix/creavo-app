@@ -18,6 +18,8 @@ interface AuthContextType {
   getCurrentUser: () => any;
   getAuth: () => boolean;
   signOut: () => void;
+  updateUserProfile: (updatedUserData: Partial<UserType>) => void
+
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -140,6 +142,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     Cookies.remove("isAuthenticated", { path: '/' });
     setAuth(false, null);
   };
+  const updateUserProfile = (updatedUserData: Partial<UserType>): void => {
+    if (!currentUser) return
+
+    // Create updated user object by merging current user with updates
+    const updatedUser = {
+      ...currentUser,
+      ...updatedUserData,
+      // Handle nested profile object separately if it exists in the updates
+      profile: updatedUserData.profile
+        ? {
+            ...currentUser.profile,
+            ...updatedUserData.profile,
+          }
+        : currentUser.profile,
+    }
+
+    // Update state
+    setCurrentUser(updatedUser)
+
+    // Update cookie
+    Cookies.set("currentUser", JSON.stringify(updatedUser), COOKIE_OPTIONS)
+  }
 
   return (
     <AuthContext.Provider
@@ -151,6 +175,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         getCurrentUser,
         getAuth,
         signOut,
+        updateUserProfile,
       }}
     >
       {children}

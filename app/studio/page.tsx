@@ -126,6 +126,21 @@ const StudioDashboard = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const {  getCurrentUser } = useAuth();
     const currentUser = getCurrentUser();
+    const {
+      data: profileData,
+      isLoading: profileLoading,
+      error: profileError,
+      refetch: refetchProfile,
+    } = useUserProfile(currentUser?.id)
+  const [userProfile , setUserProfile] = useState(profileData?.data)
+
+  useEffect(() => {
+    if (profileData?.data) {
+      setUserProfile(profileData.data);
+    }
+  }, [profileData]);
+
+  
     // console.log(currentUser)
 
     
@@ -154,7 +169,7 @@ const StudioDashboard = () => {
   
   const transformToChartData = (data: number[], labels: string[]) =>
     data.map((value, index) => ({ x: Number(labels[index]), value }));
-
+  
   const revenueChartData = transformToChartData(revenueData, labels);
   const subscribersChartData = transformToChartData(subscribersData, labels);
 
@@ -202,7 +217,13 @@ const StudioDashboard = () => {
   return (
     <div className="w-full py-8">
       <div className="w-full flex items-center justify-between">
-        <h2 className="font-bold text-2xl">Hello {currentUser.firstName}  👋</h2>
+        <h2 className="font-bold text-2xl">Hello  {profileLoading ? (
+            <span className="animate-pulse bg-gray-300 text-gray-300 px-3 py-1 rounded-md">
+              Loading...
+            </span>
+          ) : (
+            userProfile?.profile?.firstName || "Guest"
+          )}{" "}  👋</h2>
 
         <Button>
           <Link href="/studio/course" className="flex items-center gap-2">

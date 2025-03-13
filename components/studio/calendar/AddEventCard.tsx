@@ -75,6 +75,18 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
   const [error, setError] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const timeOptions = generateTimeOptions();
+  const [includeWebinar, setIncludeWebinar] = useState(false);
+  const [internalParticipants, setInternalParticipants] = useState<
+    Array<{ email: string; isCoHost: boolean; isRequiredToPay: boolean }>
+  >([]);
+  const [externalParticipants, setExternalParticipants] = useState<Array<any>>(
+    []
+  );
+  const [newParticipantEmail, setNewParticipantEmail] = useState("");
+  const [isCoHost, setIsCoHost] = useState(false);
+  const [isRequiredToPay, setIsRequiredToPay] = useState(false);
+  // Add a new state variable to track if the timezone dropdown is open
+  const [isTimezoneDropdownOpen, setIsTimezoneDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchTimezones = async () => {
@@ -88,11 +100,13 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
         });
         if (!response.ok) throw new Error("Failed to fetch timezones");
         const responseData = await response.json();
-        
+
         // Check if response has data property and it's an array
         if (responseData.data && Array.isArray(responseData.data)) {
           // Extract only the name field from each timezone object
-          const timezoneNames = responseData.data.map((tz: Timezone) => tz.name);
+          const timezoneNames = responseData.data.map(
+            (tz: Timezone) => tz.name
+          );
           setTimezones(timezoneNames);
         } else {
           setTimezones([]);
@@ -116,7 +130,9 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
     if (eventToEdit) {
       setTitle(eventToEdit.title || "");
       setDescription(eventToEdit.description || "");
-      setStartDate(eventToEdit.startTime ? new Date(eventToEdit.startTime) : null);
+      setStartDate(
+        eventToEdit.startTime ? new Date(eventToEdit.startTime) : null
+      );
       setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null);
       setStartTime(
         eventToEdit.startTime
@@ -142,10 +158,27 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
     }
   }, [eventToEdit]);
 
+  // Add a click outside handler to close the timezone dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
         onClose();
+      }
+
+      // Close timezone dropdown when clicking outside of it
+      const timezoneInput = document.querySelector(
+        'input[placeholder="Search timezone..."]'
+      );
+      const timezoneDropdown = document.querySelector(
+        ".max-h-40.overflow-y-auto"
+      );
+      if (
+        timezoneInput &&
+        timezoneDropdown &&
+        !timezoneInput.contains(event.target as Node) &&
+        !timezoneDropdown.contains(event.target as Node)
+      ) {
+        setIsTimezoneDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -164,31 +197,49 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
       setSelectedMember("");
     }
   };
+
+  const addInternalParticipant = () => {
+    if (
+      newParticipantEmail &&
+      !internalParticipants.some((p) => p.email === newParticipantEmail)
+    ) {
+      setInternalParticipants([
+        ...internalParticipants,
+        {
+          email: newParticipantEmail,
+          isCoHost,
+          isRequiredToPay,
+        },
+      ]);
+      setNewParticipantEmail("");
+      setIsCoHost(false);
+      setIsRequiredToPay(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!title.trim() || !startDate || !timezone) {
       alert("Please enter all required fields.");
       return;
     }
-  
+
     try {
       const startDateTime = new Date(startDate);
       const endDateTime = new Date(endDate ?? startDate); // Default end date to start date if null
-  
-      
-        if (startTime) {
-          const [startHours, startMinutes] = startTime.split(":").map(Number);
-          startDateTime.setHours(startHours, startMinutes, 0, 0);
-        }
-        if (endTime) {
-          const [endHours, endMinutes] = endTime.split(":").map(Number);
-          endDateTime.setHours(endHours, endMinutes, 0, 0);
-        }
-      
-  
+
+      if (startTime) {
+        const [startHours, startMinutes] = startTime.split(":").map(Number);
+        startDateTime.setHours(startHours, startMinutes, 0, 0);
+      }
+      if (endTime) {
+        const [endHours, endMinutes] = endTime.split(":").map(Number);
+        endDateTime.setHours(endHours, endMinutes, 0, 0);
+      }
+
       // Convert to ISO 8601 format for submission
       const formattedStartTime = startDateTime.toISOString();
       const formattedEndTime = endDateTime.toISOString();
-  
+
       const payload = {
         title,
         description,
@@ -200,18 +251,20 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
         timezone,
         isPaid: false,
         type: "SCHEDULED",
-        includeWebinar: true,
-        internalParticipant: [
-        {
-            "email": "evelyn79@yahoo.com",
-            "isCoHost": false,
-            "isRequiredToPay": true
-        }
-    ],
-    externalParticipant: [],
         participants: members.map((member) => ({ name: member })),
       };
-  
+
+      // Only include webinar data if the toggle is enabled
+      if (includeWebinar) {
+        Object.assign(payload, {
+          includeWebinar,
+          internalParticipant:
+            internalParticipants.length > 0 ? internalParticipants : [],
+          externalParticipant:
+            externalParticipants.length > 0 ? externalParticipants : [],
+        });
+      }
+
       const response = await fetch(`${baseUrl}/meetings/`, {
         method: "POST",
         headers: {
@@ -220,24 +273,26 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
         },
         body: JSON.stringify(payload),
       });
-  
+
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-  
+
       onClose();
     } catch (error) {
       console.error("Failed to create event:", error);
       alert("Failed to create event. Please try again.");
     }
   };
-  
+
   // Fix the time formatting in useEffect when editing an event
   useEffect(() => {
     if (eventToEdit) {
       setTitle(eventToEdit.title || "");
       setDescription(eventToEdit.description || "");
-      setStartDate(eventToEdit.startTime ? new Date(eventToEdit.startTime) : null);
+      setStartDate(
+        eventToEdit.startTime ? new Date(eventToEdit.startTime) : null
+      );
       setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null);
-  
+
       // Convert stored ISO datetime to `HH:mm` format
       setStartTime(
         eventToEdit.startTime
@@ -257,7 +312,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
             })
           : ""
       );
-  
+
       setIsAllDay(eventToEdit.isAllDay || false);
       setIsRepeating(eventToEdit.isRepeating || false);
       setTimezone(eventToEdit.timezone || "");
@@ -265,8 +320,6 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
       setMembers(eventToEdit.participants?.map((p: any) => p.name) || []);
     }
   }, [eventToEdit]);
-  
-  
 
   return (
     <AnimatePresence>
@@ -360,6 +413,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                   </div>
                 </div>
 
+                {/* Modify the timezone selection div to include the dropdown toggle functionality */}
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Timezone</Label>
                   <div className="relative">
@@ -367,33 +421,52 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                       <Input
                         type="text"
                         placeholder="Search timezone..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        value={searchQuery} // Always show what user types
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          setTimezone(""); // Clear selected timezone when typing
+                          setIsTimezoneDropdownOpen(true);
+                        }}
                         className="pl-10"
+                        onFocus={() => setIsTimezoneDropdownOpen(true)}
                       />
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     </div>
-                    <div className="max-h-40 overflow-y-auto border rounded-md">
-                      {isLoading ? (
-                        <div className="p-2 text-center text-gray-500">Loading timezones...</div>
-                      ) : error ? (
-                        <div className="p-2 text-center text-red-500">{error}</div>
-                      ) : filteredTimezones.length > 0 ? (
-                        filteredTimezones.map((tz) => (
-                          <div
-                            key={tz}
-                            className={`p-2 cursor-pointer hover:bg-gray-100 ${
-                              timezone === tz ? "bg-primary-50 text-primary-600" : ""
-                            }`}
-                            onClick={() => setTimezone(tz)}
-                          >
-                            {tz}
+                    {isTimezoneDropdownOpen && (
+                      <div className="absolute z-10 w-full max-h-40 overflow-y-auto border rounded-md bg-white shadow-md">
+                        {isLoading ? (
+                          <div className="p-2 text-center text-gray-500">
+                            Loading timezones...
                           </div>
-                        ))
-                      ) : (
-                        <div className="p-2 text-center text-gray-500">No timezones found</div>
-                      )}
-                    </div>
+                        ) : error ? (
+                          <div className="p-2 text-center text-red-500">
+                            {error}
+                          </div>
+                        ) : filteredTimezones.length > 0 ? (
+                          filteredTimezones.map((tz) => (
+                            <div
+                              key={tz}
+                              className={`p-2 cursor-pointer hover:bg-gray-100 ${
+                                timezone === tz
+                                  ? "bg-primary-50 text-primary-600"
+                                  : ""
+                              }`}
+                              onClick={() => {
+                                setTimezone(tz); // Store selected timezone
+                                setSearchQuery(tz); // Display in input
+                                setIsTimezoneDropdownOpen(false); // Close dropdown
+                              }}
+                            >
+                              {tz}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-2 text-center text-gray-500">
+                            No timezones found
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -410,7 +483,9 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                   <Checkbox
                     id="repeat"
                     checked={isRepeating}
-                    onCheckedChange={(checked) => setIsRepeating(checked === true)}
+                    onCheckedChange={(checked) =>
+                      setIsRepeating(checked === true)
+                    }
                   />
                   <Label htmlFor="repeat">Repeat Event</Label>
                 </div>
@@ -433,6 +508,110 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                     />
                   ))}
                 </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-md font-medium">Webinar</h3>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="includeWebinar"
+                    checked={includeWebinar}
+                    onCheckedChange={(checked) =>
+                      setIncludeWebinar(checked === true)
+                    }
+                  />
+                  <Label htmlFor="includeWebinar">Include Webinar</Label>
+                </div>
+
+                {includeWebinar && (
+                  <div className="space-y-4 p-3 border border-gray-200 rounded-md">
+                    <h4 className="text-sm font-medium">
+                      Internal Participants
+                    </h4>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="participantEmail">Email</Label>
+                      <Input
+                        id="participantEmail"
+                        value={newParticipantEmail}
+                        onChange={(e) => setNewParticipantEmail(e.target.value)}
+                        placeholder="Enter participant email"
+                      />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isCoHost"
+                        checked={isCoHost}
+                        onCheckedChange={(checked) =>
+                          setIsCoHost(checked === true)
+                        }
+                      />
+                      <Label htmlFor="isCoHost">Is Co-Host</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isRequiredToPay"
+                        checked={isRequiredToPay}
+                        onCheckedChange={(checked) =>
+                          setIsRequiredToPay(checked === true)
+                        }
+                      />
+                      <Label htmlFor="isRequiredToPay">Required To Pay</Label>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addInternalParticipant}
+                      disabled={!newParticipantEmail}
+                      className="w-full"
+                    >
+                      Add Participant
+                    </Button>
+
+                    {internalParticipants.length > 0 && (
+                      <div className="mt-2 space-y-2">
+                        <h5 className="text-sm font-medium">
+                          Added Participants:
+                        </h5>
+                        {internalParticipants.map((participant, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between bg-gray-50 p-2 rounded"
+                          >
+                            <div className="text-sm">
+                              <div>{participant.email}</div>
+                              <div className="text-xs text-gray-500">
+                                {participant.isCoHost ? "Co-Host" : "Attendee"}{" "}
+                                •
+                                {participant.isRequiredToPay
+                                  ? " Paid"
+                                  : " Free"}
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                setInternalParticipants(
+                                  internalParticipants.filter(
+                                    (_, i) => i !== index
+                                  )
+                                )
+                              }
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Add Member */}
