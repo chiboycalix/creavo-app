@@ -18,12 +18,6 @@ const PaymentSettings = () => {
     e.preventDefault()
   }
 
-  const handleNextDialog = () => {
-    setIsVerifyPhoneDialogOpen(false); // Close the first dialog
-    setIsVerifyOtpDialogOpen(true); // Open the second dialog
-  };
-
-
   return (
     <div className="">
       <div className="flex flex-col justify-center gap-3 pb-2 mb-7">
