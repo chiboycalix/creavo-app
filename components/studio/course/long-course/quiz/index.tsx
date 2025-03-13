@@ -258,6 +258,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       title: quizTitle,
       description: quizData.description || "No description provided",
       questions: formattedQuestions,
+      retries: 3,
       totalPoint,
     };
     handleAddQuizToModule(finalQuizData);
@@ -291,7 +292,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
-
+  console.log({ quiz })
   const isSubmitDisabled =
     !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
 

@@ -19,7 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import AccountSettings from "./AccountSettings";
 import PrivacySettings from "./PrivacySettings";
 import NotificationSettings from "./NotificationSettings";
-import PaymentSettings from "./PaymentSettings";
+import PaymentSettings from "@/components/socials/profile/payment/PaymentSettings";
 
 const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
   const tabsMenu = [
@@ -87,7 +87,7 @@ const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
                   ))}
                 </TabSettingsList>
 
-                <div className="col-span-3 h-full border bg-white pl-6 overflow-y-auto custom-scrollbar rounded-md">
+                <div className="col-span-3 h-full border bg-white overflow-y-auto custom-scrollbar rounded-md">
                   {tabsMenu.map((tab, index) => (
                     <TabsContent
                       key={index}
