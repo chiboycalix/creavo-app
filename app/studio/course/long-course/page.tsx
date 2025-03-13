@@ -245,7 +245,7 @@ const CreateLongCourse = () => {
             <Checkbox
               checked={isSelected}
               onCheckedChange={(isChecked: boolean) => setIsSelected(isChecked)}
-              label="Upload promotional video/images to Exploresss"
+              label="Upload promotional video/images to Explore"
               className=""
             />
             <Checkbox label="List to marketplace" className="" />
