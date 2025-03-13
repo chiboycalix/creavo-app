@@ -90,7 +90,7 @@ const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
                   ))}
                 </TabSettingsList>
 
-                <div className="col-span-3 h-full border bg-white pl-6 overflow-y-auto custom-scrollbar rounded-md">
+                <div className="col-span-3 h-full border bg-white overflow-y-auto custom-scrollbar rounded-md">
                   {tabsMenu.map((tab, index) => (
                     <TabsContent
                       key={index}

@@ -17,57 +17,42 @@ interface WebSocketContextType {
 }
 
 // Create a WebSocket context
-const WebSocketContext = createContext<WebSocketContextType | undefined>(
-  undefined
-);
+const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
 interface WebSocketProviderProps {
   children: ReactNode;
 }
 
 // WebSocketProvider component to wrap your app
-export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
-  children,
-}) => {
+export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
   const [ws, setWs] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const token = `Bearer ${Cookies.get("accessToken")}`;
+    const token = Cookies.get("accessToken");
+    if (!token) return;
+
     const socket = io(webSocketUrl, {
       autoConnect: true,
       transports: ["websocket", "polling"],
       withCredentials: true,
-      auth: {
-        token,
-      },
+      auth: { token: `Bearer ${token}` },
     });
 
-    // Event listeners for connection state
     socket.on("connect", () => console.log("WebSocket connected"));
     socket.on("disconnect", () => console.log("WebSocket disconnected"));
 
     setWs(socket);
 
-    // Cleanup the WebSocket connection on unmount
     return () => {
       socket.close();
     };
   }, []);
 
-  return (
-    <WebSocketContext.Provider value={{ ws }}>
-      {children}
-    </WebSocketContext.Provider>
-  );
+  return <WebSocketContext.Provider value={{ ws }}>{children}</WebSocketContext.Provider>;
 };
 
-// Custom Hook to access WebSocket
+// Custom Hook to access WebSocket safely
 export const useWebSocket = (): Socket | null => {
   const context = useContext(WebSocketContext);
-
-  if (!context) {
-    throw new Error("useWebSocket must be used within a WebSocketProvider");
-  }
-
-  return context?.ws ?? null;
+  return context?.ws ?? null; // Avoids TypeScript error
 };
