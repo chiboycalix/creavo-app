@@ -18,6 +18,9 @@ export const LAYOUT_PATHS = [
   "/course/*",
   "/streaming/*",
   "/classroom/*",
+  "/search",
+  "/search/*",
+
 
   "/socials",
   "/socials/following",
