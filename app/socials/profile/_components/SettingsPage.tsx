@@ -19,8 +19,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import AccountSettings from "./AccountSettings";
 import PrivacySettings from "./PrivacySettings";
 import NotificationSettings from "./NotificationSettings";
-import PaymentSettings from "./PaymentSettings";
 import { useSettings } from "@/context/SettingsContext";
+import PaymentSettings from "./PaymentSettings";
 
 const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
   const tabsMenu = [
