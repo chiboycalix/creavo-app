@@ -3,6 +3,8 @@ import { FileIcon } from "lucide-react";
 import ProductReviews from "./Reviews";
 import ImageCard from "./ImageCard";
 import ProductDetails from "./Details";
+import CheckoutCard from "./CheckoutCard";
+import { useMarketContext } from "@/context/MarketContext";
 
 interface Product {
   seller: {
@@ -20,6 +22,7 @@ interface EbookProductProps {
 }
 
 const EbookProduct: React.FC<EbookProductProps> = ({ product, comments }) => {
+  const { showCheckoutCard, setShowCheckoutCard } = useMarketContext();
   const downloadFiles = [
     {
       id: 1,
@@ -36,7 +39,7 @@ const EbookProduct: React.FC<EbookProductProps> = ({ product, comments }) => {
       <ImageCard product={product} />
 
       <div className="flex flex-col gap-5 w-[70%] bg-white p-6 rounded-lg shadow-sm">
-        <ProductDetails product={product}/>
+        <ProductDetails product={product} />
 
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
@@ -65,6 +68,16 @@ const EbookProduct: React.FC<EbookProductProps> = ({ product, comments }) => {
           totalReviews={10}
         />
       </div>
+      {showCheckoutCard && (
+        <CheckoutCard
+          isOpen={showCheckoutCard}
+          onClose={() => {
+            setShowCheckoutCard(false);
+          }}
+          product={product}
+          // anchorRect={addEventAnchorRect}
+        />
+      )}
     </div>
   );
 };

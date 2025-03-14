@@ -18,8 +18,8 @@ const PopularCourses: React.FC<PopularCoursesProps> = ({
 }) => {
   return (
     <div className="flex flex-wrap gap-4 justify-start">
-      <h1>Popular Courses</h1>
-      <div className="flex flex-wrap gap-4 justify-evenly sm:justify-evenly md:justify-evenly">
+      <h1 className="mb-3 font-bold">Popular Courses</h1>
+      <div className="flex flex-wrap gap-4 ">
         {courses?.map((item: any) => (
           <ProductCard
             key={item.id}

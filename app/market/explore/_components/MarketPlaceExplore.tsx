@@ -11,11 +11,11 @@ import { ChevronDown, ChevronUp } from "lucide-react"; // Icon for dropdown arro
 
 export type TabValue =
   | "All"
-  | "Digital Products"
-  | "E-Books"
+  // | "Digital Products"
+  // | "E-Books"
   | "Courses"
-  | "Events"
-  | "Services";
+  // | "Events"
+  // | "Services";
 
 const MarketPlaceExplore = () => {
   const router = useRouter();
@@ -29,6 +29,7 @@ const MarketPlaceExplore = () => {
     isSaved,
     searchRoom,
     setSearchRoom,
+    fetchListedCourses,
   } = useMarketContext();
 
   const initialTab = (searchParams.get("tab") as TabValue) || "All";
@@ -74,17 +75,17 @@ const MarketPlaceExplore = () => {
 
   const productCategories = [
     { category: "All", desc: "Explore all products", color: "bg-gray-200" },
-    {
-      category: "E-Books",
-      desc: "Discover amazing books",
-      color: "bg-green-200",
-    },
+    // {
+    //   category: "E-Books",
+    //   desc: "Discover amazing books",
+    //   color: "bg-green-200",
+    // },
     {
       category: "Courses",
       desc: "Upgrade your skills",
       color: "bg-yellow-200",
     },
-    { category: "Events", desc: "Find upcoming events", color: "bg-red-200" },
+    // { category: "Events", desc: "Find upcoming events", color: "bg-red-200" },
   ];
 
   const handleTabChange = useCallback(
@@ -137,6 +138,8 @@ const MarketPlaceExplore = () => {
       setActiveTab(tabFromUrl);
     }
   }, [searchParams, activeTab]);
+
+  fetchListedCourses();
 
   return (
     <div className="flex gap-4">
@@ -259,7 +262,7 @@ const MarketPlaceExplore = () => {
             item={courses}
           />
         </div>
-
+{/* 
         <div className="mt-10">
           <PopularEvents
             events={events}
@@ -267,7 +270,7 @@ const MarketPlaceExplore = () => {
             handleToggleSave={handleToggleSave}
             item={events}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

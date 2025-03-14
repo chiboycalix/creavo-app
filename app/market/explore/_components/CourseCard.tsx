@@ -5,7 +5,7 @@ import SaveProductButton from "@/components/marketplace/SaveProductButton";
 import { useMarketContext } from "@/context/MarketContext";
 import Link from "next/link";
 
-interface Product {
+interface Course {
   id: any;
   seller: {
     id: any;
@@ -16,41 +16,45 @@ interface Product {
   description: string;
   rating?: any;
   numberOfParticipants?: any;
-  price: number;
+  amount: number;
   type?: string;
+  currency?: string;
+  promotionalUrl?: string;
+  difficultyLevel?: string;
 }
 
-interface ProductCardProps {
-  product: Product;
+interface CourseCardProps {
+  course: Course;
   isSaved: boolean;
-  handleToggleSave: (product: Product) => void;
+  handleToggleSave: ( course: Course) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({
-  product,
+const CourseCard: React.FC<CourseCardProps> = ({
+  course,
   handleToggleSave,
 }) => {
   const { isSaved } = useMarketContext();
+  console.log('pro pro',course);
   return (
     <Link
-      href={`/market/product/${product?.id}`}
-      key={product?.id}
+      href={`/market/product/${course?.id}`}
+      key={course?.id}
       className="relative flex flex-col gap-4 p-1 bg-white rounded-md border-2 justify-between items-center w-[calc(25%-16px)] min-w-[200px] transition-transform transform hover:scale-105 hover:shadow-lg"
     >
       <div className="flex w-[100%]">
-      <img src={product?.seller?.avatar} alt="avatar" className="w-full transition-opacity hover:opacity-80" />
+      <img src={course.promotionalUrl} alt="avatar" className="w-full transition-opacity hover:opacity-80" />
       </div>
 
       <div className="flex flex-col gap-2 p-2">
       <div className="flex flex-col items-center text-center gap-2">
-        <h3 className="font-semibold">{product?.title}</h3>
+        <h3 className="font-semibold">{course?.title}</h3>
         <p className="text-sm text-gray-500 underline">
-        {product.description}
+        {course?.description}
         </p>
       </div>
 
-      <div className="flex justify-between">
-        {product.numberOfParticipants ? (
+      <div className="flex gap-3 justify-between">
+        {course?.numberOfParticipants ? (
         <div className="flex items-center gap-1">
           <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -67,9 +71,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           />
           <circle cx="12" cy="18" r="2" />
           </svg>
-          <span>{product?.numberOfParticipants}</span>
+          <span>{course?.numberOfParticipants}</span>
         </div>
-        ) : product.rating > 0 ? (
+        ) : course?.rating > 0 ? (
         <div className="flex items-center gap-1">
           <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -85,28 +89,28 @@ const ProductCard: React.FC<ProductCardProps> = ({
             d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"
           />
           </svg>
-          <span>{product?.rating}</span>
+          <span>{course?.rating}</span>
         </div>
         ) : (
-        <span>No ratings or participants found</span>
+        <span className="text-sm font-semibold">No ratings or participants</span>
         )}
-        <div className="flex items-center bg-[#DFF8F6] px-2 rounded-md">
-        <span>
-          {"£"}
-          {product?.price}
+        <div className="flex items-center bg-[#DFF8F6] px-1 rounded-md">
+        <span className="text-sm font-semibold">
+          {course?.currency}{" "}
+          {course?.amount}
         </span>
         </div>
       </div>
       </div>
       <div className="absolute bg-opacity-90 bg-white top-2 right-2 rounded-full p-1">
       <SaveProductButton
-        productId={product?.id}
+        productId={course?.id}
         initialIsSaved={isSaved}
-        onToggleSave={() => handleToggleSave(product)}
+        onToggleSave={() => handleToggleSave(course)}
       />
       </div>
     </Link>
   );
 };
 
-export default ProductCard;
+export default CourseCard;

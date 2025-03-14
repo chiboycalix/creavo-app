@@ -8,10 +8,18 @@ import {
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import React, { useState } from "react";
+import { useSettings } from "@/context/SettingsContext";
 
 const NotificationSettings = () => {
-  const [enabled, setEnabled] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const {
+    allowBrowserNotification,
+    allowLikeNotification,
+    allowTagNotification,
+    allowFollowNotification,
+    updateSetting,
+  } = useSettings();
+
   return (
     <div className="">
       <div className="flex flex-col gap-3  pb-2 mb-7">
@@ -22,8 +30,10 @@ const NotificationSettings = () => {
           </div>
           <div>
             <Switch
-              checked={notifEnabled}
-              onChange={setNotifEnabled}
+              checked={allowBrowserNotification}
+              onChange={(e) =>
+                updateSetting("allowBrowserNotification", e.valueOf())
+              }
               className="group relative flex items-center w-8 h-4 cursor-pointer rounded-lg bg-white transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-[#00856E] data-[unchecked]:bg-black border shadow-sm"
             >
               <span
@@ -46,8 +56,10 @@ const NotificationSettings = () => {
                 <div className="font-medium text-sm text-[#3D3D3D]">Likes</div>
               </div>
               <Switch
-                checked={notifEnabled}
-                onChange={setNotifEnabled}
+                checked={allowLikeNotification}
+                onChange={(e) =>
+                  updateSetting("allowLikeNotification", e.valueOf())
+                }
                 className="group relative flex items-center w-8 h-4 cursor-pointer rounded-lg bg-white transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-[#00856E] data-[unchecked]:bg-black border shadow-sm"
               >
                 <span
@@ -58,7 +70,9 @@ const NotificationSettings = () => {
             </div>
             <div className="flex justify-between">
               <div>
-                <div className="font-medium text-sm text-[#3D3D3D]">Comments</div>
+                <div className="font-medium text-sm text-[#3D3D3D]">
+                  Comments
+                </div>
               </div>
               <Switch
                 checked={notifEnabled}
@@ -73,11 +87,15 @@ const NotificationSettings = () => {
             </div>
             <div className="flex justify-between">
               <div>
-                <div className="font-medium text-sm text-[#3D3D3D]">New Followers</div>
+                <div className="font-medium text-sm text-[#3D3D3D]">
+                  New Followers
+                </div>
               </div>
               <Switch
-                checked={notifEnabled}
-                onChange={setNotifEnabled}
+                checked={allowFollowNotification}
+                onChange={(e) =>
+                  updateSetting("allowFollowNotification", e.valueOf())
+                }
                 className="group relative flex items-center w-8 h-4 cursor-pointer rounded-lg bg-white transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-[#00856E] data-[unchecked]:bg-black border shadow-sm"
               >
                 <span
@@ -88,11 +106,15 @@ const NotificationSettings = () => {
             </div>
             <div className="flex justify-between">
               <div>
-                <div className="font-medium text-sm text-[#3D3D3D]">Mentions and tags</div>
+                <div className="font-medium text-sm text-[#3D3D3D]">
+                  Mentions and tags
+                </div>
               </div>
               <Switch
-                checked={notifEnabled}
-                onChange={setNotifEnabled}
+                checked={allowTagNotification}
+                onChange={(e) =>
+                  updateSetting("allowTagNotification", e.valueOf())
+                }
                 className="group relative flex items-center w-8 h-4 cursor-pointer rounded-lg bg-white transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-[#00856E] data-[unchecked]:bg-black border shadow-sm"
               >
                 <span

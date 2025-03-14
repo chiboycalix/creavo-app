@@ -21,7 +21,7 @@ const ExploreCategories: React.FC<ExploreCategoriesProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-4 w-full">
-      <h1>Explore Categories</h1>
+      <h1 className="mb-3 font-bold">Explore Categories</h1>
       <div className="grid grid-cols-3 gap-4">
         {productCategories
           .filter((product) => product.category !== "All")

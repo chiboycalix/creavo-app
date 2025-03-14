@@ -6,7 +6,11 @@ import React, {
   useState,
   ReactNode,
   useCallback,
+  useEffect,
 } from "react";
+import { useAuth } from "./AuthContext";
+import { baseUrl } from "@/utils/constant";
+import Cookies from "js-cookie";
 
 export interface Product {
   id: number;
@@ -23,6 +27,8 @@ export interface Product {
 interface MarketContextType {
   products: Product[];
   addProduct: (product: Product) => void;
+  fetchListedCourses: () => void;
+  listedCourses: any;
   removeProduct: (id: number) => void;
   fetchProducts: () => void;
   fetchPopularCourses: () => void;
@@ -36,6 +42,8 @@ interface MarketContextType {
   searchRoom: boolean;
   setSearchRoom: (searchRoom: boolean) => void;
   fetchSingleProduct: (id: any) => void;
+  showCheckoutCard: boolean;
+  setShowCheckoutCard: (showCheckoutCard: boolean) => void;
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -57,6 +65,10 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
   const [savedProducts, setSavedProducts] = useState<any>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [searchRoom, setSearchRoom] = useState(false);
+  const [showCheckoutCard, setShowCheckoutCard] = useState(false);
+  const [listedCourses, setListedCourses] = useState<any>(null);
+  const { getCurrentUser } = useAuth();
+  const userId = getCurrentUser()?.id;
 
   const fetchProducts = () => {
     return [
@@ -66,7 +78,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "A complete UI/UX design template pack.",
         price: 29,
         rating: 4.5,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "101",
           name: "Designer Pro",
@@ -79,7 +91,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Fully responsive website template.",
         price: 49,
         rating: 4.8,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "102",
           name: "Web Solutions",
@@ -92,7 +104,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Custom social media icons for brands.",
         price: 19,
         rating: 4.2,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "103",
           name: "Graphic Master",
@@ -107,7 +119,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Step-by-step guide to digital marketing.",
         price: 15,
         rating: 4.6,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "104",
           name: "Marketing Guru",
@@ -120,7 +132,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Learn Python programming from scratch.",
         price: 25,
         rating: 4.9,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "105",
           name: "Code Academy",
@@ -133,7 +145,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Essential guide for building a startup.",
         price: 20,
         rating: 4.7,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "106",
           name: "Entrepreneur Hub",
@@ -181,88 +193,6 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
           avatar: "/assets/dummyImage.png",
         },
       },
-
-      // Events
-      {
-        id: "10",
-        title: "Tech Conference 2025",
-        description: "Join the biggest tech event of the year.",
-        price: 199,
-        rating: 5.0,
-        category: "Events",
-        seller: {
-          id: "110",
-          name: "Tech Events Ltd.",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "11",
-        title: "Music Festival Ticket",
-        description: "Experience live music with top artists.",
-        price: 120,
-        rating: 4.7,
-        category: "Events",
-        seller: {
-          id: "111",
-          name: "Music World",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "12",
-        title: "Startup Networking Night",
-        description: "Connect with entrepreneurs and investors.",
-        price: 30,
-        rating: 4.4,
-        category: "Events",
-        seller: {
-          id: "112",
-          name: "Startup Connect",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-
-      // Services
-      {
-        id: "13",
-        title: "Logo Design Service",
-        description: "Professional logo design for your brand.",
-        price: 99,
-        rating: 4.8,
-        category: "Services",
-        seller: {
-          id: "113",
-          name: "Creative Studio",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "14",
-        title: "SEO Optimization",
-        description: "Boost your website’s ranking.",
-        price: 120,
-        rating: 4.9,
-        category: "Services",
-        seller: {
-          id: "114",
-          name: "SEO Experts",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "15",
-        title: "Video Editing",
-        description: "High-quality video editing service.",
-        price: 150,
-        rating: 4.7,
-        category: "Services",
-        seller: {
-          id: "115",
-          name: "Media Pro",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
     ];
   };
 
@@ -279,7 +209,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "A complete UI/UX design course for beginners.",
         price: 0,
         numberOfParticipants: 205,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "101",
           name: "Designer Pro",
@@ -393,7 +323,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "A complete UI/UX design template pack.",
         price: 29,
         rating: 4.5,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "101",
           name: "Designer Pro",
@@ -434,7 +364,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Step-by-step guide to digital marketing.",
         price: 15,
         rating: 4.6,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "104",
           name: "Marketing Guru",
@@ -447,7 +377,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Learn Python programming from scratch.",
         price: 25,
         rating: 4.9,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "105",
           name: "Code Academy",
@@ -465,7 +395,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Fully responsive website template.",
         price: 49,
         rating: 4.8,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "102",
           name: "Web Solutions",
@@ -478,7 +408,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Custom social media icons for brands.",
         price: 19,
         rating: 4.2,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "103",
           name: "Graphic Master",
@@ -493,7 +423,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         description: "Step-by-step guide to digital marketing.",
         price: 15,
         rating: 4.6,
-        category: "E-Books",
+        category: "Courses",
         seller: {
           id: "104",
           name: "Marketing Guru",
@@ -611,11 +541,46 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     });
   }, []);
 
+  const fetchListedCourses = useCallback( async () => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/users/${userId}/courses?page=1&limit=10`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch courses");
+      }
+
+      const data = await response.json();
+      console.log(data?.data);
+      const promoCourses = data?.data.courses.filter((course: any) => course.promote === true)
+      return promoCourses;
+    } catch (error) {}
+  }, [userId]);
+
+  useEffect(() => {
+      const fetchCourses = async () => {
+        const courses = await fetchListedCourses();
+        setListedCourses(courses);
+      };
+  
+      fetchCourses();
+    }, [fetchListedCourses]);
+
   return (
     <MarketContext.Provider
       value={{
         products,
         fetchProducts,
+        fetchListedCourses,
+        listedCourses,
         fetchSingleProduct,
         fetchPopularCourses,
         fetchPopularEvents,
@@ -629,6 +594,8 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         setIsSaved,
         searchRoom,
         setSearchRoom,
+        showCheckoutCard,
+        setShowCheckoutCard,
       }}
     >
       {children}
