@@ -23,6 +23,7 @@ import { Fragment } from 'react';
 import { FaUser, FaCog, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa';
 import { BsPlusCircle } from 'react-icons/bs';
 import { Button } from '@/components/ui/button';
+import SearchInput from '@/components/search/search-input';
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;
@@ -68,7 +69,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
 
             {/* Search - Hidden on Mobile */}
             <div className="hidden md:block w-64 lg:w-80">
-              <Input variant="search" placeholder="Search" />
+            <SearchInput/>
             </div>
           </div>
 
