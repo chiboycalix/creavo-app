@@ -29,6 +29,7 @@ const MarketPlaceExplore = () => {
     isSaved,
     searchRoom,
     setSearchRoom,
+    fetchListedCourses,
   } = useMarketContext();
 
   const initialTab = (searchParams.get("tab") as TabValue) || "All";
@@ -137,6 +138,8 @@ const MarketPlaceExplore = () => {
       setActiveTab(tabFromUrl);
     }
   }, [searchParams, activeTab]);
+
+  fetchListedCourses();
 
   return (
     <div className="flex gap-4">
@@ -259,7 +262,7 @@ const MarketPlaceExplore = () => {
             item={courses}
           />
         </div>
-
+{/* 
         <div className="mt-10">
           <PopularEvents
             events={events}
@@ -267,7 +270,7 @@ const MarketPlaceExplore = () => {
             handleToggleSave={handleToggleSave}
             item={events}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

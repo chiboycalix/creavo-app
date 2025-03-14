@@ -76,15 +76,16 @@ const ProductItem = () => {
         </div>
       )}
 
-      {productType === "Events" && (
+      {/* {productType === "Events" && (
         <div>
           <EventProduct />
         </div>
-      )}
+      )} */}
 
       {productType === "Courses" && (
         <div>
-          Courses
+          <EbookProduct product={product} comments={comments} />
+          
         </div>
       )}
     </div>
