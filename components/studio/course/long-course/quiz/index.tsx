@@ -98,30 +98,30 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     [dispatch]
   );
 
-  const handleClickModule = useCallback(
-    (module: any) => {
-      setSelectedModule(module);
-      setQuestions([]);
-      setQuestionData([]);
-      setQuizTitle("");
-      setQuizData({
-        moduleId: module.id || 1,
-        title: "",
-        description: "",
-        allocatedTime: 30,
-        totalPoint: 0,
-        questions: [],
-      });
-      setShowQuestionOptions(false);
-      setTitleError(null);
-      setIsAddingQuiz(false);
-      setEditingQuestionIndex(null);
-      if (!courseId) {
-        router.push(`?tab=quiz&module=${generalHelpers.convertToSlug(module.title)}`);
-      } else {
-        router.push(`?tab=quiz&edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`);
-      }
-    },
+  const handleClickModule = useCallback((module: any) => {
+    setSelectedModule(module);
+    setQuestions([]);
+    setQuestionData([]);
+    setQuizTitle("");
+    setQuizData({
+      moduleId: module?.id,
+      title: "",
+      description: "",
+      allocatedTime: 30,
+      totalPoint: 0,
+      questions: [],
+    });
+    setShowQuestionOptions(false);
+    setTitleError(null);
+    setIsAddingQuiz(false);
+    setEditingQuestionIndex(null);
+    if (!courseId) {
+      console.log({ module })
+      router.push(`?tab=quiz&module=${module?.id}`);
+    } else {
+      router.push(`?tab=quiz&edit=${courseId}&module=${module?.id}`);
+    }
+  },
     [courseId, router]
   );
 
@@ -131,8 +131,8 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     setSelectedModule(initialModule);
     setQuizData((prev) => ({ ...prev, moduleId: initialModule.id || 1 }));
     const url = courseId
-      ? `?tab=quiz&edit=${courseId}&module=${generalHelpers.convertToSlug(initialModule.title)}`
-      : `?tab=quiz&module=${generalHelpers.convertToSlug(initialModule.title)}`;
+      ? `?tab=quiz&edit=${courseId}&module=${initialModule?.id}`
+      : `?tab=quiz&module=${initialModule?.id}`;
     router.push(url);
   }, [courseId, courseData?.data?.course?.modules, router, selectedModule, isFetchingCourse]);
 
@@ -154,9 +154,7 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     }
 
     return courseData?.data?.course.modules.map((module: any, index: number) => {
-      const isActive =
-        generalHelpers.convertFromSlug(currentModule || courseData?.data?.course?.modules[0]?.title) ===
-        generalHelpers.capitalizeWords(module.title);
+      const isActive = Number(currentModule) === module?.id
 
       return (
         <div
@@ -292,9 +290,8 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
-  console.log({ quiz })
-  const isSubmitDisabled =
-    !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
+
+  const isSubmitDisabled = !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
 
   const renderQuestions = () => {
     return questions.map((question, index) => (
