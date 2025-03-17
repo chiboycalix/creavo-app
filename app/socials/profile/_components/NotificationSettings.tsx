@@ -51,7 +51,7 @@ const NotificationSettings = () => {
             <ChevronDownIcon className="size-5 fill-black group-data-[hover]:fill-black group-data-[open]:rotate-180" />
           </DisclosureButton>
           <DisclosurePanel className=" text-black flex flex-col gap-3">
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b-2 pb-2">
               <div>
                 <div className="font-medium text-sm text-[#3D3D3D]">Likes</div>
               </div>
@@ -68,7 +68,7 @@ const NotificationSettings = () => {
                 />
               </Switch>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b-2 pb-2">
               <div>
                 <div className="font-medium text-sm text-[#3D3D3D]">
                   Comments
@@ -85,7 +85,7 @@ const NotificationSettings = () => {
                 />
               </Switch>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b-2 pb-2">
               <div>
                 <div className="font-medium text-sm text-[#3D3D3D]">
                   New Followers
@@ -104,7 +104,7 @@ const NotificationSettings = () => {
                 />
               </Switch>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b-2 pb-2">
               <div>
                 <div className="font-medium text-sm text-[#3D3D3D]">
                   Mentions and tags

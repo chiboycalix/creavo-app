@@ -139,12 +139,12 @@ export default function MainLayout({
           href: "/market/notifications",
           icon: BellIcon,
         },
-        { title: "Create Listing", href: "/market/create-listing", icon: PlusSquareIcon },
+        // { title: "Create Listing", href: "/market/create-listing", icon: PlusSquareIcon },
       ],
       dashboardItems: [
         { title: "Seller dashboard", href: "/market/seller-dashboard", icon: LayoutDashboardIcon },
         { title: "Your Listings", href: "/market/your-listings", icon: TagIcon },
-        { title: "Insight", href: "/market/insight", icon: ChartSplineIcon },
+        // { title: "Insight", href: "/market/insight", icon: ChartSplineIcon },
 
       ]
     }

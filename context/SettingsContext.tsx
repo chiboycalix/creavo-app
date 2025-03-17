@@ -163,9 +163,9 @@
 //       const data = await response.json();
 //       console.log("data", data);
 //       setUserPrivacy(data?.data?.isPrivate);
-      
+
 //     } catch (error) {
-      
+
 //     }
 //   }
 
@@ -183,7 +183,6 @@
 //     </SettingsContext.Provider>
 //   );
 // };
-
 
 "use client";
 
@@ -234,7 +233,9 @@ interface SettingsProviderProps {
   children: ReactNode;
 }
 
-export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) => {
+export const SettingsProvider: React.FC<SettingsProviderProps> = ({
+  children,
+}) => {
   const [settings, setSettings] = useState<SettingsType>({
     allowBrowserNotification: false,
     allowEmailNotification: false,
@@ -276,6 +277,11 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
 
   const updateSetting = async (key: keyof SettingsType, value: boolean) => {
     try {
+      const updatedSettings = {
+        ...settings,
+        [key]: value,
+      };
+
       const response = await fetch(
         `${baseUrl}/users/${currentUser?.id}/update-user-settings`,
         {
@@ -284,7 +290,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
             "Content-Type": "application/json",
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
           },
-          body: JSON.stringify({ [key]: value }),
+          body: JSON.stringify(updatedSettings),
         }
       );
 
@@ -292,10 +298,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         throw new Error("Failed to update setting");
       }
 
-      setSettings((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
+      setSettings(updatedSettings);
     } catch (error) {
       console.error("Failed to update setting:", error);
     }
@@ -351,7 +354,16 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   }, [getUserPrivacyStatus, currentUser?.id]);
 
   return (
-    <SettingsContext.Provider value={{ ...settings, fetchSettings, updateSetting, updateUserPrivacy, userPrivacy, setUserPrivacy }}>
+    <SettingsContext.Provider
+      value={{
+        ...settings,
+        fetchSettings,
+        updateSetting,
+        updateUserPrivacy,
+        userPrivacy,
+        setUserPrivacy,
+      }}
+    >
       {children}
     </SettingsContext.Provider>
   );
