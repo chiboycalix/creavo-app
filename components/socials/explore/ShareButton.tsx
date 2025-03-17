@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
-import { X, Copy, Facebook, Instagram, Twitter, Linkedin, Video, MessageCircle, Send } from "lucide-react"; // Added MessageCircle for WhatsApp, Send for Telegram
+import { X, Copy, Facebook, Instagram, Twitter, Linkedin, Video, MessageCircle, Send, DownloadIcon } from "lucide-react"; // Added MessageCircle for WhatsApp, Send for Telegram
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -17,11 +17,13 @@ import { RiShareForwardFill } from "react-icons/ri";
 interface ShareButtonProps {
   postId: number;
   initialShareCount: number;
+  post: any
 }
 
 const ShareButton: React.FC<ShareButtonProps> = ({
   postId,
   initialShareCount,
+  post
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
@@ -30,6 +32,48 @@ const ShareButton: React.FC<ShareButtonProps> = ({
   const [copySuccess, setCopySuccess] = useState(false);
 
   const shareUrl = `${window.location.origin}/socials/posts/${postId}`;
+
+
+  const handleDownload = async () => {
+    const media = post.media[0];
+    if (!media) return;
+
+    const token = Cookies.get("accessToken");
+
+    if (!token) {
+      console.error("No access token found");
+      return;
+    }
+
+    const response = await fetch("/api/watermark", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        postId: post.id,
+        mediaUrl: media.url,
+        mediaType: media.mimeType.startsWith("image") ? "image" : "video",
+        username: post.user_username,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Download failed:", await response.text());
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `post-${post.id}.${media.mimeType.startsWith("image") ? "jpg" : "mp4"}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
 
   const sharePostMutation = useMutation({
     mutationFn: async () => {
@@ -126,7 +170,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-[600px] relative">
+        <PopoverContent className="w-[620px] relative">
           <button
             onClick={() => setIsPopoverOpen(false)}
             className="absolute top-2 right-2 p-1 hover:bg-gray-200 rounded-full"
@@ -151,8 +195,8 @@ const ShareButton: React.FC<ShareButtonProps> = ({
                 <Button
                   onClick={handleCopyLink}
                   variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1 w-full"
+                  size={"lg"}
+                  className="flex items-center gap-1 w-full py-0"
                 >
                   <Copy className="w-4 h-4" />
                   {copySuccess ? "Copied!" : "Copy"}
@@ -160,7 +204,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-7 gap-4">
+            <div className="grid grid-cols-8 gap-4">
               <button
                 onClick={() => handleSocialShare("facebook")}
                 className="flex flex-col items-center hover:text-blue-600"
@@ -216,6 +260,13 @@ const ShareButton: React.FC<ShareButtonProps> = ({
               >
                 <Send className="w-6 h-6" />
                 <span className="text-xs mt-1">Telegram</span>
+              </button>
+              <button
+                className="flex flex-col items-center hover:text-primary-500"
+                aria-label="download video"
+              >
+                <DownloadIcon onClick={handleDownload} />
+                <span className="text-xs mt-1">Download</span>
               </button>
             </div>
           </div>
