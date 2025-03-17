@@ -153,7 +153,6 @@ export async function POST(request: NextRequest) {
       }
 
       const duration = await getVideoDuration(inputPath);
-      console.log(`Video duration: ${duration} seconds`);
 
       // Define positions
       const playbackWatermarkX = `w-${WATERMARK_WIDTH}-${PADDING}`; // Bottom-right during playback

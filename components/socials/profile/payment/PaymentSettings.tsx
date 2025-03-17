@@ -2,10 +2,10 @@
 import React, { FormEvent, useState } from "react";
 import VerifyPhoneDialog from "./VerifyPhoneDialog";
 import PaymentOtpDialog from "./PaymentOtpDialog";
+import SuccessDialog from "@/components/SuccessDialog";
 import { Input } from "@/components/Input";
 import { SelectInput } from "@/components/Input/SelectInput";
 import { Button } from "@/components/ui/button";
-import SuccessDialog from "@/components/SuccessDialog";
 
 const PaymentSettings = () => {
   const [isVerifyPhoneDialogOpen, setIsVerifyPhoneDialogOpen] = useState(false);

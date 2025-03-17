@@ -2,13 +2,15 @@ import type React from "react"
 import MediaWrapper from "../../post/MediaWrapper"
 import ShareButton from "./ShareButton"
 import dynamic from "next/dynamic"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import Cookies from "js-cookie";
+import { ChevronDown, ChevronUp, Download, DownloadIcon } from "lucide-react"
 import { useState } from "react"
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid"
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
-import Cookies from "js-cookie"
+import { Button } from "@/components/ui/button"
+import { BiDownload } from "react-icons/bi";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
@@ -24,54 +26,11 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const { toggleComments } = useComments()
   const currentUserId = getCurrentUser()?.id;
 
-  const tags = [
-    "fyp",
-    "biker", "bikergirlsof", "bikerboys",
-    "bikerboysof", "bikersof", "bikerchick", "fyp", "biker",
-    "bikergirlsof", "bikerboys", "bikerboysof",
-    "bikersof", "bikerchick"
-  ]
+  const hashtagFromCourse = post?.hashtag.match(/##(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
+  const hashtagFromPost = post?.hashtag.match(/#(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
 
-  const handleDownload = async () => {
-    const media = post.media[0];
-    if (!media) return;
+  const tags = hashtagFromCourse.length > 0 ? hashtagFromCourse : hashtagFromPost
 
-    const token = Cookies.get("accessToken");
-
-    if (!token) {
-      console.error("No access token found");
-      return;
-    }
-
-    const response = await fetch("/api/watermark", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Send token in headers
-      },
-      body: JSON.stringify({
-        postId: post.id,
-        mediaUrl: media.url,
-        mediaType: media.mimeType.startsWith("image") ? "image" : "video",
-        username: post.user_username,
-      }),
-    });
-
-    if (!response.ok) {
-      console.error("Download failed:", await response.text());
-      return;
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `post-${post.id}.${media.mimeType.startsWith("image") ? "jpg" : "mp4"}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  };
   const metrics: SocialMetric[] = [
     {
       icon: <LikeButton
@@ -101,13 +60,13 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       icon: <ShareButton
         postId={post.id}
         initialShareCount={post?.sharesCount}
+        post={post}
       />
     },
     // {
-    //   icon: <Download onClick={handleDownload} />
+    //   icon: <DownloadIcon />
     // },
   ]
-
 
   return (
     <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0">
@@ -146,21 +105,25 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           <div className="absolute w-[80%] md:w-full bottom-2 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 pt-4">
+                <div className="flex items-center justify-between gap-2 pt-4">
                   <h3 className="font-semibold">{post?.user_username}</h3>
+                  {
+                    post?.metadata !== null && <Button className="cursor-pointer">Learn more</Button>
+                  }
+
                 </div>
                 <div className="relative w-full">
-
                   <div className={`flex flex-wrap gap-2 mt-1 ${!showAllTags && 'max-h-[1.6rem]'} overflow-hidden transition-all duration-300`}>
                     <div>
                       <p className="text-xs leading-6">{post.body}</p>
                     </div>
-                    {tags.map((tag, index) => (
+                    {tags.map((tag: any, index: number) => (
                       <span key={index} className="text-gray-400 text-xs leading-6">
                         #{tag}
                       </span>
                     ))}
                   </div>
+
                   {tags.length > 6 && (
                     <button
                       onClick={() => setShowAllTags(!showAllTags)}
