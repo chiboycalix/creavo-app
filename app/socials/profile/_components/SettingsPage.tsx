@@ -19,7 +19,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import AccountSettings from "./AccountSettings";
 import PrivacySettings from "./PrivacySettings";
 import NotificationSettings from "./NotificationSettings";
-import { useSettings } from "@/context/SettingsContext";
 import PaymentSettings from "./PaymentSettings";
 
 const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
@@ -31,9 +30,6 @@ const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
   ];
   const [activeTab, setActiveTab] = useState<string>(tabsMenu[0].title);
   const handleTabChange = (category: string) => setActiveTab(category);
-  const { fetchSettings,  } = useSettings();
-
-  fetchSettings();
 
   return (
     <AnimatePresence>
@@ -56,7 +52,7 @@ const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
           />
 
           <div className=" bg-[#EDF2F675] fixed inset-0 flex flex-col gap-2 items-center justify-center">
-            <div className="w-[60%] flex  justify-start">
+            <div className="w-[70%] flex  justify-start">
               <button
                 onClick={handleClose}
                 className=" flex text-black gap-2 hover:shadow-md p-2 hover:rounded-sm transition"
@@ -70,7 +66,7 @@ const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className=" w-[60%] h-[80vh] bg-[#EDF2F675]"
+              className=" w-[70%] h-[80vh] bg-[#EDF2F675]"
             >
               <Tabs
                 value={activeTab}

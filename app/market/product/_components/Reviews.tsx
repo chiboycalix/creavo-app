@@ -35,9 +35,9 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             {[...Array(5)].map((_, i) => (
               <StarIcon
                 key={i}
-                className={`w-5 h-5 ${
-                  i < product.rating ? "text-yellow-500" : "text-gray-300"
-                }`}
+                // className={`w-5 h-5 ${
+                //   i < product?.rating ? "text-yellow-500" : "text-gray-300"
+                // }`}
               />
             ))}
             <span className="text-gray-700 text-sm ml-2">10 reviews</span>

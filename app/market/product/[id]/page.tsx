@@ -4,11 +4,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useMarketContext } from "@/context/MarketContext";
 import { Product } from "@/context/MarketContext";
 import { ArrowLeft } from "lucide-react";
-import EbookProduct from "../_components/Ebooks";
+import CourseProduct from "../_components/Course";
 import EventProduct from "../_components/Events";
 
 const ProductItem = () => {
-  const { fetchSingleProduct } = useMarketContext();
+  const { fetchSingleCourseProduct } = useMarketContext();
   const params = useParams();
   const router = useRouter();
   const [product, setProduct] = useState<any>(null);
@@ -48,19 +48,12 @@ const ProductItem = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const fetchedProduct = await fetchSingleProduct(params?.id);
+      const fetchedProduct = await fetchSingleCourseProduct(params?.id);
       setProduct(fetchedProduct);
     };
 
-    const checkProductType = async () => {
-      await setProductType(product?.category);
-    };
-
     fetchProduct();
-    checkProductType();
-  }, [params?.id, fetchSingleProduct, product?.category]);
-  console.log("product", product);
-  console.log("product type", productType);
+  }, [params?.id, fetchSingleCourseProduct, product?.category]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -70,24 +63,9 @@ const ProductItem = () => {
           Back
         </button>
       </div>
-      {productType === "E-Books" && (
-        <div>
-          <EbookProduct product={product} comments={comments} />
-        </div>
-      )}
-
-      {/* {productType === "Events" && (
-        <div>
-          <EventProduct />
-        </div>
-      )} */}
-
-      {productType === "Courses" && (
-        <div>
-          <EbookProduct product={product} comments={comments} />
-          
-        </div>
-      )}
+      <div>
+        <CourseProduct product={product} comments={comments} />
+      </div>
     </div>
   );
 };
