@@ -45,7 +45,7 @@ export default function MainLayout({
   const { data: profileData } = useUserProfile(currentUser?.id);
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
-  // Detect if the current route matches /studio/community/[communityName]
+  // Detect if the current route matches /studio/community/[space]
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
     setIsCommunityRoute(communityRoutePattern.test(pathname || ""));

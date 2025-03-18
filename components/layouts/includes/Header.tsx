@@ -40,7 +40,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const { currentUser, isAuthenticated, signOut } = useAuth();
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
-  // Detect if the current route matches /studio/community/[communityName]
+  // Detect if the current route matches /studio/community/[space]
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
     setIsCommunityRoute(communityRoutePattern.test(pathname));

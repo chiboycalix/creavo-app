@@ -15,11 +15,11 @@ import { useRouter } from "next/navigation"
 
 const CreateCommunityDialog = () => {
   const router = useRouter()
-  const [communityName, setcommunityName] = useState("")
+  const [space, setspace] = useState("")
   const maxFiles = 1;
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    router.push(`/studio/community/${communityName}`)
+    router.push(`/studio/community/${space}`)
   }
 
   return (
@@ -39,9 +39,9 @@ const CreateCommunityDialog = () => {
                 label="Community name"
                 maxLength={54}
                 placeholder="Enter Community name"
-                value={communityName}
+                value={space}
                 onChange={(e) => {
-                  setcommunityName(e.target.value)
+                  setspace(e.target.value)
                 }}
               />
               <p className='text-sm mt-1'>You can always change this later</p>
@@ -75,7 +75,7 @@ const CreateCommunityDialog = () => {
 
             <div className='w-full mt-12'>
               <Button
-                disabled={!communityName}
+                disabled={!space}
                 className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
               >
                 <ButtonLoader

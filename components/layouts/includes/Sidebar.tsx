@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "@/context/SidebarContext";
 import { CrevoeLogo } from "@/public/assets";
 import { NavItemComponent } from "./NavItem";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   navItems: NavItem[];
@@ -48,15 +49,16 @@ export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
         <nav className="px-4 flex flex-col h-full">
           <ul className="flex-1">
             <div className="mb-6">
-              <div className="flex justify-start">
+              <div className={cn("flex justify-start", isCommunityRoute && "mt-8")}>
                 <Link href="/" className="relative">
                   <Image
-                    width={isCommunityRoute ? 40 : 144}
-                    height={isCommunityRoute ? 40 : 50}
-                    src={CrevoeLogo}
+                    width={144}
+                    height={50}
+                    src={!isCommunityRoute ? CrevoeLogo : "/assets/crevoe-short.svg"}
                     alt="Crevoe logo"
                     priority
                     style={{ width: "auto", height: "auto" }}
+                    className="ml-2"
                   />
                 </Link>
               </div>
