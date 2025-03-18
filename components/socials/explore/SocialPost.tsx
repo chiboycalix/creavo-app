@@ -10,6 +10,7 @@ import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
@@ -24,7 +25,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const { getCurrentUser } = useAuth();
   const { toggleComments } = useComments()
   const currentUserId = getCurrentUser()?.id;
-
+  const router = useRouter();   
   const hashtagFromCourse = post?.hashtag.match(/##(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
   const hashtagFromPost = post?.hashtag.match(/#(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
 
@@ -67,6 +68,10 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     // },
   ]
 
+  const handleNavigateToCourse = (id: any) => {
+    router.push(`/market/product/${id}`)
+  };
+
   return (
     <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0">
       {/* Main Post Container */}
@@ -75,10 +80,10 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           {/* Main Image */}
           <div className="aspect-[12.5/16] relative">
             <MediaWrapper
-              postId={post.id}
-              title={post.title}
+              postId={post?.id}
+              title={post?.title}
               size="object-cover"
-              postMedia={post.media}
+              postMedia={post?.media}
             />
           </div>
 
@@ -107,7 +112,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
                 <div className="flex items-center justify-between gap-2 pt-4">
                   <h3 className="font-semibold">{post?.user_username}</h3>
                   {
-                    post?.metadata !== null && <Button className="cursor-pointer">Learn more</Button>
+                    post?.metadata !== null && <Button className="cursor-pointer" onClick={() => handleNavigateToCourse(post?.metadata?.courseId)}>Learn more</Button>
                   }
 
                 </div>
