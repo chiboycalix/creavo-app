@@ -85,8 +85,11 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
   const [newParticipantEmail, setNewParticipantEmail] = useState("");
   const [isCoHost, setIsCoHost] = useState(false);
   const [isRequiredToPay, setIsRequiredToPay] = useState(false);
-  // Add a new state variable to track if the timezone dropdown is open
   const [isTimezoneDropdownOpen, setIsTimezoneDropdownOpen] = useState(false);
+  const [eventType, setEventType] = useState("Video conferencing");
+  const [payment, setPayment] = useState("Paid");
+  const [currency, setCurrency] = useState("NGN");
+  const [amount, setAmount] = useState("");
 
   useEffect(() => {
     const fetchTimezones = async () => {
@@ -341,6 +344,64 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
               >
                 <X className="h-5 w-5" />
               </button>
+            </div>
+
+            <div className="space-y-4 p-4 bg-white rounded-lg w-full max-w-md">
+              {/* Event Type */}
+              <label className="block text-gray-700 text-sm font-semibold">
+                Event type
+              </label>
+              <select
+                className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
+                value={eventType}
+                onChange={(e) => setEventType(e.target.value)}
+              >
+                <option>Video conferencing</option>
+                <option>Webinar</option>
+                <option>Workshop</option>
+              </select>
+
+              {/* Payment Type */}
+              <label className="block text-gray-700 text-sm font-semibold">
+                Add payment
+              </label>
+              <select
+                className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
+                value={payment}
+                onChange={(e) => setPayment(e.target.value)}
+              >
+                <option>Paid</option>
+                <option>Free</option>
+              </select>
+
+              {/* Currency and Amount */}
+              <label className="block text-gray-700 text-sm font-semibold">
+                Currency
+              </label>
+              <div className="flex space-x-2">
+                <select
+                  className="p-2 border rounded-lg w-1/3 focus:ring focus:ring-blue-300"
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                >
+                  <option>NGN</option>
+                  <option>USD</option>
+                  <option>EUR</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="$"
+                  className="p-2 border rounded-lg w-2/3 focus:ring focus:ring-blue-300"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
+              </div>
+
+              {/* Info Text */}
+              <p className="text-gray-500 text-sm">
+                By default, we automatically convert the amount to other
+                currencies of the buyer.
+              </p>
             </div>
 
             <div className="p-4 space-y-6">
