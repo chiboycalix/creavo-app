@@ -10,7 +10,7 @@ export function useUserPosts(userId: string | undefined) {
       const response = await fetch(
         `${baseUrl}/users/${userId}/posts?page=1&limit=10`,
         {
-          headers: {
+          headers: { 
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
           },
         }
