@@ -1,55 +1,48 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { useState } from "react"
-import { X } from "lucide-react"
+import { useState, useEffect } from "react"
+import { X, User } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-
-// Mock data for search results - we'll keep this for the Posts tab only
-const mockFoodResults = [
-  {
-    id: "1",
-    type: "post",
-    title: "Family dinner",
-    imageUrl: "/assets/profilepix.png",
-  },
-  {
-    id: "2",
-    type: "post",
-    title: "Homemade pizza",
-    imageUrl: "/assets/profilepix.png",
-  },
-  {
-    id: "3",
-    type: "post",
-    title: "Outdoor dining",
-    imageUrl: "/assets/profilepix.png",
-  },
-  {
-    id: "4",
-    type: "post",
-    title: "Fresh ingredients",
-    imageUrl: "/assets/profilepix.png",
-
-  },
-  {
-    id: "5",
-    type: "post",
-    title: "Burger time",
-    imageUrl: "/assets/profilepix.png",
-  },
-  {
-    id: "6",
-    type: "post",
-    title: "Cooking class",
-    imageUrl: "/assets/profilepix.png",
-  },
-]
+import { baseUrl } from "@/utils/constant"
+import Cookies from "js-cookie"
 
 type ContentTab = {
   id: string
   label: string
+}
+
+type SearchResultItem = {
+  id: string
+  index: string
+  data: {
+    id: number
+    type: string
+    title?: string
+    description?: string
+    username?: string
+    email?: string
+    content?: string
+    userId: number // Make sure this is defined
+    [key: string]: any
+  }
+}
+
+type ApiResponse = {
+  data: {
+    results: SearchResultItem[]
+    meta: {
+      totalCount: number
+      limit: number
+      totalPages: number
+      currentPage: number
+    }
+  }
+  message: string
+  code: number
+  status: string
+  statusCode: number
 }
 
 export default function SearchResults() {
@@ -57,6 +50,17 @@ export default function SearchResults() {
   const query = searchParams.get("q") || ""
 
   const [activeContentTab, setActiveContentTab] = useState<string>("post")
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [results, setResults] = useState<{
+    posts: SearchResultItem[]
+    courses: SearchResultItem[]
+    accounts: SearchResultItem[]
+  }>({
+    posts: [],
+    courses: [],
+    accounts: [],
+  })
 
   const contentTabs: ContentTab[] = [
     { id: "post", label: "Post" },
@@ -64,38 +68,262 @@ export default function SearchResults() {
     { id: "account", label: "Account" },
   ]
 
+  const [userAvatars, setUserAvatars] = useState<Record<number, string>>({})
+
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (!query) return
+
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const token = Cookies.get("token")
+
+        const response = await fetch(`${baseUrl}/search/?search_query=${encodeURIComponent(query)}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch search results")
+        }
+
+        const data: ApiResponse = await response.json()
+
+        // Categorize results by type
+        const posts: SearchResultItem[] = []
+        const courses: SearchResultItem[] = []
+        const accounts: SearchResultItem[] = []
+
+        data.data.results.forEach((item) => {
+          if (item.data.type === "post") {
+            posts.push(item)
+          } else if (item.data.type === "course") {
+            courses.push(item)
+          } else if (item.data.type === "user") {
+            accounts.push(item)
+          }
+        })
+
+        setResults({
+          posts,
+          courses,
+          accounts,
+        })
+
+        // Set active tab based on which has results
+        if (activeContentTab === "post" && posts.length === 0) {
+          if (courses.length > 0) {
+            setActiveContentTab("courses")
+          } else if (accounts.length > 0) {
+            setActiveContentTab("account")
+          }
+        }
+      } catch (err) {
+        console.error("Search error:", err)
+        setError("An error occurred while fetching search results")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchSearchResults()
+  }, [query])
+
+  const fetchUserAvatar = async (userId: number) => {
+    if (userAvatars[userId]) return userAvatars[userId]
+
+    try {
+      const token = Cookies.get("token")
+      const response = await fetch(`${baseUrl}/profiles/${userId}`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user profile")
+      }
+
+      const data = await response.json()
+
+      // Check for the avatar in the new response structure
+      if (data.data?.profile?.avatar) {
+        const avatarUrl = data.data.profile.avatar
+        setUserAvatars((prev) => ({
+          ...prev,
+          [userId]: avatarUrl,
+        }))
+        return avatarUrl
+      }
+
+      // Fallback to the old structure if needed
+      if (data.data?.userProfileDb?.avatar) {
+        const avatarUrl = data.data.userProfileDb.avatar
+        setUserAvatars((prev) => ({
+          ...prev,
+          [userId]: avatarUrl,
+        }))
+        return avatarUrl
+      }
+
+      return null
+    } catch (err) {
+      console.error("Error fetching user profile:", err)
+      return null
+    }
+  }
+
+  useEffect(() => {
+    if (activeContentTab === "account" && results.accounts.length > 0) {
+      console.log("Fetching avatars for accounts:", results.accounts)
+      results.accounts.forEach((account) => {
+        if (account.data.userId) {
+          console.log("Fetching avatar for user ID:", account.data.userId)
+          fetchUserAvatar(account.data.userId)
+        } else if (account.data.id) {
+          console.log("Using account.data.id instead:", account.data.id)
+          fetchUserAvatar(account.data.id)
+        }
+      })
+    }
+  }, [activeContentTab, results.accounts])
+
   const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      )
+    }
+
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="text-center">
+            <h3 className="text-lg font-medium text-red-600 mb-2">Error</h3>
+            <p className="text-gray-500">{error}</p>
+          </div>
+        </div>
+      )
+    }
+
     switch (activeContentTab) {
       case "post":
-        return (
+        return results.posts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockFoodResults.map((result) => (
-              <div key={result.id} className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            {results.posts.map((post) => (
+              <div key={post.id} className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="aspect-square relative">
-                  <Image src={result.imageUrl || "/placeholder.svg"} alt={result.title} fill className="object-cover" />
+                  <Image
+                    src={post.data.imageUrl || "/assets/thumbnail.png"}
+                    alt={post.data.title || "Post"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                {post.data.title && (
+                  <div className="p-3">
+                    <h3 className="font-medium">{post.data.title}</h3>
+                    {post.data.content && <p className="text-sm text-gray-500 line-clamp-2">{post.data.content}</p>}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No posts available</h3>
+              <p className="text-gray-500">We couldnt find any posts matching your search.</p>
+            </div>
+          </div>
+        )
+
+      case "courses":
+        return results.courses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {results.courses.map((course) => (
+              <div key={course.id} className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div className="aspect-video relative bg-gray-100">
+                  <Image
+                    src={course.data.imageUrl || "/assests/thumbnail.png"}
+                    alt={course.data.title || "Course"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-medium text-lg">{course.data.title}</h3>
+                  {course.data.description && (
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{course.data.description}</p>
+                  )}
                 </div>
               </div>
             ))}
           </div>
-        )
-      case "courses":
-        return (
+        ) : (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="text-center">
               <h3 className="text-lg font-medium text-gray-900 mb-2">No courses available</h3>
-              <p className="text-gray-500">We couldn&apos;t find any courses matching your search.</p>
+              <p className="text-gray-500">We couldnt find any courses matching your search.</p>
             </div>
           </div>
         )
+
       case "account":
-        return (
+        return results.accounts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {results.accounts.map((account) => {
+              const userId = account.data.userId || account.data.id
+              return (
+                <div
+                  key={account.id}
+                  className="flex items-center p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
+                    {userAvatars[userId] ? (
+                      <Image
+                        src={userAvatars[userId] || "/placeholder.svg"}
+                        alt={account.data.username || "User"}
+                        width={30}
+                        height={30}
+                        className="rounded-full w-12 h-12 object-fit "
+                      />
+                    ) : account.data.avatar ? (
+                      <Image
+                        src={account.data.avatar || "/placeholder.svg"}
+                        alt={account.data.username || "User"}
+                        width={48}
+                        height={48}
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      <User className="h-6 w-6 text-gray-500" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-medium">{account.data.username}</h3>
+                    {account.data.email && <p className="text-sm text-gray-500">{account.data.email}</p>}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="text-center">
               <h3 className="text-lg font-medium text-gray-900 mb-2">No accounts available</h3>
-              <p className="text-gray-500">We couldn&apos;t find any accounts matching your search.</p>
+              <p className="text-gray-500">We couldnt find any accounts matching your search.</p>
             </div>
           </div>
         )
+
       default:
         return null
     }
@@ -106,13 +334,7 @@ export default function SearchResults() {
       {/* Search query display */}
       <div className="max-w-7xl mx-auto px-4 pt-4 pb-2">
         <div className="flex items-center">
-          {/* <div className="bg-gray-100 rounded-full py-2 px-4 flex items-center">
-            <span className="text-gray-800">{query}</span>
-            <Link href="/" className="ml-2">
-              <X className="h-5 w-5 text-blue-500" />
-            </Link>
-          </div> */}
-        </div>
+                  </div>
       </div>
 
       {/* Content tabs */}
