@@ -1,11 +1,11 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Spinner from '@/components/Spinner';
-import TrueOrFalse from './TrueOrFalse';
-import MutipleChoice from './MutipleChoice';
-import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import React, { useCallback, useEffect, useState } from 'react';
+import RenderQuestions from './RenderQuestions';
+import RenderQuestionList from './RenderQuestionList';
+import ModulesList from './ModulesList';
+import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Clipboard, GripVertical, Loader2, Pencil } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
 import { useAppDispatch } from '@/hooks/useStore.hook';
 import { updateSelectedModuleData } from '@/redux/slices/module.slice';
@@ -14,59 +14,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from '@/components/Input';
 import { toast } from 'sonner';
-import { addQuizToModuleService, fetchQuizService } from '@/services/quiz.service';
-
-type QuestionType = {
-  type: "trueFalse" | "multipleChoice";
-  questionNumber: number;
-};
-
-type QuestionData = {
-  questionText: string;
-  optionValues: string[];
-  selectedOption: number | null;
-  correctAnswer: "true" | "false" | "";
-  allocatedPoint: number;
-};
-
-type QuizData = {
-  moduleId: number | null;
-  title: string;
-  description: string;
-  allocatedTime: number;
-  totalPoint: number;
-  questions: any[];
-};
-
-const hardcodedQuestions = [
-  {
-    type: "multipleChoice" as const,
-    questionNumber: 1,
-    questionText: "What is the capital of France?",
-    optionValues: ["Paris", "London", "Berlin", "Madrid"],
-    selectedOption: 0, // Paris is correct
-    correctAnswer: "",
-    allocatedPoint: 2,
-  },
-  {
-    type: "trueFalse" as const,
-    questionNumber: 2,
-    questionText: "The Earth is flat.",
-    optionValues: [],
-    selectedOption: null,
-    correctAnswer: "false",
-    allocatedPoint: 1,
-  },
-  {
-    type: "multipleChoice" as const,
-    questionNumber: 3,
-    questionText: "Which planet is the largest?",
-    optionValues: ["Earth", "Jupiter", "Mars", "Venus"],
-    selectedOption: 1, // Jupiter is correct
-    correctAnswer: "",
-    allocatedPoint: 3,
-  },
-];
+import { addQuizToModuleService } from '@/services/quiz.service';
+import { QuestionData, QuestionType, QuizData } from '@/types';
 
 const Quiz = ({ courseId: id }: { courseId: any }) => {
   const dispatch = useAppDispatch();
@@ -98,30 +47,30 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     [dispatch]
   );
 
-  const handleClickModule = useCallback((module: any) => {
-    setSelectedModule(module);
-    setQuestions([]);
-    setQuestionData([]);
-    setQuizTitle("");
-    setQuizData({
-      moduleId: module?.id,
-      title: "",
-      description: "",
-      allocatedTime: 30,
-      totalPoint: 0,
-      questions: [],
-    });
-    setShowQuestionOptions(false);
-    setTitleError(null);
-    setIsAddingQuiz(false);
-    setEditingQuestionIndex(null);
-    if (!courseId) {
-      console.log({ module })
-      router.push(`?tab=quiz&module=${module?.id}`);
-    } else {
-      router.push(`?tab=quiz&edit=${courseId}&module=${module?.id}`);
-    }
-  },
+  const handleClickModule = useCallback(
+    (module: any) => {
+      setSelectedModule(module);
+      setQuestions([]);
+      setQuestionData([]);
+      setQuizTitle("");
+      setQuizData({
+        moduleId: module.id || 1,
+        title: "",
+        description: "",
+        allocatedTime: 30,
+        totalPoint: 0,
+        questions: [],
+      });
+      setShowQuestionOptions(false);
+      setTitleError(null);
+      setIsAddingQuiz(false);
+      setEditingQuestionIndex(null);
+      if (!courseId) {
+        router.push(`?tab=quiz&module=${generalHelpers.convertToSlug(module.title)}`);
+      } else {
+        router.push(`?tab=quiz&edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`);
+      }
+    },
     [courseId, router]
   );
 
@@ -131,8 +80,8 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     setSelectedModule(initialModule);
     setQuizData((prev) => ({ ...prev, moduleId: initialModule.id || 1 }));
     const url = courseId
-      ? `?tab=quiz&edit=${courseId}&module=${initialModule?.id}`
-      : `?tab=quiz&module=${initialModule?.id}`;
+      ? `?tab=quiz&edit=${courseId}&module=${generalHelpers.convertToSlug(initialModule.title)}`
+      : `?tab=quiz&module=${generalHelpers.convertToSlug(initialModule.title)}`;
     router.push(url);
   }, [courseId, courseData?.data?.course?.modules, router, selectedModule, isFetchingCourse]);
 
@@ -141,38 +90,6 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       updateSelectedModule(selectedModule);
     }
   }, [selectedModule, updateSelectedModule]);
-
-  const renderModulesList = useMemo(() => {
-    if (isFetchingCourse) return <div className="h-[60vh] flex flex-col items-center justify-center"><Spinner /></div>;
-    if (!courseData?.data?.course?.modules?.length) {
-      return (
-        <div className="h-full text-sm mb-4 flex flex-col justify-center items-center mt-28">
-          <Clipboard />
-          <p className="text-xl font-regular mt-4 font-semibold">Create module</p>
-        </div>
-      );
-    }
-
-    return courseData?.data?.course.modules.map((module: any, index: number) => {
-      const isActive = Number(currentModule) === module?.id
-
-      return (
-        <div
-          onClick={() => handleClickModule(module)}
-          key={module.id}
-          className={`w-full flex items-center border cursor-pointer rounded-sm ${isActive ? "border-primary-400" : "border-primary-100"}`}
-        >
-          <div className="p-3 flex items-center gap-2 text-left text-sm">
-            <GripVertical />
-            Module {index + 1}:
-          </div>
-          <div>
-            <p className="text-sm">{module.title}</p>
-          </div>
-        </div>
-      );
-    });
-  }, [courseData?.data?.course?.modules, currentModule, handleClickModule, isFetchingCourse]);
 
   const addQuestion = (type: "trueFalse" | "multipleChoice") => {
     const newQuestionNumber = questions.length + 1;
@@ -278,146 +195,23 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     });
   };
 
-  const { data: quiz, isLoading: isFetchingQuiz } = useQuery<any>({
-    queryKey: ["quizData", selectedModule?.id],
-    queryFn: async () => {
-      const data = await fetchQuizService({
-        moduleId: selectedModule?.id,
-      });
-      return data;
-    },
-    enabled: !!selectedModule?.id,
-    placeholderData: keepPreviousData,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const isSubmitDisabled = !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
-
-  const renderQuestions = () => {
-    return questions.map((question, index) => (
-      <div key={index} className="mb-4">
-        {question.type === "trueFalse" ? (
-          <TrueOrFalse
-            questionNumber={question.questionNumber}
-            questionText={questionData[index].questionText}
-            setQuestionText={(text) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, questionText: text } : q))
-              )
-            }
-            correctAnswer={questionData[index].correctAnswer}
-            setCorrectAnswer={(answer) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, correctAnswer: answer } : q))
-              )
-            }
-            allocatedPoint={questionData[index].allocatedPoint}
-            setAllocatedPoint={(point) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, allocatedPoint: point } : q))
-              )
-            }
-            onDelete={() => deleteQuestion(index)}
-          />
-        ) : (
-          <MutipleChoice
-            questionNumber={question.questionNumber}
-            questionText={questionData[index].questionText}
-            setQuestionText={(text) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, questionText: text } : q))
-              )
-            }
-            optionValues={questionData[index].optionValues}
-            setOptionValues={(values) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, optionValues: values } : q))
-              )
-            }
-            selectedOption={questionData[index].selectedOption}
-            setSelectedOption={(option) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, selectedOption: option } : q))
-              )
-            }
-            allocatedPoint={questionData[index].allocatedPoint}
-            setAllocatedPoint={(point) =>
-              setQuestionData((prev) =>
-                prev.map((q, i) => (i === index ? { ...q, allocatedPoint: point } : q))
-              )
-            }
-            onDelete={() => deleteQuestion(index)}
-          />
-        )}
-      </div>
-    ));
-  };
-
-  const renderQuestionList = () => {
-    if (hardcodedQuestions.length === 0) {
-      return (
-        <div className="h-full text-sm mb-4 flex flex-col justify-center items-center mt-10">
-          <Clipboard size={48} />
-          <p className="text-xl font-regular mt-4 font-semibold">No Questions Available</p>
-          <p className="text-sm text-gray-500 mt-2">Add questions to create a quiz!</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-4">
-        {hardcodedQuestions.map((question, index) => (
-          <div
-            key={index}
-            className="p-4 border rounded-md hover:bg-gray-50 flex justify-between items-start"
-          >
-            <div>
-              <p className="font-semibold">Question {question.questionNumber}: {question.questionText}</p>
-              {question.type === "multipleChoice" ? (
-                <ul className="list-disc pl-5 text-sm text-gray-500 mt-2">
-                  {question.optionValues.map((option, optIndex) => (
-                    <li key={optIndex} className={optIndex === question.selectedOption ? "text-green-600" : ""}>
-                      {option} {optIndex === question.selectedOption ? "(Correct)" : ""}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-gray-500 mt-2">
-                  Correct Answer: {question.correctAnswer === "true" ? "True" : "False"}
-                </p>
-              )}
-              <p className="text-sm text-gray-500 mt-1">Points: {question.allocatedPoint}</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setIsAddingQuiz(true);
-                setQuestions([question]);
-                setQuestionData([{
-                  questionText: question.questionText,
-                  optionValues: question.optionValues,
-                  selectedOption: question.selectedOption,
-                  correctAnswer: question.correctAnswer as "" | "true" | "false",
-                  allocatedPoint: question.allocatedPoint,
-                }]);
-                setEditingQuestionIndex(index);
-              }}
-            >
-              <Pencil size={16} />
-            </Button>
-          </div>
-        ))}
-      </div>
-    );
-  };
+  const isSubmitDisabled =
+    !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
 
   return (
     <div className="flex gap-4 w-full">
       <Card className="basis-4/12 border-none px-1 max-h-[74vh] overflow-y-auto">
         <CardHeader>
           <CardContent className="px-0 min-h-[67vh]">
-            <aside className="h-full space-y-2">{renderModulesList}</aside>
+            <aside className="h-full space-y-2">
+              {/* Use the ModulesList component */}
+              <ModulesList
+                isFetchingCourse={isFetchingCourse}
+                courseData={courseData}
+                currentModule={currentModule}
+                handleClickModule={handleClickModule}
+              />
+            </aside>
           </CardContent>
         </CardHeader>
       </Card>
@@ -429,14 +223,14 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                 <p className="font-semibold text-sm">{generalHelpers?.convertFromSlug(currentModule! || "")}</p>
               </div>
               {!isAddingQuiz ? (
-                <>
-                  {renderQuestionList()}
-                  <div className="flex gap-4 mt-4">
-                    <Button onClick={() => { setIsAddingQuiz(true); setEditingQuestionIndex(null); }} type="button">
-                      Add Quiz
-                    </Button>
-                  </div>
-                </>
+                <RenderQuestionList
+                  setIsAddingQuiz={setIsAddingQuiz}
+                  setQuestions={setQuestions}
+                  setQuestionData={setQuestionData}
+                  setEditingQuestionIndex={setEditingQuestionIndex}
+                  selectedModule={selectedModule}
+                  setQuizTitle={setQuizTitle}
+                />
               ) : (
                 <form onSubmit={handleQuizSubmit}>
                   <div className="mb-4">
@@ -454,7 +248,19 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                       <p className="text-red-500 text-sm mt-1">{titleError}</p>
                     )}
                   </div>
-                  {renderQuestions()}
+                  {
+                    questions?.map((question, index) => {
+                      return <div key={index} className="mb-4">
+                        <RenderQuestions
+                          question={question}
+                          setQuestionData={setQuestionData}
+                          questionData={questionData}
+                          index={index}
+                          deleteQuestion={deleteQuestion}
+                        />
+                      </div>
+                    })
+                  }
                   <div className="flex gap-4 mt-4">
                     {showQuestionOptions ? (
                       <>
