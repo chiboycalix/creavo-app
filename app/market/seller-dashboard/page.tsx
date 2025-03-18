@@ -10,11 +10,11 @@ const SellerDashboard = () => {
   const listingsSection = [
     {
       title: "Total Listings",
-      value: 54,
+      value: listedCourses?.length,
     },
     {
       title: "Active Listings",
-      value: 40,
+      value: listedCourses?.length,
     },
   ];
 

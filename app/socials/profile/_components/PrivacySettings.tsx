@@ -7,14 +7,19 @@ import {
   Switch,
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSettings } from "@/context/SettingsContext";
 
 const PrivacySettings = () => {
-  const [notifEnabled, setNotifEnabled] = useState(false);
-  const { updateUserPrivacy, userPrivacy, setUserPrivacy } = useSettings();
-
-  console.log("user privacy", userPrivacy);
+  const {
+    updateUserPrivacy,
+    userPrivacy,
+    setUserPrivacy,
+    fetchBlockedUsers,
+    fetchMutedUsers,
+  } = useSettings();
+  const [blockedUsers, setBlockedUsers] = useState<any>([]);
+  const [mutedUsers, setMutedUsers] = useState<any>([]);
 
   const handlePrivacyChange = () => {
     setUserPrivacy?.((prev: any) => {
@@ -63,9 +68,18 @@ const PrivacySettings = () => {
             <ChevronDownIcon className="size-5 fill-black group-data-[hover]:fill-black group-data-[open]:rotate-180" />
           </DisclosureButton>
           <DisclosurePanel className=" text-black ">
-            <div className="flex flex-col">
-              <div className="font-medium text-sm text-red-500">@user1</div>
-              <div className="font-medium text-sm text-red-500">@user2</div>
+          <div className="flex flex-col">
+              {blockedUsers?.length > 0 ? (
+              blockedUsers.map((user: any) => (
+                <div key={user.id} className="font-medium text-sm text-red-500">
+                @{user.username}
+                </div>
+              ))
+              ) : (
+              <div className="font-medium text-sm text-red-500">
+                No muted users
+              </div>
+              )}
             </div>
           </DisclosurePanel>
         </Disclosure>
@@ -78,8 +92,17 @@ const PrivacySettings = () => {
           </DisclosureButton>
           <DisclosurePanel className=" text-black">
             <div className="flex flex-col">
-              <div className="font-medium text-sm text-green-500">@user1</div>
-              <div className="font-medium text-sm text-green-500">@user2</div>
+              {mutedUsers?.length > 0 ? (
+              mutedUsers?.map((user: any) => (
+                <div key={user.id} className="font-medium text-sm text-red-500">
+                @{user.username}
+                </div>
+              ))
+              ) : (
+              <div className="font-medium text-sm text-green-500">
+                No muted users
+              </div>
+              )}
             </div>
           </DisclosurePanel>
         </Disclosure>

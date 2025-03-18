@@ -26,11 +26,12 @@ export interface Product {
 
 interface MarketContextType {
   products: Product[];
+  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   addProduct: (product: Product) => void;
   fetchListedCourses: () => void;
   listedCourses: any;
   removeProduct: (id: number) => void;
-  fetchProducts: () => void;
+  fetchCourseProducts: () => void;
   fetchPopularCourses: () => void;
   fetchPopularEvents: () => void;
   fetchOrders: () => any;
@@ -41,7 +42,7 @@ interface MarketContextType {
   setIsSaved: (isSaved: boolean) => void;
   searchRoom: boolean;
   setSearchRoom: (searchRoom: boolean) => void;
-  fetchSingleProduct: (id: any) => void;
+  fetchSingleCourseProduct: (id: any) => void;
   showCheckoutCard: boolean;
   setShowCheckoutCard: (showCheckoutCard: boolean) => void;
 }
@@ -70,135 +71,48 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
   const { getCurrentUser } = useAuth();
   const userId = getCurrentUser()?.id;
 
-  const fetchProducts = () => {
-    return [
-      {
-        id: "1",
-        title: "UI Design Kit",
-        description: "A complete UI/UX design template pack.",
-        price: 29,
-        rating: 4.5,
-        category: "Courses",
-        seller: {
-          id: "101",
-          name: "Designer Pro",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "2",
-        title: "Website Template",
-        description: "Fully responsive website template.",
-        price: 49,
-        rating: 4.8,
-        category: "Courses",
-        seller: {
-          id: "102",
-          name: "Web Solutions",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "3",
-        title: "Social Media Icons Pack",
-        description: "Custom social media icons for brands.",
-        price: 19,
-        rating: 4.2,
-        category: "Courses",
-        seller: {
-          id: "103",
-          name: "Graphic Master",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
+  const fetchCourseProducts = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/market-place/courses/list-courses?limit=10&category=STANDARD&page=1`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
+          },
+        }
+      );
 
-      // E-Books
-      {
-        id: "4",
-        title: "Digital Marketing Guide",
-        description: "Step-by-step guide to digital marketing.",
-        price: 15,
-        rating: 4.6,
-        category: "Courses",
-        seller: {
-          id: "104",
-          name: "Marketing Guru",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "5",
-        title: "Python for Beginners",
-        description: "Learn Python programming from scratch.",
-        price: 25,
-        rating: 4.9,
-        category: "Courses",
-        seller: {
-          id: "105",
-          name: "Code Academy",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "6",
-        title: "Startup Handbook",
-        description: "Essential guide for building a startup.",
-        price: 20,
-        rating: 4.7,
-        category: "Courses",
-        seller: {
-          id: "106",
-          name: "Entrepreneur Hub",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
+      if (!response.ok) {
+        throw new Error("Failed to fetch courses");
+      }
 
-      // Courses
-      {
-        id: "7",
-        title: "React JS Masterclass",
-        description: "Learn React from basics to advanced level.",
-        price: 79,
-        rating: 4.9,
-        category: "Courses",
-        seller: {
-          id: "107",
-          name: "Tech Mentor",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "8",
-        title: "Photography Basics",
-        description: "Improve your photography skills.",
-        price: 50,
-        rating: 4.3,
-        category: "Courses",
-        seller: {
-          id: "108",
-          name: "Photo Academy",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-      {
-        id: "9",
-        title: "Business Strategy 101",
-        description: "Learn effective business strategies.",
-        price: 65,
-        rating: 4.6,
-        category: "Courses",
-        seller: {
-          id: "109",
-          name: "Business Coach",
-          avatar: "/assets/dummyImage.png",
-        },
-      },
-    ];
-  };
+      const data = await response.json();
+      const courseProducts = data?.data?.courses;
+      return courseProducts;
+    } catch (error) {}
+  }, []);
 
-  const fetchSingleProduct = (id: any) => {
-    const course = fetchProducts()?.find((item) => id === item.id);
-    return course;
+  const fetchSingleCourseProduct = async (id: any) => {
+    try {
+      const response = await fetch(`${baseUrl}/market-place/course/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch courses");
+      }
+
+      const data = await response.json();
+      const course = data?.data?.course;
+      console.log("coursesese", course);
+      return course;
+    } catch (error) {}
   };
 
   const fetchPopularCourses = () => {
@@ -541,7 +455,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     });
   }, []);
 
-  const fetchListedCourses = useCallback( async () => {
+  const fetchListedCourses = useCallback(async () => {
     try {
       const response = await fetch(
         `${baseUrl}/users/${userId}/courses?page=1&limit=10`,
@@ -559,29 +473,39 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
       }
 
       const data = await response.json();
-      console.log(data?.data);
-      const promoCourses = data?.data.courses.filter((course: any) => course.promote === true)
+      const promoCourses = data?.data.courses.filter(
+        (course: any) => course.promote === true
+      );
       return promoCourses;
     } catch (error) {}
   }, [userId]);
 
   useEffect(() => {
-      const fetchCourses = async () => {
-        const courses = await fetchListedCourses();
-        setListedCourses(courses);
-      };
-  
-      fetchCourses();
-    }, [fetchListedCourses]);
+    const fetchCourses = async () => {
+      const courses = await fetchListedCourses();
+      setListedCourses(courses);
+    };
+
+    fetchCourses();
+  }, [fetchListedCourses]);
+
+  useEffect(() => {
+    const getProducts = async () => {
+      const products = await fetchCourseProducts();
+      setProducts(products);
+    };
+    getProducts();
+  }, [fetchCourseProducts]);
 
   return (
     <MarketContext.Provider
       value={{
         products,
-        fetchProducts,
+        setProducts,
+        fetchCourseProducts,
         fetchListedCourses,
+        fetchSingleCourseProduct,
         listedCourses,
-        fetchSingleProduct,
         fetchPopularCourses,
         fetchPopularEvents,
         fetchOrders,

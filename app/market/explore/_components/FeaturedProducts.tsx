@@ -68,7 +68,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
             onChange={(e) => handleSearchQuery(e)}
             type="text"
             placeholder="Search"
-            className="w-48"
+            className="w-48 p-1 border rounded-md"
           />
         </div>
       </TabsList>

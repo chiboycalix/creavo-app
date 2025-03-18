@@ -143,7 +143,7 @@ export default function MainLayout({
       ],
       dashboardItems: [
         { title: "Seller dashboard", href: "/market/seller-dashboard", icon: LayoutDashboardIcon },
-        { title: "Your Listings", href: "/market/your-listings", icon: TagIcon },
+        // { title: "Your Listings", href: "/market/your-listings", icon: TagIcon },
         // { title: "Insight", href: "/market/insight", icon: ChartSplineIcon },
 
       ]

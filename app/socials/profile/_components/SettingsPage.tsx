@@ -19,7 +19,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import AccountSettings from "./AccountSettings";
 import PrivacySettings from "./PrivacySettings";
 import NotificationSettings from "./NotificationSettings";
-import { useSettings } from "@/context/SettingsContext";
 import PaymentSettings from "./PaymentSettings";
 
 const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
@@ -31,7 +30,6 @@ const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
   ];
   const [activeTab, setActiveTab] = useState<string>(tabsMenu[0].title);
   const handleTabChange = (category: string) => setActiveTab(category);
-  // const { fetchSettings,  } = useSettings();
 
   return (
     <AnimatePresence>

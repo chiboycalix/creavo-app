@@ -41,7 +41,7 @@ const SaveProductButton: React.FC<LikeButtonProps> = ({
         <Heart
           className={`w-6 h-6 transition-colors duration-200 
             ${
-              initialIsSaved || isSaved
+              isSaved
                 ? "fill-red-500 stroke-red-500"
                 : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
             }`}

@@ -3,41 +3,36 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useMarketContext } from "@/context/MarketContext";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import ExploreCategories from "./ExploreCategories";
 import FeaturedProducts from "./FeaturedProducts";
-import PopularCourses from "./PopularCourses";
-import PopularEvents from "./PopularEvents";
 import { ChevronDown, ChevronUp } from "lucide-react"; // Icon for dropdown arrow
 
 export type TabValue =
   | "All"
   // | "Digital Products"
   // | "E-Books"
-  | "Courses"
-  // | "Events"
-  // | "Services";
+  | "Courses";
+// | "Events"
+// | "Services";
 
 const MarketPlaceExplore = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const {
-    fetchProducts,
+    fetchCourseProducts,
     fetchPopularCourses,
-    fetchPopularEvents,
     handleToggleSave,
     isSaved,
     searchRoom,
-    setSearchRoom,
     fetchListedCourses,
+    products,
+    setProducts,
   } = useMarketContext();
 
   const initialTab = (searchParams.get("tab") as TabValue) || "All";
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
-  const [products, setProducts] = useState<any>(null);
   const [courses, setCourses] = useState<any>(null);
   const [events, setEvents] = useState<any>(null);
-  // const [searchRoom, setSearchRoom] = useState<boolean>(true);
   const [selectedFilter, setSelectedFilter] = useState("Select Filter");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedPrices, setSelectedPrices] = useState<string[]>(["all"]);
@@ -80,11 +75,11 @@ const MarketPlaceExplore = () => {
     //   desc: "Discover amazing books",
     //   color: "bg-green-200",
     // },
-    {
-      category: "Courses",
-      desc: "Upgrade your skills",
-      color: "bg-yellow-200",
-    },
+    // {
+    //   category: "Courses",
+    //   desc: "Upgrade your skills",
+    //   color: "bg-yellow-200",
+    // },
     // { category: "Events", desc: "Find upcoming events", color: "bg-red-200" },
   ];
 
@@ -115,9 +110,8 @@ const MarketPlaceExplore = () => {
   // Fetch products when the tab changes
   useEffect(() => {
     const courses: any = fetchPopularCourses();
-    const events: any = fetchPopularEvents();
     const fetchAndSetProducts = async () => {
-      const products: any = fetchProducts();
+      // const products: any = fetchCourseProducts();
       if (activeTab === "All") {
         setProducts(products);
       } else {
@@ -128,8 +122,7 @@ const MarketPlaceExplore = () => {
     };
     fetchAndSetProducts();
     setCourses(courses);
-    setEvents(events);
-  }, [activeTab, fetchProducts, fetchPopularCourses, fetchPopularEvents]);
+  }, [activeTab, fetchCourseProducts, fetchPopularCourses]);
 
   // Listen for changes in the URL to update the active tab
   useEffect(() => {
@@ -246,23 +239,23 @@ const MarketPlaceExplore = () => {
           />
         </div>
 
-        <div className="mt-10 w-full">
+        {/* <div className="mt-10 w-full">
           <ExploreCategories
             productCategories={productCategories}
             pathname={pathname}
             handleTabChange={handleTabChange}
           />
-        </div>
+        </div> */}
 
-        <div className="mt-10">
+        {/* <div className="mt-10">
           <PopularCourses
             courses={courses}
             isSaved={isSaved}
             handleToggleSave={handleToggleSave}
             item={courses}
           />
-        </div>
-{/* 
+        </div> */}
+        {/* 
         <div className="mt-10">
           <PopularEvents
             events={events}
