@@ -3,6 +3,7 @@ interface GeneralHelpers {
   convertFromSlug: (slug: string) => string;
   processPostsData: (data: any) => any;
   capitalizeWords: (sentence: string) => string;
+  findCorrectOptionIndex: (options: any) => number;
   currencySymbols: {
     USD: string;
     EUR: string;
@@ -93,5 +94,11 @@ export const generalHelpers: GeneralHelpers = {
     currencyCode: keyof typeof generalHelpers.currencySymbols
   ): string => {
     return generalHelpers.currencySymbols[currencyCode] || currencyCode;
+  },
+
+  findCorrectOptionIndex: (
+    options: { isCorrect: boolean; text: string; _id: string }[]
+  ): number => {
+    return options.findIndex((option) => option.isCorrect === true);
   },
 };

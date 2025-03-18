@@ -10,7 +10,6 @@ import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext"
 import { useComments } from "@/context/CommentsContext"
 import { Button } from "@/components/ui/button"
-import { BiDownload } from "react-icons/bi";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });

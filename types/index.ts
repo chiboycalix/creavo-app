@@ -65,3 +65,25 @@ export interface AddMediaToModule {
     mediaLength: number;
   }>;
 }
+
+export type QuestionType = {
+  type: "trueFalse" | "multipleChoice";
+  questionNumber: number;
+};
+
+export type QuestionData = {
+  questionText: string;
+  optionValues: string[];
+  selectedOption: number | null;
+  correctAnswer: "true" | "false" | "";
+  allocatedPoint: number;
+};
+
+export type QuizData = {
+  moduleId: number | null;
+  title: string;
+  description: string;
+  allocatedTime: number;
+  totalPoint: number;
+  questions: any[];
+};
