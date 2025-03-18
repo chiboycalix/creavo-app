@@ -21,7 +21,8 @@ type UploadInputProps = {
   accept?: string;
   maxFiles?: number;
   nextPath?: string;
-  onChange?: any
+  onChange?: any;
+  placeholder?: string;
 } & React.ComponentProps<"div">;
 
 type UploadProgress = {
@@ -41,6 +42,7 @@ export const UploadInput = ({
   maxFiles = 5,
   nextPath,
   onChange,
+  placeholder = `Max ${maxFiles} files per upload`,
   ...rest
 }: UploadInputProps) => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
@@ -200,7 +202,7 @@ export const UploadInput = ({
           <p className="text-gray-500 mb-4">
             Drag & Drop files or <span className="text-primary">browse</span>
           </p>
-          <p className="text-gray-400">Max {maxFiles} files per upload</p>
+          <p className="text-gray-400 text-sm">{placeholder}</p>
         </div>
       </div>
       <p className="mt-4 text-sm">Supports MP4, MOV, FLV videos and common image formats</p>

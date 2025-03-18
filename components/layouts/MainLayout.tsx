@@ -27,11 +27,11 @@ import {
   BellIcon,
   Bookmark,
   ChartSplineIcon,
-  BoxesIcon
+  BoxesIcon,
+  Users2
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-
 import { RiHome8Fill } from "react-icons/ri";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
@@ -42,9 +42,14 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const { loading, currentUser } = useAuth();
-  const {
-    data: profileData,
-  } = useUserProfile(currentUser?.id);
+  const { data: profileData } = useUserProfile(currentUser?.id);
+  const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
+
+  // Detect if the current route matches /studio/community/[communityName]
+  useEffect(() => {
+    const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
+    setIsCommunityRoute(communityRoutePattern.test(pathname || ""));
+  }, [pathname]);
 
   const headerButtons: HeaderButton[] = React.useMemo(() => [
     {
@@ -54,11 +59,7 @@ export default function MainLayout({
       navItems: [
         { title: "For You", href: "/socials", icon: Compass },
         { title: "Following", href: "/socials/following", icon: UserPlusIcon },
-        {
-          title: "Upload Post",
-          href: "/socials/uploads",
-          icon: PlusSquareIcon,
-        },
+        { title: "Upload Post", href: "/socials/uploads", icon: PlusSquareIcon },
         { title: "Watchlist", href: "/socials/watchlist", icon: TvMinimalPlay },
         {
           title: "Profile",
@@ -88,31 +89,16 @@ export default function MainLayout({
         { title: 'Create course', href: '/studio/course', icon: PlusSquareIcon },
         { title: 'Course Management', href: '/studio/course-management', icon: BoxesIcon },
         { title: 'Learners', href: '/studio/learners', icon: User },
-        // {
-        //   title: 'Learners', href: '/studio/learners', icon: User,
-        //   children: [
-        //     { title: 'All Learners', href: '/studio/learners/all-learners', icon: Calendar },
-        //     { title: 'Learners Progress', href: '/studio/learners/learners-progress', icon: Video },
-        //     { title: 'Quiz', href: '/studio/trainee/quiz', icon: Archive }
-        //   ]
-        // },
-        
         { title: 'Calendar', href: '/studio/calendar', icon: Calendar },
         {
           title: 'Event', href: '/studio/meeting', icon: Video,
           children: [
-            {
-              title: 'Video conference', href: '/studio/event/meeting',
-            },
-            {
-              title: 'Webinar', href: '/studio/event/webinar',
-            },
-            {
-              title: 'Classroom', href: '/studio/event/classroom',
-            },
-
+            { title: 'Video conference', href: '/studio/event/meeting' },
+            { title: 'Webinar', href: '/studio/event/webinar' },
+            { title: 'Classroom', href: '/studio/event/classroom' },
           ]
         },
+        { title: 'Community', href: '/studio/community', icon: Users2 },
         {
           title: "Analytics",
           href: "/studio/analytics",
@@ -134,30 +120,16 @@ export default function MainLayout({
       navItems: [
         { title: "Explore", href: "/market", icon: CompassIcon },
         { title: "Saved", href: "/market/saved", icon: Bookmark },
-        {
-          title: "Notifications",
-          href: "/market/notifications",
-          icon: BellIcon,
-        },
-        // { title: "Create Listing", href: "/market/create-listing", icon: PlusSquareIcon },
+        { title: "Notifications", href: "/market/notifications", icon: BellIcon },
       ],
       dashboardItems: [
         { title: "Seller dashboard", href: "/market/seller-dashboard", icon: LayoutDashboardIcon },
-        // { title: "Your Listings", href: "/market/your-listings", icon: TagIcon },
-        // { title: "Insight", href: "/market/insight", icon: ChartSplineIcon },
-
       ]
     }
   ], [currentUser]);
 
-  const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(
-    headerButtons[0].navItems
-  );
-
-  const [currentDashboardItems, setCurrentdashboardItems] = useState<NavItem[]>(
-    headerButtons[2]?.dashboardItems || []
-  );
-
+  const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(headerButtons[0].navItems);
+  const [currentDashboardItems, setCurrentdashboardItems] = useState<NavItem[]>(headerButtons[2]?.dashboardItems || []);
 
   const findNavItemsForPath = React.useCallback((path: string) => {
     for (const button of headerButtons) {
@@ -201,12 +173,11 @@ export default function MainLayout({
     <SidebarProvider>
       <div className="flex h-screen bg-gray-50 pb-14 overflow-hidden">
         <aside className="fixed left-0 top-0 h-full z-50">
-
           {loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} dashboardItems={currentDashboardItems} />}
         </aside>
 
-        <div className="flex-1 lg:ml-72">
-          <header className="fixed top-0 right-0 left-0 lg:left-64 z-30">
+        <div className={`flex-1 ${isCommunityRoute ? "lg:ml-16" : "lg:ml-72"}`}>
+          <header className={`fixed top-0 right-0 z-30 ${isCommunityRoute ? "left-16" : "left-0 lg:left-72"}`}>
             <Header
               onButtonClick={setCurrentNavItems}
               headerButtons={headerButtons}
