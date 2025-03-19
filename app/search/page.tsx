@@ -7,6 +7,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { baseUrl } from "@/utils/constant"
 import Cookies from "js-cookie"
+import PostModal from "./_components/PostModal"
 
 type ContentTab = {
   id: string
@@ -23,8 +24,10 @@ type SearchResultItem = {
     description?: string
     username?: string
     email?: string
+    body?: string
     content?: string
-    userId: number // Make sure this is defined
+    userId?: number
+    media?: any[]
     [key: string]: any
   }
 }
@@ -62,13 +65,15 @@ export default function SearchResults() {
     accounts: [],
   })
 
+  // Modal state
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const contentTabs: ContentTab[] = [
     { id: "post", label: "Post" },
     { id: "courses", label: "Courses" },
     { id: "account", label: "Account" },
   ]
-
-  const [userAvatars, setUserAvatars] = useState<Record<number, string>>({})
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -133,65 +138,14 @@ export default function SearchResults() {
     fetchSearchResults()
   }, [query])
 
-  const fetchUserAvatar = async (userId: number) => {
-    if (userAvatars[userId]) return userAvatars[userId]
-
-    try {
-      const token = Cookies.get("token")
-      const response = await fetch(`${baseUrl}/profiles/${userId}`, {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-          "Content-Type": "application/json",
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch user profile")
-      }
-
-      const data = await response.json()
-
-      // Check for the avatar in the new response structure
-      if (data.data?.profile?.avatar) {
-        const avatarUrl = data.data.profile.avatar
-        setUserAvatars((prev) => ({
-          ...prev,
-          [userId]: avatarUrl,
-        }))
-        return avatarUrl
-      }
-
-      // Fallback to the old structure if needed
-      if (data.data?.userProfileDb?.avatar) {
-        const avatarUrl = data.data.userProfileDb.avatar
-        setUserAvatars((prev) => ({
-          ...prev,
-          [userId]: avatarUrl,
-        }))
-        return avatarUrl
-      }
-
-      return null
-    } catch (err) {
-      console.error("Error fetching user profile:", err)
-      return null
-    }
+  const openPostModal = (postId: number) => {
+    setSelectedPostId(postId)
+    setIsModalOpen(true)
   }
 
-  useEffect(() => {
-    if (activeContentTab === "account" && results.accounts.length > 0) {
-      console.log("Fetching avatars for accounts:", results.accounts)
-      results.accounts.forEach((account) => {
-        if (account.data.userId) {
-          console.log("Fetching avatar for user ID:", account.data.userId)
-          fetchUserAvatar(account.data.userId)
-        } else if (account.data.id) {
-          console.log("Using account.data.id instead:", account.data.id)
-          fetchUserAvatar(account.data.id)
-        }
-      })
-    }
-  }, [activeContentTab, results.accounts])
+  const closePostModal = () => {
+    setIsModalOpen(false)
+  }
 
   const renderContent = () => {
     if (isLoading) {
@@ -216,26 +170,58 @@ export default function SearchResults() {
     switch (activeContentTab) {
       case "post":
         return results.posts.length > 0 ? (
+         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {results.posts.map((post) => (
-              <div key={post.id} className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-square relative">
-                  <Image
-                    src={post.data.imageUrl || "/assets/thumbnail.png"}
-                    alt={post.data.title || "Post"}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                {post.data.title && (
-                  <div className="p-3">
-                    <h3 className="font-medium">{post.data.title}</h3>
-                    {post.data.content && <p className="text-sm text-gray-500 line-clamp-2">{post.data.content}</p>}
-                  </div>
-                )}
+  {results.posts.map((post) => {
+    const mediaUrl = post.data.media?.[0] || "";
+    const isVideo = mediaUrl.endsWith(".mp4") || mediaUrl.endsWith(".webm") || mediaUrl.endsWith(".ogg");
+    const isImage = mediaUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/);
+
+    return (
+      <div
+        key={post.id}
+        className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+        onClick={() => openPostModal(post.data.id)}
+      >
+        <div className="aspect-square relative">
+          {mediaUrl ? (
+            isVideo ? (
+              <video
+                src={mediaUrl}
+                className="object-cover w-full h-full"
+              />
+            ) : isImage ? (
+              <Image
+                src={mediaUrl}
+                alt={post.data.title || post.data.body || "Post"}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                <p className="text-gray-400">Unsupported Media</p>
               </div>
-            ))}
-          </div>
+            )
+          ) : (
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+              <p className="text-gray-400">No media</p>
+            </div>
+          )}
+        </div>
+
+        <div className="p-3">
+          {post.data.title && <h3 className="font-medium">{post.data.title}</h3>}
+          {(post.data.body || post.data.content) && (
+            <p className="text-sm text-gray-500 line-clamp-2">
+              {post.data.body || post.data.content}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  })}
+</div>
+         </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="text-center">
@@ -252,7 +238,7 @@ export default function SearchResults() {
               <div key={course.id} className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="aspect-video relative bg-gray-100">
                   <Image
-                    src={course.data.imageUrl || "/assests/thumbnail.png"}
+                    src={course.data.imageUrl || course.data.thumbnailUrl || "/placeholder.svg?height=200&width=400"}
                     alt={course.data.title || "Course"}
                     fill
                     className="object-cover"
@@ -279,41 +265,30 @@ export default function SearchResults() {
       case "account":
         return results.accounts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {results.accounts.map((account) => {
-              const userId = account.data.userId || account.data.id
-              return (
-                <div
-                  key={account.id}
-                  className="flex items-center p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
-                    {userAvatars[userId] ? (
-                      <Image
-                        src={userAvatars[userId] || "/placeholder.svg"}
-                        alt={account.data.username || "User"}
-                        width={30}
-                        height={30}
-                        className="rounded-full w-12 h-12 object-fit "
-                      />
-                    ) : account.data.avatar ? (
-                      <Image
-                        src={account.data.avatar || "/placeholder.svg"}
-                        alt={account.data.username || "User"}
-                        width={48}
-                        height={48}
-                        className="rounded-full object-cover"
-                      />
-                    ) : (
-                      <User className="h-6 w-6 text-gray-500" />
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{account.data.username}</h3>
-                    {account.data.email && <p className="text-sm text-gray-500">{account.data.email}</p>}
-                  </div>
+            {results.accounts.map((account) => (
+              <div
+                key={account.id}
+                className="flex items-center p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
+                  {account.data.avatar ? (
+                    <Image
+                      src={account.data.avatar || "/placeholder.svg"}
+                      alt={account.data.username || "User"}
+                      width={48}
+                      height={48}
+                      className="rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="h-6 w-6 text-gray-500" />
+                  )}
                 </div>
-              )
-            })}
+                <div>
+                  <h3 className="font-medium">{account.data.username}</h3>
+                  {account.data.email && <p className="text-sm text-gray-500">{account.data.email}</p>}
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16">
@@ -334,7 +309,13 @@ export default function SearchResults() {
       {/* Search query display */}
       <div className="max-w-7xl mx-auto px-4 pt-4 pb-2">
         <div className="flex items-center">
-                  </div>
+          <div className="bg-gray-100 rounded-full py-2 px-4 flex items-center">
+            <span className="text-gray-800">{query}</span>
+            <Link href="/" className="ml-2">
+              <X className="h-5 w-5 text-blue-500" />
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Content tabs */}
@@ -361,6 +342,9 @@ export default function SearchResults() {
 
       {/* Search results content */}
       <div className="max-w-7xl mx-auto px-4 py-8">{renderContent()}</div>
+
+      {/* Post Modal */}
+      {selectedPostId && <PostModal postId={selectedPostId} isOpen={isModalOpen} onClose={closePostModal} />}
     </div>
   )
 }
