@@ -21,7 +21,6 @@ export const LAYOUT_PATHS = [
   "/search",
   "/search/*",
 
-
   "/socials",
   "/socials/following",
   "/socials/profile",
@@ -46,6 +45,8 @@ export const LAYOUT_PATHS = [
   "/studio/event/classroom",
   "/studio/event/classroom/*",
   "/studio/calendar",
+  "/studio/community",
+  "/studio/community/*",
   "/studio/schedule",
   "/studio/learners",
   "/studio/analytics/*",
