@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
-import Image from 'next/image'
+import { getMimeTypeFromCloudinaryUrl } from '@/utils'
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[]
@@ -28,7 +29,8 @@ const GallerySlider = ({
   const [direction, setDirection] = useState(0)
   const images = galleryImgs?.length > 0 ? galleryImgs : []
 
-  const isImage = galleryImgs[index]?.mimeType === "image/jpeg" || galleryImgs[index]?.mimeType === "image/*"
+  const mimeType = getMimeTypeFromCloudinaryUrl(galleryImgs && galleryImgs[0]?.url || '');
+  const isImage = mimeType === "image/*" || galleryImgs[index]?.mimeType === "image/jpeg" || galleryImgs[index]?.mimeType === "image/*"
 
   const changePhotoId = (newVal: number) => {
     if (newVal > index) {

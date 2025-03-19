@@ -1,60 +1,59 @@
-import React from 'react'
+import React from "react";
 
-const SocialPostSkeleton = () => {
+export default function SocialPostSkeleton() {
   return (
-    <div className="max-w-xl bg-white rounded-xl overflow-hidden animate animate-pulse sm:mb-10 mb-0">
-      <div className="relative">
-        {/* Basic Badge Skeleton */}
-        <div className="absolute top-4 left-4 z-10">
-          <div className="h-6 w-16 bg-slate-500 rounded-full animate-pulse" />
-        </div>
+    <div className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0">
+      {/* Main Post Container */}
+      <div className="bg-gray-200 text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
+        <div className="relative">
+          {/* Main Image Skeleton */}
+          <div className="aspect-[12.5/16] relative bg-gray-300 animate-pulse"></div>
 
-        {/* Main Image Skeleton */}
-        <div className="aspect-[12.5/16] relative bg-slate-400 animate-pulse" />
+          {/* Metrics - Mobile & Tablet Skeleton */}
+          <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
+            {[...Array(5)].map((_, index) => (
+              <div key={index} className="flex flex-col items-center mb-4">
+                <div className="w-8 h-8 bg-gray-400 rounded-full animate-pulse"></div>
+                <span className="w-4 h-4 bg-gray-400 mt-1 rounded-full animate-pulse"></span>
+              </div>
+            ))}
+          </div>
 
-        {/* Metrics Skeleton */}
-        <div className="absolute right-4 bottom-40 flex flex-col gap-4">
-          {[1, 2, 3].map((_, index) => (
-            <div key={index} className="flex flex-col items-center gap-1">
-              <div className="w-10 h-10 bg-slate-500/80 backdrop-blur rounded-full animate-pulse" />
-              <div className="w-8 h-4 bg-slate-500/80 backdrop-blur rounded animate-pulse" />
-            </div>
-          ))}
-        </div>
-
-        {/* Profile Section Skeleton */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-start gap-2">
-              {/* Profile Picture Skeleton */}
-              <div className="w-[70px] h-[55px] bg-slate-500 rounded-full animate-pulse" />
-
-              <div>
-                {/* Username and Name Skeleton */}
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-20 bg-slate-500 rounded animate-pulse" />
-                  <div className="h-4 w-16 bg-slate-500 rounded animate-pulse" />
+          {/* Profile Section Skeleton */}
+          <div className="absolute w-[80%] md:w-full bottom-2 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2 pt-4">
+                  <div className="w-24 h-6 bg-gray-400 rounded-full animate-pulse"></div>
+                  <div className="w-20 h-6 bg-gray-400 rounded-full animate-pulse"></div>
                 </div>
-
-                {/* Tags Skeleton */}
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {[...Array(8)].map((_, index) => (
-                    <div
-                      key={index}
-                      className="h-4 w-16 bg-slate-500 rounded animate-pulse"
-                    />
-                  ))}
+                <div className="relative w-full">
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    <div className="w-full h-4 bg-gray-400 rounded-full animate-pulse"></div>
+                    {[...Array(3)].map((_, index) => (
+                      <span key={index} className="w-12 h-4 bg-gray-400 rounded-full animate-pulse"></span>
+                    ))}
+                  </div>
+                  <div className="w-16 h-4 bg-gray-400 mt-1 rounded-full animate-pulse"></div>
                 </div>
               </div>
             </div>
-
-            {/* Follow Button Skeleton */}
-            <div className="h-10 w-24 bg-slate-500 rounded animate-pulse" />
           </div>
+        </div>
+      </div>
+
+      {/* Metrics - Desktop Skeleton */}
+      <div className="hidden lg:flex flex-col h-full justify-center mb-10">
+        <div className="flex flex-col gap-4 mt-auto">
+          <div className="w-8 h-8 bg-gray-400 rounded-full animate-pulse"></div>
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="flex flex-col items-center mb-0">
+              <div className="w-8 h-8 bg-gray-400 rounded-full animate-pulse"></div>
+              <span className="w-4 h-4 bg-gray-400 mt-1 rounded-full animate-pulse"></span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
-};
-
-export default SocialPostSkeleton
+}
