@@ -154,8 +154,8 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
         <GallerySlider
           galleryImgs={postMedia!}
           className={cn(
-            "object-contain rounded-xl my-5",
-            isLandscape ? "w-full h-auto max-h-full" : "w-auto max-h-[85vh]"
+            "object-contain rounded-xl",
+            isLandscape ? "w-full h-auto max-h-full" : "w-auto max-h-[87vh]"
           )}
           isRenderedInComment={isRenderedInComment}
           handleImageLoad={handleImageLoad}

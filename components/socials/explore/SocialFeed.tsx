@@ -205,7 +205,7 @@ const SocialFeed = ({ initialPosts }: any) => {
                 )
               })
             )}
-            <div ref={ref} className="py-1 text-center w-full flex items-center justify-center pb-20">
+            <div ref={ref} className="py-1 text-center w-full flex items-center justify-center">
               {queryIsFetchingNextPage ? (
                 <div>
                   <Loader />
@@ -219,7 +219,6 @@ const SocialFeed = ({ initialPosts }: any) => {
           </div>
         </div>
 
-        {/* Comments Section - Hidden on mobile by default, can be toggled */}
         <div>
           {
             showComments && <CommentCard />
