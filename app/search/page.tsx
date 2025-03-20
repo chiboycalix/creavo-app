@@ -8,6 +8,7 @@ import Link from "next/link"
 import { baseUrl } from "@/utils/constant"
 import Cookies from "js-cookie"
 import PostModal from "./_components/PostModal"
+import { result } from "lodash"
 
 type ContentTab = {
   id: string
@@ -231,41 +232,65 @@ export default function SearchResults() {
           </div>
         )
 
-      case "courses":
-        return results.courses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {results.courses.map((course) => (
-              <div key={course.id} className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                <div className="aspect-video relative bg-gray-100">
-                  <Image
-                    src={course.data.imageUrl || course.data.thumbnailUrl || "/placeholder.svg?height=200&width=400"}
-                    alt={course.data.title || "Course"}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-medium text-lg">{course.data.title}</h3>
-                  {course.data.description && (
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{course.data.description}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No courses available</h3>
-              <p className="text-gray-500">We couldnt find any courses matching your search.</p>
+        case "courses":
+          return results.courses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {results.courses.map((course) => {
+                const mediaUrl = course.data.promotionalUrl;
+                const isVideo = /\.(mp4|webm|ogg)$/i.test(mediaUrl); // Check if the URL is a video
+        
+                return (
+                  <div
+                    key={course.id}
+                    className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="aspect-video relative bg-gray-100">
+                      {isVideo ? (
+                        <video
+                          className="object-cover w-full h-full"
+                        >
+                          <source src={mediaUrl} type="video/mp4" />
+                        </video>
+                      ) : (
+                        <Image
+                          src={mediaUrl}
+                          alt={course.data.title || "Course"}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-medium text-lg">{course.data.title}</h3>
+                      {course.data.description && (
+                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                          {course.data.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </div>
-        )
-
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No courses available
+                </h3>
+                <p className="text-gray-500">
+                  We couldn’t find any courses matching your search.
+                </p>
+              </div>
+            </div>
+          );
+        
+        
       case "account":
         return results.accounts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {results.accounts.map((account) => (
+            {results.accounts.map((account) =>
+             (
               <div
                 key={account.id}
                 className="flex items-center p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
@@ -273,7 +298,7 @@ export default function SearchResults() {
                 <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
                   {account.data.avatar ? (
                     <Image
-                      src={account.data.avatar || "/placeholder.svg"}
+                      src={account.data.avatar}
                       alt={account.data.username || "User"}
                       width={48}
                       height={48}
@@ -306,19 +331,6 @@ export default function SearchResults() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Search query display */}
-      <div className="max-w-7xl mx-auto px-4 pt-4 pb-2">
-        <div className="flex items-center">
-          <div className="bg-gray-100 rounded-full py-2 px-4 flex items-center">
-            <span className="text-gray-800">{query}</span>
-            <Link href="/" className="ml-2">
-              <X className="h-5 w-5 text-blue-500" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Content tabs */}
       <div className="border-b">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex space-x-8">
@@ -340,10 +352,8 @@ export default function SearchResults() {
         </div>
       </div>
 
-      {/* Search results content */}
       <div className="max-w-7xl mx-auto px-4 py-8">{renderContent()}</div>
 
-      {/* Post Modal */}
       {selectedPostId && <PostModal postId={selectedPostId} isOpen={isModalOpen} onClose={closePostModal} />}
     </div>
   )
