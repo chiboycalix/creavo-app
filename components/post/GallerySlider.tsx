@@ -6,6 +6,7 @@ import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils'
+import { cn } from '@/lib/utils'
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[]
@@ -15,14 +16,20 @@ type GallerySliderTypes = {
   ratioClass?: string
   galleryClass?: string
   isRenderedInComment?: boolean;
+  handleImageLoad: any;
+  handleVideoLoad: any;
+  imageRef: any;
+  videoRef: any;
+  isLandscape: boolean;
 }
 const GallerySlider = ({
   galleryImgs,
   className = '',
-  imageClass = '',
-  galleryClass = 'rounded-none',
-  isRenderedInComment = false,
-  navigation = true,
+  handleImageLoad,
+  handleVideoLoad,
+  imageRef,
+  videoRef,
+  isLandscape,
 }: GallerySliderTypes) => {
   const [loaded, setLoaded] = useState(false)
   const [index, setIndex] = useState(0)
@@ -69,7 +76,7 @@ const GallerySlider = ({
       }}
     >
       <div
-        className={`relative  group group/cardGallerySlider ${className}`}
+        className={`relative  group group/cardGallerySlider`}
         {...handlers}
       >
         {/* Main image */}
@@ -85,24 +92,28 @@ const GallerySlider = ({
                 variants={variants(340, 1)}
                 initial="enter"
                 animate="center"
-                // exit="exit"
-                className="h-full"
               >
                 {isImage ? (
-                  <Image
+                  <img
                     loading="lazy"
-                    width={500}
-                    height={300}
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    className={`${isRenderedInComment ? "object-cover h-[calc(79vh)] w-full" : "object-cover md:max-h-[87vh] h-[calc(87vh)]"}`}
-                    onLoad={() => setLoaded(true)}
+                    className={cn(``, isLandscape ? "" : "min-w-full", className)}
+                    onLoad={() => {
+                      setLoaded(true)
+                      handleImageLoad()
+                    }}
+                    ref={imageRef}
                   />
                 ) : (
                   <video
                     src={currentMedia?.url || ''}
-                    className={`object-cover h-screen ${imageClass}`}
-                    onLoad={() => setLoaded(true)}
+                    className={cn(``, className)}
+                    onLoad={() => {
+                      setLoaded(true)
+                      handleVideoLoad()
+                    }}
+                    ref={videoRef}
                   />
                 )}
               </motion.div>

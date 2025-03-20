@@ -14,6 +14,7 @@ export default function ExplorePage() {
         initialPosts={data?.pages[0]}
         isFetcingPosts={isFetching}
       />
+
     </CommentProvider>
   );
 }

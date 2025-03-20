@@ -3,13 +3,14 @@ import MediaWrapper from "../../post/MediaWrapper";
 import ShareButton from "./ShareButton";
 import dynamic from "next/dynamic";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { VscEye } from "react-icons/vsc";
 import { useAuth } from "@/context/AuthContext";
 import { useComments } from "@/context/CommentsContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
@@ -32,6 +33,28 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const hashtagFromCourse = post?.hashtag.match(/##(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
   const hashtagFromPost = post?.hashtag.match(/#(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
   const tags = hashtagFromCourse.length > 0 ? hashtagFromCourse : hashtagFromPost;
+
+  const [isLandscape, setIsLandscape] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  const detectOrientation = (width: number, height: number) => {
+    setIsLandscape(width > height);
+  };
+
+  const handleImageLoad = () => {
+    if (imageRef.current) {
+      const { naturalWidth, naturalHeight } = imageRef.current;
+      detectOrientation(naturalWidth, naturalHeight);
+    }
+  };
+
+  const handleVideoLoad = () => {
+    if (videoRef.current) {
+      const { videoWidth, videoHeight } = videoRef.current;
+      detectOrientation(videoWidth, videoHeight);
+    }
+  };
 
   const handleDownloadStatusChange = (downloading: boolean, progress: number) => {
     setIsDownloading(downloading);
@@ -98,42 +121,30 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     router.push(`/market/product/${id}`);
   };
   return (
-    <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative">
+    <div data-post-id={post.id} ref={ref}
+      className={cn("px-4 h-full",
+        isLandscape ? "w-full" : "w-full",
+      )}
+    >
       {/* Main Post Container */}
-      <div className="bg-black text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
-        <div className="relative">
-          {/* Main Image */}
-          <div className="aspect-[12.5/16] relative">
-            <MediaWrapper
-              postId={post?.id}
-              title={post?.title}
-              size="object-cover"
-              postMedia={post?.media}
-            />
-          </div>
-
-          {/* Metrics - Mobile & Tablet */}
-          <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
-            <FollowButton
-              followedId={post?.userId}
-              avatar={post?.user_profile_avatar || "/assets/display.jpg"}
-              initialFollowStatus={post?.followed}
-              isMyPost={Number(post.userId) === currentUserId}
-            />
-            {metrics.map((metric, index) => (
-              <div key={index} className="flex flex-col items-center mb-4">
-                <div className="text-sm rounded-full cursor-pointer">{metric.icon}</div>
-                <span className="text-xs font-semibold">{metric.count}</span>
-              </div>
-            ))}
-          </div>
+      <div className="flex flex-1 gap-4 items-center justify-center w-full h-full">
+        <div className={cn("relative rounded-xl bg-black")}>
+          <MediaWrapper
+            postId={post?.id}
+            postMedia={post?.media}
+            imageRef={imageRef}
+            videoRef={videoRef}
+            handleImageLoad={handleImageLoad}
+            handleVideoLoad={handleVideoLoad}
+            isLandscape={isLandscape}
+          />
 
           {/* Profile Section */}
-          <div className="absolute w-[80%] md:w-full bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+          <div className="absolute left-0 right-0 bottom-0 p-4 w-[80%] md:w-full bg-gradient-to-t from-black/90 to-transparent rounded-b-xl">
             <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
+              <div className="flex-1">
                 <div className="flex items-center justify-between gap-2 pt-4">
-                  <h3 className="font-semibold">{post?.user_username}</h3>
+                  <h3 className="font-semibold text-white">{post?.user_username}</h3>
                   {post?.metadata !== null && (
                     <Button className="cursor-pointer" onClick={() => handleNavigateToCourse(post?.metadata?.courseId)}>
                       Learn more
@@ -143,10 +154,10 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
                 <div className="relative w-full">
                   <div className={`flex flex-wrap gap-2 mt-1 ${!showAllTags && "max-h-[1.6rem]"} overflow-hidden transition-all duration-300`}>
                     <div>
-                      <p className="text-xs leading-6">{post.body}</p>
+                      <p className="text-xs leading-6 text-white">{post.body}</p>
                     </div>
                     {tags.map((tag: any, index: number) => (
-                      <span key={index} className="text-gray-400 text-xs leading-6">
+                      <span key={index} className="text-gray-300 text-xs leading-6">
                         #{tag}
                       </span>
                     ))}
@@ -173,11 +184,8 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Metrics - Desktop */}
-      <div className="hidden lg:flex flex-col h-full justify-center mb-10">
-        <div className="flex flex-col gap-4 mt-auto">
+        <div className="flex flex-col justify-center items-center">
           <FollowButton
             followedId={post?.userId}
             avatar={post?.user_profile_avatar || "/assets/display.jpg"}
@@ -191,22 +199,21 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Progress Bar with Percentage or Downloaded Message */}
-      {(isDownloading || isDownloaded) && (
-        <div className="absolute bottom-0 left-0 w-[88%] flex flex-col items-center justify-between px-2 py-1 bg-gray-800 bg-opacity-75 rounded-b-xl">
-          <span className="text-white text-xs font-semibold ml-2 whitespace-nowrap">
-            {isDownloaded ? "Downloaded" : `${downloadProgress}% Saving...`}
-          </span>
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary-500 transition-all duration-300 ease-in-out"
-              style={{ width: `${downloadProgress}%` }}
-            />
+        {(isDownloading || isDownloaded) && (
+          <div className="absolute bottom-0 left-0 w-[88%] flex flex-col items-center justify-between px-2 py-1 bg-gray-800 bg-opacity-75 rounded-b-xl">
+            <span className="text-white text-xs font-semibold ml-2 whitespace-nowrap">
+              {isDownloaded ? "Downloaded" : `${downloadProgress}% Saving...`}
+            </span>
+            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary-500 transition-all duration-300 ease-in-out"
+                style={{ width: `${downloadProgress}%` }}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

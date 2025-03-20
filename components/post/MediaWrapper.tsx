@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import GallerySlider from './GallerySlider'
 import Cookies from "js-cookie";
 import { FaPlay, FaPause } from 'react-icons/fa'
@@ -6,32 +6,39 @@ import { PostMediaType, usePost } from '@/context/PostContext'
 import { useVideoPlayback } from '@/context/VideoPlaybackContext'
 import { baseUrl } from '@/utils/constant'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils';
+import { cn } from '@/lib/utils';
 
 type MediaWrapperProps = {
-  title: string
-  size?: string
   postMedia?: PostMediaType[]
   postId?: number
   media?: string
   mediaClass?: string
   isRenderedInComment?: boolean;
+  imageRef: any;
+  videoRef: any;
+  handleImageLoad: any;
+  handleVideoLoad: any;
+  isLandscape: boolean;
 }
 
 const MediaWrapper: React.FC<MediaWrapperProps> = ({
-  title,
-  size,
   postMedia,
   postId,
   isRenderedInComment,
+  imageRef,
+  videoRef,
+  handleImageLoad,
+  handleVideoLoad,
+  isLandscape
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
   const [hasBeenViewed, setHasBeenViewed] = useState(false)
   const { updateViewsCount } = usePost()
   const { isGloballyPaused, setIsGloballyPaused } = useVideoPlayback()
   const mimeType = getMimeTypeFromCloudinaryUrl(postMedia && postMedia[0]?.url || '');
-  console.log({ postMedia: postMedia![0], mimeType })
+
   const isImage = mimeType === "image/*" || (postMedia && (postMedia && postMedia[0]?.mimeType === 'image/jpeg') || postMedia && postMedia[0]?.mimeType === 'image/*')
 
   const togglePlay = () => {
@@ -64,7 +71,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
         video.removeEventListener('timeupdate', updateProgress)
       }
     }
-  }, [])
+  }, [videoRef])
 
   useEffect(() => {
     if (isImage) return
@@ -101,7 +108,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
 
             video
               .play()
-              .catch(error => console.log('Autoplay prevented:', error))
+              .catch((error: any) => console.log('Autoplay prevented:', error))
             setIsPlaying(true)
           } else {
             video.pause()
@@ -131,15 +138,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
       if (video) observer.unobserve(video)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [
-    isImage,
-    hasBeenViewed,
-    postId,
-    updateViewsCount,
-    postMedia,
-    isGloballyPaused,
-    setIsGloballyPaused,
-  ])
+  }, [isImage, hasBeenViewed, postId, updateViewsCount, postMedia, isGloballyPaused, setIsGloballyPaused, videoRef])
 
   // Effect to handle global pause state
   useEffect(() => {
@@ -147,23 +146,33 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
       videoRef.current?.pause()
       setIsPlaying(false)
     }
-  }, [isGloballyPaused, isPlaying])
+  }, [isGloballyPaused, isPlaying, videoRef])
 
   return (
-    <div className={`${size} relative overflow-hidden flex items-center`}>
+    <div className={`flex flex-1 gap-4 items-center justify-center w-full h-full`}>
       {isImage ? (
         <GallerySlider
           galleryImgs={postMedia!}
-          className="w-full h-full object-cover"
-          imageClass="h-full"
+          className={cn(
+            "object-contain rounded-xl my-5",
+            isLandscape ? "w-full h-auto max-h-full" : "w-auto max-h-[85vh]"
+          )}
           isRenderedInComment={isRenderedInComment}
+          handleImageLoad={handleImageLoad}
+          handleVideoLoad={handleVideoLoad}
+          imageRef={imageRef}
+          videoRef={videoRef}
+          isLandscape={isLandscape}
         />
       ) : (
         <>
           <video
             ref={videoRef}
             src={postMedia?.[0]?.url || ''}
-            className="w-full object-fit h-[87vh]"
+            className={cn(
+              "object-contain rounded-xl",
+              isLandscape ? "w-full h-auto max-h-screen" : "h-full w-auto max-h-[85vh]"
+            )}
             loop
             playsInline
           />
@@ -179,7 +188,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
               {isPlaying ? <FaPause /> : <FaPlay />}
             </button>
           </div>
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-200">
+          <div className="absolute bottom-0 z-50 left-0 w-full h-1 bg-gray-200">
             <div
               className="h-full bg-blue-600 transition-all duration-300"
               style={{ width: `${progress}%` }}
