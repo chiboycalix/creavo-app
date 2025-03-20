@@ -63,8 +63,8 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
     allowFollowNotification: false,
     allowLikeNotification: false,
     allowTagNotification: false,
-    fetchSettings: async () => {},
-    updateSetting: () => {},
+    fetchSettings: async () => { },
+    updateSetting: () => { },
   });
 
   const [userPrivacy, setUserPrivacy] = useState<boolean>(true);
@@ -183,7 +183,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch privacy status");
+        // throw new Error("Failed to fetch privacy status");
       }
 
       const data = await response.json();
@@ -191,7 +191,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
       const mutedUsers = data?.data;
       return mutedUsers;
     } catch (error) {
-      console.error("Failed to fetch privacy status:", error);
+      console.log("Failed to fetch privacy status:", error);
     }
   }, [currentUser?.id]);
 
@@ -209,7 +209,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch privacy status");
+        // throw new Error("Failed to fetch privacy status");
       }
 
       const data = await response.json();
@@ -217,7 +217,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
       const blockedUsers = data?.data;
       return blockedUsers;
     } catch (error) {
-      console.error("Failed to fetch privacy status:", error);
+      console.log("Failed to fetch privacy status:", error);
     }
   }, [currentUser?.id]);
 
@@ -238,7 +238,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
 
     mutedUsers();
     blockedUsers();
-  }, [ fetchMutedUsers, fetchBlockedUsers]);
+  }, [fetchMutedUsers, fetchBlockedUsers]);
 
   return (
     <SettingsContext.Provider
