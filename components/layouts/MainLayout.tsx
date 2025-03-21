@@ -30,6 +30,7 @@ import { shouldUseMainLayout } from "@/utils/path-utils";
 import { RiHome8Fill } from "react-icons/ri";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import CustomImageIcon from "../CustomImageIcon";
+import { cn } from "@/lib/utils";
 
 export default function MainLayout({
   children,
@@ -40,10 +41,15 @@ export default function MainLayout({
   const { loading, currentUser } = useAuth();
   const { data: profileData } = useUserProfile(currentUser?.id);
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
+  const [isExploreRoute, setIsExploreRoute] = useState<boolean>(false);
 
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
     setIsCommunityRoute(communityRoutePattern.test(pathname || ""));
+
+    const exploreRoutePattern = /^\/socials/;
+    setIsExploreRoute(exploreRoutePattern.test(pathname || ""));
+
   }, [pathname]);
 
   const headerButtons: HeaderButton[] = React.useMemo(() => [
@@ -84,6 +90,7 @@ export default function MainLayout({
           title: 'Event', href: '/studio/meeting', icon: Video,
           children: [
             { title: 'Video conference', href: '/studio/event/meeting' },
+
             { title: 'Classroom', href: '/studio/event/classroom' },
           ]
         },
@@ -153,7 +160,7 @@ export default function MainLayout({
   }
 
   const useMainLayout = shouldUseMainLayout(pathname || "");
-
+  console.log({ pathname })
   if (!useMainLayout) {
     return <div>{children}</div>;
   }
@@ -173,7 +180,7 @@ export default function MainLayout({
             />
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
-            <div className="p-0 sm:p-12">
+            <div className={cn("p-0", pathname === "/socials" || pathname === "/socials/following" ? "sm:py-6 sm:px-12" : "sm:p-12")}>
               {children}
             </div>
           </main>

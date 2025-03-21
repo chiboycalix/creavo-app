@@ -65,7 +65,6 @@ export function getMimeTypeFromCloudinaryUrl(url: string): string | null {
     const urlParts = url?.split(/[#?]/)[0];
     const extensionMatch = urlParts?.match(/\.([a-zA-Z0-9]+)$/);
     const extension = extensionMatch ? extensionMatch[1]?.toLowerCase() : null;
-    console.log({ extension });
     if (!extension) {
       if (url?.includes("/video/")) return "video/mp4";
       if (url?.includes("/image/")) return "image/jpeg";
