@@ -3,8 +3,17 @@ import React from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { UploadInput } from "@/components/Input/UploadInput";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 export default function Upload() {
+  const router = useRouter()
+  const handleUploadComplete = (urls: string[]) => {
+    console.log("Uploaded URLs:", urls);
+    // Navigate or perform other actions with the URLs
+    // /socials/edit-post
+    router.push("/socials/edit-post")
+
+  };
 
   return (
     <ProtectedRoute

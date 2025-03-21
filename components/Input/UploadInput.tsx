@@ -21,7 +21,6 @@ type UploadInputProps = {
   accept?: string;
   maxFiles?: number;
   nextPath?: string;
-  onChange?: any;
   placeholder?: string;
   footerText?: string;
 } & React.ComponentProps<"div">;
@@ -42,13 +41,12 @@ export const UploadInput = ({
   accept = "video/*,image/*",
   maxFiles = 5,
   nextPath,
-  onChange,
   placeholder = `Max ${maxFiles} files per upload`,
   footerText = "Supports MP4, MOV, FLV videos and common image formats",
   ...rest
 }: UploadInputProps) => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const router = useRouter();
@@ -87,11 +85,10 @@ export const UploadInput = ({
         },
       });
       const url = response.data.secure_url;
-      onChange(url)
       setUploads((prev) =>
         prev.map((upload) =>
           upload.file === file ? { ...upload, url, uploading: false } : upload
-        ),
+        )
       );
       return url;
     } catch (error) {
@@ -119,7 +116,8 @@ export const UploadInput = ({
       type: file.type.startsWith("image/") ? "image" : "video",
     }));
     setUploads((prev) => [...prev, ...newUploads]);
-    await Promise.all(newFiles.map((file) => uploadToCloudinary(file)));
+    const urls = await Promise.all(newFiles.map((file) => uploadToCloudinary(file)));
+    return urls.filter((url) => url !== null) as string[];
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,19 +151,19 @@ export const UploadInput = ({
     fileInputRef.current?.click();
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (!nextPath) return;
+
+    setIsLoading(true);
     const urls = uploads.map((upload) => upload.url).filter(Boolean) as string[];
-    if (urls.length > 0 && nextPath) {
-      const urlString = urls.join(",");
-      setIsLoading(true); // Show loader
-      setTimeout(() => {
-        router.push(`${nextPath}?urls=${urlString}`, { scroll: false });
-        setUploads([]); // Reset uploads after navigation
-        setIsLoading(false); // Hide loader after navigation
-      }, 100); // Small delay to ensure loader is visible
+    if (urls.length > 0) {
+      // Encode URLs as a JSON string and base64 encode it
+      const encodedUrls = btoa(JSON.stringify(urls));
+      router.push(`${nextPath}?urls=${encodedUrls}`);
     } else {
-      alert("No files uploaded yet or nextPath not provided!");
+      showToast('error', 'No files uploaded', 'Please upload files before proceeding.');
     }
+    setIsLoading(false);
   };
 
   const allUploaded = uploads.length > 0 && uploads.every((upload) => !upload.uploading);
@@ -257,7 +255,7 @@ export const UploadInput = ({
             <Button
               onClick={handleNext}
               className="mt-4 bg-primary text-white px-6 py-2 rounded-md shadow hover:bg-primary-600 transition-colors duration-200"
-              disabled={isLoading} // Disable button during loading
+              disabled={isLoading}
             >
               Next
             </Button>
