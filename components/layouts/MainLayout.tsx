@@ -27,9 +27,9 @@ import {
   Users2
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { RiHome8Fill } from "react-icons/ri";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import CustomImageIcon from "../CustomImageIcon";
 
 export default function MainLayout({
   children,
@@ -60,19 +60,14 @@ export default function MainLayout({
         {
           title: "Profile",
           href: `/socials/profile`,
-          icon: (
-            <Avatar className="w-1 h-1">
-              <AvatarImage
-                src={
-                  profileData?.data
-                    ? profileData?.data?.profile?.avatar
-                    : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"
-                }
-                sizes="sm"
-              />
-              <AvatarFallback>P</AvatarFallback>
-            </Avatar>
-          ),
+          icon: <CustomImageIcon
+            imageUrl={profileData?.data
+              ? profileData?.data?.profile?.avatar
+              : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"}
+            className="rounded-full"
+            alt="Custom Image"
+
+          />
         },
       ],
     },

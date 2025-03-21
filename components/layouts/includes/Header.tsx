@@ -88,7 +88,6 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
             {headerButtons.map((button) => {
               const isActive = isButtonActive(button.navItems);
               const Icon = button.icon;
-
               return (
                 <button
                   key={button.id}
