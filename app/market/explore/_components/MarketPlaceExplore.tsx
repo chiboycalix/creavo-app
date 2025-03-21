@@ -27,9 +27,9 @@ const MarketPlaceExplore = () => {
     fetchListedCourses,
     products,
     setProducts,
+    setIsSaved, 
+    savedProducts,
   } = useMarketContext();
-
-  console.log("products", products);
 
   const initialTab = (searchParams.get("tab") as TabValue) || "All";
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
@@ -58,6 +58,7 @@ const MarketPlaceExplore = () => {
     { value: "25to40", label: "$25 - $40" },
     { value: "40plus", label: "$40+" },
   ];
+
 
   const handleRatingSelect = (rating: any) => {
     setSelectedRating(rating);
@@ -124,6 +125,9 @@ const MarketPlaceExplore = () => {
     };
     fetchAndSetProducts();
     setCourses(courses);
+
+    
+
   }, [activeTab, fetchCourseProducts, fetchPopularCourses]);
 
   // Listen for changes in the URL to update the active tab
