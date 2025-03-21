@@ -10,7 +10,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useComments } from "@/context/CommentsContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { getMimeTypeFromCloudinaryUrl } from "@/utils";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
