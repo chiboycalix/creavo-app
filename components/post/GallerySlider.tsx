@@ -16,11 +16,11 @@ type GallerySliderTypes = {
   ratioClass?: string
   galleryClass?: string
   isRenderedInComment?: boolean
-  handleImageLoad: any
-  handleVideoLoad: any
-  imageRef: any
-  videoRef: any
-  isLandscape: boolean
+  handleImageLoad?: any
+  handleVideoLoad?: any
+  imageRef?: any
+  videoRef?: any
+  isLandscape?: boolean
 }
 
 const GallerySlider = ({

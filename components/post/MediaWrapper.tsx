@@ -14,12 +14,14 @@ type MediaWrapperProps = {
   media?: string
   mediaClass?: string
   isRenderedInComment?: boolean;
-  imageRef: any;
-  videoRef: any;
-  handleImageLoad: any;
-  handleVideoLoad: any;
-  isLandscape: boolean;
-  className: string;
+  imageRef?: any;
+  videoRef?: any;
+  handleImageLoad?: any;
+  handleVideoLoad?: any;
+  isLandscape?: boolean;
+  className?: string;
+  title?: string;
+  size?: string;
 }
 
 const MediaWrapper: React.FC<MediaWrapperProps> = ({
@@ -155,7 +157,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
       {isImage ? (
         <GallerySlider
           galleryImgs={postMedia!}
-          className={className}
+          className={className!}
           isRenderedInComment={isRenderedInComment}
           handleImageLoad={handleImageLoad}
           handleVideoLoad={handleVideoLoad}
