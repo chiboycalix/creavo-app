@@ -14,6 +14,9 @@ import { baseUrl } from "@/utils/constant"
 import Cookies from "js-cookie"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
+// NOT: import { useDebounce } from "use-debounce"
+import { Avatar } from "@/components/ui/avatar"
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface Timezone {
   name: string
@@ -67,7 +70,14 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
   const [error, setError] = useState<string | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const timeOptions = generateTimeOptions()
-  const includeWebinar = false
+  const [isWebinar, setIsWebinar] = useState(false)
+  const [participantSearch, setParticipantSearch] = useState("")
+  const [isSearching, setIsSearching] = useState(false)
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [internalParticipants, setInternalParticipants] = useState<any[]>([])
+  const [externalParticipants, setExternalParticipants] = useState<string[]>([])
+  const [newExternalEmail, setNewExternalEmail] = useState("")
   const [isTimezoneDropdownOpen, setIsTimezoneDropdownOpen] = useState(false)
 
   useEffect(() => {
@@ -107,16 +117,64 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
   }, [isOpen])
 
   useEffect(() => {
+    const searchUsers = async (query: string) => {
+      if (!query || query.length < 2) {
+        setSearchResults([])
+        setIsSearching(false)
+        return
+      }
+
+      setIsSearching(true)
+      try {
+        const response = await fetch(`${baseUrl}/users/?username=${encodeURIComponent(query)}`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
+          },
+        })
+
+        if (!response.ok) throw new Error("Failed to search users")
+
+        const data = await response.json()
+        setSearchResults(data.data || [])
+      } catch (error) {
+        console.error("Error searching users:", error)
+        setSearchResults([])
+      } finally {
+        setIsSearching(false)
+      }
+    }
+
+    // Clear any existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+
+    // Set a new timeout for debouncing
+    searchTimeoutRef.current = setTimeout(() => {
+      searchUsers(participantSearch)
+    }, 500)
+
+    // Cleanup function
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [participantSearch])
+
+  useEffect(() => {
     if (eventToEdit) {
       setTitle(eventToEdit.title || "")
       setDescription(eventToEdit.description || "")
       setStartDate(eventToEdit.startTime ? new Date(eventToEdit.startTime) : null)
       setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null)
+
       setStartTime(
         eventToEdit.startTime
           ? new Date(eventToEdit.startTime).toLocaleTimeString("en-GB", {
               hour: "2-digit",
               minute: "2-digit",
+              hour12: false,
             })
           : "",
       )
@@ -125,13 +183,24 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
           ? new Date(eventToEdit.endTime).toLocaleTimeString("en-GB", {
               hour: "2-digit",
               minute: "2-digit",
+              hour12: false,
             })
           : "",
       )
+
       setIsAllDay(eventToEdit.isAllDay || false)
       setIsRepeating(eventToEdit.isRepeating || false)
       setTimezone(eventToEdit.timezone || "")
       setColor(eventToEdit.color || "bg-blue-200")
+      setIsWebinar(eventToEdit.includeWebinar || false)
+
+      if (eventToEdit.internalParticipant) {
+        setInternalParticipants(eventToEdit.internalParticipant)
+      }
+
+      if (eventToEdit.externalParticipant) {
+        setExternalParticipants(eventToEdit.externalParticipant)
+      }
     }
   }, [eventToEdit])
 
@@ -196,6 +265,11 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
         timezone,
         isPaid: false,
         type: "SCHEDULED",
+        includeWebinar: isWebinar,
+        ...(isWebinar && {
+          internalParticipant: internalParticipants.map((p) => ({ email: p.email })),
+          externalParticipant: externalParticipants,
+        }),
       }
 
       const response = await fetch(`${baseUrl}/meetings/`, {
@@ -216,40 +290,32 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
     }
   }
 
-  // Fix the time formatting in useEffect when editing an event
-  useEffect(() => {
-    if (eventToEdit) {
-      setTitle(eventToEdit.title || "")
-      setDescription(eventToEdit.description || "")
-      setStartDate(eventToEdit.startTime ? new Date(eventToEdit.startTime) : null)
-      setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null)
-
-      // Convert stored ISO datetime to `HH:mm` format
-      setStartTime(
-        eventToEdit.startTime
-          ? new Date(eventToEdit.startTime).toLocaleTimeString("en-GB", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })
-          : "",
-      )
-      setEndTime(
-        eventToEdit.endTime
-          ? new Date(eventToEdit.endTime).toLocaleTimeString("en-GB", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })
-          : "",
-      )
-
-      setIsAllDay(eventToEdit.isAllDay || false)
-      setIsRepeating(eventToEdit.isRepeating || false)
-      setTimezone(eventToEdit.timezone || "")
-      setColor(eventToEdit.color || "bg-blue-200")
+  const addInternalParticipant = (user: any) => {
+    if (!internalParticipants.some((p) => p.email === user.email)) {
+      setInternalParticipants([...internalParticipants, user])
     }
-  }, [eventToEdit])
+    setParticipantSearch("")
+    setSearchResults([])
+  }
+
+  const removeInternalParticipant = (email: string) => {
+    setInternalParticipants(internalParticipants.filter((p) => p.email !== email))
+  }
+
+  const addExternalParticipant = () => {
+    if (
+      newExternalEmail &&
+      !externalParticipants.includes(newExternalEmail) &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newExternalEmail)
+    ) {
+      setExternalParticipants([...externalParticipants, newExternalEmail])
+      setNewExternalEmail("")
+    }
+  }
+
+  const removeExternalParticipant = (email: string) => {
+    setExternalParticipants(externalParticipants.filter((e) => e !== email))
+  }
 
   return (
     <AnimatePresence>
@@ -397,7 +463,6 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                   />
                   <Label htmlFor="allDay">All Day</Label>
                 </div>
-
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="repeat"
@@ -405,6 +470,14 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                     onCheckedChange={(checked) => setIsRepeating(checked === true)}
                   />
                   <Label htmlFor="repeat">Repeat Event</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="webinar"
+                    checked={isWebinar}
+                    onCheckedChange={(checked) => setIsWebinar(checked === true)}
+                  />
+                  <Label htmlFor="webinar">Is Webinar</Label>
                 </div>
               </div>
 
@@ -422,6 +495,133 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                   ))}
                 </div>
               </div>
+              {isWebinar && (
+                <div className="space-y-4">
+                  <h3 className="text-md font-medium">Participants</h3>
+
+                  {/* Internal participants search */}
+                  <div className="space-y-2">
+                    <Label htmlFor="participants">Add Internal Participants</Label>
+                    <div className="relative">
+                      <Input
+                        id="participants"
+                        value={participantSearch}
+                        onChange={(e) => {
+                          setParticipantSearch(e.target.value)
+                          if (e.target.value.length > 0) {
+                            setIsSearching(true)
+                          }
+                        }}
+                        placeholder="Search by username or email"
+                        className="pl-10"
+                      />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+
+                      {/* Search results dropdown */}
+                      {participantSearch.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border rounded-md bg-white shadow-md">
+                          {isSearching ? (
+                            <div className="p-2 text-center">
+                              <div className="flex items-center justify-center space-x-2">
+                                <div className="h-4 w-4 rounded-full border-2 border-primary-600 border-t-transparent animate-spin"></div>
+                                <span className="text-gray-500">Searching...</span>
+                              </div>
+                            </div>
+                          ) : searchResults.length > 0 ? (
+                            searchResults.map((user) => (
+                              <div
+                                key={user.id}
+                                className="p-2 flex items-center hover:bg-gray-100 cursor-pointer"
+                                onClick={() => addInternalParticipant(user)}
+                              >
+                                <Avatar className="h-8 w-8 mr-2">
+                                  <AvatarImage src={user.avatar || "/placeholder.svg?height=32&width=32"} />
+                                  <AvatarFallback>{user.username?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <div className="font-medium">{user.username}</div>
+                                  <div className="text-sm text-gray-500">{user.email}</div>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-2 text-center text-gray-500">No users found</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Selected internal participants */}
+                  {internalParticipants.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Internal Participants</Label>
+                      <div className="space-y-2">
+                        {internalParticipants.map((participant) => (
+                          <div
+                            key={participant.email}
+                            className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
+                          >
+                            <div className="flex items-center">
+                              <Avatar className="h-6 w-6 mr-2">
+                                <AvatarImage src={participant.avatar || "/placeholder.svg?height=24&width=24"} />
+                                <AvatarFallback>{participant.username?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              <span>{participant.email}</span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeInternalParticipant(participant.email)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* External participants */}
+                  <div className="space-y-2">
+                    <Label htmlFor="externalParticipant">Add External Participants</Label>
+                    <div className="flex space-x-2">
+                      <Input
+                        id="externalParticipant"
+                        value={newExternalEmail}
+                        onChange={(e) => setNewExternalEmail(e.target.value)}
+                        placeholder="Enter email address"
+                      />
+                      <Button type="button" onClick={addExternalParticipant} variant="outline">
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Selected external participants */}
+                  {externalParticipants.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>External Participants</Label>
+                      <div className="space-y-2">
+                        {externalParticipants.map((email) => (
+                          <div key={email} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                            <span>{email}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeExternalParticipant(email)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="p-4 border-t border-gray-200">

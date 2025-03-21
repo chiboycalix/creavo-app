@@ -1,14 +1,12 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
-import { X, User } from "lucide-react"
+import { User } from "lucide-react"
 import Image from "next/image"
-import Link from "next/link"
 import { baseUrl } from "@/utils/constant"
 import Cookies from "js-cookie"
-import PostModal from "./_components/PostModal"
-import { result } from "lodash"
+import Link from "next/link"
 
 type ContentTab = {
   id: string
@@ -67,8 +65,7 @@ export default function SearchResults() {
   })
 
   // Modal state
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const router = useRouter()
 
   const contentTabs: ContentTab[] = [
     { id: "post", label: "Post" },
@@ -139,15 +136,6 @@ export default function SearchResults() {
     fetchSearchResults()
   }, [query])
 
-  const openPostModal = (postId: number) => {
-    setSelectedPostId(postId)
-    setIsModalOpen(true)
-  }
-
-  const closePostModal = () => {
-    setIsModalOpen(false)
-  }
-
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -171,58 +159,53 @@ export default function SearchResults() {
     switch (activeContentTab) {
       case "post":
         return results.posts.length > 0 ? (
-         <div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-  {results.posts.map((post) => {
-    const mediaUrl = post.data.media?.[0] || "";
-    const isVideo = mediaUrl.endsWith(".mp4") || mediaUrl.endsWith(".webm") || mediaUrl.endsWith(".ogg");
-    const isImage = mediaUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/);
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {results.posts.map((post) => {
+                const mediaUrl = post.data.media?.[0] || ""
+                const isVideo = mediaUrl.endsWith(".mp4") || mediaUrl.endsWith(".webm") || mediaUrl.endsWith(".ogg")
+                const isImage = mediaUrl.match(/\.(jpeg|jpg|png|gif|webp|svg)$/)
 
-    return (
-      <div
-        key={post.id}
-        className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-        onClick={() => openPostModal(post.data.id)}
-      >
-        <div className="aspect-square relative">
-          {mediaUrl ? (
-            isVideo ? (
-              <video
-                src={mediaUrl}
-                className="object-cover w-full h-full"
-              />
-            ) : isImage ? (
-              <Image
-                src={mediaUrl}
-                alt={post.data.title || post.data.body || "Post"}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                <p className="text-gray-400">Unsupported Media</p>
-              </div>
-            )
-          ) : (
-            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-              <p className="text-gray-400">No media</p>
+                return (
+                  <Link
+                    key={post.id}
+                    href={`/socials/posts/${post.data.id}`}
+                    className="block overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  >
+                    <div className="aspect-square relative">
+                      {mediaUrl ? (
+                        isVideo ? (
+                          <video src={mediaUrl} className="object-cover w-full h-full" />
+                        ) : isImage ? (
+                          <Image
+                            src={mediaUrl || "/placeholder.svg"}
+                            alt={post.data.title || post.data.body || "Post"}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <p className="text-gray-400">Unsupported Media</p>
+                          </div>
+                        )
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                          <p className="text-gray-400">No media</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-3">
+                      {post.data.title && <h3 className="font-medium">{post.data.title}</h3>}
+                      {(post.data.body || post.data.content) && (
+                        <p className="text-sm text-gray-500 line-clamp-2">{post.data.body || post.data.content}</p>
+                      )}
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
-          )}
-        </div>
-
-        <div className="p-3">
-          {post.data.title && <h3 className="font-medium">{post.data.title}</h3>}
-          {(post.data.body || post.data.content) && (
-            <p className="text-sm text-gray-500 line-clamp-2">
-              {post.data.body || post.data.content}
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  })}
-</div>
-         </div>
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="text-center">
@@ -232,65 +215,52 @@ export default function SearchResults() {
           </div>
         )
 
-        case "courses":
-          return results.courses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {results.courses.map((course) => {
-                const mediaUrl = course.data.promotionalUrl;
-                const isVideo = /\.(mp4|webm|ogg)$/i.test(mediaUrl); // Check if the URL is a video
-        
-                return (
-                  <div
-                    key={course.id}
-                    className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="aspect-video relative bg-gray-100">
-                      {isVideo ? (
-                        <video
-                          className="object-cover w-full h-full"
-                        >
-                          <source src={mediaUrl} type="video/mp4" />
-                        </video>
-                      ) : (
-                        <Image
-                          src={mediaUrl}
-                          alt={course.data.title || "Course"}
-                          fill
-                          className="object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-medium text-lg">{course.data.title}</h3>
-                      {course.data.description && (
-                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                          {course.data.description}
-                        </p>
-                      )}
-                    </div>
+      case "courses":
+        return results.courses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {results.courses.map((course) => {
+              const mediaUrl = course.data.promotionalUrl
+              const isVideo = /\.(mp4|webm|ogg)$/i.test(mediaUrl) // Check if the URL is a video
+
+              return (
+                <div key={course.id} className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <div className="aspect-video relative bg-gray-100">
+                    {isVideo ? (
+                      <video className="object-cover w-full h-full">
+                        <source src={mediaUrl} type="video/mp4" />
+                      </video>
+                    ) : (
+                      <Image
+                        src={mediaUrl || "/placeholder.svg"}
+                        alt={course.data.title || "Course"}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
                   </div>
-                );
-              })}
+                  <div className="p-4">
+                    <h3 className="font-medium text-lg">{course.data.title}</h3>
+                    {course.data.description && (
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">{course.data.description}</p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No courses available</h3>
+              <p className="text-gray-500">We couldn’t find any courses matching your search.</p>
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-16">
-              <div className="text-center">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No courses available
-                </h3>
-                <p className="text-gray-500">
-                  We couldn’t find any courses matching your search.
-                </p>
-              </div>
-            </div>
-          );
-        
-        
+          </div>
+        )
+
       case "account":
         return results.accounts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {results.accounts.map((account) =>
-             (
+            {results.accounts.map((account) => (
               <div
                 key={account.id}
                 className="flex items-center p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
@@ -298,7 +268,7 @@ export default function SearchResults() {
                 <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
                   {account.data.avatar ? (
                     <Image
-                      src={account.data.avatar}
+                      src={account.data.avatar || "/placeholder.svg"}
                       alt={account.data.username || "User"}
                       width={48}
                       height={48}
@@ -353,9 +323,6 @@ export default function SearchResults() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">{renderContent()}</div>
-
-      {selectedPostId && <PostModal postId={selectedPostId} isOpen={isModalOpen} onClose={closePostModal} />}
     </div>
   )
 }
-
