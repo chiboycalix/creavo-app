@@ -30,7 +30,7 @@ export default function Upload() {
               </CardTitle>
               <CardContent>
                 <div className="mb-4">
-                  <h2>Upload post</h2>
+                  <h2 className="mb-1">Upload post</h2>
                   <p className="text-sm">Add your videos here</p>
                 </div>
                 <UploadInput

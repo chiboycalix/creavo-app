@@ -44,7 +44,7 @@ const CreateCommunityDialog = () => {
                   setspace(e.target.value)
                 }}
               />
-              <p className='text-sm mt-1'>You can always change this later</p>
+              <p className='text-xs mt-1'>You can always change this later</p>
             </div>
 
             <div className='mb-8'>

@@ -4,7 +4,7 @@ import { Plus, Settings } from "lucide-react";
 export default async function SpacePage({ params }: any) {
 
   return (
-    <div className="">
+    <div className="w-full">
       <div className="border-b p-4 shadow-md shadow-primary-50 flex justify-between items-center">
         <div>
           <p className="font-semibold text-sm">General</p>

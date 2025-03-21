@@ -84,7 +84,6 @@ export default function MainLayout({
           title: 'Event', href: '/studio/meeting', icon: Video,
           children: [
             { title: 'Video conference', href: '/studio/event/meeting' },
-            { title: 'Webinar', href: '/studio/event/webinar' },
             { title: 'Classroom', href: '/studio/event/classroom' },
           ]
         },
@@ -174,7 +173,7 @@ export default function MainLayout({
             />
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
-            <div className="p-0 sm:p-6">
+            <div className="p-0 sm:p-12">
               {children}
             </div>
           </main>
