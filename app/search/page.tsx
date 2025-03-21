@@ -223,7 +223,11 @@ export default function SearchResults() {
               const isVideo = /\.(mp4|webm|ogg)$/i.test(mediaUrl) // Check if the URL is a video
 
               return (
-                <div key={course.id} className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <Link
+                  key={course.id}
+                  href={`/market/product/${course.data.id}`}
+                  className="block overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                >
                   <div className="aspect-video relative bg-gray-100">
                     {isVideo ? (
                       <video className="object-cover w-full h-full">
@@ -244,7 +248,7 @@ export default function SearchResults() {
                       <p className="text-sm text-gray-500 mt-1 line-clamp-2">{course.data.description}</p>
                     )}
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
@@ -252,7 +256,7 @@ export default function SearchResults() {
           <div className="flex flex-col items-center justify-center py-16">
             <div className="text-center">
               <h3 className="text-lg font-medium text-gray-900 mb-2">No courses available</h3>
-              <p className="text-gray-500">We couldn’t find any courses matching your search.</p>
+              <p className="text-gray-500">We couldn&apos;t find any courses matching your search.</p>
             </div>
           </div>
         )

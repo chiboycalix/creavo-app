@@ -477,7 +477,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                     checked={isWebinar}
                     onCheckedChange={(checked) => setIsWebinar(checked === true)}
                   />
-                  <Label htmlFor="webinar">Is Webinar</Label>
+                  <Label htmlFor="webinar">Video Conferencing </Label>
                 </div>
               </div>
 
