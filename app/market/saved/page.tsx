@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
 import { useMarketContext } from "@/context/MarketContext";
-import SaveProductButton from "@/components/marketplace/SaveProductButton";
 import ProductCard from "../explore/_components/ProductCard";
-import OtherCard from "../explore/_components/OtherCard";
 
 const SavedProducts = () => {
   const { savedProducts, isSaved, handleToggleSave } = useMarketContext();
@@ -21,7 +19,7 @@ const SavedProducts = () => {
           <ProductCard
             key={product.id}
             product={product}
-            isSaved={isSaved}
+            isSaved={true}
             handleToggleSave={handleToggleSave}
           />
         ))}

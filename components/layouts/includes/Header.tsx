@@ -38,6 +38,13 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const [profile, setProfile] = useState<any | null>(null);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const { currentUser, isAuthenticated, signOut } = useAuth();
+  const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
+
+  // Detect if the current route matches /studio/community/[space]
+  useEffect(() => {
+    const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
+    setIsCommunityRoute(communityRoutePattern.test(pathname));
+  }, [pathname]);
 
   useEffect(() => {
     if (currentUser) {
@@ -50,7 +57,10 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white fixed top-0 right-0 left-0 md:left-72 z-30">
+    <header
+      className={`bg-white fixed top-0 right-0 z-30 ${isCommunityRoute ? "left-16" : "left-0 md:left-72"
+        }`}
+    >
       <div className="pr-4 sm:pr-6 lg:pr-6 w-full">
         <div className="flex h-20 justify-between items-center w-full gap-4">
           {/* Left Section with Menu Toggle and Search */}
@@ -69,11 +79,11 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
 
             {/* Search - Hidden on Mobile */}
             <div className="hidden md:block w-64 lg:w-80">
-            <SearchInput/>
+              <SearchInput />
             </div>
           </div>
 
-          {/* Center Section with Navigation Buttons - Now visible on all screens */}
+          {/* Center Section with Navigation Buttons */}
           <div className="flex items-center justify-center space-x-1 sm:space-x-2 lg:space-x-4 flex-shrink-0">
             {headerButtons.map((button) => {
               const isActive = isButtonActive(button.navItems);
@@ -139,7 +149,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                         />
                       ) : (
                         <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                          <User className="h-4 w-4 text-gray-500" />
+                          <User className="h-4 w- quiere4 text-gray-500" />
                         </div>
                       )}
                     </div>
@@ -168,28 +178,6 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                             </Link>
                           )}
                         </MenuItem>
-                        {/* <MenuItem>
-                          {({ active }) => (
-                            <Link
-                              href="/profile/new"
-                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
-                            >
-                              <BsPlusCircle className="mr-3 h-4 w-4 text-gray-500" />
-                              Add New Profile
-                            </Link>
-                          )}
-                        </MenuItem> */}
-                        {/* <MenuItem>
-                          {({ active }) => (
-                            <Link
-                              href="/settings"
-                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
-                            >
-                              <FaCog className="mr-3 h-4 w-4 text-gray-500" />
-                              Settings
-                            </Link>
-                          )}
-                        </MenuItem> */}
                         <MenuItem>
                           {({ active }) => (
                             <Link
@@ -276,7 +264,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
           leaveFrom="opacity-100 translate-y-0"
           leaveTo="opacity-0 -translate-y-2"
         >
-          <div className='mb-4'>
+          <div className="mb-4">
             <Input variant="search" placeholder="Search" className="w-full" />
           </div>
         </Transition>

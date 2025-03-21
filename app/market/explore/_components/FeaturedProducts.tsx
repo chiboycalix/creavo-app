@@ -25,6 +25,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
 
+  console.log("feature products", products);
+
   const handleTabChange = (category: string) => {
     setActiveTab(category);
   };
@@ -43,13 +45,14 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
     }
   }, [searchQuery]);
 
-  // Listen for changes in the URL to update the active tab
   useEffect(() => {
     const tabFromUrl = (searchParams.get("tab") as TabValue) || "All";
     if (tabFromUrl !== activeTab) {
       setActiveTab(tabFromUrl);
     }
   }, [searchParams]);
+
+  console.log("products", products);
 
   return (
     <Tabs value={activeTab} className="w-auto">
@@ -69,16 +72,15 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
             onChange={(e) => handleSearchQuery(e)}
             type="text"
             placeholder="Search"
-            className="w-48"
+            className="w-48 p-1 border rounded-md"
           />
         </div>
       </TabsList>
 
       {productCategories.map((tab) => (
         <TabsContent key={tab.category} value={tab.category}>
-          <h2>Featured Products</h2>
-          {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"> */}
-          <div className="flex flex-wrap gap-4 justify-start sm:justify-start md:justify-start">
+          <h2 className="mb-3 font-bold">Featured Products</h2>
+          <div className="flex flex-wrap gap-4 ">
             {products
               ?.filter(
                 (product: any) =>

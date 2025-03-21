@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
-import { X, Copy, Facebook, Instagram, Twitter, Linkedin, Video, MessageCircle, Send } from "lucide-react"; // Added MessageCircle for WhatsApp, Send for Telegram
+import { X, Copy, Facebook, Instagram, Twitter, Linkedin, Video, MessageCircle, Send, DownloadIcon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -17,19 +17,107 @@ import { RiShareForwardFill } from "react-icons/ri";
 interface ShareButtonProps {
   postId: number;
   initialShareCount: number;
+  post: any;
+  onDownloadStatusChange?: (isDownloading: boolean, progress: number) => void; // New prop
 }
 
 const ShareButton: React.FC<ShareButtonProps> = ({
   postId,
   initialShareCount,
+  post,
+  onDownloadStatusChange,
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
   const router = useRouter();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   const shareUrl = `${window.location.origin}/socials/posts/${postId}`;
+
+  const handleDownload = async () => {
+    const media = post.media[0];
+    if (!media) return;
+
+    const token = Cookies.get("accessToken");
+    if (!token) {
+      console.error("No access token found");
+      return;
+    }
+
+    setIsDownloading(true);
+    setIsPopoverOpen(false);
+    setDownloadProgress(0);
+    onDownloadStatusChange?.(true, 0);
+
+    try {
+      const response = await fetch(`${baseUrl}/watermark`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          postId: post.id,
+          mediaUrl: media.url,
+          mediaType: media.mimeType.startsWith("image") ? "image" : "video",
+          username: post.user_username,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Download failed");
+      }
+
+      const totalSize = response.headers.get("content-length");
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("Failed to read response body");
+
+      const chunks = [];
+      let receivedLength = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        chunks.push(value);
+        receivedLength += value.length;
+
+        if (totalSize) {
+          const progress = Math.round((receivedLength / parseInt(totalSize)) * 100);
+          setDownloadProgress(progress);
+          onDownloadStatusChange?.(true, progress);
+        } else {
+          const progress = Math.min(90, downloadProgress + 10);
+          setDownloadProgress(progress);
+          onDownloadStatusChange?.(true, progress);
+        }
+      }
+
+      const blob = new Blob(chunks);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `post-${post.id}.${media.mimeType.startsWith("image") ? "jpg" : "mp4"}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      setDownloadProgress(100);
+      onDownloadStatusChange?.(true, 100);
+      setTimeout(() => {
+        setIsDownloading(false);
+        onDownloadStatusChange?.(false, 100);
+      }, 500);
+    } catch (error) {
+      console.error("Download failed:", error);
+      setIsDownloading(false);
+      onDownloadStatusChange?.(false, 0);
+    }
+  };
 
   const sharePostMutation = useMutation({
     mutationFn: async () => {
@@ -98,7 +186,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
     instagram: `https://www.instagram.com/`,
     tiktok: `https://www.tiktok.com/`,
     whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(shareUrl)}`,
-    telegram: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=Check%20this%20out!`
+    telegram: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=Check%20this%20out!`,
   };
 
   const handleSocialShare = (platform: keyof typeof socialMediaShareLinks) => {
@@ -111,7 +199,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
       ?.data.posts.find((post) => post.id === postId)?.shareCount ?? initialShareCount;
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="relative flex flex-col items-center gap-2">
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
           <button
@@ -126,7 +214,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-[600px] relative">
+        <PopoverContent className="w-[620px] relative">
           <button
             onClick={() => setIsPopoverOpen(false)}
             className="absolute top-2 right-2 p-1 hover:bg-gray-200 rounded-full"
@@ -137,7 +225,6 @@ const ShareButton: React.FC<ShareButtonProps> = ({
 
           <div className="p-4">
             <h3 className="text-lg font-semibold mb-2">Share this post</h3>
-
             <div className="flex items-center gap-2 mb-4">
               <div className="basis-10/12">
                 <Input
@@ -151,71 +238,51 @@ const ShareButton: React.FC<ShareButtonProps> = ({
                 <Button
                   onClick={handleCopyLink}
                   variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1 w-full"
+                  size={"lg"}
+                  className="flex items-center gap-1 w-full py-0"
                 >
                   <Copy className="w-4 h-4" />
                   {copySuccess ? "Copied!" : "Copy"}
                 </Button>
               </div>
             </div>
-
-            <div className="grid grid-cols-7 gap-4">
-              <button
-                onClick={() => handleSocialShare("facebook")}
-                className="flex flex-col items-center hover:text-blue-600"
-                aria-label="Share on Facebook"
-              >
+            <div className="grid grid-cols-8 gap-4">
+              <button onClick={() => handleSocialShare("facebook")} className="flex flex-col items-center hover:text-blue-600" aria-label="Share on Facebook">
                 <Facebook className="w-6 h-6" />
                 <span className="text-xs mt-1">Facebook</span>
               </button>
-              <button
-                onClick={() => handleSocialShare("twitter")}
-                className="flex flex-col items-center hover:text-blue-400"
-                aria-label="Share on Twitter"
-              >
+              <button onClick={() => handleSocialShare("twitter")} className="flex flex-col items-center hover:text-blue-400" aria-label="Share on Twitter">
                 <Twitter className="w-6 h-6" />
                 <span className="text-xs mt-1">Twitter</span>
               </button>
-              <button
-                onClick={() => handleSocialShare("linkedin")}
-                className="flex flex-col items-center hover:text-blue-700"
-                aria-label="Share on LinkedIn"
-              >
+              <button onClick={() => handleSocialShare("linkedin")} className="flex flex-col items-center hover:text-blue-700" aria-label="Share on LinkedIn">
                 <Linkedin className="w-6 h-6" />
                 <span className="text-xs mt-1">LinkedIn</span>
               </button>
-              <button
-                onClick={() => handleSocialShare("instagram")}
-                className="flex flex-col items-center hover:text-pink-500"
-                aria-label="Share on Instagram"
-              >
+              <button onClick={() => handleSocialShare("instagram")} className="flex flex-col items-center hover:text-pink-500" aria-label="Share on Instagram">
                 <Instagram className="w-6 h-6" />
                 <span className="text-xs mt-1">Instagram</span>
               </button>
-              <button
-                onClick={() => handleSocialShare("tiktok")}
-                className="flex flex-col items-center hover:text-black"
-                aria-label="Share on TikTok"
-              >
+              <button onClick={() => handleSocialShare("tiktok")} className="flex flex-col items-center hover:text-black" aria-label="Share on TikTok">
                 <Video className="w-6 h-6" />
                 <span className="text-xs mt-1">TikTok</span>
               </button>
-              <button
-                onClick={() => handleSocialShare("whatsapp")}
-                className="flex flex-col items-center hover:text-green-500"
-                aria-label="Share on WhatsApp"
-              >
+              <button onClick={() => handleSocialShare("whatsapp")} className="flex flex-col items-center hover:text-green-500" aria-label="Share on WhatsApp">
                 <MessageCircle className="w-6 h-6" />
                 <span className="text-xs mt-1">WhatsApp</span>
               </button>
-              <button
-                onClick={() => handleSocialShare("telegram")}
-                className="flex flex-col items-center hover:text-blue-500"
-                aria-label="Share on Telegram"
-              >
+              <button onClick={() => handleSocialShare("telegram")} className="flex flex-col items-center hover:text-blue-500" aria-label="Share on Telegram">
                 <Send className="w-6 h-6" />
                 <span className="text-xs mt-1">Telegram</span>
+              </button>
+              <button
+                onClick={handleDownload}
+                disabled={isDownloading}
+                className="flex flex-col items-center hover:text-primary-500 disabled:opacity-50"
+                aria-label="Download media"
+              >
+                <DownloadIcon className="w-6 h-6" />
+                <span className="text-xs mt-1">Download</span>
               </button>
             </div>
           </div>
