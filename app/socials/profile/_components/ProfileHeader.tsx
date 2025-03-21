@@ -125,16 +125,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <FollowButton followedId={Number(userProfile?.id)} />
           )}
           <span
-            className="inline-flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
+            className="inline-flex items-center rounded-md px-3 py-1.5 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
           >
-            <BiShare size={26} />
+            <img src="/assets/profile/share.svg" alt="" />
           </span>
           <span
-            className="inline-flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
+            className="inline-flex items-center rounded-md px-3 py-1.5 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
+            onClick={handleSettingsModal}
           >
-            <Settings size={26} onClick={handleSettingsModal} />
+            <img src="/assets/profile/settings.svg" alt="" />
           </span>
         </div>
       </div>

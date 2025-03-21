@@ -84,7 +84,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
           </div>
 
           {/* Center Section with Navigation Buttons */}
-          <div className="flex items-center justify-center space-x-1 sm:space-x-2 lg:space-x-4 flex-shrink-0">
+          <div className="flex items-center justify-center space-x-0">
             {headerButtons.map((button) => {
               const isActive = isButtonActive(button.navItems);
               const Icon = button.icon;
