@@ -21,7 +21,10 @@ interface SocialMetric {
   count?: string;
 }
 
-export default function SocialPost({ post, ref }: { post: any; ref: any }) {
+export default function SocialPost({ post, ref, setOptionsAnchorRect, setShowOptionsMenu }: {
+  post: any; ref: any, setOptionsAnchorRect: any;
+  setShowOptionsMenu: any
+}) {
   const [showAllTags, setShowAllTags] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -74,6 +77,13 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     }
   }, [isDownloaded]);
 
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setOptionsAnchorRect(buttonRect);
+    setShowOptionsMenu(true);
+    toggleComments(post?.id)
+  };
+
   const metrics: SocialMetric[] = [
     {
       icon: (
@@ -88,8 +98,8 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     {
       icon: (
         <ChatBubbleOvalLeftEllipsisIcon
-          className="w-8 h-8 text-white sm:text-[#BFBFBF]"
-          onClick={() => toggleComments(post?.id)}
+          className="w-8 h-8 text-[#BFBFBF]"
+          onClick={(e: any) => handleOptionsClick(e)}
         />
       ),
       count: post?.commentsCount,
@@ -104,7 +114,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         />
       ),
     },
-    { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
+    { icon: <VscEye className="w-8 h-8 text-[#BFBFBF]" />, count: post?.viewsCount },
     {
       icon: (
         <ShareButton
@@ -193,7 +203,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
             isMyPost={Number(post.userId) === currentUserId}
           />
           {metrics.map((metric, index) => (
-            <div key={index} className="flex flex-col items-center mb-0">
+            <div key={index} className="flex flex-col items-center my-2">
               <div className="text-sm rounded-full cursor-pointer transition-colors">{metric.icon}</div>
               <span className="text-xs text-gray-800 font-semibold">{metric.count}</span>
             </div>

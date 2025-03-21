@@ -38,6 +38,17 @@ const SocialFeed = ({ initialPosts }: any) => {
     }
   })
 
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [optionsAnchorRect, setOptionsAnchorRect] = useState<DOMRect | null>(
+    null
+  );
+
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setOptionsAnchorRect(buttonRect);
+    setShowOptionsMenu(true);
+  };
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768)
@@ -134,8 +145,7 @@ const SocialFeed = ({ initialPosts }: any) => {
   return (
     <div className="w-full min-h-screen">
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Posts Section - Adjusts width based on screen size */}
-        <div className={``}>
+        <div className={`w-full`}>
           <div
             ref={containerRef}
             className="overflow-y-auto snap-y snap-mandatory no-scrollbar"
@@ -197,6 +207,8 @@ const SocialFeed = ({ initialPosts }: any) => {
                                 firstNewPostRef.current = el
                               }
                             }}
+                            setOptionsAnchorRect={setOptionsAnchorRect}
+                            setShowOptionsMenu={setShowOptionsMenu}
                           />
                         </div>
                       )
@@ -205,9 +217,9 @@ const SocialFeed = ({ initialPosts }: any) => {
                 )
               })
             )}
-            <div ref={ref} className="py-1 text-center w-full flex items-center justify-center">
+            <div ref={ref} className="py-1 text-center w-full flex items-center justify-center mb-10">
               {queryIsFetchingNextPage ? (
-                <div>
+                <div className=''>
                   <Loader />
                 </div>
               ) : hasNextPage ? (
@@ -221,7 +233,11 @@ const SocialFeed = ({ initialPosts }: any) => {
 
         <div>
           {
-            showComments && <CommentCard />
+            showComments && <CommentCard
+              isOpen={showOptionsMenu}
+              onClose={() => setShowOptionsMenu(false)}
+              anchorRect={optionsAnchorRect}
+            />
           }
         </div>
       </div>

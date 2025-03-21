@@ -23,8 +23,6 @@ export function Comments({ postId }: { postId: number; }) {
 
   const {
     data: profileData,
-    isLoading: profileLoading,
-    error: profileError
   } = useUserProfile(currentUser?.id);
 
   const handleToggleCommentInput = (commentId: string) => {
