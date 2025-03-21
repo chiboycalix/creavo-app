@@ -11,6 +11,8 @@ import { useWebSocket } from "@/context/WebSocket";
 import { Input } from "@/components/Input";
 import { TextareaInput } from "@/components/Input/TextareaInput";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import ButtonLoader from "@/components/ButtonLoader";
 
 interface UserProfile {
   id: number;
@@ -41,7 +43,6 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
   const [bio, setBio] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [alert, setAlert] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ws = useWebSocket();
 
@@ -121,11 +122,11 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
       };
 
       const response = (await AUTH_API.updateProfile(updatedUserData)) as any;
+
       if (response.code !== STATUS_CODES.OK) {
         return;
       }
-
-      setAlert("Update was successful");
+      toast.success("Update was successful")
       setLoading(false);
 
       setUser((prev) => {
@@ -159,8 +160,10 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false);
+      console.log({ error })
+      toast.error(error?.data[0])
     }
   };
 
@@ -233,7 +236,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
                 className="w-full"
               />
 
-              {/* {username && <Socket username={username} />} */}
+              {username && <Socket username={username} />}
             </div>
             <div className="mb-8">
               <TextareaInput
@@ -250,13 +253,15 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
               className="w-full py-3 text-white rounded-lg font-medium focus:outline-none  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
-              {loading ? <Loader2 color="white" /> : "Save Changes"}
+              <ButtonLoader
+                isLoading={loading}
+                caption="Save Changes"
+              />
             </Button>
           </div>
 
         </form>
       </>
-      {alert && <Toastify key="toast" message={alert} />}
     </AnimatePresence>
   );
 };

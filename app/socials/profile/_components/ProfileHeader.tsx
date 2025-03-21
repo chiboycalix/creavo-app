@@ -7,12 +7,9 @@ import FollowingCard from "@/components/socials/profile/FollowingCard";
 import FollowersCard from "@/components/socials/profile/FollowersCard";
 import EditUserProfileModal from "./EditUserInputModal";
 import { BsPencil } from "react-icons/bs";
-import { BiShare } from "react-icons/bi";
-import { Settings } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -111,13 +108,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <DialogContent className="bg-primary-50 max-w-xl">
                 <DialogHeader>
                   <DialogTitle>Edit Profile</DialogTitle>
-                  <DialogDescription>
-                    <EditUserProfileModal
-                      userProfile={userProfile}
-                      aria-label="Edit user profile modal"
-                      onProfileUpdate={onProfileUpdate}
-                    />
-                  </DialogDescription>
+                  <EditUserProfileModal
+                    userProfile={userProfile}
+                    aria-label="Edit user profile modal"
+                    onProfileUpdate={onProfileUpdate}
+                  />
                 </DialogHeader>
               </DialogContent>
             </Dialog>
