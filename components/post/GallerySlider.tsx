@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
-import { getMediaDimensionsClientSide, getMimeTypeFromCloudinaryUrl } from '@/utils'
+import { getMimeTypeFromCloudinaryUrl } from '@/utils'
 import { cn } from '@/lib/utils'
+import { Loader } from 'lucide-react'
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[]
@@ -15,13 +15,14 @@ type GallerySliderTypes = {
   navigation?: boolean
   ratioClass?: string
   galleryClass?: string
-  isRenderedInComment?: boolean;
-  handleImageLoad: any;
-  handleVideoLoad: any;
-  imageRef: any;
-  videoRef: any;
-  isLandscape: boolean;
+  isRenderedInComment?: boolean
+  handleImageLoad: any
+  handleVideoLoad: any
+  imageRef: any
+  videoRef: any
+  isLandscape: boolean
 }
+
 const GallerySlider = ({
   galleryImgs,
   className = '',
@@ -29,14 +30,13 @@ const GallerySlider = ({
   handleVideoLoad,
   imageRef,
   videoRef,
-  isLandscape,
 }: GallerySliderTypes) => {
   const [loaded, setLoaded] = useState(false)
   const [index, setIndex] = useState(0)
   const [direction, setDirection] = useState(0)
   const images = galleryImgs?.length > 0 ? galleryImgs : []
 
-  const mimeType = getMimeTypeFromCloudinaryUrl(galleryImgs && galleryImgs[0]?.url || '');
+  const mimeType = getMimeTypeFromCloudinaryUrl(galleryImgs && galleryImgs[0]?.url || '')
   const isImage = mimeType === "image/*" || galleryImgs[index]?.mimeType === "image/jpeg" || galleryImgs[index]?.mimeType === "image/*"
 
   const changePhotoId = (newVal: number) => {
@@ -46,6 +46,7 @@ const GallerySlider = ({
       setDirection(-1)
     }
     setIndex(newVal)
+    setLoaded(false)
   }
 
   const handlers = useSwipeable({
@@ -64,16 +65,6 @@ const GallerySlider = ({
 
   const currentMedia = images[index]
 
-  useEffect(() => {
-    getMediaDimensionsClientSide("https://res.cloudinary.com/dlujwccdb/image/upload/v1742544174/fitness_oemylu.jpg").then((dimen) => {
-      console.log({ dimen })
-    }).catch((error) => {
-      console.log({ error })
-    })
-
-  }, [currentMedia?.url])
-
-
   if (!images || images.length === 0) {
     return <div>No images to display.</div>
   }
@@ -86,13 +77,18 @@ const GallerySlider = ({
       }}
     >
       <div
-        className={`relative  group group/cardGallerySlider`}
+        className={`relative group group/cardGallerySlider w-full`}
         {...handlers}
       >
-        {/* Main image */}
-        <div className={` h-full overflow-hidden rounded-none`}>
+        {/* Main media container */}
+        <div className={`h-full overflow-hidden rounded-none relative w-full`}>
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-200 max-w-full">
+              <Loader className="animate-spin w-12 h-12 text-black" />
+            </div>
+          )}
           <Link
-            className={`relative flex items-center justify-center h-full `}
+            className={`relative flex items-center justify-center h-full`}
             href={''}
           >
             <AnimatePresence initial={false} custom={direction}>
@@ -108,7 +104,7 @@ const GallerySlider = ({
                     loading="lazy"
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    className={cn("h-[725px] w-full", className, "")}
+                    className={cn(className, images?.length ? "h-[725px] w-full" : "h-[100vh] w-full object-cover")}
                     onLoad={() => {
                       setLoaded(true)
                       handleImageLoad()
@@ -119,7 +115,7 @@ const GallerySlider = ({
                   <video
                     src={currentMedia?.url || ''}
                     className={className}
-                    onLoad={() => {
+                    onLoadedData={() => {
                       setLoaded(true)
                       handleVideoLoad()
                     }}
@@ -129,26 +125,20 @@ const GallerySlider = ({
               </motion.div>
             </AnimatePresence>
           </Link>
-
         </div>
 
-        {/* Buttons + bottom nav bar */}
-        <div className=''>
-
-          {images.length > 1 && (
-            <div className="flex justify-center space-x-2 mt-4">
-              {images.map((_, i) => (
-                <button
-                  key={i}
-                  className={`h-2 w-2 relative bottom-2 z-[5000] rounded-full ${i === index ? 'bg-primary-700' : 'bg-gray-400'
-                    }`}
-                  onClick={() => changePhotoId(i)}
-                />
-              ))}
-            </div>
-          )}
-
-        </div>
+        {images.length > 1 && (
+          <div className="flex justify-center space-x-2 mt-4">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                className={`h-2 w-2 relative bottom-3 z-[5000] rounded-full ${i === index ? 'bg-primary-700' : 'bg-gray-400'
+                  }`}
+                onClick={() => changePhotoId(i)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </MotionConfig>
   )

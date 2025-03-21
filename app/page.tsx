@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Spinner from '@/components/Spinner'
 
 export default function Page() {
   const router = useRouter()
@@ -10,5 +11,5 @@ export default function Page() {
     router.push('/socials')
   }, [router])
 
-  return null // or loading spinner
+  return <Spinner />
 }

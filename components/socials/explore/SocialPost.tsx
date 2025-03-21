@@ -11,7 +11,8 @@ import { useComments } from "@/context/CommentsContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { getMediaDimensionsClientSide } from "@/utils";
+import { useMediaDimensions } from '@/hooks/useMediaDimensions';
+
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
@@ -37,7 +38,7 @@ export default function SocialPost({ post, socialPostRef, setOptionsAnchorRect, 
   const hashtagFromCourse = post?.hashtag.match(/##(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
   const hashtagFromPost = post?.hashtag.match(/#(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
   const tags = hashtagFromCourse.length > 0 ? hashtagFromCourse : hashtagFromPost;
-
+  const { width, height, type } = useMediaDimensions(post?.media[0]?.url);
   const [isLandscape, setIsLandscape] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -132,25 +133,27 @@ export default function SocialPost({ post, socialPostRef, setOptionsAnchorRect, 
     router.push(`/market/product/${id}`);
   };
 
-  // useEffect(() => {
-  //   getMediaDimensionsClientSide("https://res.cloudinary.com/dlujwccdb/video/upload/v1742387359/Download_2_nisph3.mp4").then((dimen) => {
-  //     console.log({ dimen })
-  //   }).catch((error) => {
-  //     console.log({ error })
-  //   })
+  const isImage = type === "image";
+  const isVideo = type === "video"
 
-  // }, [])
+  const imageWrapperStyle = isImage && isLandscape
+  const videoWrapperStyle = isVideo && isLandscape
+
   return (
     <div data-post-id={post.id} ref={socialPostRef}
-      className={cn("mb-6 flex flex-row items-center justify-center h-[88vh] gap-4",
+      className={cn("mb-6 flex flex-row items-center justify-center h-[88vh] gap-4 relative",
         isLandscape ? "w-full" : "w-full",
       )}
     >
       {/* Main Post Container */}
-      <div className={cn("flex gap-4 items-center justify-center w-full relative flex-1 bg-black rounded-xl overflow-hidden h-full", isLandscape ? "max-w-3xl" : "max-w-md")}>
+      <div className={cn("flex gap-4 items-center justify-center w-full relative flex-1 rounded-xl overflow-hidden h-full",
+        isLandscape ? "max-w-3xl" : "max-w-md",
+        imageWrapperStyle && "bg-black",
+        videoWrapperStyle && "bg-black rounded-t-xl"
+      )}>
         <div
           className={cn(
-            "flex items-center justify-center h-full",
+            "flex items-center justify-center rounded-xl h-full relative",
             isLandscape ? "py-8" : ""
           )}
         >
@@ -163,13 +166,15 @@ export default function SocialPost({ post, socialPostRef, setOptionsAnchorRect, 
             handleVideoLoad={handleVideoLoad}
             isLandscape={isLandscape}
             className={cn(
-              "object-contain",
-              isLandscape ? "w-full" : "h-[85vh] max-w-full"
+              "rounded-xl",
+              isLandscape ? "w-full object-contain" : "max-w-full object-cover"
             )}
           />
 
           {/* Profile Section */}
-          <div className="absolute left-0 right-0 bottom-0 p-4 w-[80%] md:w-full bg-gradient-to-t from-black/90 to-transparent rounded-b-xl">
+          <div
+            className={cn("absolute left-0 bottom-0 right-0 p-4 md:w-full bg-gradient-to-t from-black/90 to-transparent rounded-b-xl",
+            )}>
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center justify-between gap-2 pt-4">
@@ -230,13 +235,17 @@ export default function SocialPost({ post, socialPostRef, setOptionsAnchorRect, 
       </div>
 
       {(isDownloading || isDownloaded) && (
-        <div className="absolute bottom-0 left-0 w-[88%] flex flex-col items-center justify-between px-2 py-1 bg-gray-800 bg-opacity-75 rounded-b-xl">
+        <div
+          className={cn(`absolute bottom-0 left-0 flex flex-col items-center justify-center px-2 py-[0.07rem] bg-gray-800 bg-opacity-75 rounded-b-full`,
+            isLandscape ? "w-[75%] ml-[9%]" : "w-[44.5%] ml-[24.4%]"
+
+          )}>
           <span className="text-white text-xs font-semibold ml-2 whitespace-nowrap">
             {isDownloaded ? "Downloaded" : `${downloadProgress}% Saving...`}
           </span>
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary-500 transition-all duration-300 ease-in-out"
+              className="h-full bg-primary-500 transition-all duration-300 ease-in-out rounded-b-full"
               style={{ width: `${downloadProgress}%` }}
             />
           </div>

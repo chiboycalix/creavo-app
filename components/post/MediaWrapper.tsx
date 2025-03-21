@@ -6,6 +6,7 @@ import { PostMediaType, usePost } from '@/context/PostContext'
 import { useVideoPlayback } from '@/context/VideoPlaybackContext'
 import { baseUrl } from '@/utils/constant'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils';
+import { cn } from '@/lib/utils';
 
 type MediaWrapperProps = {
   postMedia?: PostMediaType[]
@@ -30,7 +31,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
   handleImageLoad,
   handleVideoLoad,
   isLandscape,
-  className
+  className,
 }) => {
 
   const [isPlaying, setIsPlaying] = useState(false)
@@ -141,7 +142,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
     }
   }, [isImage, hasBeenViewed, postId, updateViewsCount, postMedia, isGloballyPaused, setIsGloballyPaused, videoRef])
 
-  // Effect to handle global pause state
+
   useEffect(() => {
     if (isGloballyPaused && isPlaying) {
       videoRef.current?.pause()
@@ -167,9 +168,13 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
           <video
             ref={videoRef}
             src={postMedia?.[0]?.url || ''}
-            className={className}
+            className={cn(
+              "object-contain",
+              isLandscape ? "w-full" : "w-full"
+            )}
             loop
             playsInline
+            onLoadedData={handleVideoLoad}
           />
           <div
             className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
@@ -183,9 +188,9 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
               {isPlaying ? <FaPause /> : <FaPlay />}
             </button>
           </div>
-          <div className="absolute left-[0.3rem] bottom-[0.07rem] w-[99%] z-50 h-1 bg-gray-200 rounded-b-full">
+          <div className={cn("absolute left-[0.3rem] bottom-[0.07rem] w-[98.5%] ml-[0.5%] z-50 h-1 bg-gray-400 rounded-b-full")}>
             <div
-              className="h-full bg-blue-600 transition-all duration-300"
+              className="h-full bg-red-600 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>

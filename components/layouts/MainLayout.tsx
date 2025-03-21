@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useState, useEffect } from "react";
-import ProfileCompletionManager from "../ProfileCompletionManager";
 import SidebarSkeleton from "../sketetons/SidebarSkeleton";
 import Header from "./includes/Header";
 import Sidebar from "./includes/Sidebar";
@@ -10,7 +9,6 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 import {
-  Archive,
   Video,
   User,
   Compass,
@@ -23,10 +21,8 @@ import {
   Calendar,
   ChartAreaIcon,
   LayoutDashboardIcon,
-  TagIcon,
   BellIcon,
   Bookmark,
-  ChartSplineIcon,
   BoxesIcon,
   Users2
 } from "lucide-react";
@@ -45,7 +41,6 @@ export default function MainLayout({
   const { data: profileData } = useUserProfile(currentUser?.id);
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
-  // Detect if the current route matches /studio/community/[space]
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
     setIsCommunityRoute(communityRoutePattern.test(pathname || ""));
@@ -185,7 +180,6 @@ export default function MainLayout({
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
             <div className="p-0 sm:p-6">
-              <ProfileCompletionManager />
               {children}
             </div>
           </main>

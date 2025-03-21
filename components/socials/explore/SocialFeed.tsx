@@ -15,9 +15,12 @@ const SocialFeed = ({ initialPosts }: any) => {
   const { ref, inView } = useInView({ rootMargin: "400px" })
   const firstNewPostRef = useRef<HTMLDivElement>(null)
   const [isFirstLoad, setIsFirstLoad] = useState(true)
-  const [isMobileView, setIsMobileView] = useState(false)
   const currentPageIndexRef = useRef(0)
   const { setActivePostId } = useComments()
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [optionsAnchorRect, setOptionsAnchorRect] = useState<DOMRect | null>(
+    null
+  );
   const observerRefs = useRef(new Map())
   const socialFeedRef = useRef<HTMLDivElement>(null) as any
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
@@ -38,11 +41,6 @@ const SocialFeed = ({ initialPosts }: any) => {
       pageParams: [1]
     }
   })
-
-  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
-  const [optionsAnchorRect, setOptionsAnchorRect] = useState<DOMRect | null>(
-    null
-  );
 
   useEffect(() => {
     if (!socialFeedRef.current) return;
@@ -65,17 +63,6 @@ const SocialFeed = ({ initialPosts }: any) => {
       socialFeedRef.current?.removeEventListener('scroll', handleScroll);
     };
   }, [currentPostIndex]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768)
-    }
-
-    handleResize()
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     entries.forEach((entry) => {
@@ -234,7 +221,7 @@ const SocialFeed = ({ initialPosts }: any) => {
                 )
               })
             )}
-            <div ref={ref} className="py-1 text-center w-full flex items-center justify-center mb-10">
+            <div ref={ref} className="py-1 text-center w-full flex items-center ml-[30rem] mb-10">
               {queryIsFetchingNextPage ? (
                 <div className=''>
                   <Loader />
