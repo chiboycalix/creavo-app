@@ -5,6 +5,7 @@ import { FaPlay, FaPause } from 'react-icons/fa'
 import { PostMediaType, usePost } from '@/context/PostContext'
 import { useVideoPlayback } from '@/context/VideoPlaybackContext'
 import { baseUrl } from '@/utils/constant'
+import { getMimeTypeFromCloudinaryUrl } from '@/utils';
 
 type MediaWrapperProps = {
   title: string
@@ -29,8 +30,9 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
   const [hasBeenViewed, setHasBeenViewed] = useState(false)
   const { updateViewsCount } = usePost()
   const { isGloballyPaused, setIsGloballyPaused } = useVideoPlayback()
-
-  const isImage = (postMedia && (postMedia && postMedia[0]?.mimeType === 'image/jpeg') || postMedia && postMedia[0]?.mimeType === 'image/*')
+  const mimeType = getMimeTypeFromCloudinaryUrl(postMedia && postMedia[0]?.url || '');
+  console.log({ postMedia: postMedia![0], mimeType })
+  const isImage = mimeType === "image/*" || (postMedia && (postMedia && postMedia[0]?.mimeType === 'image/jpeg') || postMedia && postMedia[0]?.mimeType === 'image/*')
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -151,7 +153,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
     <div className={`${size} relative overflow-hidden flex items-center`}>
       {isImage ? (
         <GallerySlider
-          galleryImgs={postMedia}
+          galleryImgs={postMedia!}
           className="w-full h-full object-cover"
           imageClass="h-full"
           isRenderedInComment={isRenderedInComment}
