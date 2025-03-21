@@ -1,3 +1,4 @@
+import PageTitle from '@/components/PageTitle'
 import CreateCommunityDialog from '@/components/studio/community/CreateCommunityDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -5,10 +6,12 @@ import React from 'react'
 
 const Community = () => {
   return (
-    <div className='h-[70vh] py-4'>
-      <h2 className='text-xl font-semibold'>Community</h2>
+    <div className='h-[70vh]'>
+      <PageTitle>
+        Community
+      </PageTitle>
 
-      <Card className='mt-56 w-[70%] mx-auto border-none'>
+      <Card className='mt-40 w-[70%] mx-auto border-none'>
         <CardHeader>
           <CardTitle className='text-center flex flex-col items-center justify-center'>
             <img src="/assets/community.svg" alt="" />

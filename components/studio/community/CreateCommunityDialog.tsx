@@ -44,16 +44,16 @@ const CreateCommunityDialog = () => {
                   setspace(e.target.value)
                 }}
               />
-              <p className='text-sm mt-1'>You can always change this later</p>
+              <p className='text-xs mt-1'>You can always change this later</p>
             </div>
 
             <div className='mb-8'>
               <Input
                 variant="textarea"
-                label="Course Description"
+                label="Community Description"
                 maxLength={365}
                 placeholder="Enter your course description"
-                value={"desc"}
+                value={""}
                 onChange={(e) => {
                 }}
                 rows={5}
@@ -70,6 +70,7 @@ const CreateCommunityDialog = () => {
                 onChange={(uploads: any) => {
                 }}
                 className="py-10"
+                footerText="Supports common image formats"
               />
             </div>
 

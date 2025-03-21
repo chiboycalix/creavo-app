@@ -101,7 +101,7 @@ const CreateLongCourse = () => {
   }
 
   return (
-    <Card className='border-none mt-4 max-w-5xl mx-auto'>
+    <Card className='border-none mt-4 max-w-xl mx-auto'>
       <CardHeader className="">
         <CardTitle className="text-base font-semibold">New Course</CardTitle>
       </CardHeader>
@@ -120,7 +120,7 @@ const CreateLongCourse = () => {
               }}
               errorMessage={errors.title}
             />
-            <p className='text-sm mt-1'>You can always change this later</p>
+            <p className='text-xs mt-1'>You can always change this later</p>
           </div>
 
           <div className='mb-8'>

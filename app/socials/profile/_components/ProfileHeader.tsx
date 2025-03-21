@@ -7,12 +7,9 @@ import FollowingCard from "@/components/socials/profile/FollowingCard";
 import FollowersCard from "@/components/socials/profile/FollowersCard";
 import EditUserProfileModal from "./EditUserInputModal";
 import { BsPencil } from "react-icons/bs";
-import { BiShare } from "react-icons/bi";
-import { Settings } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -111,13 +108,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <DialogContent className="bg-primary-50 max-w-xl">
                 <DialogHeader>
                   <DialogTitle>Edit Profile</DialogTitle>
-                  <DialogDescription>
-                    <EditUserProfileModal
-                      userProfile={userProfile}
-                      aria-label="Edit user profile modal"
-                      onProfileUpdate={onProfileUpdate}
-                    />
-                  </DialogDescription>
+                  <EditUserProfileModal
+                    userProfile={userProfile}
+                    aria-label="Edit user profile modal"
+                    onProfileUpdate={onProfileUpdate}
+                  />
                 </DialogHeader>
               </DialogContent>
             </Dialog>
@@ -125,16 +120,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <FollowButton followedId={Number(userProfile?.id)} />
           )}
           <span
-            className="inline-flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
+            className="inline-flex items-center rounded-md px-3 py-1.5 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
           >
-            <BiShare size={26} />
+            <img src="/assets/profile/share.svg" alt="" />
           </span>
           <span
-            className="inline-flex items-center rounded-md px-3 py-1 bg-gray-300 cursor-pointer"
+            className="inline-flex items-center rounded-md px-3 py-1.5 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
+            onClick={handleSettingsModal}
           >
-            <Settings size={26} onClick={handleSettingsModal} />
+            <img src="/assets/profile/settings.svg" alt="" />
           </span>
         </div>
       </div>

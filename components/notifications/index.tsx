@@ -117,7 +117,7 @@ const NotificationsPopover = () => {
           <h3 className="basis-6/12 text-lg font-semibold">Notifications</h3>
         </div>
 
-        <div className="max-h-[80vh] overflow-y-auto">
+        <div className="max-h-[80vh] overflow-y-auto no-scrollbar">
           <div className="min-h-[80vh] overflow-y-auto">
             {isFetchingNotifications ? (
               <NotificationSkeleton />

@@ -47,7 +47,7 @@ export const DatePickerInput = ({
         <PopoverTrigger asChild>
           <div
             className={cn(
-              "relative cursor-pointer bg-white rounded border-2 border-primary-100 py-3",
+              "relative cursor-pointer bg-white rounded-md border-2 border-primary-100 py-3",
               leftIcon ? "pl-10" : "pl-3",
               rightIcon ? "pr-10" : "pr-3",
               errorMessage && "bg-red-100",

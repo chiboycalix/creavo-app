@@ -31,7 +31,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
   const { updateViewsCount } = usePost()
   const { isGloballyPaused, setIsGloballyPaused } = useVideoPlayback()
   const mimeType = getMimeTypeFromCloudinaryUrl(postMedia && postMedia[0]?.url || '');
-  console.log({ postMedia: postMedia![0], mimeType })
+
   const isImage = mimeType === "image/*" || (postMedia && (postMedia && postMedia[0]?.mimeType === 'image/jpeg') || postMedia && postMedia[0]?.mimeType === 'image/*')
 
   const togglePlay = () => {

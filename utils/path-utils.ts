@@ -40,8 +40,6 @@ export const LAYOUT_PATHS = [
   "/studio/course-management/*",
   "/studio/event/meeting",
   "/studio/event/meeting/*",
-  "/studio/event/webinar",
-  "/studio/event/webinar/*",
   "/studio/event/classroom",
   "/studio/event/classroom/*",
   "/studio/calendar",

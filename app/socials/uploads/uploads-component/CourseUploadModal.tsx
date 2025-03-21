@@ -49,7 +49,6 @@ const CourseUploadModal: React.FC<CourseUploadModalProps> = ({
     e.stopPropagation();
   };
 
-  // Function to handle drop event
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
 

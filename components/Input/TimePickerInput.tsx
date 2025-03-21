@@ -67,7 +67,7 @@ export const TimePickerInput = ({
           <button
             type="button"
             className={cn(
-              "relative cursor-pointer bg-white rounded border-2 border-primary-100 py-3 w-full text-left",
+              "relative cursor-pointer bg-white rounded-md border-2 border-primary-100 py-3 w-full text-left",
               leftIcon ? "pl-10" : "pl-3",
               rightIcon ? "pr-10" : "pr-3",
               errorMessage && "bg-red-100",

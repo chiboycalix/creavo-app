@@ -17,7 +17,7 @@ function OverviewPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full mx-auto px-0 py-4">
+      <div className="w-full">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
           <select className="border rounded-md px-4 py-2">
@@ -27,7 +27,7 @@ function OverviewPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-8">
-          <StatCard title="Today Revenue" value="$2,868.99" subtitle="143 Subscription" color="text-green-500"  />
+          <StatCard title="Today Revenue" value="$2,868.99" subtitle="143 Subscription" color="text-green-500" />
           <StatCard title="Available to withdraw" value="$1,567.99" subtitle="Wed, Jul 20" />
           <StatCard title="Subscribers" value="3,422" subtitle="34 This month" trend={{ value: 3.2, isPositive: true }} />
           <StatCard title="Video Conference Participant" value="156k" subtitle="32k visitors" trend={{ value: 3.2, isPositive: true }} />

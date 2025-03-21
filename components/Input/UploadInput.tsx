@@ -21,8 +21,8 @@ type UploadInputProps = {
   accept?: string;
   maxFiles?: number;
   nextPath?: string;
-  onChange?: any;
   placeholder?: string;
+  footerText?: string;
 } & React.ComponentProps<"div">;
 
 type UploadProgress = {
@@ -41,12 +41,12 @@ export const UploadInput = ({
   accept = "video/*,image/*",
   maxFiles = 5,
   nextPath,
-  onChange,
   placeholder = `Max ${maxFiles} files per upload`,
+  footerText = "Supports MP4, MOV, FLV videos and common image formats",
   ...rest
 }: UploadInputProps) => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const router = useRouter();
@@ -85,11 +85,10 @@ export const UploadInput = ({
         },
       });
       const url = response.data.secure_url;
-      onChange(url)
       setUploads((prev) =>
         prev.map((upload) =>
           upload.file === file ? { ...upload, url, uploading: false } : upload
-        ),
+        )
       );
       return url;
     } catch (error) {
@@ -117,7 +116,8 @@ export const UploadInput = ({
       type: file.type.startsWith("image/") ? "image" : "video",
     }));
     setUploads((prev) => [...prev, ...newUploads]);
-    await Promise.all(newFiles.map((file) => uploadToCloudinary(file)));
+    const urls = await Promise.all(newFiles.map((file) => uploadToCloudinary(file)));
+    return urls.filter((url) => url !== null) as string[];
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,19 +151,19 @@ export const UploadInput = ({
     fileInputRef.current?.click();
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (!nextPath) return;
+
+    setIsLoading(true);
     const urls = uploads.map((upload) => upload.url).filter(Boolean) as string[];
-    if (urls.length > 0 && nextPath) {
-      const urlString = urls.join(",");
-      setIsLoading(true); // Show loader
-      setTimeout(() => {
-        router.push(`${nextPath}?urls=${urlString}`, { scroll: false });
-        setUploads([]); // Reset uploads after navigation
-        setIsLoading(false); // Hide loader after navigation
-      }, 100); // Small delay to ensure loader is visible
+    if (urls.length > 0) {
+      // Encode URLs as a JSON string and base64 encode it
+      const encodedUrls = btoa(JSON.stringify(urls));
+      router.push(`${nextPath}?urls=${encodedUrls}`);
     } else {
-      alert("No files uploaded yet or nextPath not provided!");
+      showToast('error', 'No files uploaded', 'Please upload files before proceeding.');
     }
+    setIsLoading(false);
   };
 
   const allUploaded = uploads.length > 0 && uploads.every((upload) => !upload.uploading);
@@ -178,7 +178,7 @@ export const UploadInput = ({
       )}
       <div
         className={cn(
-          "relative border-2 border-dashed bg-white border-primary-100 rounded-lg p-4 py-28 cursor-pointer",
+          "relative border-2 border-dashed bg-white border-primary-100 rounded-md p-4 py-28 cursor-pointer",
           isDragging && "border-primary-500 bg-primary-100",
           errorMessage && "border-red-500",
           className
@@ -205,15 +205,15 @@ export const UploadInput = ({
           <p className="text-gray-400 text-sm">{placeholder}</p>
         </div>
       </div>
-      <p className="mt-4 text-sm">Supports MP4, MOV, FLV videos and common image formats</p>
+      <p className="mt-4 text-sm">{footerText}</p>
       {uploads.length > 0 && (
         <div className="mt-6 flex flex-col gap-6">
           <div className="border border-gray-200 rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-700 mb-4">Uploading Files</h3>
             <div className="flex flex-wrap gap-4">
               {uploads.map((upload, index) => (
-                <div key={upload.file.name} className="relative w-32 h-40 flex flex-col">
-                  <div className="w-32 h-32 flex-shrink-0">
+                <div key={upload.file.name} className="relative w-52 h-40 flex flex-col">
+                  <div className="w-52 h-32 flex-shrink-0">
                     {upload.type === "image" ? (
                       <img
                         src={upload.url || upload.previewUrl}
@@ -237,13 +237,16 @@ export const UploadInput = ({
                       style={{ width: `${upload.progress}%` }}
                     />
                   </div>
-                  <button
-                    onClick={() => handleRemoveFile(index)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                    disabled={upload.uploading}
-                  >
-                    ×
-                  </button>
+                  {
+                    !upload.uploading && <button
+                      onClick={() => handleRemoveFile(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      disabled={upload.uploading}
+                    >
+                      ×
+                    </button>
+                  }
+
                 </div>
               ))}
             </div>
@@ -252,7 +255,7 @@ export const UploadInput = ({
             <Button
               onClick={handleNext}
               className="mt-4 bg-primary text-white px-6 py-2 rounded-md shadow hover:bg-primary-600 transition-colors duration-200"
-              disabled={isLoading} // Disable button during loading
+              disabled={isLoading}
             >
               Next
             </Button>

@@ -3,11 +3,12 @@ import { LineChart } from '@/components/analytics/LineChart';
 import { StatCard } from '@/components/analytics/StatCard';
 import { ChartHeader } from '@/components/analytics/ChatHeaders';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import PageTitle from '@/components/PageTitle';
 function App() {
   const completionData = [
     { x: 10, value: 42000, enrollment: 15 },
     { x: 11, value: 43000, enrollment: 18 },
-    { x: 12, value: 60000, enrollment: 22 }, 
+    { x: 12, value: 60000, enrollment: 22 },
     { x: 13, value: 45000, enrollment: 19 },
     { x: 14, value: 55000, enrollment: 23 },
     { x: 15, value: 53000, enrollment: 24 },
@@ -22,9 +23,11 @@ function App() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="w-full">
       <div className="flex flex-col items-start mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Sales Metrics</h1>
+        <PageTitle>
+          Sales Metrics
+        </PageTitle>
         <div className="flex items-center gap-4 mt-2">
           <p className="text-gray-600">Get top insights about your performance</p>
           <Select defaultValue="all">
