@@ -19,7 +19,8 @@ const SocialFeed = ({ initialPosts }: any) => {
   const currentPageIndexRef = useRef(0)
   const { setActivePostId } = useComments()
   const observerRefs = useRef(new Map())
-  const containerRef = useRef<HTMLDivElement>(null) as any
+  const socialFeedRef = useRef<HTMLDivElement>(null) as any
+  const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const isFetchingRef = useRef(false)
   const postHeightRef = useRef(0)
   const { showComments } = useComments();
@@ -43,11 +44,27 @@ const SocialFeed = ({ initialPosts }: any) => {
     null
   );
 
-  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const buttonRect = event.currentTarget.getBoundingClientRect();
-    setOptionsAnchorRect(buttonRect);
-    setShowOptionsMenu(true);
-  };
+  useEffect(() => {
+    if (!socialFeedRef.current) return;
+
+    const handleScroll = () => {
+      if (!socialFeedRef.current) return;
+
+      const scrollPos = socialFeedRef.current.scrollTop;
+      const postHeight = socialFeedRef.current.clientHeight;
+      const index = Math.floor(scrollPos / postHeight);
+
+      if (index !== currentPostIndex) {
+        setCurrentPostIndex(index);
+      }
+    };
+
+    socialFeedRef.current.addEventListener('scroll', handleScroll);
+
+    return () => {
+      socialFeedRef.current?.removeEventListener('scroll', handleScroll);
+    };
+  }, [currentPostIndex]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -98,15 +115,15 @@ const SocialFeed = ({ initialPosts }: any) => {
   }, [])
 
   const scrollToFirstNewPost = useCallback(() => {
-    if (firstNewPostRef.current && !isFirstLoad && containerRef.current && postHeightRef.current) {
+    if (firstNewPostRef.current && !isFirstLoad && socialFeedRef.current && postHeightRef.current) {
       const scrollPosition = postHeightRef.current * currentPageIndexRef.current * 10
-      containerRef.current.scrollTo({
+      socialFeedRef.current.scrollTo({
         top: scrollPosition,
         behavior: 'instant',
       })
 
       requestAnimationFrame(() => {
-        containerRef.current.dispatchEvent(new Event('scroll'))
+        socialFeedRef.current.dispatchEvent(new Event('scroll'))
       })
     }
     if (isFirstLoad) {
@@ -147,7 +164,7 @@ const SocialFeed = ({ initialPosts }: any) => {
       <div className="flex flex-col md:flex-row gap-6">
         <div className={`w-full`}>
           <div
-            ref={containerRef}
+            ref={socialFeedRef}
             className="overflow-y-auto snap-y snap-mandatory no-scrollbar"
             style={{
               height,
@@ -201,7 +218,7 @@ const SocialFeed = ({ initialPosts }: any) => {
                         >
                           <SocialPost
                             post={post}
-                            ref={(el: any) => {
+                            socialPostRef={(el: any) => {
                               setPostRef(el, post.id)
                               if (isFirstPostOfNewPage) {
                                 firstNewPostRef.current = el

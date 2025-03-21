@@ -11,6 +11,7 @@ import { useComments } from "@/context/CommentsContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { getMediaDimensionsClientSide } from "@/utils";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
@@ -21,8 +22,8 @@ interface SocialMetric {
   count?: string;
 }
 
-export default function SocialPost({ post, ref, setOptionsAnchorRect, setShowOptionsMenu }: {
-  post: any; ref: any, setOptionsAnchorRect: any;
+export default function SocialPost({ post, socialPostRef, setOptionsAnchorRect, setShowOptionsMenu }: {
+  post: any; socialPostRef: any, setOptionsAnchorRect: any;
   setShowOptionsMenu: any
 }) {
   const [showAllTags, setShowAllTags] = useState(false);
@@ -130,15 +131,29 @@ export default function SocialPost({ post, ref, setOptionsAnchorRect, setShowOpt
   const handleNavigateToCourse = (id: any) => {
     router.push(`/market/product/${id}`);
   };
+
+  // useEffect(() => {
+  //   getMediaDimensionsClientSide("https://res.cloudinary.com/dlujwccdb/video/upload/v1742387359/Download_2_nisph3.mp4").then((dimen) => {
+  //     console.log({ dimen })
+  //   }).catch((error) => {
+  //     console.log({ error })
+  //   })
+
+  // }, [])
   return (
-    <div data-post-id={post.id} ref={ref}
-      className={cn("px-4 h-full",
+    <div data-post-id={post.id} ref={socialPostRef}
+      className={cn("mb-6 flex flex-row items-center justify-center h-[88vh] gap-4",
         isLandscape ? "w-full" : "w-full",
       )}
     >
       {/* Main Post Container */}
-      <div className="flex flex-1 gap-4 items-center justify-center w-full h-full">
-        <div className={cn("relative rounded-xl bg-black")}>
+      <div className={cn("flex gap-4 items-center justify-center w-full relative flex-1 bg-black rounded-xl overflow-hidden h-full", isLandscape ? "max-w-3xl" : "max-w-md")}>
+        <div
+          className={cn(
+            "flex items-center justify-center h-full",
+            isLandscape ? "py-8" : ""
+          )}
+        >
           <MediaWrapper
             postId={post?.id}
             postMedia={post?.media}
@@ -147,6 +162,10 @@ export default function SocialPost({ post, ref, setOptionsAnchorRect, setShowOpt
             handleImageLoad={handleImageLoad}
             handleVideoLoad={handleVideoLoad}
             isLandscape={isLandscape}
+            className={cn(
+              "object-contain",
+              isLandscape ? "w-full" : "h-[85vh] max-w-full"
+            )}
           />
 
           {/* Profile Section */}
@@ -194,36 +213,35 @@ export default function SocialPost({ post, ref, setOptionsAnchorRect, setShowOpt
             </div>
           </div>
         </div>
-
-        <div className="flex flex-col justify-center items-center">
-          <FollowButton
-            followedId={post?.userId}
-            avatar={post?.user_profile_avatar || "/assets/display.jpg"}
-            initialFollowStatus={post?.followed}
-            isMyPost={Number(post.userId) === currentUserId}
-          />
-          {metrics.map((metric, index) => (
-            <div key={index} className="flex flex-col items-center my-2">
-              <div className="text-sm rounded-full cursor-pointer transition-colors">{metric.icon}</div>
-              <span className="text-xs text-gray-800 font-semibold">{metric.count}</span>
-            </div>
-          ))}
-        </div>
-
-        {(isDownloading || isDownloaded) && (
-          <div className="absolute bottom-0 left-0 w-[88%] flex flex-col items-center justify-between px-2 py-1 bg-gray-800 bg-opacity-75 rounded-b-xl">
-            <span className="text-white text-xs font-semibold ml-2 whitespace-nowrap">
-              {isDownloaded ? "Downloaded" : `${downloadProgress}% Saving...`}
-            </span>
-            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary-500 transition-all duration-300 ease-in-out"
-                style={{ width: `${downloadProgress}%` }}
-              />
-            </div>
-          </div>
-        )}
       </div>
+      <div className="flex flex-col justify-center items-center">
+        <FollowButton
+          followedId={post?.userId}
+          avatar={post?.user_profile_avatar || "/assets/display.jpg"}
+          initialFollowStatus={post?.followed}
+          isMyPost={Number(post.userId) === currentUserId}
+        />
+        {metrics.map((metric, index) => (
+          <div key={index} className="flex flex-col items-center my-2">
+            <div className="text-sm rounded-full cursor-pointer transition-colors">{metric.icon}</div>
+            <span className="text-xs text-gray-800 font-semibold">{metric.count}</span>
+          </div>
+        ))}
+      </div>
+
+      {(isDownloading || isDownloaded) && (
+        <div className="absolute bottom-0 left-0 w-[88%] flex flex-col items-center justify-between px-2 py-1 bg-gray-800 bg-opacity-75 rounded-b-xl">
+          <span className="text-white text-xs font-semibold ml-2 whitespace-nowrap">
+            {isDownloaded ? "Downloaded" : `${downloadProgress}% Saving...`}
+          </span>
+          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary-500 transition-all duration-300 ease-in-out"
+              style={{ width: `${downloadProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

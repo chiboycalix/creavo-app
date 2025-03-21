@@ -6,7 +6,6 @@ import { PostMediaType, usePost } from '@/context/PostContext'
 import { useVideoPlayback } from '@/context/VideoPlaybackContext'
 import { baseUrl } from '@/utils/constant'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils';
-import { cn } from '@/lib/utils';
 
 type MediaWrapperProps = {
   postMedia?: PostMediaType[]
@@ -19,6 +18,7 @@ type MediaWrapperProps = {
   handleImageLoad: any;
   handleVideoLoad: any;
   isLandscape: boolean;
+  className: string;
 }
 
 const MediaWrapper: React.FC<MediaWrapperProps> = ({
@@ -29,7 +29,8 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
   videoRef,
   handleImageLoad,
   handleVideoLoad,
-  isLandscape
+  isLandscape,
+  className
 }) => {
 
   const [isPlaying, setIsPlaying] = useState(false)
@@ -149,14 +150,11 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
   }, [isGloballyPaused, isPlaying, videoRef])
 
   return (
-    <div className={`flex flex-1 gap-4 items-center justify-center w-full h-full`}>
+    <>
       {isImage ? (
         <GallerySlider
           galleryImgs={postMedia!}
-          className={cn(
-            "object-contain rounded-xl",
-            isLandscape ? "w-full h-auto max-h-full" : "w-auto max-h-[87vh]"
-          )}
+          className={className}
           isRenderedInComment={isRenderedInComment}
           handleImageLoad={handleImageLoad}
           handleVideoLoad={handleVideoLoad}
@@ -169,10 +167,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
           <video
             ref={videoRef}
             src={postMedia?.[0]?.url || ''}
-            className={cn(
-              "object-contain rounded-xl",
-              isLandscape ? "w-full h-auto max-h-screen" : "h-full w-auto max-h-[85vh]"
-            )}
+            className={className}
             loop
             playsInline
           />
@@ -196,7 +191,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
           </div>
         </>
       )}
-    </div>
+    </>
   )
 }
 

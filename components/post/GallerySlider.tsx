@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
-import { getMimeTypeFromCloudinaryUrl } from '@/utils'
+import { getMediaDimensionsClientSide, getMimeTypeFromCloudinaryUrl } from '@/utils'
 import { cn } from '@/lib/utils'
 
 type GallerySliderTypes = {
@@ -64,6 +64,16 @@ const GallerySlider = ({
 
   const currentMedia = images[index]
 
+  useEffect(() => {
+    getMediaDimensionsClientSide("https://res.cloudinary.com/dlujwccdb/image/upload/v1742544174/fitness_oemylu.jpg").then((dimen) => {
+      console.log({ dimen })
+    }).catch((error) => {
+      console.log({ error })
+    })
+
+  }, [currentMedia?.url])
+
+
   if (!images || images.length === 0) {
     return <div>No images to display.</div>
   }
@@ -80,7 +90,7 @@ const GallerySlider = ({
         {...handlers}
       >
         {/* Main image */}
-        <div className={` h-full overflow-hidden sm:rounded-xl rounded-none`}>
+        <div className={` h-full overflow-hidden rounded-none`}>
           <Link
             className={`relative flex items-center justify-center h-full `}
             href={''}
@@ -98,7 +108,7 @@ const GallerySlider = ({
                     loading="lazy"
                     src={currentMedia?.url || ''}
                     alt="listing card gallery"
-                    className={cn(``, isLandscape ? "" : "min-w-full", className)}
+                    className={cn("h-[725px] w-full", className, "")}
                     onLoad={() => {
                       setLoaded(true)
                       handleImageLoad()
@@ -108,7 +118,7 @@ const GallerySlider = ({
                 ) : (
                   <video
                     src={currentMedia?.url || ''}
-                    className={cn(``, className)}
+                    className={className}
                     onLoad={() => {
                       setLoaded(true)
                       handleVideoLoad()
@@ -119,6 +129,7 @@ const GallerySlider = ({
               </motion.div>
             </AnimatePresence>
           </Link>
+
         </div>
 
         {/* Buttons + bottom nav bar */}
@@ -129,7 +140,7 @@ const GallerySlider = ({
               {images.map((_, i) => (
                 <button
                   key={i}
-                  className={`h-2 w-2 relative bottom-2 z-20 rounded-full ${i === index ? 'bg-primary-700' : 'bg-gray-400'
+                  className={`h-2 w-2 relative bottom-2 z-[5000] rounded-full ${i === index ? 'bg-primary-700' : 'bg-gray-400'
                     }`}
                   onClick={() => changePhotoId(i)}
                 />
