@@ -25,6 +25,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
 
+  console.log("feature products", products);
+
   const handleTabChange = (category: string) => {
     setActiveTab(category);
   };
@@ -49,6 +51,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
       setActiveTab(tabFromUrl);
     }
   }, [searchParams]);
+
+  console.log("products", products);
 
   return (
     <Tabs value={activeTab} className="w-auto">
@@ -76,7 +80,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
       {productCategories.map((tab) => (
         <TabsContent key={tab.category} value={tab.category}>
           <h2 className="mb-3 font-bold">Featured Products</h2>
-          <div className="flex flex-wrap gap-4 sm:justify-evenly md:justify-evenly">
+          <div className="flex flex-wrap gap-4 ">
             {products
               ?.filter(
                 (product: any) =>

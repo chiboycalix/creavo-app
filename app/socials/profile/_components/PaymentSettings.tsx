@@ -1,14 +1,21 @@
-
 "use client";
 import { Trash2Icon } from "lucide-react";
 import React, { useState } from "react";
+import { useSettings } from "@/context/SettingsContext";
 
 const PaymentSettings = () => {
   const [accountNumber, setAccountNumber] = useState("");
-  const [bank, setBank] = useState("");
+  const [bankName, setBankName] = useState("");
   const [accountName, setAccountName] = useState("");
+  const { setBankAccountDetails } = useSettings();
 
-  const banks = ["Bank A", "Bank B", "Bank C", "Bank D"]; // Replace with real bank names
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    if (setBankAccountDetails) {
+      setBankAccountDetails({ accountNumber, bankName, accountName });
+    }
+  };
 
   return (
     <div className="">
@@ -22,13 +29,15 @@ const PaymentSettings = () => {
         <div className="p-1">
           <h3 className="text-md font-bold mb-4">Bank Information</h3>
 
-          <form className="flex flex-col gap-4">
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => handleSubmit(e)}
+          >
             <div className="flex flex-col">
               <label className="text-sm mb-1 font-semibold">
                 Account Number
               </label>
               <input
-              
                 type="number"
                 className=" border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-sm"
                 placeholder="Account number"
@@ -38,25 +47,14 @@ const PaymentSettings = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="text-sm mb-1 font-semibold">Bank</label>
-              <select
-                className="text-sm border p-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-                value={bank}
-                onChange={(e) => setBank(e.target.value)}
-              >
-                <option className="text-sm font-thin" value="">
-                  Select Bank
-                </option>
-                {banks.map((bankName, index) => (
-                  <option
-                    key={index}
-                    value={bankName}
-                    className="text-sm font-thin"
-                  >
-                    {bankName}
-                  </option>
-                ))}
-              </select>
+              <label className="text-sm mb-1 font-semibold">Bank Name</label>
+              <input
+                type="text"
+                className=" border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-sm"
+                placeholder="Bank name"
+                value={bankName}
+                onChange={(e) => setBankName(e.target.value)}
+              />
             </div>
 
             {/* Account Name */}

@@ -63,6 +63,7 @@ interface MarketProviderProps {
 
 export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [singleProduct, setSingleProduct] = useState<any>(null);
   const [savedProducts, setSavedProducts] = useState<any>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [searchRoom, setSearchRoom] = useState(false);
@@ -96,7 +97,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
 
   const fetchSingleCourseProduct = async (id: any) => {
     try {
-      const response = await fetch(`${baseUrl}/market-place/course/${id}`, {
+      const response = await fetch(`${baseUrl}/market-place/courses/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -109,8 +110,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
       }
 
       const data = await response.json();
-      const course = data?.data?.course;
-      console.log("coursesese", course);
+      const course = data?.data;
       return course;
     } catch (error) {}
   };

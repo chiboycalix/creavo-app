@@ -30,6 +30,7 @@ interface SettingsType {
   fetchBlockedUsers?: () => void;
   mutedUsers?: any;
   blockedUsers?: any;
+  setBankAccountDetails?: (bankDetails: any) => void;
 }
 
 export interface PrivacyType {
@@ -221,6 +222,37 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
     }
   }, [currentUser?.id]);
 
+  const setBankAccountDetails = async (bankDetails: any) => {
+    const {accountNumber, bankName, accountName} = bankDetails;
+    try {
+      const response = await fetch(
+        `${baseUrl}/users/${currentUser?.id}/create-payout-account`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
+          },
+          body: JSON.stringify({
+            accountName,
+            accountNumber,
+            bankName,
+          }),
+        }
+      );
+
+      console.log("bank details", bankDetails);
+
+      console.log("response", response);
+
+      if (!response.ok) {
+        throw new Error("Failed to update bank details");
+      }
+    } catch (error) {
+      console.error("Failed to update bank details:", error);
+    }
+  };
+
   useEffect(() => {
     if (currentUser?.id) getUserPrivacyStatus();
   }, [getUserPrivacyStatus, currentUser?.id]);
@@ -253,6 +285,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
         fetchBlockedUsers,
         blockedUsers,
         mutedUsers,
+        setBankAccountDetails,
       }}
     >
       {children}
