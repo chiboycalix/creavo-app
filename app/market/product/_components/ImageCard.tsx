@@ -2,7 +2,7 @@ import React from "react";
 import { useMarketContext } from "@/context/MarketContext";
 
 const ImageCard = ({ product }: any) => {
-  const { showCheckoutCard, setShowCheckoutCard } = useMarketContext();
+  const {  setShowCheckoutCard } = useMarketContext();
   const isVideo = product?.promotionalUrl?.endsWith(".mp4") ?? false;
 
   return (
