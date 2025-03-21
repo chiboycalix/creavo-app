@@ -29,6 +29,8 @@ const MarketPlaceExplore = () => {
     setProducts,
   } = useMarketContext();
 
+  console.log("products", products);
+
   const initialTab = (searchParams.get("tab") as TabValue) || "All";
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
   const [courses, setCourses] = useState<any>(null);

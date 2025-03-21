@@ -2,28 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMarketContext } from "@/context/MarketContext";
-import { Product } from "@/context/MarketContext";
 import { ArrowLeft } from "lucide-react";
 import CourseProduct from "../_components/Course";
-import EventProduct from "../_components/Events";
 
 const ProductItem = () => {
   const { fetchSingleCourseProduct } = useMarketContext();
   const params = useParams();
   const router = useRouter();
   const [product, setProduct] = useState<any>(null);
-  const [productType, setProductType] = useState("");
-
-  const downloadFiles = [
-    {
-      id: 1,
-      fileName: "Chapter 1 - Introduction",
-    },
-    {
-      id: 2,
-      fileName: "Chapter 2 - Main Lesson",
-    },
-  ];
 
   const comments = [
     {
@@ -46,14 +32,16 @@ const ProductItem = () => {
     router.back();
   };
 
+  console.log('params', params?.id);
+
   useEffect(() => {
     const fetchProduct = async () => {
       const fetchedProduct = await fetchSingleCourseProduct(params?.id);
-      setProduct(fetchedProduct);
+      await setProduct(fetchedProduct);
     };
 
     fetchProduct();
-  }, [params?.id, fetchSingleCourseProduct, product?.category]);
+  }, [params?.id, fetchSingleCourseProduct]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -64,7 +52,7 @@ const ProductItem = () => {
         </button>
       </div>
       <div>
-        <CourseProduct product={product} comments={comments} />
+        <CourseProduct product={product} comments={comments}  />
       </div>
     </div>
   );

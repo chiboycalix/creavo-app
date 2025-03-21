@@ -2,6 +2,7 @@ import React from "react";
 import { Product } from "@/context/MarketContext";
 
 const ProductDetails = ({ product }: any) => {
+  console.log("product details", product);
   return (
     <div className="space-y-3">
       <h2 className="text-2xl font-semibold text-gray-900">{product?.title}</h2>

@@ -50,6 +50,7 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [step, setStep] = useState(1);
+  const isVideo = product?.promotionalUrl?.endsWith(".mp4") ?? false;
 
   console.log("here ", product);
 
@@ -131,7 +132,6 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                           required: true,
                         }}
                         containerClass="w-[100%] rounded-md"
-                                      
                       />
                     </div>
                   </div>
@@ -139,11 +139,15 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                   <div className="space-y-4 flex flex-col bg-[#D1DCF180] p-3 rounded-md">
                     <div className="flex justify-between">
                       <div>Sub Total</div>
-                      <div>${product?.price} </div>
+                      <div>
+                        {product?.currency} {product?.amount}{" "}
+                      </div>
                     </div>
                     <div className="flex justify-between">
                       <div>Total</div>
-                      <div>${product?.price} </div>
+                      <div>
+                        {product?.currency} {product?.amount}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -153,7 +157,7 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                     className="w-full bg-primary-600 hover:bg-primary-700 text-white"
                     onClick={handleSubmit}
                   >
-                    {`Pay $${product?.price}`}
+                    {`Pay ${product?.currency} ${product?.amount}`}
                   </Button>
                 </div>
               </div>
@@ -197,12 +201,22 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                       <h2 className="pb-4 border-b-2">Product Summary</h2>
                       <div className=" flex flex-col gap-3 border-2 rounded-md p-3 border-[#EFEFEF] ">
                         <div className="flex items-start gap-2 ">
-                          <div className=" h-auto ">
-                            <img
-                              src={product?.seller?.avatar}
-                              alt=""
-                              className=""
-                            />
+                          <div className="w-full h-auto ">
+                            {isVideo ? (
+                              <video
+                                src={product?.promotionalUrl}
+                                className="w-24 h-24 object-cover"
+                                autoPlay
+                                loop
+                                muted
+                              />
+                            ) : (
+                              <img
+                                src={product?.promotionalUrl}
+                                alt=""
+                                className="w-24 h-24 object-cover"
+                              />
+                            )}
                           </div>
 
                           <div className="flex flex-col gap-2 w-full pr-5">

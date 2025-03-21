@@ -1,23 +1,23 @@
-"use client";
+"use client"
 
-import type React from "react";
-import { useState, useEffect, useRef } from "react";
-import { X, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/check-box";
-import { Label } from "@/components/ui/label";
-import { motion, AnimatePresence } from "framer-motion";
-import { SelectInput } from "@/components/Input/SelectInput";
-import { baseUrl } from "@/utils/constant";
-import Cookies from "js-cookie";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import type React from "react"
+import { useState, useEffect, useRef } from "react"
+import { X, Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/check-box"
+import { Label } from "@/components/ui/label"
+import { motion, AnimatePresence } from "framer-motion"
+import { SelectInput } from "@/components/Input/SelectInput"
+import { baseUrl } from "@/utils/constant"
+import Cookies from "js-cookie"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 interface Timezone {
-  name: string;
-  description: string;
+  name: string
+  description: string
 }
 
 const colorOptions = [
@@ -30,218 +30,160 @@ const colorOptions = [
   { label: "Indigo", value: "bg-indigo-200" },
   { label: "Teal", value: "bg-teal-200" },
   { label: "Orange", value: "bg-orange-200" },
-];
+]
 
 const generateTimeOptions = () => {
-  const options = [];
+  const options = []
   for (let hour = 0; hour < 24; hour++) {
     for (let minute = 0; minute < 60; minute += 30) {
-      const time = `${hour.toString().padStart(2, "0")}:${minute
-        .toString()
-        .padStart(2, "0")}`;
-      options.push({ label: time, value: time });
+      const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`
+      options.push({ label: time, value: time })
     }
   }
-  return options;
-};
-
-interface AddEventCardProps {
-  isOpen: boolean;
-  onClose: () => void;
-  anchorRect: DOMRect | null;
-  eventToEdit?: any;
+  return options
 }
 
-const AddEventCard: React.FC<AddEventCardProps> = ({
-  isOpen,
-  onClose,
-  eventToEdit,
-}) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [isAllDay, setIsAllDay] = useState(false);
-  const [isRepeating, setIsRepeating] = useState(false);
-  const [timezone, setTimezone] = useState("");
-  const [color, setColor] = useState("bg-blue-200");
-  const [members, setMembers] = useState<string[]>([]);
-  const [selectedMember, setSelectedMember] = useState("");
-  const [timezones, setTimezones] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const timeOptions = generateTimeOptions();
-  const [includeWebinar, setIncludeWebinar] = useState(false);
-  const [internalParticipants, setInternalParticipants] = useState<
-    Array<{ email: string; isCoHost: boolean; isRequiredToPay: boolean }>
-  >([]);
-  const [externalParticipants, setExternalParticipants] = useState<Array<any>>(
-    []
-  );
-  const [newParticipantEmail, setNewParticipantEmail] = useState("");
-  const [isCoHost, setIsCoHost] = useState(false);
-  const [isRequiredToPay, setIsRequiredToPay] = useState(false);
-  const [isTimezoneDropdownOpen, setIsTimezoneDropdownOpen] = useState(false);
-  const [eventType, setEventType] = useState("Video conferencing");
-  const [payment, setPayment] = useState("Paid");
-  const [currency, setCurrency] = useState("NGN");
-  const [amount, setAmount] = useState("");
+interface AddEventCardProps {
+  isOpen: boolean
+  onClose: () => void
+  anchorRect: DOMRect | null
+  eventToEdit?: any
+}
+
+const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdit }) => {
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [startDate, setStartDate] = useState<Date | null>(null)
+  const [endDate, setEndDate] = useState<Date | null>(null)
+  const [startTime, setStartTime] = useState("")
+  const [endTime, setEndTime] = useState("")
+  const [isAllDay, setIsAllDay] = useState(false)
+  const [isRepeating, setIsRepeating] = useState(false)
+  const [timezone, setTimezone] = useState("")
+  const [color, setColor] = useState("bg-blue-200")
+  const [timezones, setTimezones] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const timeOptions = generateTimeOptions()
+  const includeWebinar = false
+  const [isTimezoneDropdownOpen, setIsTimezoneDropdownOpen] = useState(false)
 
   useEffect(() => {
     const fetchTimezones = async () => {
-      setIsLoading(true);
-      setError(null);
+      setIsLoading(true)
+      setError(null)
       try {
         const response = await fetch(`${baseUrl}/meetings/timezones`, {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
           },
-        });
-        if (!response.ok) throw new Error("Failed to fetch timezones");
-        const responseData = await response.json();
+        })
+        if (!response.ok) throw new Error("Failed to fetch timezones")
+        const responseData = await response.json()
 
         // Check if response has data property and it's an array
         if (responseData.data && Array.isArray(responseData.data)) {
           // Extract only the name field from each timezone object
-          const timezoneNames = responseData.data.map(
-            (tz: Timezone) => tz.name
-          );
-          setTimezones(timezoneNames);
+          const timezoneNames = responseData.data.map((tz: Timezone) => tz.name)
+          setTimezones(timezoneNames)
         } else {
-          setTimezones([]);
-          setError("Invalid timezone data received");
+          setTimezones([])
+          setError("Invalid timezone data received")
         }
       } catch (error) {
-        console.error("Error fetching timezones:", error);
-        setError("Failed to load timezones");
-        setTimezones([]);
+        console.error("Error fetching timezones:", error)
+        setError("Failed to load timezones")
+        setTimezones([])
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
     if (isOpen) {
-      fetchTimezones();
+      fetchTimezones()
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   useEffect(() => {
     if (eventToEdit) {
-      setTitle(eventToEdit.title || "");
-      setDescription(eventToEdit.description || "");
-      setStartDate(
-        eventToEdit.startTime ? new Date(eventToEdit.startTime) : null
-      );
-      setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null);
+      setTitle(eventToEdit.title || "")
+      setDescription(eventToEdit.description || "")
+      setStartDate(eventToEdit.startTime ? new Date(eventToEdit.startTime) : null)
+      setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null)
       setStartTime(
         eventToEdit.startTime
           ? new Date(eventToEdit.startTime).toLocaleTimeString("en-GB", {
               hour: "2-digit",
               minute: "2-digit",
             })
-          : ""
-      );
+          : "",
+      )
       setEndTime(
         eventToEdit.endTime
           ? new Date(eventToEdit.endTime).toLocaleTimeString("en-GB", {
               hour: "2-digit",
               minute: "2-digit",
             })
-          : ""
-      );
-      setIsAllDay(eventToEdit.isAllDay || false);
-      setIsRepeating(eventToEdit.isRepeating || false);
-      setTimezone(eventToEdit.timezone || "");
-      setColor(eventToEdit.color || "bg-blue-200");
-      setMembers(eventToEdit.participants?.map((p: any) => p.name) || []);
+          : "",
+      )
+      setIsAllDay(eventToEdit.isAllDay || false)
+      setIsRepeating(eventToEdit.isRepeating || false)
+      setTimezone(eventToEdit.timezone || "")
+      setColor(eventToEdit.color || "bg-blue-200")
     }
-  }, [eventToEdit]);
+  }, [eventToEdit])
 
   // Add a click outside handler to close the timezone dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        onClose();
+        onClose()
       }
 
       // Close timezone dropdown when clicking outside of it
-      const timezoneInput = document.querySelector(
-        'input[placeholder="Search timezone..."]'
-      );
-      const timezoneDropdown = document.querySelector(
-        ".max-h-40.overflow-y-auto"
-      );
+      const timezoneInput = document.querySelector('input[placeholder="Search timezone..."]')
+      const timezoneDropdown = document.querySelector(".max-h-40.overflow-y-auto")
       if (
         timezoneInput &&
         timezoneDropdown &&
         !timezoneInput.contains(event.target as Node) &&
         !timezoneDropdown.contains(event.target as Node)
       ) {
-        setIsTimezoneDropdownOpen(false);
+        setIsTimezoneDropdownOpen(false)
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose]);
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [onClose])
 
   const filteredTimezones = searchQuery
-    ? timezones.filter((tz) =>
-        tz.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : timezones;
-
-  const addMember = () => {
-    if (selectedMember && !members.includes(selectedMember)) {
-      setMembers([...members, selectedMember]);
-      setSelectedMember("");
-    }
-  };
-
-  const addInternalParticipant = () => {
-    if (
-      newParticipantEmail &&
-      !internalParticipants.some((p) => p.email === newParticipantEmail)
-    ) {
-      setInternalParticipants([
-        ...internalParticipants,
-        {
-          email: newParticipantEmail,
-          isCoHost,
-          isRequiredToPay,
-        },
-      ]);
-      setNewParticipantEmail("");
-      setIsCoHost(false);
-      setIsRequiredToPay(false);
-    }
-  };
+    ? timezones.filter((tz) => tz.toLowerCase().includes(searchQuery.toLowerCase()))
+    : timezones
 
   const handleSubmit = async () => {
     if (!title.trim() || !startDate || !timezone) {
-      alert("Please enter all required fields.");
-      return;
+      alert("Please enter all required fields.")
+      return
     }
 
     try {
-      const startDateTime = new Date(startDate);
-      const endDateTime = new Date(endDate ?? startDate); // Default end date to start date if null
+      const startDateTime = new Date(startDate)
+      const endDateTime = new Date(endDate ?? startDate) // Default end date to start date if null
 
       if (startTime) {
-        const [startHours, startMinutes] = startTime.split(":").map(Number);
-        startDateTime.setHours(startHours, startMinutes, 0, 0);
+        const [startHours, startMinutes] = startTime.split(":").map(Number)
+        startDateTime.setHours(startHours, startMinutes, 0, 0)
       }
       if (endTime) {
-        const [endHours, endMinutes] = endTime.split(":").map(Number);
-        endDateTime.setHours(endHours, endMinutes, 0, 0);
+        const [endHours, endMinutes] = endTime.split(":").map(Number)
+        endDateTime.setHours(endHours, endMinutes, 0, 0)
       }
 
       // Convert to ISO 8601 format for submission
-      const formattedStartTime = startDateTime.toISOString();
-      const formattedEndTime = endDateTime.toISOString();
+      const formattedStartTime = startDateTime.toISOString()
+      const formattedEndTime = endDateTime.toISOString()
 
       const payload = {
         title,
@@ -254,18 +196,6 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
         timezone,
         isPaid: false,
         type: "SCHEDULED",
-        participants: members.map((member) => ({ name: member })),
-      };
-
-      // Only include webinar data if the toggle is enabled
-      if (includeWebinar) {
-        Object.assign(payload, {
-          includeWebinar,
-          internalParticipant:
-            internalParticipants.length > 0 ? internalParticipants : [],
-          externalParticipant:
-            externalParticipants.length > 0 ? externalParticipants : [],
-        });
       }
 
       const response = await fetch(`${baseUrl}/meetings/`, {
@@ -275,26 +205,24 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
         },
         body: JSON.stringify(payload),
-      });
+      })
 
-      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+      if (!response.ok) throw new Error(`Error: ${response.statusText}`)
 
-      onClose();
+      onClose()
     } catch (error) {
-      console.error("Failed to create event:", error);
-      alert("Failed to create event. Please try again.");
+      console.error("Failed to create event:", error)
+      alert("Failed to create event. Please try again.")
     }
-  };
+  }
 
   // Fix the time formatting in useEffect when editing an event
   useEffect(() => {
     if (eventToEdit) {
-      setTitle(eventToEdit.title || "");
-      setDescription(eventToEdit.description || "");
-      setStartDate(
-        eventToEdit.startTime ? new Date(eventToEdit.startTime) : null
-      );
-      setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null);
+      setTitle(eventToEdit.title || "")
+      setDescription(eventToEdit.description || "")
+      setStartDate(eventToEdit.startTime ? new Date(eventToEdit.startTime) : null)
+      setEndDate(eventToEdit.endTime ? new Date(eventToEdit.endTime) : null)
 
       // Convert stored ISO datetime to `HH:mm` format
       setStartTime(
@@ -304,8 +232,8 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
               minute: "2-digit",
               hour12: false,
             })
-          : ""
-      );
+          : "",
+      )
       setEndTime(
         eventToEdit.endTime
           ? new Date(eventToEdit.endTime).toLocaleTimeString("en-GB", {
@@ -313,16 +241,15 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
               minute: "2-digit",
               hour12: false,
             })
-          : ""
-      );
+          : "",
+      )
 
-      setIsAllDay(eventToEdit.isAllDay || false);
-      setIsRepeating(eventToEdit.isRepeating || false);
-      setTimezone(eventToEdit.timezone || "");
-      setColor(eventToEdit.color || "bg-blue-200");
-      setMembers(eventToEdit.participants?.map((p: any) => p.name) || []);
+      setIsAllDay(eventToEdit.isAllDay || false)
+      setIsRepeating(eventToEdit.isRepeating || false)
+      setTimezone(eventToEdit.timezone || "")
+      setColor(eventToEdit.color || "bg-blue-200")
     }
-  }, [eventToEdit]);
+  }, [eventToEdit])
 
   return (
     <AnimatePresence>
@@ -338,70 +265,9 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
           >
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-xl font-semibold">Add Event</h2>
-              <button
-                onClick={onClose}
-                className="p-1 rounded-full hover:bg-gray-100"
-              >
+              <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
                 <X className="h-5 w-5" />
               </button>
-            </div>
-
-            <div className="space-y-4 p-4 bg-white rounded-lg w-full max-w-md">
-              {/* Event Type */}
-              <label className="block text-gray-700 text-sm font-semibold">
-                Event type
-              </label>
-              <select
-                className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
-                value={eventType}
-                onChange={(e) => setEventType(e.target.value)}
-              >
-                <option>Video conferencing</option>
-                <option>Webinar</option>
-                <option>Workshop</option>
-              </select>
-
-              {/* Payment Type */}
-              <label className="block text-gray-700 text-sm font-semibold">
-                Add payment
-              </label>
-              <select
-                className="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
-                value={payment}
-                onChange={(e) => setPayment(e.target.value)}
-              >
-                <option>Paid</option>
-                <option>Free</option>
-              </select>
-
-              {/* Currency and Amount */}
-              <label className="block text-gray-700 text-sm font-semibold">
-                Currency
-              </label>
-              <div className="flex space-x-2">
-                <select
-                  className="p-2 border rounded-lg w-1/3 focus:ring focus:ring-blue-300"
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                >
-                  <option>NGN</option>
-                  <option>USD</option>
-                  <option>EUR</option>
-                </select>
-                <input
-                  type="text"
-                  placeholder="$"
-                  className="p-2 border rounded-lg w-2/3 focus:ring focus:ring-blue-300"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-              </div>
-
-              {/* Info Text */}
-              <p className="text-gray-500 text-sm">
-                By default, we automatically convert the amount to other
-                currencies of the buyer.
-              </p>
             </div>
 
             <div className="p-4 space-y-6">
@@ -484,9 +350,9 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                         placeholder="Search timezone..."
                         value={searchQuery} // Always show what user types
                         onChange={(e) => {
-                          setSearchQuery(e.target.value);
-                          setTimezone(""); // Clear selected timezone when typing
-                          setIsTimezoneDropdownOpen(true);
+                          setSearchQuery(e.target.value)
+                          setTimezone("") // Clear selected timezone when typing
+                          setIsTimezoneDropdownOpen(true)
                         }}
                         className="pl-10"
                         onFocus={() => setIsTimezoneDropdownOpen(true)}
@@ -496,35 +362,27 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                     {isTimezoneDropdownOpen && (
                       <div className="absolute z-10 w-full max-h-40 overflow-y-auto border rounded-md bg-white shadow-md">
                         {isLoading ? (
-                          <div className="p-2 text-center text-gray-500">
-                            Loading timezones...
-                          </div>
+                          <div className="p-2 text-center text-gray-500">Loading timezones...</div>
                         ) : error ? (
-                          <div className="p-2 text-center text-red-500">
-                            {error}
-                          </div>
+                          <div className="p-2 text-center text-red-500">{error}</div>
                         ) : filteredTimezones.length > 0 ? (
                           filteredTimezones.map((tz) => (
                             <div
                               key={tz}
                               className={`p-2 cursor-pointer hover:bg-gray-100 ${
-                                timezone === tz
-                                  ? "bg-primary-50 text-primary-600"
-                                  : ""
+                                timezone === tz ? "bg-primary-50 text-primary-600" : ""
                               }`}
                               onClick={() => {
-                                setTimezone(tz); // Store selected timezone
-                                setSearchQuery(tz); // Display in input
-                                setIsTimezoneDropdownOpen(false); // Close dropdown
+                                setTimezone(tz) // Store selected timezone
+                                setSearchQuery(tz) // Display in input
+                                setIsTimezoneDropdownOpen(false) // Close dropdown
                               }}
                             >
                               {tz}
                             </div>
                           ))
                         ) : (
-                          <div className="p-2 text-center text-gray-500">
-                            No timezones found
-                          </div>
+                          <div className="p-2 text-center text-gray-500">No timezones found</div>
                         )}
                       </div>
                     )}
@@ -544,9 +402,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                   <Checkbox
                     id="repeat"
                     checked={isRepeating}
-                    onCheckedChange={(checked) =>
-                      setIsRepeating(checked === true)
-                    }
+                    onCheckedChange={(checked) => setIsRepeating(checked === true)}
                   />
                   <Label htmlFor="repeat">Repeat Event</Label>
                 </div>
@@ -558,180 +414,18 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
                   {colorOptions.map((option) => (
                     <div
                       key={option.value}
-                      className={`w-8 h-8 rounded-full cursor-pointer ${
-                        option.value
-                      } ${
-                        color === option.value
-                          ? "ring-2 ring-primary-600 ring-offset-2"
-                          : ""
+                      className={`w-8 h-8 rounded-full cursor-pointer ${option.value} ${
+                        color === option.value ? "ring-2 ring-primary-600 ring-offset-2" : ""
                       }`}
                       onClick={() => setColor(option.value)}
                     />
                   ))}
                 </div>
               </div>
-
-              <div className="space-y-4">
-                <h3 className="text-md font-medium">Webinar</h3>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="includeWebinar"
-                    checked={includeWebinar}
-                    onCheckedChange={(checked) =>
-                      setIncludeWebinar(checked === true)
-                    }
-                  />
-                  <Label htmlFor="includeWebinar">Include Webinar</Label>
-                </div>
-
-                {includeWebinar && (
-                  <div className="space-y-4 p-3 border border-gray-200 rounded-md">
-                    <h4 className="text-sm font-medium">
-                      Internal Participants
-                    </h4>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="participantEmail">Email</Label>
-                      <Input
-                        id="participantEmail"
-                        value={newParticipantEmail}
-                        onChange={(e) => setNewParticipantEmail(e.target.value)}
-                        placeholder="Enter participant email"
-                      />
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="isCoHost"
-                        checked={isCoHost}
-                        onCheckedChange={(checked) =>
-                          setIsCoHost(checked === true)
-                        }
-                      />
-                      <Label htmlFor="isCoHost">Is Co-Host</Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="isRequiredToPay"
-                        checked={isRequiredToPay}
-                        onCheckedChange={(checked) =>
-                          setIsRequiredToPay(checked === true)
-                        }
-                      />
-                      <Label htmlFor="isRequiredToPay">Required To Pay</Label>
-                    </div>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={addInternalParticipant}
-                      disabled={!newParticipantEmail}
-                      className="w-full"
-                    >
-                      Add Participant
-                    </Button>
-
-                    {internalParticipants.length > 0 && (
-                      <div className="mt-2 space-y-2">
-                        <h5 className="text-sm font-medium">
-                          Added Participants:
-                        </h5>
-                        {internalParticipants.map((participant, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between bg-gray-50 p-2 rounded"
-                          >
-                            <div className="text-sm">
-                              <div>{participant.email}</div>
-                              <div className="text-xs text-gray-500">
-                                {participant.isCoHost ? "Co-Host" : "Attendee"}{" "}
-                                •
-                                {participant.isRequiredToPay
-                                  ? " Paid"
-                                  : " Free"}
-                              </div>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                setInternalParticipants(
-                                  internalParticipants.filter(
-                                    (_, i) => i !== index
-                                  )
-                                )
-                              }
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Add Member */}
-              <div className="space-y-4">
-                <h3 className="text-md font-medium">Add Member</h3>
-
-                <div className="flex items-end gap-2">
-                  <div className="flex-1">
-                    <SelectInput
-                      value={selectedMember}
-                      onChange={setSelectedMember}
-                      options={[
-                        { label: "John Doe", value: "John Doe" },
-                        { label: "Jane Smith", value: "Jane Smith" },
-                        { label: "Alex Johnson", value: "Alex Johnson" },
-                      ]}
-                      className="w-full"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={addMember}
-                    disabled={!selectedMember}
-                  >
-                    Add
-                  </Button>
-                </div>
-
-                {members.length > 0 && (
-                  <div className="mt-2 space-y-2">
-                    {members.map((member, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between bg-gray-50 p-2 rounded"
-                      >
-                        <span>{member}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            setMembers(members.filter((_, i) => i !== index))
-                          }
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
 
             <div className="p-4 border-t border-gray-200">
-              <Button
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white"
-                onClick={handleSubmit}
-              >
+              <Button className="w-full bg-primary-600 hover:bg-primary-700 text-white" onClick={handleSubmit}>
                 SAVE
               </Button>
             </div>
@@ -739,7 +433,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({
         </div>
       )}
     </AnimatePresence>
-  );
-};
+  )
+}
 
-export default AddEventCard;
+export default AddEventCard
