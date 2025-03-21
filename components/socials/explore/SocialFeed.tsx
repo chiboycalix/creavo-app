@@ -9,6 +9,7 @@ import { useComments } from '@/context/CommentsContext'
 import { useFetchInfinitePosts } from '@/hooks/posts/useFetchInfinitePosts'
 import { generalHelpers } from '@/helpers'
 import { useInView } from 'react-intersection-observer'
+import { Loader } from 'lucide-react'
 
 const SocialFeed = ({ initialPosts }: any) => {
   const { ref, inView } = useInView({ rootMargin: "400px" })
@@ -214,9 +215,11 @@ const SocialFeed = ({ initialPosts }: any) => {
                 )
               })
             )}
-            <div ref={ref} className="py-1 text-center">
+            <div ref={ref} className="py-1 text-center w-full flex items-center ml-[15rem] mb-10 mt-2">
               {queryIsFetchingNextPage ? (
-                <div className="h-1 w-10/12 rounded-lg bg-gray-400 animate-pulse mx-auto"></div>
+                <div className=''>
+                  <Loader className='animate-spin' />
+                </div>
               ) : hasNextPage ? (
                 ''
               ) : (

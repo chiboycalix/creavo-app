@@ -105,7 +105,7 @@ const PostEditPage = () => {
           {/* Left: Media Display */}
           <div className="w-1/2">
             {urls.length > 0 ? (
-              <div className="relative bg-gray-50 rounded-xl border p-4 overflow-hidden">
+              <div className="relative rounded-xl p-4 overflow-hidden">
                 {/* Media Container */}
                 <div className="relative w-full h-[30rem]">
                   {urls.map((url, index) => (
@@ -118,13 +118,13 @@ const PostEditPage = () => {
                         <video
                           src={url}
                           controls
-                          className="w-full h-full object-contain rounded-lg"
+                          className="w-full h-full object-cover rounded-lg"
                         />
                       ) : (
                         <img
                           src={url}
                           alt={`Media ${index}`}
-                          className="w-full h-full object-contain rounded-lg"
+                          className="w-full h-full object-cover rounded-lg"
                         />
                       )}
                     </div>
@@ -170,7 +170,7 @@ const PostEditPage = () => {
               <TextareaInput
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:ring-primary focus:border-primary"
+                className="mt-1 block w-full rounded-md p-3 shadow-sm"
                 rows={4}
                 placeholder="Write a caption..."
                 label="Write caption"

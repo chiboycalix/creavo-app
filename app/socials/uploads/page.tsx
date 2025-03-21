@@ -21,11 +21,11 @@ export default function Upload() {
               </CardTitle>
               <CardContent>
                 <div className="mb-4">
-                  <h2>File Upload</h2>
-                  <p className="text-sm">Add your documents here,  you can upload up to 3 posts at a time</p>
+                  <h2>Upload post</h2>
+                  <p className="text-sm">Add your videos here</p>
                 </div>
                 <UploadInput
-                  label="Upload Media"
+                  label=""
                   maxFiles={5}
                   accept="image/*,video/*"
                   className="mb-6"

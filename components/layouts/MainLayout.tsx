@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useState, useEffect } from "react";
-import ProfileCompletionManager from "../ProfileCompletionManager";
 import SidebarSkeleton from "../sketetons/SidebarSkeleton";
 import Header from "./includes/Header";
 import Sidebar from "./includes/Sidebar";
@@ -10,7 +9,6 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 import {
-  Archive,
   Video,
   User,
   Compass,
@@ -23,10 +21,8 @@ import {
   Calendar,
   ChartAreaIcon,
   LayoutDashboardIcon,
-  TagIcon,
   BellIcon,
   Bookmark,
-  ChartSplineIcon,
   BoxesIcon,
   Users2
 } from "lucide-react";
@@ -185,7 +181,6 @@ export default function MainLayout({
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
             <div className="p-0 sm:p-6">
-              <ProfileCompletionManager />
               {children}
             </div>
           </main>

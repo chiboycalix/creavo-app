@@ -23,6 +23,7 @@ type UploadInputProps = {
   nextPath?: string;
   onChange?: any;
   placeholder?: string;
+  footerText?: string;
 } & React.ComponentProps<"div">;
 
 type UploadProgress = {
@@ -43,6 +44,7 @@ export const UploadInput = ({
   nextPath,
   onChange,
   placeholder = `Max ${maxFiles} files per upload`,
+  footerText = "Supports MP4, MOV, FLV videos and common image formats",
   ...rest
 }: UploadInputProps) => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
@@ -178,7 +180,7 @@ export const UploadInput = ({
       )}
       <div
         className={cn(
-          "relative border-2 border-dashed bg-white border-primary-100 rounded-lg p-4 py-28 cursor-pointer",
+          "relative border-2 border-dashed bg-white border-primary-100 rounded-md p-4 py-28 cursor-pointer",
           isDragging && "border-primary-500 bg-primary-100",
           errorMessage && "border-red-500",
           className
@@ -205,15 +207,15 @@ export const UploadInput = ({
           <p className="text-gray-400 text-sm">{placeholder}</p>
         </div>
       </div>
-      <p className="mt-4 text-sm">Supports MP4, MOV, FLV videos and common image formats</p>
+      <p className="mt-4 text-sm">{footerText}</p>
       {uploads.length > 0 && (
         <div className="mt-6 flex flex-col gap-6">
           <div className="border border-gray-200 rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-700 mb-4">Uploading Files</h3>
             <div className="flex flex-wrap gap-4">
               {uploads.map((upload, index) => (
-                <div key={upload.file.name} className="relative w-32 h-40 flex flex-col">
-                  <div className="w-32 h-32 flex-shrink-0">
+                <div key={upload.file.name} className="relative w-52 h-40 flex flex-col">
+                  <div className="w-52 h-32 flex-shrink-0">
                     {upload.type === "image" ? (
                       <img
                         src={upload.url || upload.previewUrl}
@@ -237,13 +239,16 @@ export const UploadInput = ({
                       style={{ width: `${upload.progress}%` }}
                     />
                   </div>
-                  <button
-                    onClick={() => handleRemoveFile(index)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                    disabled={upload.uploading}
-                  >
-                    ×
-                  </button>
+                  {
+                    !upload.uploading && <button
+                      onClick={() => handleRemoveFile(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      disabled={upload.uploading}
+                    >
+                      ×
+                    </button>
+                  }
+
                 </div>
               ))}
             </div>
