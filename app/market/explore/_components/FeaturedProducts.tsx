@@ -15,17 +15,14 @@ interface FeaturedProductsProps {
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   productCategories,
   products,
-  isSaved,
   handleToggleSave,
 }) => {
-  const { setSearchRoom } = useMarketContext();
+  const { setSearchRoom, isSaved, setIsSaved, savedProducts } = useMarketContext();
   const [activeTab, setActiveTab] = useState<string>(
     productCategories[0].category
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
-
-  console.log("feature products", products);
 
   const handleTabChange = (category: string) => {
     setActiveTab(category);
@@ -51,8 +48,6 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
       setActiveTab(tabFromUrl);
     }
   }, [searchParams]);
-
-  console.log("products", products);
 
   return (
     <Tabs value={activeTab} className="w-auto">

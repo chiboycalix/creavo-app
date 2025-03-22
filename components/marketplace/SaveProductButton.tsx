@@ -13,9 +13,8 @@ interface LikeButtonProps {
 
 const SaveProductButton: React.FC<LikeButtonProps> = ({
   productId,
-  initialIsSaved,
-  savedId,
   onToggleSave,
+  
 }) => {
   const { isSaved, setIsSaved, savedProducts } = useMarketContext();
 
@@ -27,7 +26,7 @@ const SaveProductButton: React.FC<LikeButtonProps> = ({
   };
 
   useEffect(() => {
-    const isProductSaved = savedProducts.includes(productId);
+    const isProductSaved = savedProducts?.some((product: any) => product.id === productId);
     setIsSaved(isProductSaved);
   }, [productId, savedProducts, setIsSaved]);
 
