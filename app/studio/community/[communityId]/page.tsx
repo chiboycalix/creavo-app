@@ -1,8 +1,13 @@
+"use client"
 import { Button } from "@/components/ui/button";
+import { useListCommunities } from "@/hooks/communities/useListCommunities";
 import { Plus, Settings } from "lucide-react";
 
-export default async function SpacePage({ params }: any) {
+import { useEffect, useState } from "react";
 
+export default function SpacePage() {
+  const { data, isFetching } = useListCommunities();
+  console.log({ data })
   return (
     <div className="w-full">
       <div className="border-b p-4 shadow-md shadow-primary-50 flex justify-between items-center">
@@ -17,14 +22,14 @@ export default async function SpacePage({ params }: any) {
       </div>
 
       <div className="p-4 py-10 bg-gray-100 w-[50%] mx-auto mt-20 rounded-md flex items-center flex-col">
-        <p>Looks like you&apos;re leading the way</p>
-        <p>Start a discussion by creating a new post</p>
+        <p>Looks like you don&apos;t have a space yet</p>
+        <p>Create a space</p>
 
-        <div className="mt-8 w-6/12">
+        {/* <div className="mt-8 w-6/12">
           <Button className="w-full">
             <Plus />
             Add member</Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

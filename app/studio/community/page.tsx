@@ -3,11 +3,8 @@ import PageTitle from '@/components/PageTitle'
 import React from 'react'
 import CreateCommunityDialog from '@/components/studio/community/CreateCommunityDialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useListCommunities } from '@/hooks/communities/useListCommunities'
 
 const Community = () => {
-  const { data, isFetching } = useListCommunities();
-  // console.log({ data })
 
   return (
     <div className='h-[70vh]'>
