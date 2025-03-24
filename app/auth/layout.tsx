@@ -1,5 +1,6 @@
 "use client"
 import HeaderImage from '@/components/HeaderImage';
+import { Card } from '@/components/ui/card';
 import { CrevoeLogo } from '@/public/assets';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
@@ -68,9 +69,9 @@ export default function AuthLayout({
   };
 
   return (
-    <div className="h-screen flex flex-col md:flex-row">
-      <div className='hidden md:block md:basis-5/12 p-8'>
-        <div className="relative h-full w-full overflow-hidden rounded-md">
+    <div className="h-screen flex flex-col md:flex-row bg-primary-50/80 p-8 gap-10">
+      <div className='hidden md:block md:basis-5/12 h-full'>
+        <div className="relative h-full w-full overflow-hidden rounded-3xl">
           <div
             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
@@ -117,12 +118,12 @@ export default function AuthLayout({
         </div>
       </div>
 
-      <div className="flex-1 md:w-1/2 px-6 py-8 md:px-20 md:py-12 h-full flex flex-col justify-center">
+      <Card className="border-none flex-1 md:w-1/2 px-6 py-8 md:px-20 md:py-12 flex flex-col rounded-3xl justify-center">
         <div className="flex flex-col justify-center items-center mb-6">
           <HeaderImage src={CrevoeLogo} />
           <div className='mt-4 w-full'>{children}</div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

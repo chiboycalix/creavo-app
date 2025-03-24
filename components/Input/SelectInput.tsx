@@ -81,7 +81,7 @@ export const SelectInput = ({
       )}
       <div
         className={cn(
-          "relative cursor-pointer bg-primary-50/25 rounded-md border-2 border-primary-100",
+          "relative cursor-pointer bg-primary-50/25 rounded-lg border-2 border-primary-100",
           className
         )}
         onClick={() => setIsOpen(!isOpen)}
@@ -110,7 +110,7 @@ export const SelectInput = ({
           </div>
           {isOpen && (
             <div className={cn(
-              "absolute w-full top-full left-0 right-0 mt-2 bg-white border border-primary-100 rounded-md shadow-lg z-50",
+              "absolute w-full top-full left-0 right-0 mt-2 bg-white border border-primary-100 rounded-lg shadow-lg z-50",
               dropdownClass
             )}>
               {searchable && (
@@ -120,7 +120,7 @@ export const SelectInput = ({
                     value={searchTerm}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                     placeholder="Search..."
-                    className="w-full p-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-primary-200"
+                    className="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-200"
                     onClick={e => e.stopPropagation()}
                   />
                 </div>
@@ -145,7 +145,7 @@ export const SelectInput = ({
                         checked={selectedValues.includes(option.value)}
                         onChange={() => { }}
                         className={cn(
-                          "w-4 h-4 rounded-md border-primary-200",
+                          "w-4 h-4 rounded-lg border-primary-200",
                           "text-primary-600 focus:ring-primary-200",
                           "bg-white checked:bg-primary-600"
                         )}

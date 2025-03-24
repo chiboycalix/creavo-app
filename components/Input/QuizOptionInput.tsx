@@ -52,7 +52,7 @@ const QuizOptionInput = ({
             value={values[index] || ""}
             onChange={(e) => handleOptionChange(index, e.target.value)}
             placeholder={placeholder}
-            className="w-full py-3 border-none rounded-md bg-white"
+            className="w-full py-3 border-none rounded-lg bg-white"
           />
         </div>
       ))}

@@ -109,7 +109,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
             <MediaWrapper
               postId={post?.id}
               title={post?.title}
-              size="object-cover"
+              size="object-contain"
               postMedia={post?.media}
             />
           </div>

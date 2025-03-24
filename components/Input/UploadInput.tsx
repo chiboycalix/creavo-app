@@ -198,7 +198,7 @@ export const UploadInput = ({
       )}
       <div
         className={cn(
-          "relative border-2 border-dashed bg-white border-primary-100 rounded-md p-4 py-28 cursor-pointer",
+          "relative border-2 border-dashed bg-white border-primary-100 rounded-lg p-4 py-28 cursor-pointer",
           isDragging && "border-primary-500 bg-primary-100",
           errorMessage && "border-red-500",
           className
@@ -273,7 +273,7 @@ export const UploadInput = ({
           {allUploaded && nextPath && (
             <Button
               onClick={handleNext}
-              className="mt-4 bg-primary text-white px-6 py-2 rounded-md shadow hover:bg-primary-600 transition-colors duration-200"
+              className="mt-4 bg-primary text-white px-6 py-2 rounded-lg shadow hover:bg-primary-600 transition-colors duration-200"
               disabled={isLoading}
             >
               Next

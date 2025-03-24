@@ -6,6 +6,7 @@ import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils'
+import { Loader } from 'lucide-react'
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[]
@@ -74,6 +75,12 @@ const GallerySlider = ({
       >
         {/* Main image */}
         <div className={` h-full overflow-hidden sm:rounded-xl rounded-none`}>
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-200 max-w-full">
+              <Loader className="animate-spin w-12 h-12 text-black" />
+            </div>
+          )}
+
           <Link
             className={`relative flex items-center justify-center h-full `}
             href={''}
@@ -85,23 +92,23 @@ const GallerySlider = ({
                 variants={variants(340, 1)}
                 initial="enter"
                 animate="center"
-                // exit="exit"
+                exit="exit"
                 className="h-full"
               >
                 {isImage ? (
-                  <Image
+                  <img
                     loading="lazy"
                     width={500}
                     height={300}
-                    src={currentMedia?.url || ''}
+                    src={currentMedia?.url}
                     alt="listing card gallery"
-                    className={`${isRenderedInComment ? "object-cover h-[calc(79vh)] w-full" : "object-cover md:max-h-[87vh] h-[calc(87vh)]"}`}
+                    className={`${isRenderedInComment ? "object-contain h-[calc(79vh)] w-full" : "object-contain md:max-h-[87vh] h-[calc(87vh)]"}`}
                     onLoad={() => setLoaded(true)}
                   />
                 ) : (
                   <video
-                    src={currentMedia?.url || ''}
-                    className={`object-cover h-screen ${imageClass}`}
+                    src={currentMedia?.url}
+                    className={`object-contain h-screen ${imageClass}`}
                     onLoad={() => setLoaded(true)}
                   />
                 )}

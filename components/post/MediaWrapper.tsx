@@ -1,22 +1,23 @@
-import React, { useState, useRef, useEffect } from 'react'
-import GallerySlider from './GallerySlider'
+import React, { useState, useRef, useEffect } from 'react';
+import GallerySlider from './GallerySlider';
 import Cookies from "js-cookie";
-import { FaPlay, FaPause } from 'react-icons/fa'
-import { PostMediaType, usePost } from '@/context/PostContext'
-import { useVideoPlayback } from '@/context/VideoPlaybackContext'
-import { baseUrl } from '@/utils/constant'
+import { FaPlay, FaPause } from 'react-icons/fa';
+import { PostMediaType, usePost } from '@/context/PostContext';
+import { useVideoPlayback } from '@/context/VideoPlaybackContext';
+import { baseUrl } from '@/utils/constant';
 import { getMimeTypeFromCloudinaryUrl } from '@/utils';
 import { cn } from '@/lib/utils';
+import { Loader } from 'lucide-react';
 
 type MediaWrapperProps = {
-  title: string
-  size?: string
-  postMedia?: PostMediaType[]
-  postId?: number
-  media?: string
-  mediaClass?: string
+  title: string;
+  size?: string;
+  postMedia?: PostMediaType[];
+  postId?: number;
+  media?: string;
+  mediaClass?: string;
   isRenderedInComment?: boolean;
-}
+};
 
 const MediaWrapper: React.FC<MediaWrapperProps> = ({
   title,
@@ -25,113 +26,119 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
   postId,
   isRenderedInComment,
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [hasBeenViewed, setHasBeenViewed] = useState(false)
-  const { updateViewsCount } = usePost()
-  const { isGloballyPaused, setIsGloballyPaused } = useVideoPlayback()
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [hasBeenViewed, setHasBeenViewed] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false); // New state for buffering
+  const { updateViewsCount } = usePost();
+  const { isGloballyPaused, setIsGloballyPaused } = useVideoPlayback();
   const mimeType = getMimeTypeFromCloudinaryUrl(postMedia && postMedia[0]?.url || '');
 
-  const isImage = mimeType === "image/*" || (postMedia && (postMedia && postMedia[0]?.mimeType === 'image/jpeg') || postMedia && postMedia[0]?.mimeType === 'image/*')
+  const isImage = mimeType === "image/*" || (postMedia && (postMedia[0]?.mimeType === 'image/jpeg' || postMedia[0]?.mimeType === 'image/*'));
 
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
-        videoRef.current.pause()
+        videoRef.current.pause();
       } else {
-        videoRef.current.play()
+        videoRef.current.play();
       }
-      setIsPlaying(!isPlaying)
+      setIsPlaying(!isPlaying);
     }
-  }
+  };
 
   useEffect(() => {
     const updateProgress = () => {
       if (videoRef.current) {
-        const progress =
-          (videoRef.current.currentTime / videoRef.current.duration) * 100
-        setProgress(progress)
+        const progress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+        setProgress(progress);
       }
-    }
+    };
 
-    const video = videoRef.current
+    const handleWaiting = () => {
+      if (isPlaying) {
+        setIsBuffering(true); // Show loading indicator when buffering
+      }
+    };
+
+    const handlePlaying = () => {
+      setIsBuffering(false); // Hide loading indicator when playback resumes
+    };
+
+    const video = videoRef.current;
     if (video) {
-      video.addEventListener('timeupdate', updateProgress)
+      video.addEventListener('timeupdate', updateProgress);
+      video.addEventListener('waiting', handleWaiting); // Detect buffering
+      video.addEventListener('playing', handlePlaying); // Detect when buffering ends
     }
 
     return () => {
       if (video) {
-        video.removeEventListener('timeupdate', updateProgress)
+        video.removeEventListener('timeupdate', updateProgress);
+        video.removeEventListener('waiting', handleWaiting);
+        video.removeEventListener('playing', handlePlaying);
       }
-    }
-  }, [])
+    };
+  }, [isPlaying]);
 
   useEffect(() => {
-    if (isImage) return
+    if (isImage) return;
 
-    const video = videoRef.current
-    if (!video) return
+    const video = videoRef.current;
+    if (!video) return;
 
     const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
+      (entries) => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting && !isGloballyPaused) {
             if (!hasBeenViewed && postId) {
-              updateViewsCount(postId, (count: number) => count + 1)
-              setHasBeenViewed(true)
+              updateViewsCount(postId, (count: number) => count + 1);
+              setHasBeenViewed(true);
 
               if (postMedia) {
-                fetch(
-                  `${baseUrl}/media/${postMedia[0].id}/view`,
-                  {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization: `Bearer ${Cookies.get(
-                        'accessToken'
-                      )}`,
-                    },
-                    body: JSON.stringify({ mediaTimestamp: 1 }),
-                  }
-                ).catch(error =>
+                fetch(`${baseUrl}/media/${postMedia[0].id}/view`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${Cookies.get('accessToken')}`,
+                  },
+                  body: JSON.stringify({ mediaTimestamp: 1 }),
+                }).catch((error) =>
                   console.log('Error updating view count:', error)
-                )
+                );
               }
             }
 
-            video
-              .play()
-              .catch(error => console.log('Autoplay prevented:', error))
-            setIsPlaying(true)
+            video.play().catch((error) => console.log('Autoplay prevented:', error));
+            setIsPlaying(true);
           } else {
-            video.pause()
-            setIsPlaying(false)
+            video.pause();
+            setIsPlaying(false);
           }
-        })
+        });
       },
       { threshold: 0.5 }
-    )
+    );
 
-    observer.observe(video)
+    observer.observe(video);
 
-    // Page Visibility API
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        video.pause()
-        setIsPlaying(false)
-        setIsGloballyPaused(true)
+        video.pause();
+        setIsPlaying(false);
+        setIsGloballyPaused(true);
       } else {
-        setIsGloballyPaused(false)
+        setIsGloballyPaused(false);
       }
-    }
+    };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange)
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      if (video) observer.unobserve(video)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-    }
+      if (video) observer.unobserve(video);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [
     isImage,
     hasBeenViewed,
@@ -140,22 +147,21 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
     postMedia,
     isGloballyPaused,
     setIsGloballyPaused,
-  ])
+  ]);
 
-  // Effect to handle global pause state
   useEffect(() => {
     if (isGloballyPaused && isPlaying) {
-      videoRef.current?.pause()
-      setIsPlaying(false)
+      videoRef.current?.pause();
+      setIsPlaying(false);
     }
-  }, [isGloballyPaused, isPlaying])
+  }, [isGloballyPaused, isPlaying]);
 
   return (
     <div className={`${size} relative overflow-hidden flex items-center`}>
       {isImage ? (
         <GallerySlider
           galleryImgs={postMedia!}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           imageClass="h-full"
           isRenderedInComment={isRenderedInComment}
         />
@@ -163,22 +169,28 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
         <>
           <video
             ref={videoRef}
-            src={postMedia?.[0]?.url || ''}
+            src={postMedia?.[0]?.url}
             className="w-full object-fit h-[87vh]"
             loop
             playsInline
           />
           <div
-            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
-            style={{ opacity: isPlaying ? 0 : 1 }}
+            className="absolute inset-0 flex items-center justify-center transition-opacity duration-300"
+            style={{ opacity: isPlaying && !isBuffering ? 0 : 1, background: isBuffering ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)' }}
             onClick={togglePlay}
           >
-            <button
-              onClick={togglePlay}
-              className="text-white text-6xl transform transition-transform duration-300 hover:scale-110"
-            >
-              {isPlaying ? <FaPause /> : <FaPlay />}
-            </button>
+            {isBuffering ? (
+              <div className="flex items-center justify-center">
+                <Loader className='w-12 h-12 rounded-full animate-spin-slow' />
+              </div>
+            ) : (
+              <button
+                onClick={togglePlay}
+                className="text-white text-6xl transform transition-transform duration-300 hover:scale-110"
+              >
+                {isPlaying ? <FaPause /> : <FaPlay />}
+              </button>
+            )}
           </div>
           <div className={cn("absolute left-[0.3rem] bottom-[0.07rem] w-[98.5%] ml-[0.5%] z-50 h-1 bg-gray-400 rounded-b-full")}>
             <div
@@ -189,7 +201,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default MediaWrapper
+export default MediaWrapper;

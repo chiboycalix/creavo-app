@@ -131,18 +131,15 @@ const SocialFeed = ({ initialPosts }: any) => {
 
   const getPostHeight = () => {
     if (typeof window !== 'undefined') {
-      // Mobile: Full height
       if (window.innerWidth < 768) return 'calc(100vh - 4rem)'
-      // Tablet and Desktop: Adjust for header
       return 'calc(100vh - 6rem)'
     }
-    return 'calc(100vh - 4rem)' // Default fallback
+    return 'calc(100vh - 4rem)'
   }
 
   return (
     <div className="w-full min-h-screen">
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Posts Section - Adjusts width based on screen size */}
         <div className={`${isMobileView ? 'w-full' : 'md:w-8/12 lg:w-6/12'} order-1 md:order-none`}>
           <div
             ref={containerRef}
@@ -215,7 +212,7 @@ const SocialFeed = ({ initialPosts }: any) => {
                 )
               })
             )}
-            <div ref={ref} className="py-1 text-center w-full flex items-center ml-[15rem] mb-10 mt-2">
+            <div ref={ref} className="py-1 text-center w-full flex items-center ml-[13rem] mb-10 mt-2">
               {queryIsFetchingNextPage ? (
                 <div className=''>
                   <Loader className='animate-spin' />
@@ -229,7 +226,6 @@ const SocialFeed = ({ initialPosts }: any) => {
           </div>
         </div>
 
-        {/* Comments Section - Hidden on mobile by default, can be toggled */}
         <div className={`${isMobileView ? 'hidden' : 'md:flex-1'}`}>
           {
             showComments && <CommentCard />
