@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook"
 import { useCreateCommunityValidator } from "@/helpers/validators/useCreateCommunityValidator"
 import { CreateCommunityForm } from "@/types"
 import { resetCreateCommunityForm, updatCreateCommunityForm } from "@/redux/slices/community.slice"
+import { generalHelpers } from "@/helpers"
 
 const CreateCommunityDialog = () => {
   const router = useRouter()
@@ -32,10 +33,9 @@ const CreateCommunityDialog = () => {
   const { mutate: handleCreateCommunity, isPending: isCreatingCommunity } = useMutation({
     mutationFn: (payload: any) => createCommunityService(payload),
     onSuccess: async (data) => {
-      console.log({ data })
       toast.success("Community created successfully")
+      router.push(`/studio/community/${generalHelpers.convertToSlug(createCommunityStateValues?.name)}`)
       dispatch(resetCreateCommunityForm())
-      // router.push(`/studio/community/${space}`)
     },
     onError: (error: any) => {
       console.log({ error })
@@ -100,7 +100,6 @@ const CreateCommunityDialog = () => {
                 placeholder={`Max 10 MB files are allowed`}
 
                 onChange={(uploads: any) => {
-                  console.log(uploads, "nonoi")
                   updateCreateCommunity({ logo: uploads[0] })
                 }}
                 className="py-10"
