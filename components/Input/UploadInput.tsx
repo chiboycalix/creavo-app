@@ -23,6 +23,7 @@ type UploadInputProps = {
   nextPath?: string;
   placeholder?: string;
   footerText?: string;
+  onChange?: (urls: string[]) => void; // Added onChange prop to return URLs
 } & React.ComponentProps<"div">;
 
 type UploadProgress = {
@@ -43,6 +44,7 @@ export const UploadInput = ({
   nextPath,
   placeholder = `Max ${maxFiles} files per upload`,
   footerText = "Supports MP4, MOV, FLV videos and common image formats",
+  onChange, // Destructured new prop
   ...rest
 }: UploadInputProps) => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
@@ -98,13 +100,18 @@ export const UploadInput = ({
           upload.file === file ? { ...upload, uploading: false } : upload
         )
       );
+      showToast('error', 'Upload failed', 'An error occurred while uploading the file.');
       return null;
     }
   };
 
   const handleFiles = async (newFiles: File[]) => {
     if (uploads.length + newFiles.length > maxFiles) {
-      showToast('error', 'Failed to upload file', errorMessage || `You can only upload up to ${maxFiles} files per post.`);
+      showToast(
+        'error',
+        'Failed to upload file',
+        errorMessage || `You can only upload up to ${maxFiles} files per post.`
+      );
       return;
     }
 
@@ -116,8 +123,16 @@ export const UploadInput = ({
       type: file.type.startsWith("image/") ? "image" : "video",
     }));
     setUploads((prev) => [...prev, ...newUploads]);
+
     const urls = await Promise.all(newFiles.map((file) => uploadToCloudinary(file)));
-    return urls.filter((url) => url !== null) as string[];
+    const validUrls = urls.filter((url) => url !== null) as string[];
+
+    // Call onChange with the valid URLs once uploads are complete
+    if (validUrls.length > 0 && onChange) {
+      onChange(validUrls);
+    }
+
+    return validUrls;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +159,17 @@ export const UploadInput = ({
   const handleRemoveFile = (index: number) => {
     const uploadToRemove = uploads[index];
     if (uploadToRemove.previewUrl) URL.revokeObjectURL(uploadToRemove.previewUrl);
-    setUploads((prev) => prev.filter((_, i) => i !== index));
+    setUploads((prev) => {
+      const newUploads = prev.filter((_, i) => i !== index);
+      // Update onChange with remaining URLs after removal
+      if (onChange) {
+        const remainingUrls = newUploads
+          .map((upload) => upload.url)
+          .filter(Boolean) as string[];
+        onChange(remainingUrls);
+      }
+      return newUploads;
+    });
   };
 
   const handleUploadClick = () => {
@@ -157,7 +182,6 @@ export const UploadInput = ({
     setIsLoading(true);
     const urls = uploads.map((upload) => upload.url).filter(Boolean) as string[];
     if (urls.length > 0) {
-      // Encode URLs as a JSON string and base64 encode it
       const encodedUrls = btoa(JSON.stringify(urls));
       router.push(`${nextPath}?urls=${encodedUrls}`);
     } else {
@@ -237,16 +261,15 @@ export const UploadInput = ({
                       style={{ width: `${upload.progress}%` }}
                     />
                   </div>
-                  {
-                    !upload.uploading && <button
+                  {!upload.uploading && (
+                    <button
                       onClick={() => handleRemoveFile(index)}
                       className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
                       disabled={upload.uploading}
                     >
                       ×
                     </button>
-                  }
-
+                  )}
                 </div>
               ))}
             </div>

@@ -86,7 +86,7 @@ const PostEditPage = () => {
       deviceId: deviceId
     })
   }
-
+  console.log({ urls })
   return (
     <Card className="mt-20 border-none">
       <CardHeader>
@@ -114,7 +114,7 @@ const PostEditPage = () => {
                         <img
                           src={url}
                           alt={`Media ${index}`}
-                          className="w-full h-full object-contain rounded-md"
+                          className="w-full h-full object-cover rounded-md"
                         />
                       )}
                     </div>

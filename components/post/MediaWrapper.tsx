@@ -6,6 +6,7 @@ import { PostMediaType, usePost } from '@/context/PostContext'
 import { useVideoPlayback } from '@/context/VideoPlaybackContext'
 import { baseUrl } from '@/utils/constant'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils';
+import { cn } from '@/lib/utils';
 
 type MediaWrapperProps = {
   title: string
@@ -179,9 +180,9 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
               {isPlaying ? <FaPause /> : <FaPlay />}
             </button>
           </div>
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-200">
+          <div className={cn("absolute left-[0.3rem] bottom-[0.07rem] w-[98.5%] ml-[0.5%] z-50 h-1 bg-gray-400 rounded-b-full")}>
             <div
-              className="h-full bg-blue-600 transition-all duration-300"
+              className="h-full bg-red-600 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>

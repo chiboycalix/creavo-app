@@ -40,7 +40,7 @@ export default function Upload() {
                   className="mb-6"
                   nextPath="/socials/edit-post"
                   onChange={(upload) => {
-                    console.log({ upload })
+
                   }}
                 />
               </CardContent>

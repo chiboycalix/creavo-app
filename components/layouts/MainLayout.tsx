@@ -41,14 +41,10 @@ export default function MainLayout({
   const { loading, currentUser } = useAuth();
   const { data: profileData } = useUserProfile(currentUser?.id);
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
-  const [isExploreRoute, setIsExploreRoute] = useState<boolean>(false);
 
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
     setIsCommunityRoute(communityRoutePattern.test(pathname || ""));
-
-    const exploreRoutePattern = /^\/socials/;
-    setIsExploreRoute(exploreRoutePattern.test(pathname || ""));
 
   }, [pathname]);
 

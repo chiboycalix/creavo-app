@@ -134,7 +134,7 @@ const UploadMedia = ({ description, queryClient, moduleId, courseId }: UploadMed
                   label="Upload Videos"
                   accept="video/*"
                   maxFiles={1}
-                  onChange={(uploads) => updateAddMediaToModule({ url: uploads })}
+                  onChange={(uploads: any) => updateAddMediaToModule({ url: uploads[0] })}
                 />
               </div>
               <br />

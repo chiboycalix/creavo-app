@@ -2,7 +2,7 @@ import type React from "react";
 import MediaWrapper from "../../post/MediaWrapper";
 import ShareButton from "./ShareButton";
 import dynamic from "next/dynamic";
-import { ChevronDown, ChevronUp, Download, DownloadIcon } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { VscEye } from "react-icons/vsc";
@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useComments } from "@/context/CommentsContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { formatCommentDate } from "@/utils";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
@@ -97,6 +98,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const handleNavigateToCourse = (id: any) => {
     router.push(`/market/product/${id}`);
   };
+
   return (
     <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative">
       {/* Main Post Container */}
@@ -133,7 +135,12 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 pt-4">
-                  <h3 className="font-semibold">{post?.user_username}</h3>
+                  <h3 className="font-semibold inline-flex gap-1 items-center">
+                    <span> {post?.user_username}</span>
+                    <span className="text-xs text-gray-300 mt-0.5">
+                      {formatCommentDate(post.createdAt)}
+                    </span>
+                  </h3>
                   {post?.metadata !== null && (
                     <Button className="cursor-pointer" onClick={() => handleNavigateToCourse(post?.metadata?.courseId)}>
                       Learn more
@@ -195,7 +202,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
 
       {/* Progress Bar with Percentage or Downloaded Message */}
       {(isDownloading || isDownloaded) && (
-        <div className="absolute bottom-0 left-0 w-[88%] flex flex-col items-center justify-between px-2 py-1 bg-gray-800 bg-opacity-75 rounded-b-xl">
+        <div className="absolute bottom-0 left-0 w-[87%] flex flex-col items-center justify-between py-1 rounded-b-xl">
           <span className="text-white text-xs font-semibold ml-2 whitespace-nowrap">
             {isDownloaded ? "Downloaded" : `${downloadProgress}% Saving...`}
           </span>

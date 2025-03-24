@@ -1,8 +1,7 @@
 import PageTitle from '@/components/PageTitle'
-import CreateCommunityDialog from '@/components/studio/community/CreateCommunityDialog'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import React from 'react'
+import CreateCommunityDialog from '@/components/studio/community/CreateCommunityDialog'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const Community = () => {
   return (

@@ -235,7 +235,7 @@ const CreateLongCourse = () => {
               accept="video/*,image/*"
               maxFiles={maxFiles}
               onChange={(uploads: any) => {
-                updateCreateCourse({ promotionalUrl: uploads })
+                updateCreateCourse({ promotionalUrl: uploads[0] })
               }}
             />
           </div>
