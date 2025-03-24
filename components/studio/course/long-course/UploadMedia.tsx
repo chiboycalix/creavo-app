@@ -13,6 +13,7 @@ import { useMutation, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { resetAddMediaToModuleForm, updateAddMediaToModuleForm } from "@/redux/slices/module.slice";
 import { getMimeTypeFromCloudinaryUrl } from "@/utils";
+import ButtonLoader from "@/components/ButtonLoader";
 
 interface UploadMediaProps {
   description: string;
@@ -150,7 +151,10 @@ const UploadMedia = ({ description, queryClient, moduleId, courseId }: UploadMed
                   className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
                   disabled={isAddingMediaToModule || !addMediaToModuleStateValues.url}
                 >
-                  {isAddingMediaToModule ? <Loader2 /> : "Continue"}
+                  <ButtonLoader
+                    caption="Continue"
+                    isLoading={isAddingMediaToModule}
+                  />
                 </Button>
               </div>
             </form>

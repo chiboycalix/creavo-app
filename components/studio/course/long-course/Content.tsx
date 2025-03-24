@@ -17,6 +17,7 @@ import { generalHelpers } from "@/helpers";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { useFetchCourseData } from "@/hooks/courses/useFetchCourseData";
+import ButtonLoader from "@/components/ButtonLoader";
 
 const Content = ({ courseId: id }: any) => {
   const dispatch = useAppDispatch();
@@ -212,8 +213,11 @@ const Content = ({ courseId: id }: any) => {
               rows={10}
             />
           </div>
-          <Button type="submit" className="w-full h-[50px]">
-            {isAddingModule ? <Spinner /> : "Continue"}
+          <Button type="submit" className="w-full h-[50px]" disabled={isAddingModule}>
+            <ButtonLoader
+              isLoading={isAddingModule}
+              caption="Continue"
+            />
           </Button>
         </form>
       );
