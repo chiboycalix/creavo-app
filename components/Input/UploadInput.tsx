@@ -7,12 +7,8 @@ import { MdOutlineCloudUpload } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { useToast } from "@/context/ToastContext";
+import { FullPageLoader } from "../Loaders/FullPageLoader";
 
-const FullPageLoader = () => (
-  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-    <div className="w-16 h-16 border-4 border-t-4 border-primary-500 border-solid rounded-full animate-spin"></div>
-  </div>
-);
 
 type UploadInputProps = {
   label?: ReactNode;
@@ -23,7 +19,7 @@ type UploadInputProps = {
   nextPath?: string;
   placeholder?: string;
   footerText?: string;
-  onChange?: (urls: string[]) => void; // Added onChange prop to return URLs
+  onChange?: (urls: string[]) => void;
 } & React.ComponentProps<"div">;
 
 type UploadProgress = {

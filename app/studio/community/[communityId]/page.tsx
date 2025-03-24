@@ -1,13 +1,9 @@
 "use client"
-import { Button } from "@/components/ui/button";
 import { useListCommunities } from "@/hooks/communities/useListCommunities";
-import { Plus, Settings } from "lucide-react";
-
-import { useEffect, useState } from "react";
+import { Plus, Settings } from "lucide-react";;
 
 export default function SpacePage() {
-  const { data, isFetching } = useListCommunities();
-  console.log({ data })
+
   return (
     <div className="w-full">
       <div className="border-b p-4 shadow-md shadow-primary-50 flex justify-between items-center">

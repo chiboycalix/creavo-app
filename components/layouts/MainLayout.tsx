@@ -155,7 +155,7 @@ export default function MainLayout({
   }
 
   const useMainLayout = shouldUseMainLayout(pathname || "");
-  console.log({ pathname })
+
   if (!useMainLayout) {
     return <div>{children}</div>;
   }
