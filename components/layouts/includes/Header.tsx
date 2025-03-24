@@ -39,10 +39,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const { currentUser, isAuthenticated, signOut } = useAuth();
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
-  // Detect if the current route matches /studio/community/[space]
   useEffect(() => {
-    const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
-    setIsCommunityRoute(communityRoutePattern.test(pathname));
+    const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
+    setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
   useEffect(() => {
@@ -54,7 +53,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const isButtonActive = (navItems: NavItem[]) => {
     return navItems.some(item => pathname.startsWith(item.href));
   };
-
+  console.log({ isCommunityRoute })
   return (
     <header
       className={`bg-white fixed top-0 right-0 z-30 ${isCommunityRoute ? "left-16" : "left-0 md:left-72"

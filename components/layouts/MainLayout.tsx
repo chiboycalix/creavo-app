@@ -43,9 +43,8 @@ export default function MainLayout({
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
   useEffect(() => {
-    const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
-    setIsCommunityRoute(communityRoutePattern.test(pathname || ""));
-
+    const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
+    setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
   const headerButtons: HeaderButton[] = React.useMemo(() => [
