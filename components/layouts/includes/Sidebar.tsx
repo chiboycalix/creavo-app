@@ -22,8 +22,8 @@ export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
   useEffect(() => {
-    const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
-    setIsCommunityRoute(communityRoutePattern.test(pathname));
+    const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
+    setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
   useEffect(() => {

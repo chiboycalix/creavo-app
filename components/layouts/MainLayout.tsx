@@ -43,9 +43,8 @@ export default function MainLayout({
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
   useEffect(() => {
-    const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
-    setIsCommunityRoute(communityRoutePattern.test(pathname || ""));
-
+    const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
+    setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
   const headerButtons: HeaderButton[] = React.useMemo(() => [
@@ -156,7 +155,7 @@ export default function MainLayout({
   }
 
   const useMainLayout = shouldUseMainLayout(pathname || "");
-  console.log({ pathname })
+
   if (!useMainLayout) {
     return <div>{children}</div>;
   }
@@ -176,7 +175,7 @@ export default function MainLayout({
             />
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
-            <div className={cn("p-0", pathname === "/socials" || pathname === "/socials/following" ? "sm:py-6 sm:px-12" : "sm:p-12")}>
+            <div className={cn("p-0", pathname === "/socials" || pathname === "/socials/following" ? "sm:py-6 sm:px-16" : "sm:p-12")}>
               {children}
             </div>
           </main>

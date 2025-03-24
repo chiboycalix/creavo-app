@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { resetAddMediaToModuleForm, updateAddMediaToModuleForm } from "@/redux/slices/module.slice";
 import { getMimeTypeFromCloudinaryUrl } from "@/utils";
+import ButtonLoader from "@/components/ButtonLoader";
 
 interface UploadShortCourseMediaProps {
   description: string;
@@ -75,7 +76,7 @@ const UploadShortCourseMedia = ({ description, onUploadSuccess, courseId }: Uplo
         <DialogTrigger className="bg-primary border-0 p-2 text-sm cursor-pointer rounded-lg text-white basis-3/12 font-medium leading-6">
           Upload content
         </DialogTrigger>
-        <DialogContent className="max-w-3xl max-h-[70vh] overflow-y-auto">
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle></DialogTitle>
             <form onSubmit={handleSubmit}>
@@ -98,7 +99,7 @@ const UploadShortCourseMedia = ({ description, onUploadSuccess, courseId }: Uplo
                   placeholder="Enter your video description"
                   value={addMediaToModuleStateValues.description || ""}
                   onChange={(e) => updateAddMediaToModule({ description: e.target.value })}
-                  rows={10}
+                  rows={5}
                 />
               </div>
               <div className="">
@@ -106,6 +107,7 @@ const UploadShortCourseMedia = ({ description, onUploadSuccess, courseId }: Uplo
                   label="Upload Videos"
                   accept="video/*"
                   maxFiles={1}
+                  className="py-10"
                   onChange={(uploads: any) => updateAddMediaToModule({ url: uploads[0] })}
                 />
               </div>
@@ -122,7 +124,10 @@ const UploadShortCourseMedia = ({ description, onUploadSuccess, courseId }: Uplo
                   className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
                   disabled={isAddingMediaToModule}
                 >
-                  {isAddingMediaToModule ? <Loader2 className="animate-spin" /> : "Continue"}
+                  <ButtonLoader
+                    caption="Continue"
+                    isLoading={isAddingMediaToModule}
+                  />
                 </Button>
               </div>
             </form>

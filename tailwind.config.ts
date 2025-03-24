@@ -38,6 +38,10 @@ export default {
           services: "#F8DCDC",
         },
       },
+      animation: {
+        "spin-slow": "spin 1.5s linear infinite",
+        "pulse-slow": "pulse 2s ease-in-out infinite",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

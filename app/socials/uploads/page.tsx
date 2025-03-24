@@ -21,9 +21,9 @@ export default function Upload() {
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className="min-h-[85vh] w-full flex justify-center items-center">
+      <div className="min-h-[85vh] w-9/12 mx-auto flex justify-center items-center">
         <div className="w-10/12">
-          <Card>
+          <Card className="border-none rounded-3xl">
             <CardHeader>
               <CardTitle className="text-base">
 
@@ -37,7 +37,7 @@ export default function Upload() {
                   label=""
                   maxFiles={5}
                   accept="image/*,video/*"
-                  className="mb-6"
+                  className="p-2 py-10"
                   nextPath="/socials/edit-post"
                   onChange={(upload) => {
 

@@ -150,7 +150,7 @@ const CreateShortCourse = () => {
                   updateCreateShortCourse({ description: e.target.value });
                 }}
                 errorMessage={errors.description}
-                rows={10}
+                rows={5}
               />
             </div>
             <div className='mb-4'>
@@ -254,6 +254,7 @@ const CreateShortCourse = () => {
                 onChange={(uploads: any) => {
                   updateCreateShortCourse({ promotionalUrl: uploads[0] })
                 }}
+                className='py-10'
               />
             </div>
 

@@ -105,7 +105,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 <BsPencil className="mr-1" />
                 <span className="text-xs">Edit Profile</span>
               </DialogTrigger>
-              <DialogContent className="bg-primary-50 max-w-xl">
+              <DialogContent className="max-w-xl">
                 <DialogHeader>
                   <DialogTitle>Edit Profile</DialogTitle>
                   <EditUserProfileModal
