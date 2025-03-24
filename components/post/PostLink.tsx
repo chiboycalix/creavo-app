@@ -6,5 +6,5 @@ type PostLinkType = {
   children: React.ReactNode
 }
 export default function PostLink({ postId, children }: PostLinkType) {
-  return <Link href={`/posts/${postId}`}>{children}</Link>
+  return <Link href={`/socials/posts/${postId}`}>{children}</Link>
 }

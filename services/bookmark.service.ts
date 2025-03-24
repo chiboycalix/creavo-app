@@ -36,7 +36,6 @@ export const getUserBookmarks = async (
         scope,
       },
     });
-
     return response;
   } catch (error) {
     return {

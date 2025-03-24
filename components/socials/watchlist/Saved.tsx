@@ -33,7 +33,7 @@ export default function BookmarkApp() {
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : userId ? (
-          <UserBookmarks userId={userId} initialLimit={20} />
+          <UserBookmarks userId={userId} initialLimit={10} />
         ) : (
           <p className="text-gray-500 text-center">Loading...</p>
         )}

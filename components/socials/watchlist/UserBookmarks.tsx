@@ -1,15 +1,13 @@
+"use client"
+
 import { useState, useEffect, useCallback } from "react"
 import { getUserBookmarks } from "@/services/bookmark.service"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Bookmark, ExternalLink, AlertCircle } from "lucide-react"
+import { Bookmark, AlertCircle, Heart } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { baseUrl } from "@/utils/constant"
 import { toast } from "sonner"
 import { toggleBookmark } from "@/services/bookmark.service"
-import MediaWrapper from "../../post/MediaWrapper"
 
 interface BookmarksResponse {
   data: {
@@ -67,7 +65,6 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
   const [totalPages, setTotalPages] = useState(1)
   const [currentUserId, setCurrentUserId] = useState<number | null>(null)
 
-  // Fetch posts to get userId if not provided
   const fetchUserIdFromPosts = useCallback(async () => {
     try {
       const response = await fetch(`${baseUrl}/posts?page=1&limit=1`)
@@ -89,7 +86,7 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
         setCurrentUserId(userId)
       } else {
         const fetchedUserId = await fetchUserIdFromPosts()
-        setCurrentUserId(fetchedUserId || 1) 
+        setCurrentUserId(fetchedUserId || 1)
       }
     }
 
@@ -102,7 +99,6 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
       setLoading(true)
       setError(null)
       const response = await getUserBookmarks(currentUserId, page, limit)
-
       if (response && response.data && Array.isArray(response.data.posts)) {
         setBookmarks(response.data.posts)
         if (response.meta) {
@@ -142,7 +138,6 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
   const handleRemoveBookmark = async (bookmarkId: number) => {
     try {
       await toggleBookmark(bookmarkId)
-      // Remove the bookmark from the local state
       setBookmarks(bookmarks.filter((bookmark) => bookmark.id !== bookmarkId))
 
       toast.success("Bookmark removed", {
@@ -185,25 +180,26 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
       )}
 
       {loading ? (
-        <div className="grid grid-cols-3">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Card key={index} className="w-full">
-              <CardHeader className="pb-2">
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/4 mt-2" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6 mt-2" />
-              </CardContent>
-              <CardFooter>
-                <Skeleton className="h-4 w-1/3" />
-              </CardFooter>
-            </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div key={index} className="rounded-lg overflow-hidden">
+              <div className="animate-pulse bg-gray-200 aspect-video w-full"></div>
+              <div className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="animate-pulse h-6 w-6 bg-gray-300 rounded-full"></div>
+                  <div className="animate-pulse h-4 bg-gray-300 w-24"></div>
+                </div>
+                <div className="animate-pulse h-4 bg-gray-300 w-full mb-1"></div>
+                <div className="animate-pulse h-4 bg-gray-300 w-3/4"></div>
+                <div className="flex items-center mt-2">
+                  <div className="animate-pulse h-3 bg-gray-300 w-16"></div>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       ) : bookmarks.length === 0 ? (
-        <Card className="w-full text-center p-8">
+        <div className="w-full text-center p-8">
           <div className="flex flex-col items-center gap-2">
             <Bookmark className="h-12 w-12 text-muted-foreground" />
             <h3 className="font-semibold mt-2">No bookmarks found</h3>
@@ -211,57 +207,69 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
               You haven&apos;t saved any posts yet. Start bookmarking content you want to revisit later.
             </p>
           </div>
-        </Card>
+        </div>
       ) : (
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {bookmarks.map((bookmark) => (
-            <Card key={bookmark.id} className="w-full hover:shadow-md transition-shadow">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
+            <div
+              key={bookmark.id}
+              className="hover:bg-gray-100 transition-colors rounded-lg cursor-pointer overflow-hidden"
+              onClick={() => (window.location.href = `/posts/${bookmark.id}`)}
+            >
+              <div className="relative aspect-video w-full">
+                {bookmark.media && bookmark.media.length > 0 ? (
+                  <img
+                    src={
+                      bookmark.media[0].thumbnailUrl !== "None" ? bookmark.media[0].thumbnailUrl : bookmark.media[0].url
+                    }
+                    alt={bookmark.body}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <Bookmark className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+              </div>
+              <div className="p-3">
+                <div className="flex items-center gap-2 mb-2">
                   <img
                     src={bookmark.user_profile_avatar || "/placeholder.svg"}
                     alt={bookmark.user_username}
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-6 h-6 rounded-full object-cover"
                   />
-                  <div>
-                    <CardTitle className="text-lg">
-                      {bookmark.user_profile_firstName !== "None" && bookmark.user_profile_lastName !== "None"
-                        ? `${bookmark.user_profile_firstName} ${bookmark.user_profile_lastName}`
-                        : bookmark.user_username}
-                    </CardTitle>
-                    <CardDescription>
-                      @{bookmark.user_username} • {formatDate(bookmark.createdAt)}
-                    </CardDescription>
-                  </div>
+                  <h3 className="font-medium text-sm truncate">{bookmark.hashtag || bookmark.user_username}</h3>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm mb-3">{bookmark.body}</p>
-                {bookmark.hashtag && (
-                  <Badge variant="secondary" className="mr-2">
-                    {bookmark.hashtag}
-                  </Badge>
-                )}
-                <MediaWrapper
-                  postId={bookmark.id}
-                  title={bookmark.body}
-                  size="object-cover"
-                  postMedia={bookmark.media}
-                />
-              </CardContent>
-              <CardFooter className="flex justify-between pt-2">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>{bookmark.likesCount} likes</span>
-                  <span>{bookmark.commentsCount} comments</span>
+                <p className="text-sm mb-2 line-clamp-2">{bookmark.body}</p>
+                <div className="flex items-center text-sm text-gray-500 mt-1">
+                  <span className="flex items-center">
+                    <Heart className="w-3 h-3 mr-1" /> {bookmark.likesCount} likes
+                  </span>
+                  <span className="mx-2">•</span>
+                  <span>{formatDate(bookmark.createdAt)}</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => handleRemoveBookmark(bookmark.id)}>
-                  Remove
-                </Button>
-              </CardFooter>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
+
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={handlePreviousPage}
+          disabled={page === 1}
+          className="text-sm text-blue-500 disabled:text-gray-400"
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleNextPage}
+          disabled={page === totalPages}
+          className="text-sm text-blue-500 disabled:text-gray-400"
+        >
+          Next
+        </button>
+      </div>
     </div>
   )
 }
