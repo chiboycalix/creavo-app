@@ -150,7 +150,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
             ) : courses && courses?.length > 0 ? (
               courses.map((course) => (
                 <div key={course.id} className="flex flex-col">
-                  <a href={`/courses/${course.id}`}>
+                  <a href={`/market/product/${course.id}`}>
                     <div className=" inset-0 flex items-center justify-center bg-gray-100 p-1 rounded-md">
                       <FolderIcon className="h-16 w-16 text-gray-400" />
                     </div>
