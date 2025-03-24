@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Plus, Settings } from "lucide-react";
+import { Button } from '@/components/ui/button'
+import { Plus, Settings } from 'lucide-react'
+import React from 'react'
 
-export default async function SpacePage({ params }: any) {
-
+const Space = () => {
   return (
     <div className="w-full">
       <div className="border-b p-4 shadow-md shadow-primary-50 flex justify-between items-center">
@@ -27,5 +27,7 @@ export default async function SpacePage({ params }: any) {
         </div>
       </div>
     </div>
-  );
+  )
 }
+
+export default Space

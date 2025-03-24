@@ -120,7 +120,7 @@ const FollowersCard = ({ isOpen, onClose, anchorRect, userId }: FollowersProps) 
                 ) : hasNextPage ? (
                   'Load More'
                 ) : (
-                  'No more following'
+                  'No more followers'
                 )}
               </div>
             }

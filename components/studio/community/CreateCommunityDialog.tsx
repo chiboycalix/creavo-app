@@ -12,15 +12,43 @@ import {
 import { Input } from '@/components/Input'
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useMutation } from "@tanstack/react-query"
+import { createCommunityService } from "@/services/community.service"
+import { toast } from "sonner"
+import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook"
+import { useCreateCommunityValidator } from "@/helpers/validators/useCreateCommunityValidator"
+import { CreateCommunityForm } from "@/types"
+import { resetCreateCommunityForm, updatCreateCommunityForm } from "@/redux/slices/community.slice"
+import { generalHelpers } from "@/helpers"
 
 const CreateCommunityDialog = () => {
   const router = useRouter()
-  const [space, setspace] = useState("")
   const maxFiles = 1;
+  const dispatch = useAppDispatch();
+  const { createCommunityForm: createCommunityStateValues } = useAppSelector((store) => store.communityStore);
+  const { validate, errors, validateField } = useCreateCommunityValidator({ store: createCommunityStateValues });
+  const updateCreateCommunity = (payload: Partial<CreateCommunityForm>) => dispatch(updatCreateCommunityForm(payload));
+
+
+  const { mutate: handleCreateCommunity, isPending: isCreatingCommunity } = useMutation({
+    mutationFn: (payload: any) => createCommunityService(payload),
+    onSuccess: async (data) => {
+      toast.success("Community created successfully")
+      router.push(`/studio/community/${generalHelpers.convertToSlug(createCommunityStateValues?.name)}`)
+      dispatch(resetCreateCommunityForm())
+    },
+    onError: (error: any) => {
+      console.log({ error })
+      toast.error("Failed to create")
+    },
+  });
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    router.push(`/studio/community/${space}`)
+    validate(() => handleCreateCommunity(createCommunityStateValues))
   }
+
+  const isDisabled = !createCommunityStateValues?.name || !createCommunityStateValues?.description || isCreatingCommunity
 
   return (
     <Dialog>
@@ -29,7 +57,7 @@ const CreateCommunityDialog = () => {
           Create Community
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-sm">Basic Settings</DialogTitle>
           <form onSubmit={handleSubmit}>
@@ -39,10 +67,12 @@ const CreateCommunityDialog = () => {
                 label="Community name"
                 maxLength={54}
                 placeholder="Enter Community name"
-                value={space}
+                value={createCommunityStateValues?.name}
                 onChange={(e) => {
-                  setspace(e.target.value)
+                  validateField("name", e.target.value)
+                  updateCreateCommunity({ name: e.target.value });
                 }}
+                errorMessage={errors.name}
               />
               <p className='text-xs mt-1'>You can always change this later</p>
             </div>
@@ -53,21 +83,24 @@ const CreateCommunityDialog = () => {
                 label="Community Description"
                 maxLength={365}
                 placeholder="Enter your course description"
-                value={""}
+                value={createCommunityStateValues?.description}
                 onChange={(e) => {
+                  validateField("description", e.target.value)
+                  updateCreateCommunity({ description: e.target.value });
                 }}
+                errorMessage={errors.description}
                 rows={5}
               />
             </div>
-
-
             <div>
               <UploadInput
                 label="Upload community banner image"
                 accept="image/*"
                 maxFiles={maxFiles}
                 placeholder={`Max 10 MB files are allowed`}
+
                 onChange={(uploads: any) => {
+                  updateCreateCommunity({ logo: uploads[0] })
                 }}
                 className="py-10"
                 footerText="Supports common image formats"
@@ -76,11 +109,11 @@ const CreateCommunityDialog = () => {
 
             <div className='w-full mt-12'>
               <Button
-                disabled={!space}
+                disabled={isDisabled}
                 className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
               >
                 <ButtonLoader
-                  isLoading={false}
+                  isLoading={isCreatingCommunity}
                   caption="Continue"
                 />
               </Button>
