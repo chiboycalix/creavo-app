@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from '@/components/Input'
-import { FormEvent, useState } from "react"
+import { FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
 import { createCommunityService } from "@/services/community.service"
@@ -20,8 +20,9 @@ import { useCreateCommunityValidator } from "@/helpers/validators/useCreateCommu
 import { CreateCommunityForm } from "@/types"
 import { resetCreateCommunityForm, updatCreateCommunityForm } from "@/redux/slices/community.slice"
 import { generalHelpers } from "@/helpers"
+import { Plus } from "lucide-react"
 
-const CreateCommunityDialog = () => {
+const CreateSpaceDialog = () => {
   const router = useRouter()
   const maxFiles = 1;
   const dispatch = useAppDispatch();
@@ -29,11 +30,10 @@ const CreateCommunityDialog = () => {
   const { validate, errors, validateField } = useCreateCommunityValidator({ store: createCommunityStateValues });
   const updateCreateCommunity = (payload: Partial<CreateCommunityForm>) => dispatch(updatCreateCommunityForm(payload));
 
-
   const { mutate: handleCreateCommunity, isPending: isCreatingCommunity } = useMutation({
     mutationFn: (payload: any) => createCommunityService(payload),
     onSuccess: async (data) => {
-      toast.success("Community created successfully")
+      toast.success("Space created successfully")
       router.push(`/studio/community/${generalHelpers.convertToSlug(createCommunityStateValues?.name)}`)
       dispatch(resetCreateCommunityForm())
     },
@@ -53,9 +53,7 @@ const CreateCommunityDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className='w-full'>
-          Create Community
-        </Button>
+        <Plus className="h-4 w-4 bg-primary-700 text-white rounded cursor-pointer" />
       </DialogTrigger>
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -64,7 +62,7 @@ const CreateCommunityDialog = () => {
             <div className='mb-8'>
               <Input
                 variant="text"
-                label="Community name"
+                label="Space name"
                 maxLength={54}
                 placeholder="Enter Community name"
                 value={createCommunityStateValues?.name}
@@ -80,9 +78,9 @@ const CreateCommunityDialog = () => {
             <div className='mb-8'>
               <Input
                 variant="textarea"
-                label="Community Description"
+                label="Space Description"
                 maxLength={365}
-                placeholder="Enter your community description"
+                placeholder="Enter your space description"
                 value={createCommunityStateValues?.description}
                 onChange={(e) => {
                   validateField("description", e.target.value)
@@ -94,7 +92,7 @@ const CreateCommunityDialog = () => {
             </div>
             <div>
               <UploadInput
-                label="Upload community banner image"
+                label="Upload space banner image"
                 accept="image/*"
                 maxFiles={maxFiles}
                 placeholder={`Max 10 MB files are allowed`}
@@ -125,4 +123,4 @@ const CreateCommunityDialog = () => {
   )
 }
 
-export default CreateCommunityDialog
+export default CreateSpaceDialog

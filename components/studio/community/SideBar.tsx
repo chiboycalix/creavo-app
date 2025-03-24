@@ -1,15 +1,16 @@
 "use client"
+import Link from 'next/link';
 import { Card } from '@/components/ui/card';
-import Image from 'next/image';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useState } from 'react';
-import Link from 'next/link';
 import { useListCommunities } from '@/hooks/communities/useListCommunities';
+import { CommunityHeaderSkeleton } from '@/components/sketetons/CommunityHeaderSkeleton';
+import CreateSpaceDialog from './CreateSpaceDialog';
 
 
 export default function Sidebar() {
@@ -22,24 +23,39 @@ export default function Sidebar() {
     { id: "2", name: "Social" },
   ];
 
+  const handleAddSpaceToCommunity = (e: any) => {
+    console.log("hii")
+  }
+
   return (
     <Card className='rounded-md h-[88vh] bg-white'>
       <div className="w-64 p-4">
-        <div className="flex items-center space-x-2 pt-2 pb-4 mb-6 border-b">
-          <img src={community?.logo
-          } alt="Community Avatar" className="rounded-full h-8 w-8" />
-          <span className="text-sm font-semibold">{community?.displayName}</span>
-        </div>
+        {
+          isFetching ? <CommunityHeaderSkeleton /> : <div className="flex items-center space-x-2 pt-2 pb-4 mb-6 border-b">
+            <img src={community?.logo
+            } alt="Community Avatar" className="rounded-full h-10 w-10 object-cover" />
+            <span className="text-sm font-semibold">{community?.displayName}</span>
+          </div>
+        }
+
         <div className="space-y-2">
           <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-            <CollapsibleTrigger className="flex items-center gap-2">
-              Space
-              {isOpen ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </CollapsibleTrigger>
+            <div className='inline-flex justify-between items-center gap-4 w-full'>
+              <CollapsibleTrigger className="basis-10/12">
+                <div className="flex items-center gap-2">
+                  Space
+                  {isOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </div>
+
+              </CollapsibleTrigger>
+              <div onClick={handleAddSpaceToCommunity} className='flex-1 cursor-pointer'>
+                <CreateSpaceDialog />
+              </div>
+            </div>
             <CollapsibleContent className="py-2">
               {spaces.map((space) => (
                 <Link
@@ -52,8 +68,6 @@ export default function Sidebar() {
               ))}
             </CollapsibleContent>
           </Collapsible>
-
-          {/* */}
         </div>
       </div>
     </Card>

@@ -20,8 +20,7 @@ import {
   MenuItem,
 } from '@headlessui/react';
 import { Fragment } from 'react';
-import { FaUser, FaCog, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa';
-import { BsPlusCircle } from 'react-icons/bs';
+import { FaUser, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import SearchInput from '@/components/search/search-input';
 
@@ -64,7 +63,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
       <div className="pr-4 sm:pr-6 lg:pr-6 w-full">
         <div className="flex h-20 justify-between items-center w-full gap-4">
           {/* Left Section with Menu Toggle and Search */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 basis-4/12">
             <button
               onClick={toggle}
               className="md:hidden p-2 rounded-lg text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors"
@@ -84,7 +83,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
           </div>
 
           {/* Center Section with Navigation Buttons */}
-          <div className="flex items-center justify-center space-x-0">
+          <div className="flex items-center justify-center space-x-0 basis-4/12">
             {headerButtons.map((button) => {
               const isActive = isButtonActive(button.navItems);
               const Icon = button.icon;
@@ -113,7 +112,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
           </div>
 
           {/* Right Section with Actions */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="flex items-center justify-end space-x-2 sm:space-x-4 basis-4/12">
             {/* Mobile Search Toggle */}
             <button
               onClick={() => setIsSearchVisible(!isSearchVisible)}

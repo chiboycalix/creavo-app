@@ -135,7 +135,7 @@ const CreateLongCourse = () => {
                 updateCreateCourse({ description: e.target.value });
               }}
               errorMessage={errors.description}
-              rows={10}
+              rows={5}
             />
           </div>
           <div className='mb-4'>
@@ -237,6 +237,7 @@ const CreateLongCourse = () => {
               onChange={(uploads: any) => {
                 updateCreateCourse({ promotionalUrl: uploads[0] })
               }}
+              className='py-10'
             />
           </div>
 
