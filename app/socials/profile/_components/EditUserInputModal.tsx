@@ -187,7 +187,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
                 type="file"
                 accept="image/*"
                 ref={fileInputRef}
-                className="hidden"
+                className="hidden "
                 onChange={handleImageChange}
               />
               <Button
@@ -227,7 +227,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-white"
+                className="w-full bg-white "
               />
 
               {/* {username && <Socket username={username} />} */}

@@ -346,7 +346,7 @@ const Calendar = () => {
         <PageTitle>Calendar</PageTitle>
         <Button
           onClick={handleAddEvent}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+          className="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
         >
           Add Event <PlusCircle className="w-4 h-4" />
         </Button>
