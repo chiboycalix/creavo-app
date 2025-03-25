@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react"
 import ProfileHeader from "./_components/ProfileHeader"
 import ProfileTabs from "./_components/ProfileTabs"
-import Loading from "@/components/Loading"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import Error from "@/components/Error"
 import { useRouter } from "next/navigation"
