@@ -157,7 +157,7 @@ export default function SignUpForm() {
         </div>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={loading || !email || !password || !confirmPassword || password !== confirmPassword}
           className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
         >
           {loading ? (
@@ -167,16 +167,8 @@ export default function SignUpForm() {
           )}
         </Button>
 
-        <div className="text-center text-sm">
-          By creating an account, you agree to our{' '}
-          <a href="#" className="font-semibold">
-            Terms of Service
-          </a>{' '}
-          and{' '}
-          <a href="#" className="font-semibold">
-            {' '}
-            Privacy & Cookie Statement.
-          </a>
+        <div>
+          <p className="text-xs text-center w-10/12 mx-auto leading-5">By creating an account, you agree to our Terms of Service and Privacy & Cookie Statement.</p>
         </div>
       </form>
     </div>

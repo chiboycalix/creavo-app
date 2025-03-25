@@ -23,7 +23,7 @@ export interface Course {
   promotionalUrl: string;
 }
 
-function App() {
+const EngagementMetrics = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
@@ -96,7 +96,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">User Courses</h1>
           <div className="relative">
@@ -199,4 +199,4 @@ function App() {
   );
 }
 
-export default App;
+export default EngagementMetrics;

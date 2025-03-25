@@ -12,6 +12,7 @@ import { ChartHeader } from "@/components/analytics/ChatHeaders";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import PageTitle from "@/components/PageTitle";
 
 const overviewData = [
   {
@@ -124,15 +125,15 @@ const tableData = [
 const StudioDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const {  getCurrentUser } = useAuth();
-    const currentUser = getCurrentUser();
-    const {
-      data: profileData,
-      isLoading: profileLoading,
-      error: profileError,
-      refetch: refetchProfile,
-    } = useUserProfile(currentUser?.id)
-  const [userProfile , setUserProfile] = useState(profileData?.data)
+  const { getCurrentUser } = useAuth();
+  const currentUser = getCurrentUser();
+  const {
+    data: profileData,
+    isLoading: profileLoading,
+    error: profileError,
+    refetch: refetchProfile,
+  } = useUserProfile(currentUser?.id)
+  const [userProfile, setUserProfile] = useState(profileData?.data)
 
   useEffect(() => {
     if (profileData?.data) {
@@ -140,11 +141,11 @@ const StudioDashboard = () => {
     }
   }, [profileData]);
 
-  
-    // console.log(currentUser)
 
-    
-  
+  // console.log(currentUser)
+
+
+
   const revenueData = [42, 43, 60, 45, 55, 53, 52, 83, 48, 52, 68, 65, 60, 58];
   const subscribersData = [
     42, 43, 60, 45, 55, 53, 52, 83, 48, 52, 68, 65, 60, 58,
@@ -165,11 +166,11 @@ const StudioDashboard = () => {
     "22",
     "23",
   ];
-  
-  
+
+
   const transformToChartData = (data: number[], labels: string[]) =>
     data.map((value, index) => ({ x: Number(labels[index]), value }));
-  
+
   const revenueChartData = transformToChartData(revenueData, labels);
   const subscribersChartData = transformToChartData(subscribersData, labels);
 
@@ -201,11 +202,10 @@ const StudioDashboard = () => {
 
         return (
           <div
-            className={`w-fit px-3 py-1 rounded-full ${
-              grade >= 6
-                ? "bg-green-100 text-green-600"
-                : "bg-red-100 text-red-600"
-            }`}
+            className={`w-fit px-3 py-1 rounded-full ${grade >= 6
+              ? "bg-green-100 text-green-600"
+              : "bg-red-100 text-red-600"
+              }`}
           >
             {grade}/10
           </div>
@@ -215,19 +215,22 @@ const StudioDashboard = () => {
   ] as any;
 
   return (
-    <div className="w-full py-8">
+    <div className="w-full">
       <div className="w-full flex items-center justify-between">
-        <h2 className="font-bold text-2xl">Hello  {profileLoading ? (
+        <PageTitle>
+          {profileLoading ? (
             <span className="animate-pulse bg-gray-300 text-gray-300 px-3 py-1 rounded-md">
               Loading...
             </span>
           ) : (
-            userProfile?.profile?.firstName || "Guest"
-          )}{" "}  👋</h2>
+            <><span>Hey, {userProfile?.profile?.firstName || "Guest"}</span></>
+          )
+          }{" "}  👋
+        </PageTitle>
 
         <Button>
           <Link href="/studio/course" className="flex items-center gap-2">
-        <PlusSquareIcon /> Create Course
+            <PlusSquareIcon /> Create Course
           </Link>
         </Button>
 
@@ -250,7 +253,7 @@ const StudioDashboard = () => {
           />
         </div>
         <div className="w-[30%] ">
-        <CompletionRate  color="#82AFF3" />
+          <CompletionRate color="#82AFF3" />
         </div>
       </div>
       <div className="mt-10">

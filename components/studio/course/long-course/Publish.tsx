@@ -1,29 +1,19 @@
 
+import ContentDisclosure from '../ContentDisclosure';
+import SuccessDialog from '../SuccessDialog';
 import React, { useState } from 'react'
-import ButtonLoader from '@/components/ButtonLoader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
-import { fetchSingleCourseService, publishCourseService } from '@/services/course.service';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { fetchSingleCourseService } from '@/services/course.service';
+import { MultiStepDialogFlow } from '@/components/MultiStepDialogFlow';
 
 const Publish = ({ courseId }: { courseId: any }) => {
   const [courseValue, setCourseValue] = useState("draft")
 
-  const { mutate: handlePublishCourse, isPending: isPublishingModule } = useMutation({
-    mutationFn: (payload: any) => publishCourseService(payload),
-    onSuccess: (data) => {
-      toast.success("Course published successfully");
-    },
-    onError: (error: any) => {
-      toast.error(error?.data?.[0] || "Failed to publish course");
-    },
-  });
-
   const { data: courseData, isFetching } = useQuery<any>({
-    queryKey: ["courseData", courseId],
+    queryKey: ["shortCourseData", courseId],
     queryFn: async () => {
       const data = await fetchSingleCourseService({
         courseId: courseId
@@ -34,13 +24,6 @@ const Publish = ({ courseId }: { courseId: any }) => {
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
-
-
-  const handleSubmit = () => {
-    handlePublishCourse({
-      courseId
-    })
-  }
 
   const isPublished = courseData?.course?.isPublished
 
@@ -78,15 +61,33 @@ const Publish = ({ courseId }: { courseId: any }) => {
             </div>
           </RadioGroup>
         </div>
-        <div className='w-full mt-12'>
-          <Button
-            onClick={handleSubmit}
-            className='w-4/12' disabled={isPublishingModule || courseValue === "draft" || isPublished}>
-            <ButtonLoader
-              isLoading={isPublishingModule}
-              caption='Save'
-            />
-          </Button>
+        <div className='w-3/12 mt-12'>
+          <MultiStepDialogFlow
+            triggerButtonText="Continue"
+            isTriggerButtonDisabled={courseValue === "draft"}
+            steps={[
+              {
+                title: "Altered Content Disclosure",
+                showFooter: true,
+                content: ({ setButtonProps, goNext, closeDialog }) => (
+                  <ContentDisclosure
+                    setButtonProps={setButtonProps}
+                    goNext={goNext}
+                    closeDialog={closeDialog}
+                    courseId={courseId}
+                  />
+                ),
+              },
+              {
+                title: "",
+                content: ({ closeDialog }) => (
+                  <SuccessDialog
+                    closeDialog={closeDialog}
+                  />
+                ),
+              },
+            ]}
+          />
         </div>
       </CardContent>
     </Card>

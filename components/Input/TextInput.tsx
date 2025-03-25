@@ -61,7 +61,7 @@ export const TextInput = ({
         )}
         <input
           className={cn(
-            "outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2 rounded py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
+            "outline-none focus:ring-0 ring-primary-700 border-primary-100 border-2 rounded-lg py-3 text-gray-800 text-sm text-wrap w-full disabled:cursor-not-allowed placeholder:text-gray-400 placeholder:normal-case",
             (icon || leftIcon) ? "pl-10" : "pl-3",
             rightIcon ? "pr-10" : "pr-3",
             errorMessage ? "bg-red-100" : "bg-primary-50/25",

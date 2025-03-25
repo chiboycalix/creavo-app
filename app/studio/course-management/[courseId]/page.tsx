@@ -76,19 +76,15 @@ const Course = () => {
                   <CardContent className='py-4 px-4 w-full'>
                     <div>
                       {mimeType === "image/*" ? (
-                        <Image
+                        <img
                           src={courseData?.data?.course?.promotionalUrl || Thumbnail}
                           alt="Thumbnail"
-                          width={384}
-                          height={200}
-                          className='rounded-md max-h-72 w-full'
+                          className='rounded-md max-h-72 w-full object-cover'
                         />
                       ) : (
                         <video
                           src={courseData?.data?.course?.promotionalUrl}
                           controls
-                          width={384}
-                          height={200}
                           className="w-full max-h-72 object-cover rounded-md"
                         />
                       )}

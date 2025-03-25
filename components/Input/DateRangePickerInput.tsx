@@ -52,7 +52,7 @@ export const DateRangePickerInput = ({
         <PopoverTrigger asChild>
           <div
             className={cn(
-              "relative cursor-pointer bg-gray-100 rounded border-2 border-primary-100 py-3",
+              "relative cursor-pointer bg-gray-100 rounded-lg border-2 border-primary-100 py-3",
               leftIcon ? "pl-10" : "pl-3",
               rightIcon ? "pr-10" : "pr-3",
               errorMessage && "bg-red-100",
@@ -93,7 +93,7 @@ export const DateRangePickerInput = ({
               onDateRangeSelect?.(newDateRange);
             }}
             numberOfMonths={numberOfMonths}
-            className="rounded-md border"
+            className="rounded-lg border"
           />
         </PopoverContent>
       </Popover>

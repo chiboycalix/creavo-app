@@ -8,6 +8,7 @@ import SelectedEventCard from "@/components/studio/calendar/SelectedEventCard";
 import { Button } from "@/components/ui/button";
 import { baseUrl } from "@/utils/constant";
 import Cookies from "js-cookie";
+import PageTitle from "@/components/PageTitle";
 
 interface CalendarEvent {
   id: number;
@@ -98,8 +99,7 @@ const Calendar = () => {
       const lastDay = new Date(currentYear, currentMonth + 1, 0);
 
       const response = await fetch(
-        `${baseUrl}/meetings/user-Meetings/list?page=1&limit=100&startDate=${
-          firstDay.toISOString().split("T")[0]
+        `${baseUrl}/meetings/user-Meetings/list?page=1&limit=100&startDate=${firstDay.toISOString().split("T")[0]
         }&endDate=${lastDay.toISOString().split("T")[0]}`,
         {
           headers: {
@@ -343,7 +343,7 @@ const Calendar = () => {
   return (
     <div className="flex flex-col h-screen bg-white">
       <header className="flex justify-between items-center px-6 py-4 border-b">
-        <h1 className="text-xl font-semibold">Calendar</h1>
+        <PageTitle>Calendar</PageTitle>
         <Button
           onClick={handleAddEvent}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
@@ -383,14 +383,13 @@ const Calendar = () => {
                   whileHover={{ scale: 1.1 }}
                   className={`
                     relative w-8 h-8 rounded-full flex items-center justify-center text-sm
-                    ${
-                      day.currentMonth
-                        ? day.day === selectedDay &&
-                          day.month === currentMonth &&
-                          day.year === currentYear
-                          ? "bg-blue-600 text-white"
-                          : "hover:bg-gray-100"
-                        : "text-gray-300"
+                    ${day.currentMonth
+                      ? day.day === selectedDay &&
+                        day.month === currentMonth &&
+                        day.year === currentYear
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-gray-100"
+                      : "text-gray-300"
                     }
                   `}
                   onClick={() => handleDayClick(day)}
@@ -466,11 +465,10 @@ const Calendar = () => {
                 <div key={time} className="flex items-center">
                   <div className="w-16 text-sm text-gray-500">{time}</div>
                   <div
-                    className={`flex-1 min-h-[3rem] border-t border-gray-100 relative ${
-                      hasEvent
-                        ? "cursor-pointer hover:bg-gray-50"
-                        : "cursor-default"
-                    }`}
+                    className={`flex-1 min-h-[3rem] border-t border-gray-100 relative ${hasEvent
+                      ? "cursor-pointer hover:bg-gray-50"
+                      : "cursor-default"
+                      }`}
                     onClick={(e) => hasEvent && handleTimeSlotClick(e, time)}
                   >
                     {hasEvent && (
@@ -478,7 +476,7 @@ const Calendar = () => {
                         className={`absolute inset-0  opacity-50 rounded-md`}
                       >
                         {timeSlotMeetings.map((meeting) => {
-                          console.log(meeting.color); 
+                          console.log(meeting.color);
                           return (
                             <div
                               key={meeting.id}

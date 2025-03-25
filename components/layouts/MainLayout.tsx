@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useState, useEffect } from "react";
-import ProfileCompletionManager from "../ProfileCompletionManager";
 import SidebarSkeleton from "../sketetons/SidebarSkeleton";
 import Header from "./includes/Header";
 import Sidebar from "./includes/Sidebar";
@@ -10,7 +9,6 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 import {
-  Archive,
   Video,
   User,
   Compass,
@@ -23,17 +21,16 @@ import {
   Calendar,
   ChartAreaIcon,
   LayoutDashboardIcon,
-  TagIcon,
   BellIcon,
   Bookmark,
-  ChartSplineIcon,
   BoxesIcon,
   Users2
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { RiHome8Fill } from "react-icons/ri";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import CustomImageIcon from "../CustomImageIcon";
+import { cn } from "@/lib/utils";
 
 export default function MainLayout({
   children,
@@ -45,10 +42,9 @@ export default function MainLayout({
   const { data: profileData } = useUserProfile(currentUser?.id);
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
-  // Detect if the current route matches /studio/community/[space]
   useEffect(() => {
-    const communityRoutePattern = /^\/studio\/community\/[^/]+$/;
-    setIsCommunityRoute(communityRoutePattern.test(pathname || ""));
+    const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
+    setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
   const headerButtons: HeaderButton[] = React.useMemo(() => [
@@ -64,19 +60,14 @@ export default function MainLayout({
         {
           title: "Profile",
           href: `/socials/profile`,
-          icon: (
-            <Avatar className="w-1 h-1">
-              <AvatarImage
-                src={
-                  profileData?.data
-                    ? profileData?.data?.profile?.avatar
-                    : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"
-                }
-                sizes="sm"
-              />
-              <AvatarFallback>P</AvatarFallback>
-            </Avatar>
-          ),
+          icon: <CustomImageIcon
+            imageUrl={profileData?.data
+              ? profileData?.data?.profile?.avatar
+              : "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png"}
+            className="rounded-full"
+            alt="Custom Image"
+
+          />
         },
       ],
     },
@@ -94,7 +85,7 @@ export default function MainLayout({
           title: 'Event', href: '/studio/meeting', icon: Video,
           children: [
             { title: 'Video conference', href: '/studio/event/meeting' },
-            { title: 'Webinar', href: '/studio/event/webinar' },
+
             { title: 'Classroom', href: '/studio/event/classroom' },
           ]
         },
@@ -184,8 +175,7 @@ export default function MainLayout({
             />
           </header>
           <main className="relative h-full mt-16 overflow-y-auto">
-            <div className="p-0 sm:p-6">
-              <ProfileCompletionManager />
+            <div className={cn("p-0", pathname === "/socials" || pathname === "/socials/following" ? "sm:py-6 sm:px-16" : "sm:p-12")}>
               {children}
             </div>
           </main>

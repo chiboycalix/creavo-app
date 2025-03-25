@@ -7,12 +7,7 @@ import { MdOutlineCloudUpload } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { useToast } from "@/context/ToastContext";
-
-const FullPageLoader = () => (
-  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-    <div className="w-16 h-16 border-4 border-t-4 border-primary-500 border-solid rounded-full animate-spin"></div>
-  </div>
-);
+import { RouterSpinner } from "../Loaders/RouterSpinner";
 
 type UploadInputProps = {
   label?: ReactNode;
@@ -21,8 +16,9 @@ type UploadInputProps = {
   accept?: string;
   maxFiles?: number;
   nextPath?: string;
-  onChange?: any;
   placeholder?: string;
+  footerText?: string;
+  onChange?: (urls: string[]) => void;
 } & React.ComponentProps<"div">;
 
 type UploadProgress = {
@@ -41,12 +37,13 @@ export const UploadInput = ({
   accept = "video/*,image/*",
   maxFiles = 5,
   nextPath,
-  onChange,
   placeholder = `Max ${maxFiles} files per upload`,
+  footerText = "Supports MP4, MOV, FLV videos and common image formats",
+  onChange, // Destructured new prop
   ...rest
 }: UploadInputProps) => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const router = useRouter();
@@ -85,11 +82,10 @@ export const UploadInput = ({
         },
       });
       const url = response.data.secure_url;
-      onChange(url)
       setUploads((prev) =>
         prev.map((upload) =>
           upload.file === file ? { ...upload, url, uploading: false } : upload
-        ),
+        )
       );
       return url;
     } catch (error) {
@@ -99,13 +95,18 @@ export const UploadInput = ({
           upload.file === file ? { ...upload, uploading: false } : upload
         )
       );
+      showToast('error', 'Upload failed', 'An error occurred while uploading the file.');
       return null;
     }
   };
 
   const handleFiles = async (newFiles: File[]) => {
     if (uploads.length + newFiles.length > maxFiles) {
-      showToast('error', 'Failed to upload file', errorMessage || `You can only upload up to ${maxFiles} files per post.`);
+      showToast(
+        'error',
+        'Failed to upload file',
+        errorMessage || `You can only upload up to ${maxFiles} files per post.`
+      );
       return;
     }
 
@@ -117,7 +118,16 @@ export const UploadInput = ({
       type: file.type.startsWith("image/") ? "image" : "video",
     }));
     setUploads((prev) => [...prev, ...newUploads]);
-    await Promise.all(newFiles.map((file) => uploadToCloudinary(file)));
+
+    const urls = await Promise.all(newFiles.map((file) => uploadToCloudinary(file)));
+    const validUrls = urls.filter((url) => url !== null) as string[];
+
+    // Call onChange with the valid URLs once uploads are complete
+    if (validUrls.length > 0 && onChange) {
+      onChange(validUrls);
+    }
+
+    return validUrls;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,33 +154,42 @@ export const UploadInput = ({
   const handleRemoveFile = (index: number) => {
     const uploadToRemove = uploads[index];
     if (uploadToRemove.previewUrl) URL.revokeObjectURL(uploadToRemove.previewUrl);
-    setUploads((prev) => prev.filter((_, i) => i !== index));
+    setUploads((prev) => {
+      const newUploads = prev.filter((_, i) => i !== index);
+      // Update onChange with remaining URLs after removal
+      if (onChange) {
+        const remainingUrls = newUploads
+          .map((upload) => upload.url)
+          .filter(Boolean) as string[];
+        onChange(remainingUrls);
+      }
+      return newUploads;
+    });
   };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (!nextPath) return;
+
+    setIsLoading(true);
     const urls = uploads.map((upload) => upload.url).filter(Boolean) as string[];
-    if (urls.length > 0 && nextPath) {
-      const urlString = urls.join(",");
-      setIsLoading(true); // Show loader
-      setTimeout(() => {
-        router.push(`${nextPath}?urls=${urlString}`, { scroll: false });
-        setUploads([]); // Reset uploads after navigation
-        setIsLoading(false); // Hide loader after navigation
-      }, 100); // Small delay to ensure loader is visible
+    if (urls.length > 0) {
+      const encodedUrls = btoa(JSON.stringify(urls));
+      router.push(`${nextPath}?urls=${encodedUrls}`);
     } else {
-      alert("No files uploaded yet or nextPath not provided!");
+      showToast('error', 'No files uploaded', 'Please upload files before proceeding.');
     }
+    setIsLoading(false);
   };
 
   const allUploaded = uploads.length > 0 && uploads.every((upload) => !upload.uploading);
 
   return (
     <div className="leading-3">
-      {isLoading && <FullPageLoader />}
+      {isLoading && <RouterSpinner />}
       {label && (
         <label className="flex items-center text-gray-900 font-medium text-sm gap-x-2 mb-1">
           {label}
@@ -205,15 +224,15 @@ export const UploadInput = ({
           <p className="text-gray-400 text-sm">{placeholder}</p>
         </div>
       </div>
-      <p className="mt-4 text-sm">Supports MP4, MOV, FLV videos and common image formats</p>
+      <p className="mt-4 text-sm">{footerText}</p>
       {uploads.length > 0 && (
         <div className="mt-6 flex flex-col gap-6">
           <div className="border border-gray-200 rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-700 mb-4">Uploading Files</h3>
             <div className="flex flex-wrap gap-4">
               {uploads.map((upload, index) => (
-                <div key={upload.file.name} className="relative w-32 h-40 flex flex-col">
-                  <div className="w-32 h-32 flex-shrink-0">
+                <div key={upload.file.name} className="relative w-52 h-40 flex flex-col">
+                  <div className="w-52 h-32 flex-shrink-0">
                     {upload.type === "image" ? (
                       <img
                         src={upload.url || upload.previewUrl}
@@ -237,13 +256,15 @@ export const UploadInput = ({
                       style={{ width: `${upload.progress}%` }}
                     />
                   </div>
-                  <button
-                    onClick={() => handleRemoveFile(index)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                    disabled={upload.uploading}
-                  >
-                    ×
-                  </button>
+                  {!upload.uploading && (
+                    <button
+                      onClick={() => handleRemoveFile(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      disabled={upload.uploading}
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -251,8 +272,8 @@ export const UploadInput = ({
           {allUploaded && nextPath && (
             <Button
               onClick={handleNext}
-              className="mt-4 bg-primary text-white px-6 py-2 rounded-md shadow hover:bg-primary-600 transition-colors duration-200"
-              disabled={isLoading} // Disable button during loading
+              className="mt-4 bg-primary text-white px-6 py-2 rounded-lg shadow hover:bg-primary-600 transition-colors duration-200"
+              disabled={isLoading}
             >
               Next
             </Button>

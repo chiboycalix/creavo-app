@@ -171,7 +171,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   return (
     <div className={cn("relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center", isMyPost ? "mb-0" : "mb-4")}>
       <Avatar className="w-12 h-12">
-        <AvatarImage src={avatar} alt="User avatar" />
+        <AvatarImage src={avatar} alt="User avatar" className="object-cover " />
         <AvatarFallback>.</AvatarFallback>
       </Avatar>
       {

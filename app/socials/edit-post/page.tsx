@@ -13,28 +13,20 @@ import { TagsInput } from "@/components/Input/TagsInput";
 import { toast } from "sonner";
 
 const PostEditPage = () => {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [title, setTitle] = useState("");
-  const [urls, setUrls] = useState<string[]>([]);
   const [caption, setCaption] = useState("");
   const [hashtags, setHashtags] = useState<any>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [deviceId, setDeviceId] = useState(null);
   const [location, setLocation] = useState<object | null>(null);
-
-  useEffect(() => {
-    const urlsParam = searchParams.get("urls");
-    if (urlsParam) {
-      const parsedUrls = urlsParam.split(",").filter(Boolean);
-      setUrls(parsedUrls);
-    }
-  }, [searchParams]);
+  const searchParams = useSearchParams();
+  const encodedUrls = searchParams.get("urls");
+  const urls = encodedUrls ? JSON.parse(atob(encodedUrls)) : [];
 
   const handleDotClick = (index: number) => {
     setCurrentSlide(index);
   };
-
 
   const handleGetDeviceId = async () => {
     const res = await fetch("https://api.ipify.org/?format=json");
@@ -94,21 +86,19 @@ const PostEditPage = () => {
       deviceId: deviceId
     })
   }
-
+  console.log({ urls })
   return (
     <Card className="mt-20 border-none">
       <CardHeader>
         <CardTitle className="text-base"></CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="w-full mx-auto p-4 flex gap-6">
-          {/* Left: Media Display */}
-          <div className="w-1/2">
+        <div className="w-full mx-auto p-4 flex gap-6 items-center h-[30rem]">
+          <div className="w-1/2 h-full">
             {urls.length > 0 ? (
-              <div className="relative bg-gray-50 rounded-xl border p-4 overflow-hidden">
-                {/* Media Container */}
-                <div className="relative w-full h-[30rem]">
-                  {urls.map((url, index) => (
+              <div className="relative rounded-xl p-4 overflow-hidden h-full">
+                <div className="relative w-full h-full border rounded-md">
+                  {urls.map((url: string, index: number) => (
                     <div
                       key={index}
                       className={`absolute top-0 left-0 w-full h-full transition-opacity duration-500 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0"
@@ -118,13 +108,13 @@ const PostEditPage = () => {
                         <video
                           src={url}
                           controls
-                          className="w-full h-full object-contain rounded-lg"
+                          className="w-full h-full object-cover rounded-md"
                         />
                       ) : (
                         <img
                           src={url}
                           alt={`Media ${index}`}
-                          className="w-full h-full object-contain rounded-lg"
+                          className="w-full h-full object-cover rounded-md"
                         />
                       )}
                     </div>
@@ -133,7 +123,7 @@ const PostEditPage = () => {
 
                 {urls.length > 1 && (
                   <div className="flex justify-center mt-4 space-x-2">
-                    {urls.map((_, index) => (
+                    {urls.map((url: string, index: number) => (
                       <button
                         key={index}
                         onClick={() => handleDotClick(index)}
@@ -170,7 +160,7 @@ const PostEditPage = () => {
               <TextareaInput
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:ring-primary focus:border-primary"
+                className="mt-1 block w-full rounded-md p-3 shadow-sm"
                 rows={4}
                 placeholder="Write a caption..."
                 label="Write caption"

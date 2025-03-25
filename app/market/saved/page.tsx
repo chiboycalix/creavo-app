@@ -5,6 +5,7 @@ import ProductCard from "../explore/_components/ProductCard";
 
 const SavedProducts = () => {
   const { savedProducts, isSaved, handleToggleSave } = useMarketContext();
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <div>
@@ -15,14 +16,21 @@ const SavedProducts = () => {
         />
       </div>
       <div className="mt-10 flex flex-wrap gap-4 ">
-        {savedProducts?.map((product: any) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            isSaved={true}
-            handleToggleSave={handleToggleSave}
-          />
-        ))}
+        {savedProducts?.length > 0 ? (
+          savedProducts?.map((product: any) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              isSaved={true}
+              handleToggleSave={handleToggleSave}
+            />
+          ))
+        ) : (
+          <div className="w-full flex flex-col items-center justify-center gap-3">
+            <h3 className="font-semibold">You have not saved any product</h3>
+            <p>Save Products from the Marketplace Explore to purchase later</p>
+          </div>
+        )}
       </div>
     </div>
   );

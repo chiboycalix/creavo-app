@@ -67,7 +67,7 @@ export const PhoneInput = ({
         <select
           value={countryCode}
           onChange={handleCountryCodeChange}
-          className="border-2 border-primary-100 bg-white rounded-l py-3 px-1 text-gray-800 text-sm bg-primary-50/25 outline-none focus:ring-0"
+          className="border-2 border-primary-100 bg-white rounded-l-md py-3 px-1 text-gray-800 text-sm bg-primary-50/25 outline-none focus:ring-0"
         >
           {countryCodes.map((country) => (
             <option key={country.code} value={country.code}>

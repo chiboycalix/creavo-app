@@ -65,7 +65,6 @@ export function getMimeTypeFromCloudinaryUrl(url: string): string | null {
     const urlParts = url?.split(/[#?]/)[0];
     const extensionMatch = urlParts?.match(/\.([a-zA-Z0-9]+)$/);
     const extension = extensionMatch ? extensionMatch[1]?.toLowerCase() : null;
-    console.log({ extension });
     if (!extension) {
       if (url?.includes("/video/")) return "video/mp4";
       if (url?.includes("/image/")) return "image/jpeg";
@@ -90,4 +89,44 @@ export function getMimeTypeFromCloudinaryUrl(url: string): string | null {
     console.error("Error parsing MIME type from URL:", error);
     return null;
   }
+}
+
+export async function getMediaDimensionsClientSide(url: string): Promise<{
+  width: number;
+  height: number;
+  type: "video" | "image" | "unknown";
+}> {
+  return new Promise((resolve) => {
+    if (url.includes("/video/")) {
+      const video = document.createElement("video");
+      video.src = url;
+      video.onloadedmetadata = () => {
+        resolve({
+          width: video.videoWidth,
+          height: video.videoHeight,
+          type: "video",
+        });
+        video.remove();
+      };
+      video.onerror = () => {
+        resolve({ width: 0, height: 0, type: "unknown" });
+        video.remove();
+      };
+    } else {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => {
+        resolve({
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          type: "image",
+        });
+        img.remove();
+      };
+      img.onerror = () => {
+        resolve({ width: 0, height: 0, type: "unknown" });
+        img.remove();
+      };
+    }
+  });
 }

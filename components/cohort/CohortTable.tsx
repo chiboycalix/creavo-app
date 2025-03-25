@@ -6,6 +6,7 @@ import { fetchLearnerEngagement, fetchUserCourses } from "@/services/course.serv
 import { apiClient } from "@/lib/apiClient"
 import { LearnerDetails } from "./LearnerDetails"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import PageTitle from "../PageTitle"
 
 
 export interface QuizAttempt {
@@ -242,7 +243,9 @@ export function CohortTable() {
   return (
     <div className="w-full flex flex-col relative justify-start">
       <div className="flex items-center w-full justify-between mb-4">
-        <h1 className="text-lg font-semibold">All Trainee</h1>
+        <PageTitle>
+          All Trainee
+        </PageTitle>
         <div className="flex items-center gap-2">
           <div className="relative text-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
@@ -277,9 +280,8 @@ export function CohortTable() {
                     {displayCourses.map((course) => (
                       <li
                         key={course.id}
-                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 ${
-                          selectedCourse?.id === course.id ? "bg-gray-100 font-medium" : ""
-                        }`}
+                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 ${selectedCourse?.id === course.id ? "bg-gray-100 font-medium" : ""
+                          }`}
                         onClick={() => handleCourseSelect(course)}
                       >
                         {course.title}
@@ -300,35 +302,35 @@ export function CohortTable() {
       </div>
 
       <TooltipProvider delayDuration={200}>
-      <div className="flex ml-3 items-center gap-4 mb-4">
-        <div className="flex items-center gap-2">
-          <input type="checkbox" className="rounded border-gray-300" checked={selectAll} onChange={handleSelectAll} />
+        <div className="flex ml-3 items-center gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <input type="checkbox" className="rounded border-gray-300" checked={selectAll} onChange={handleSelectAll} />
+          </div>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Mail className="h-3 w-3 text-gray-600 cursor-pointer" />
+            </TooltipTrigger>
+            <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Send email</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Users className="h-3 w-3 text-gray-600 cursor-pointer" />
+            </TooltipTrigger>
+            <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">
+              Add to community
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Share className="h-3 w-3 text-gray-600 cursor-pointer" />
+            </TooltipTrigger>
+            <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Share</TooltipContent>
+          </Tooltip>
         </div>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Mail className="h-3 w-3 text-gray-600 cursor-pointer" />
-          </TooltipTrigger>
-          <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Send email</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Users className="h-3 w-3 text-gray-600 cursor-pointer" />
-          </TooltipTrigger>
-          <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">
-            Add to community
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Share className="h-3 w-3 text-gray-600 cursor-pointer" />
-          </TooltipTrigger>
-          <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Share</TooltipContent>
-        </Tooltip>
-      </div>
-    </TooltipProvider>
+      </TooltipProvider>
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
@@ -435,9 +437,8 @@ export function CohortTable() {
                 return (
                   <button
                     key={pageNum}
-                    className={`w-8 h-8 rounded-full ${
-                      paginationMeta.currentPage === pageNum ? "bg-blue-500 text-white" : "hover:bg-gray-100"
-                    }`}
+                    className={`w-8 h-8 rounded-full ${paginationMeta.currentPage === pageNum ? "bg-blue-500 text-white" : "hover:bg-gray-100"
+                      }`}
                     onClick={() => {
                       setCurrentPage(pageNum)
                     }}

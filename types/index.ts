@@ -87,3 +87,9 @@ export type QuizData = {
   totalPoint: number;
   questions: any[];
 };
+
+export interface CreateCommunityForm {
+  name: string;
+  description: string;
+  logo?: string;
+}

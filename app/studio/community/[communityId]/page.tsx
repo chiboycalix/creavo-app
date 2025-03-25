@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Plus, Settings } from "lucide-react";
+"use client"
+import { Plus, Settings } from "lucide-react";;
 
-export default async function SpacePage({ params }: any) {
+export default function SpacePage() {
 
   return (
-    <div className="">
+    <div className="w-full">
       <div className="border-b p-4 shadow-md shadow-primary-50 flex justify-between items-center">
         <div>
           <p className="font-semibold text-sm">General</p>
@@ -17,14 +17,8 @@ export default async function SpacePage({ params }: any) {
       </div>
 
       <div className="p-4 py-10 bg-gray-100 w-[50%] mx-auto mt-20 rounded-md flex items-center flex-col">
-        <p>Looks like you&apos;re leading the way</p>
-        <p>Start a discussion by creating a new post</p>
-
-        <div className="mt-8 w-6/12">
-          <Button className="w-full">
-            <Plus />
-            Add member</Button>
-        </div>
+        <p>Looks like you don&apos;t have a space yet</p>
+        <p>Create a space</p>
       </div>
     </div>
   );

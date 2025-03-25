@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SaveProductButton from "@/components/marketplace/SaveProductButton";
 import { useMarketContext } from "@/context/MarketContext";
 import Link from "next/link";
@@ -49,17 +49,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
   product,
   handleToggleSave,
 }) => {
-  const { isSaved } = useMarketContext();
+  const {  savedProducts } = useMarketContext();
   const isVideo = product?.promotionalUrl?.endsWith(".mp4") ?? false;
+  const [isSaved, setIsSaved] = useState(false)
+
 
   return (
     <Link
       href={`/market/product/${product?.id}`}
       key={product?.id}
-      className="relative flex flex-col gap-4 p-3 bg-white rounded-lg border border-gray-200 shadow-sm transition-transform transform hover:scale-105 hover:shadow-lg w-[calc(25%-16px)] min-w-[200px] max-w-[300px]"
+      className="relative flex flex-col items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm transition-transform transform hover:scale-105 hover:shadow-lg w-[calc(25%-16px)] min-w-[200px] max-w-[300px]"
     >
       {/* Image Wrapper */}
-      <div className="w-full h-40 overflow-hidden rounded-md bg-gray-100">
+      <div className="w-full h-44 overflow-hidden rounded-md bg-gray-100">
         {isVideo ? (
           <video
             src={product?.promotionalUrl}
@@ -80,9 +82,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* Product Details */}
       <div className="flex flex-col gap-3 p-2">
         <div className="text-center">
-          <h3 className="font-semibold text-lg text-gray-800">
+          <h4 className="font-semibold text-md text-gray-800">
             {product?.title}
-          </h3>
+          </h4>
           <p className="text-sm text-gray-500">{product?.description}</p>
         </div>
 

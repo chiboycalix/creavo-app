@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils'
+import { Loader } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useMediaDimensions } from '@/hooks/useDimensions'
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[]
@@ -19,16 +21,12 @@ type GallerySliderTypes = {
 const GallerySlider = ({
   galleryImgs,
   className = '',
-  imageClass = '',
-  galleryClass = 'rounded-none',
-  isRenderedInComment = false,
-  navigation = true,
 }: GallerySliderTypes) => {
   const [loaded, setLoaded] = useState(false)
   const [index, setIndex] = useState(0)
   const [direction, setDirection] = useState(0)
   const images = galleryImgs?.length > 0 ? galleryImgs : []
-
+  const isMultiMedia = galleryImgs?.length > 1
   const mimeType = getMimeTypeFromCloudinaryUrl(galleryImgs && galleryImgs[0]?.url || '');
   const isImage = mimeType === "image/*" || galleryImgs[index]?.mimeType === "image/jpeg" || galleryImgs[index]?.mimeType === "image/*"
 
@@ -57,10 +55,12 @@ const GallerySlider = ({
 
   const currentMedia = images[index]
 
+  const { width, height, type } = useMediaDimensions(currentMedia?.url);
+  const isLandscape = width >= height;
+
   if (!images || images.length === 0) {
     return <div>No images to display.</div>
   }
-
   return (
     <MotionConfig
       transition={{
@@ -74,8 +74,14 @@ const GallerySlider = ({
       >
         {/* Main image */}
         <div className={` h-full overflow-hidden sm:rounded-xl rounded-none`}>
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-200 max-w-full">
+              <Loader className="animate-spin w-12 h-12 text-black" />
+            </div>
+          )}
+
           <Link
-            className={`relative flex items-center justify-center h-full `}
+            className={`relative flex items-center justify-center h-full`}
             href={''}
           >
             <AnimatePresence initial={false} custom={direction}>
@@ -85,24 +91,29 @@ const GallerySlider = ({
                 variants={variants(340, 1)}
                 initial="enter"
                 animate="center"
-                // exit="exit"
+                exit="exit"
                 className="h-full"
               >
                 {isImage ? (
-                  <Image
+                  <img
                     loading="lazy"
-                    width={500}
-                    height={300}
-                    src={currentMedia?.url || ''}
+                    src={currentMedia?.url}
                     alt="listing card gallery"
-                    className={`${isRenderedInComment ? "object-cover h-[calc(79vh)] w-full" : "object-cover md:max-h-[87vh] h-[calc(87vh)]"}`}
-                    onLoad={() => setLoaded(true)}
+                    className={cn(`w-full`,
+                      isMultiMedia ? "md:max-h-[85vh] h-[calc(87vh)]" : "md:max-h-[88vh] h-[calc(87vh)] ",
+                      isLandscape ? "object-contain" : "object-cover")
+                    }
+                    onLoad={() => {
+                      setLoaded(true)
+                    }}
                   />
                 ) : (
                   <video
-                    src={currentMedia?.url || ''}
-                    className={`object-cover h-screen ${imageClass}`}
-                    onLoad={() => setLoaded(true)}
+                    src={currentMedia?.url}
+                    className={cn(`h-screen w-full`, isLandscape ? "object-contain" : "object-cover")}
+                    onLoad={() => {
+                      setLoaded(true)
+                    }}
                   />
                 )}
               </motion.div>
@@ -112,7 +123,6 @@ const GallerySlider = ({
 
         {/* Buttons + bottom nav bar */}
         <div className=''>
-
           {images.length > 1 && (
             <div className="flex justify-center space-x-2 mt-4">
               {images.map((_, i) => (
