@@ -33,6 +33,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const hashtagFromCourse = post?.hashtag.match(/##(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
   const hashtagFromPost = post?.hashtag.match(/#(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
   const tags = hashtagFromCourse.length > 0 ? hashtagFromCourse : hashtagFromPost;
+  const [isLandscape, setIsLandscape] = useState(false);
 
   const handleDownloadStatusChange = (downloading: boolean, progress: number) => {
     setIsDownloading(downloading);
@@ -105,11 +106,10 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       <div className="bg-black text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
         <div className="relative">
           {/* Main Image */}
-          <div className="aspect-[12.5/16] relative">
+          <div className="w-full h-full relative">
             <MediaWrapper
               postId={post?.id}
               title={post?.title}
-              size="object-cover"
               postMedia={post?.media}
             />
           </div>

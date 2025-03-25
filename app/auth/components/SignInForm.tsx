@@ -131,11 +131,15 @@ export default function SignInForm() {
         </div>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={loading || !email || !password}
           className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
         >
           {loading ? <Spinner /> : "Sign In with Crevoe"}
         </Button>
+
+        <div>
+          <p className="text-xs text-center w-10/12 mx-auto leading-5">By creating an account, you agree to our Terms of Service and Privacy & Cookie Statement.</p>
+        </div>
       </form>
     </div>
   );

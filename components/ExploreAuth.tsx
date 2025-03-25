@@ -15,15 +15,15 @@ const ExploreAuth = ({ isSignIn, setIsSignIn }: ExploreAuthProps) => {
 
   return (
     <div className="flex flex-col w-full gap-2.5 mt-8 transition-all duration-300">
-      <Button className={`w-full bg-primary`} onClick={() => router.push("/")}>
+      <Button className={`w-full bg-primary-300`} onClick={() => router.push("/")}>
         Explore
       </Button>
 
       <div className="flex w-full bg-primary-50 p-1 rounded-xl gap-2">
         <Button
           className={`w-full text-[#454545] ${isSignIn
-              ? "bg-primary-200 font-bold hover:bg-primary-300"
-              : "bg-transparent hover:bg-primary-200"
+            ? "bg-primary-200 font-bold hover:bg-primary-300"
+            : "bg-transparent hover:bg-primary-200"
             }`}
           onClick={() => setIsSignIn(true)}
         >
@@ -31,8 +31,8 @@ const ExploreAuth = ({ isSignIn, setIsSignIn }: ExploreAuthProps) => {
         </Button>
         <Button
           className={`w-full text-[#454545] ${!isSignIn
-              ? "bg-primary-200 font-bold hover:bg-primary-300"
-              : "bg-transparent hover:bg-primary-200"
+            ? "bg-primary-200 font-bold hover:bg-primary-300"
+            : "bg-transparent hover:bg-primary-200"
             }`}
           onClick={() => setIsSignIn(false)}
         >

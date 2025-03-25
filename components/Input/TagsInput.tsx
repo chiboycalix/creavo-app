@@ -66,7 +66,7 @@ export const TagsInput = ({
       )}
       <div
         className={cn(
-          "flex flex-wrap items-center gap-2 p-2 border-primary-100 border-2 rounded-md bg-primary-50/25",
+          "flex flex-wrap items-center gap-2 p-2 border-primary-100 border-2 rounded-lg bg-primary-50/25",
           errorMessage && "bg-red-100",
           className
         )}

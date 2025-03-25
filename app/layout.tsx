@@ -1,9 +1,10 @@
 import MainLayout from "@/components/layouts/MainLayout";
 import ReactQueryProvider from "@/context/QueryContext";
 import ReduxProvider from "@/context/ReduxContext";
+import ClientLayout from "@/components/ClientLayout";
+import NetworkStatusWrapper from "@/components/NetworkStatusWrapper";
 import { Manrope } from "next/font/google";
 import { Metadata } from "next";
-import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { VideoPlaybackProvider } from "@/context/VideoPlaybackContext";
@@ -13,6 +14,9 @@ import { WebSocketProvider } from "@/context/WebSocket";
 import { VideoConferencingProvider } from "@/context/VideoConferencingContext";
 import { MarketProvider } from "@/context/MarketContext";
 import { SettingsProvider } from "@/context/SettingsContext";
+import { Suspense } from 'react';
+import { RouterSpinner } from "@/components/Loaders/RouterSpinner";
+import "./globals.css";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -32,30 +36,36 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={manrope.className}>
-        <ReactQueryProvider>
-          <ReduxProvider>
-            <AuthProvider>
-              <MarketProvider>
-                <SettingsProvider>
-                  <WebSocketProvider>
-                    <MainLayout>
-                      <ToastProvider>
-                        <PostProvider>
-                          <VideoConferencingProvider>
-                            <VideoPlaybackProvider>
-                              {children}
-                            </VideoPlaybackProvider>
-                            <Toaster richColors expand />
-                          </VideoConferencingProvider>
-                        </PostProvider>
-                      </ToastProvider>
-                    </MainLayout>
-                  </WebSocketProvider>
-                </SettingsProvider>
-              </MarketProvider>
-            </AuthProvider>
-          </ReduxProvider>
-        </ReactQueryProvider>
+        <Suspense fallback={<RouterSpinner />}>
+          <ClientLayout>
+            <NetworkStatusWrapper>
+              <ReactQueryProvider>
+                <ReduxProvider>
+                  <AuthProvider>
+                    <MarketProvider>
+                      <SettingsProvider>
+                        <WebSocketProvider>
+                          <MainLayout>
+                            <ToastProvider>
+                              <PostProvider>
+                                <VideoConferencingProvider>
+                                  <VideoPlaybackProvider>
+                                    {children}
+                                  </VideoPlaybackProvider>
+                                  <Toaster richColors expand />
+                                </VideoConferencingProvider>
+                              </PostProvider>
+                            </ToastProvider>
+                          </MainLayout>
+                        </WebSocketProvider>
+                      </SettingsProvider>
+                    </MarketProvider>
+                  </AuthProvider>
+                </ReduxProvider>
+              </ReactQueryProvider>
+            </NetworkStatusWrapper>
+          </ClientLayout>
+        </Suspense>
       </body>
     </html>
   );

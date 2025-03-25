@@ -1,5 +1,4 @@
 "use client"
-import { useListCommunities } from "@/hooks/communities/useListCommunities";
 import { Plus, Settings } from "lucide-react";;
 
 export default function SpacePage() {
@@ -20,12 +19,6 @@ export default function SpacePage() {
       <div className="p-4 py-10 bg-gray-100 w-[50%] mx-auto mt-20 rounded-md flex items-center flex-col">
         <p>Looks like you don&apos;t have a space yet</p>
         <p>Create a space</p>
-
-        {/* <div className="mt-8 w-6/12">
-          <Button className="w-full">
-            <Plus />
-            Add member</Button>
-        </div> */}
       </div>
     </div>
   );

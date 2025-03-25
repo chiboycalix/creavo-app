@@ -1,11 +1,11 @@
 "use client";
 import PageTitle from "@/components/PageTitle";
 import React, { useEffect } from "react";
+import CommunityPageSkeleton from "@/components/sketetons/CommunityPageSkeleton";
 import CreateCommunityDialog from "@/components/studio/community/CreateCommunityDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useListCommunities } from "@/hooks/communities/useListCommunities";
 import { useRouter } from "next/navigation";
-import { FullPageLoader } from "@/components/Loaders/FullPageLoader";
 
 const Community = () => {
   const { data: communityData, isFetching } = useListCommunities();
@@ -20,7 +20,7 @@ const Community = () => {
   }, [isFetching, community, router]);
 
   if (isFetching) {
-    return <FullPageLoader />;
+    return <CommunityPageSkeleton />;
   }
 
   if (!community) {
@@ -55,8 +55,7 @@ const Community = () => {
       </div>
     );
   }
-
-  return <FullPageLoader />;
+  return <CommunityPageSkeleton />;
 };
 
 export default Community;

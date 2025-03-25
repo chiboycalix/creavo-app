@@ -19,11 +19,11 @@ export function Tabs({ tab }: TabsProps) {
   return (
     <div className="flex-1 max-w-md mx-auto w-full">
       <div className='mb-2'>
-        <Button className={`w-full bg-primary`} onClick={() => router.push('/')}>
+        <Button className={`w-full bg-primary-100 text-black hover:bg-primary-200`} onClick={() => router.push('/')}>
           Explore
         </Button>
       </div>
-      <div className="flex w-full bg-primary-50 p-1 rounded-xl gap-2">
+      <div className="flex w-full bg-primary-100 p-1 rounded-xl gap-2">
         <Button className={`w-full text-[#454545] ${tab === 'signin' ? "bg-primary-200 font-bold hover:bg-primary-300" : "bg-transparent hover:bg-primary-200"}`} onClick={() => handleTabChange('signin')}>
           Sign In
         </Button>

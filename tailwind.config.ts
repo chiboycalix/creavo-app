@@ -39,8 +39,26 @@ export default {
         },
       },
       animation: {
-        "spin-slow": "spin 1.5s linear infinite",
-        "pulse-slow": "pulse 2s ease-in-out infinite",
+        spin: "spin 4s linear infinite",
+        pulse: "pulse 2s ease-in-out infinite",
+        bounce: "bounce 1.5s ease-in-out infinite",
+        colorShift: "colorShift 3s ease-in-out infinite",
+        fadeInOut: "fadeInOut 2s ease-in-out infinite",
+      },
+      keyframes: {
+        colorShift: {
+          "0%, 100%": { color: "#DE2424" },
+          "50%": { color: "#FF6B6B" },
+        },
+        fadeInOut: {
+          "0%, 100%": { opacity: "0.5" },
+          "50%": { opacity: "1" },
+        },
+        spinAndPulse: {
+          "0%": { transform: "rotate(0deg) scale(1)", opacity: "0.7" },
+          "50%": { transform: "rotate(180deg) scale(1.1)", opacity: "1" },
+          "100%": { transform: "rotate(360deg) scale(1)", opacity: "0.7" },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
