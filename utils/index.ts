@@ -90,3 +90,43 @@ export function getMimeTypeFromCloudinaryUrl(url: string): string | null {
     return null;
   }
 }
+
+export async function getMediaDimensionsClientSide(url: string): Promise<{
+  width: number;
+  height: number;
+  type: "video" | "image" | "unknown";
+}> {
+  return new Promise((resolve) => {
+    if (url.includes("/video/")) {
+      const video = document.createElement("video");
+      video.src = url;
+      video.onloadedmetadata = () => {
+        resolve({
+          width: video.videoWidth,
+          height: video.videoHeight,
+          type: "video",
+        });
+        video.remove();
+      };
+      video.onerror = () => {
+        resolve({ width: 0, height: 0, type: "unknown" });
+        video.remove();
+      };
+    } else {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => {
+        resolve({
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          type: "image",
+        });
+        img.remove();
+      };
+      img.onerror = () => {
+        resolve({ width: 0, height: 0, type: "unknown" });
+        img.remove();
+      };
+    }
+  });
+}

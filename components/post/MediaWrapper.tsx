@@ -8,6 +8,7 @@ import { baseUrl } from '@/utils/constant';
 import { getMimeTypeFromCloudinaryUrl } from '@/utils';
 import { cn } from '@/lib/utils';
 import { Loader } from 'lucide-react';
+import { useMediaDimensions } from '@/hooks/useDimensions';
 
 type MediaWrapperProps = {
   title: string;
@@ -20,8 +21,6 @@ type MediaWrapperProps = {
 };
 
 const MediaWrapper: React.FC<MediaWrapperProps> = ({
-  title,
-  size,
   postMedia,
   postId,
   isRenderedInComment,
@@ -156,13 +155,15 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
     }
   }, [isGloballyPaused, isPlaying]);
 
+  const { width, height, type } = useMediaDimensions(postMedia?.[0]?.url);
+  const isLandscape = width >= height;
+
   return (
-    <div className={`${size} relative overflow-hidden flex items-center`}>
+    <div className={`relative overflow-hidden flex items-center`}>
       {isImage ? (
         <GallerySlider
           galleryImgs={postMedia!}
           className="w-full h-full object-contain"
-          imageClass="h-full"
           isRenderedInComment={isRenderedInComment}
         />
       ) : (
@@ -170,7 +171,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
           <video
             ref={videoRef}
             src={postMedia?.[0]?.url}
-            className="w-full object-fit h-[87vh]"
+            className={cn("w-full h-[87vh]", isLandscape ? "object-contain" : "object-cover")}
             loop
             playsInline
           />

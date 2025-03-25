@@ -7,8 +7,7 @@ import { MdOutlineCloudUpload } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { useToast } from "@/context/ToastContext";
-import { FullPageLoader } from "../Loaders/FullPageLoader";
-
+import { RouterSpinner } from "../Loaders/RouterSpinner";
 
 type UploadInputProps = {
   label?: ReactNode;
@@ -190,7 +189,7 @@ export const UploadInput = ({
 
   return (
     <div className="leading-3">
-      {isLoading && <FullPageLoader />}
+      {isLoading && <RouterSpinner />}
       {label && (
         <label className="flex items-center text-gray-900 font-medium text-sm gap-x-2 mb-1">
           {label}
