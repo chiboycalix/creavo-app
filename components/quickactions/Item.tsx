@@ -7,8 +7,8 @@ const Item = ({ icon, title, description, className, link }: { icon: any, title:
     <Link href={link} className={cn(`flex items-start space-x-4 p-0.5 hover:shadow px-2 py-2`, className)}>
       <div className='p-1.5 bg-gray-100  rounded-full'>{icon}</div>
       <div>
-        <h2 className='text-sm font-semibold text-gray-700'>{title}</h2>
-        <p className='text-sm text-gray-600'>{description}</p>
+        <h2 className='text-sm font-semibold text-gray-700 mb-1'>{title}</h2>
+        <p className='text-xs text-gray-600 leading-5'>{description}</p>
       </div>
     </Link>
   )

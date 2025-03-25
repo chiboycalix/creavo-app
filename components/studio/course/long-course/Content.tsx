@@ -286,7 +286,6 @@ const Content = ({ courseId: id }: any) => {
                           <p className="text-sm font-semibold">{moduleContent.title}</p>
                           <p className="text-xs">{moduleContent.description}</p>
                         </div>
-                        <Video size={30} />
                       </div>
                     </div>
                     <div className="basis-1/12 ml-1">
