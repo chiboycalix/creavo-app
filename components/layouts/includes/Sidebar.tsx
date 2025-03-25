@@ -75,7 +75,7 @@ export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
               ))}
               {dashboardMenu && !isCommunityRoute && (
                 <>
-                  <div className="mt-4 mb-3 pl-4 font-bold">Your Account</div>
+                  <div className="mt-4 mb-3 pl-4 font-semibold">Your Account</div>
                   {dashboardItems?.map((item, index) => (
                     <li key={index}>
                       <NavItemComponent

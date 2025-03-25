@@ -17,7 +17,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   products,
   handleToggleSave,
 }) => {
-  const { setSearchRoom, isSaved, setIsSaved, savedProducts } = useMarketContext();
+  const { setSearchRoom, isSaved, setIsSaved, savedProducts } =
+    useMarketContext();
   const [activeTab, setActiveTab] = useState<string>(
     productCategories[0].category
   );
@@ -51,7 +52,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
 
   return (
     <Tabs value={activeTab} className="w-auto">
-      <TabsList className="flex justify-between mb-10">
+      {/* <TabsList className="flex justify-between mb-10">
         {productCategories?.map((tab) => (
           <TabsTrigger
             key={tab?.category}
@@ -62,19 +63,19 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
             {tab?.category}
           </TabsTrigger>
         ))}
-        <div>
-          <input
-            onChange={(e) => handleSearchQuery(e)}
-            type="text"
-            placeholder="Search"
-            className="w-48 p-1 border rounded-md"
-          />
-        </div>
-      </TabsList>
+      </TabsList> */}
+      <div className="flex justify-end mb-4">
+        <input
+          onChange={(e) => handleSearchQuery(e)}
+          type="text"
+          placeholder="Search"
+          className="w-48 p-1 pl-3 border-2 rounded-lg border-[#DCF4FF] bg-[#FAFDFF]"
+        />
+      </div>
 
       {productCategories.map((tab) => (
         <TabsContent key={tab.category} value={tab.category}>
-          <h2 className="mb-3 font-bold">Featured Products</h2>
+          {/* <h2 className="mb-3 font-bold">Featured Products</h2> */}
           <div className="flex flex-wrap gap-4 ">
             {products
               ?.filter(
