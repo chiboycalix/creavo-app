@@ -19,7 +19,7 @@ const SellerDashboard = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pt-3">
       <div className="bg-white">
         <h1 className="p-3 font-bold">Overview</h1>
         <div className="flex justify-between w-full p-3 gap-3">

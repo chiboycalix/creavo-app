@@ -27,7 +27,7 @@ const MarketPlaceExplore = () => {
     fetchListedCourses,
     products,
     setProducts,
-    setIsSaved, 
+    setIsSaved,
     savedProducts,
   } = useMarketContext();
 
@@ -59,6 +59,28 @@ const MarketPlaceExplore = () => {
     { value: "40plus", label: "$40+" },
   ];
 
+  const searchCategories = [
+    {
+      value: "businessAndCorporate",
+      label: "Business & Corporate",
+    },
+    {
+      value: "educationalAndTraining",
+      label: "Eoducational & Training",
+    },
+    {
+      value: "cultural",
+      label: "Cultural",
+    },
+    {
+      value: "sportsAndFitness",
+      label: "Sports & Fitness",
+    },
+    {
+      value: "technologyAndInnovation",
+      label: "Technology & Innovation",
+    },
+  ];
 
   const handleRatingSelect = (rating: any) => {
     setSelectedRating(rating);
@@ -114,7 +136,6 @@ const MarketPlaceExplore = () => {
   useEffect(() => {
     const courses: any = fetchPopularCourses();
     const fetchAndSetProducts = async () => {
-      // const products: any = fetchCourseProducts();
       if (activeTab === "All") {
         setProducts(products);
       } else {
@@ -125,9 +146,6 @@ const MarketPlaceExplore = () => {
     };
     fetchAndSetProducts();
     setCourses(courses);
-
-    
-
   }, [activeTab, fetchCourseProducts, fetchPopularCourses]);
 
   // Listen for changes in the URL to update the active tab
@@ -143,8 +161,15 @@ const MarketPlaceExplore = () => {
   return (
     <div className="flex gap-4">
       {searchRoom && (
-        <div className="w-[20%] min-w-[250px] max-w-[300px] flex flex-col gap-4 p-4 border rounded-md bg-white shadow-sm">
-          <h1 className="text-lg font-semibold">Categories</h1>
+        <div className="w-[20%] min-w-[250px] max-w-[300px] flex flex-col gap-4 p-4 border rounded-md bg-white shadow-sm mt-10">
+          <div className="flex flex-col gap-2">
+            <h3 className="font-semibold">Category</h3>
+            <ul className="flex flex-col gap-2">
+              {searchCategories.map((item, index) => (
+                <li key={index}>{item.label}</li>
+              ))}
+            </ul>
+          </div>
           <div className="font-medium">Sort by</div>
 
           {/* Sort Dropdown */}
@@ -162,7 +187,7 @@ const MarketPlaceExplore = () => {
             </div>
 
             {isDropdownOpen && (
-              <div className="absolute left-0 w-full mt-2 p-2 border rounded bg-white shadow-md">
+              <div className="left-0 w-full mt-2 p-2 border rounded bg-white shadow-md">
                 {options.map((option) => (
                   <label
                     key={option.value}
@@ -218,7 +243,7 @@ const MarketPlaceExplore = () => {
             </div>
 
             {isRatingsDropdownOpen && (
-              <div className="absolute left-0 w-full mt-2 p-2 border rounded bg-white shadow-md">
+              <div className="left-0 w-full mt-2 p-2 border rounded bg-white shadow-md">
                 {ratingsOptions.map((rating) => (
                   <div
                     key={rating}

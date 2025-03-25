@@ -1,12 +1,13 @@
+"use client";
 import React from "react";
 import { useMarketContext } from "@/context/MarketContext";
 
 const ImageCard = ({ product }: any) => {
-  const {  setShowCheckoutCard } = useMarketContext();
+  const { setShowCheckoutCard } = useMarketContext();
   const isVideo = product?.promotionalUrl?.endsWith(".mp4") ?? false;
 
   return (
-    <div className="flex flex-col gap-4 w-[30%] bg-white p-4 rounded-lg shadow-sm">
+    <div className="flex flex-col gap-4 w-[25%] p-4">
       <div className="w-full">
         {isVideo ? (
           <video

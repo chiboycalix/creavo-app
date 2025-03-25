@@ -49,19 +49,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
   product,
   handleToggleSave,
 }) => {
-  const {  savedProducts } = useMarketContext();
+  const { savedProducts } = useMarketContext();
   const isVideo = product?.promotionalUrl?.endsWith(".mp4") ?? false;
-  const [isSaved, setIsSaved] = useState(false)
-
+  const [isSaved, setIsSaved] = useState(false);
 
   return (
     <Link
       href={`/market/product/${product?.id}`}
       key={product?.id}
-      className="relative flex flex-col items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm transition-transform transform hover:scale-105 hover:shadow-lg w-[calc(25%-16px)] min-w-[200px] max-w-[300px]"
+      className="relative flex flex-col items-center gap-3 bg-white rounded-lg border border-gray-200 shadow-sm transition-transform transform hover:scale-105 hover:shadow-lg w-[calc(25%-16px)] min-w-[200px] max-w-[300px]"
     >
       {/* Image Wrapper */}
-      <div className="w-full h-44 overflow-hidden rounded-md bg-gray-100">
+      <div className="w-full h-44 overflow-hidden bg-gray-100">
         {isVideo ? (
           <video
             src={product?.promotionalUrl}
@@ -80,58 +79,38 @@ const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Product Details */}
-      <div className="flex flex-col gap-3 p-2">
+      <div className="flex flex-col gap-3 w-full p-3">
         <div className="text-center">
-          <h4 className="font-semibold text-md text-gray-800">
+          <h4 className="font-semibold text-md text-gray-800 w-full">
             {product?.title}
           </h4>
-          <p className="text-sm text-gray-500">{product?.description}</p>
+          <p className="w-full text-sm text-gray-500 underline">{product?.description}</p>
         </div>
 
-        <div className="flex justify-between items-center text-gray-700">
-          {product.numberOfParticipants ? (
-            <div className="flex items-center gap-1 text-sm">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-5 h-5 text-gray-500"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M12 2l8 4-8 4-8-4 8-4zm0 6v10m-4-4h8"
-                />
-                <circle cx="12" cy="18" r="2" />
-              </svg>
-              <span>{product?.numberOfParticipants}</span>
-            </div>
-          ) : product.rating > 0 ? (
-            <div className="flex items-center gap-1 text-sm">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="black"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-5 h-5 text-gray-500"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"
-                />
-              </svg>
+        <div className="flex  items-center justify-between w-full text-gray-700">
+          <div className="flex items-center gap-1 text-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="black"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-4 h-4 text-gray-500"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"
+              />
+            </svg>
+            {product.rating > 0 ? (
               <span>{product?.rating}</span>
-            </div>
-          ) : (
-            <span className="text-xs text-gray-400">
-              No ratings or participants
-            </span>
-          )}
-          <div className="flex items-center bg-[#DFF8F6] px-3 py-1 rounded-md text-sm font-medium">
+            ) : (
+              <span>No rating</span>
+            )}
+          </div>
+
+          <div className="flex items-center bg-[#DFF8F6] px-2 py-0.5 rounded-md text-sm font-medium">
             {!product?.isPaid ? (
               <span>Free</span>
             ) : (

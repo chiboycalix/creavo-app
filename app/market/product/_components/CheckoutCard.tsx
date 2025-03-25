@@ -52,17 +52,6 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
   const [step, setStep] = useState(1);
   const isVideo = product?.promotionalUrl?.endsWith(".mp4") ?? false;
 
-  console.log("here ", product);
-
-  //   useEffect(() => {
-  //     const handleClickOutside = (event: MouseEvent) => {
-  //       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-  //         onClose();
-  //       }
-  //     };
-  //     document.addEventListener("mousedown", handleClickOutside);
-  //     return () => document.removeEventListener("mousedown", handleClickOutside);
-  //   }, [onClose]);
 
   const handleSubmit = async () => {
     console.log("submitting");
@@ -97,9 +86,9 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                   <h2>Contact Information</h2>
                 </div>
 
-                <div className="flex flex-col p-4 space-y-6">
+                <div className="flex flex-col py-4 space-y-6">
                   <div className="space-y-4">
-                    <div className="space-y-2">
+                    <div className=" flex gap-2 flex-col">
                       <Label htmlFor="title">Name</Label>
                       <Input
                         id="title"
@@ -110,7 +99,7 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                       />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className=" flex gap-2 flex-col">
                       <Label htmlFor="name">Email</Label>
                       <Input
                         id="email"
@@ -121,7 +110,7 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                       />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className=" flex flex-col gap-2">
                       <Label htmlFor="phone">Phone Number</Label>
                       <PhoneInput
                         country={"ng"}
@@ -131,7 +120,11 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                           name: "phone",
                           required: true,
                         }}
-                        containerClass="w-[100%] rounded-md"
+                        containerClass="w-full bg-red-300 rounded-md"
+                        inputStyle={{
+                          width: "100%",
+                          height: "40px"
+                        }}
                       />
                     </div>
                   </div>
@@ -152,7 +145,7 @@ const CheckoutCard: React.FC<AddEventCardProps> = ({
                   </div>
                 </div>
 
-                <div className="p-4 border-gray-200">
+                <div className=" border-gray-200">
                   <Button
                     className="w-full bg-primary-600 hover:bg-primary-700 text-white"
                     onClick={handleSubmit}
