@@ -168,7 +168,7 @@ export default function SignUpForm() {
         </Button>
 
         <div>
-          <p className="text-xs text-center w-10/12 mx-auto leading-5">By creating an account, you agree to our Terms of Service and Privacy & Cookie Statement.</p>
+          <p className="text-[10px] text-center w-10/12 mx-auto leading-5">By creating an account, you agree to our Terms of Service and Privacy & Cookie Statement.</p>
         </div>
       </form>
     </div>
