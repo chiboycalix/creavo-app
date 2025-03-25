@@ -6,6 +6,7 @@ import { GripVertical, Trash, Video } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useFetchCourseData } from "@/hooks/courses/useFetchCourseData";
 import { useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Content = ({ courseId: id }: any) => {
   const queryClient = useQueryClient();
@@ -56,47 +57,48 @@ const Content = ({ courseId: id }: any) => {
           />
         </div>
       ) : (
-        <>
-          {courseData?.data?.course?.media?.map((video: any) => (
-            <div key={video?.id} className="flex items-center mb-4 gap-2">
-              <div className="basis-[2%]">
-                <GripVertical />
-              </div>
-              <div className="flex-1 flex items-center border cursor-pointer rounded-sm px-2">
-                <div className="w-16 h-12 flex-shrink-0">
-                  {video?.mimeType === "image/*" ? (
-                    <img
-                      src={video?.url || video?.previewUrl}
-                      alt={video?.file?.name}
-                      className="w-full h-full object-cover rounded"
-                    />
-                  ) : (
-                    <video
-                      src={video?.url || video?.previewUrl}
-                      controls
-                      className="w-full h-full object-cover rounded"
-                    />
-                  )}
+        <Card className="w-10/12 mx-auto p-6 border-none">
+          <CardContent>
+            {courseData?.data?.course?.media?.map((video: any) => (
+              <div key={video?.id} className="flex items-center mb-4 gap-2">
+                <div className="basis-[2%]">
+                  <GripVertical />
                 </div>
-                <div className="w-full flex justify-between items-center p-3">
-                  <div>
-                    <p className="text-sm font-semibold">{video?.title}</p>
-                    <p className="text-xs">{video?.description}</p>
+                <div className="flex-1 flex items-center border cursor-pointer rounded-sm px-2">
+                  <div className="w-16 h-12 flex-shrink-0">
+                    {video?.mimeType === "image/*" ? (
+                      <img
+                        src={video?.url || video?.previewUrl}
+                        alt={video?.file?.name}
+                        className="w-full h-full object-cover rounded"
+                      />
+                    ) : (
+                      <video
+                        src={video?.url || video?.previewUrl}
+                        controls
+                        className="w-full h-full object-cover rounded"
+                      />
+                    )}
                   </div>
-                  <Video size={30} />
+                  <div className="w-full flex justify-between items-center p-3">
+                    <div>
+                      <p className="text-sm font-semibold">{video?.title}</p>
+                      <p className="text-xs">{video?.description}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="basis-1/12 ml-1">
+                  <Trash />
                 </div>
               </div>
-              <div className="basis-1/12 ml-1">
-                <Trash />
-              </div>
-            </div>
-          ))}
-          <UploadShortCourseMedia
-            description="Upload your existing content to automatically create a new lesson"
-            onUploadSuccess={handleVideoUploadSuccess}
-            courseId={courseId}
-          />
-        </>
+            ))}
+            <UploadShortCourseMedia
+              description="Upload your existing content to automatically create a new lesson"
+              onUploadSuccess={handleVideoUploadSuccess}
+              courseId={courseId}
+            />
+          </CardContent>
+        </Card>
       )}
     </div>
   );

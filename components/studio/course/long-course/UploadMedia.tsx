@@ -104,7 +104,7 @@ const UploadMedia = ({ description, queryClient, moduleId, courseId }: UploadMed
         <DialogTrigger className="bg-primary border-0 p-2 text-sm cursor-pointer rounded-lg text-white basis-3/12 font-medium leading-6">
           Upload content
         </DialogTrigger>
-        <DialogContent className="max-w-3xl max-h-[70vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle></DialogTitle>
             <form onSubmit={handleSubmit}>
@@ -127,7 +127,7 @@ const UploadMedia = ({ description, queryClient, moduleId, courseId }: UploadMed
                   placeholder="Enter your video description"
                   value={addMediaToModuleStateValues.description}
                   onChange={(e) => updateAddMediaToModule({ description: e.target.value })}
-                  rows={10}
+                  rows={5}
                 />
               </div>
               <div className="">
@@ -136,6 +136,7 @@ const UploadMedia = ({ description, queryClient, moduleId, courseId }: UploadMed
                   accept="video/*"
                   maxFiles={1}
                   onChange={(uploads: any) => updateAddMediaToModule({ url: uploads[0] })}
+                  className="py-10"
                 />
               </div>
               <br />

@@ -23,6 +23,7 @@ import { Fragment } from 'react';
 import { FaUser, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import SearchInput from '@/components/search/search-input';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;
@@ -38,6 +39,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const { currentUser, isAuthenticated, signOut } = useAuth();
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
 
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
@@ -53,6 +55,13 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const isButtonActive = (navItems: NavItem[]) => {
     return navItems.some(item => pathname.startsWith(item.href));
   };
+
+  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
+
+  // Determine the avatar URL to use
+  const avatarUrl = profileLoading
+    ? defaultAvatar // Show default while loading
+    : profileData?.data?.profile?.avatar || defaultAvatar;
 
   return (
     <header
@@ -135,20 +144,14 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                     aria-label="User Menu"
                   >
                     <div className="relative w-8 h-8 sm:w-9 sm:h-9">
-                      {profile?.avatar ? (
-                        <Image
-                          src={profile.avatar}
-                          alt="User Avatar"
-                          fill
-                          sizes="(max-width: 640px) 32px, 36px"
-                          className="rounded-full object-cover"
-                          priority
-                        />
-                      ) : (
-                        <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                          <User className="h-4 w- quiere4 text-gray-500" />
-                        </div>
-                      )}
+                      <Image
+                        src={avatarUrl}
+                        alt="User Avatar"
+                        fill
+                        sizes="(max-width: 640px) 32px, 36px"
+                        className="rounded-full object-cover"
+                        priority
+                      />
                     </div>
                     <ChevronDown className="h-4 w-4 text-gray-500 hidden sm:block" />
                   </MenuButton>

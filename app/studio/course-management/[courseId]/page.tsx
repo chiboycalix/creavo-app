@@ -22,7 +22,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { generalHelpers } from '@/helpers';
 import { formatDate, getMimeTypeFromCloudinaryUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { Loader2, ShareIcon, Trash, TriangleAlertIcon } from 'lucide-react';
+import { ArrowBigLeftIcon, ArrowLeft, ArrowLeftIcon, Loader2, ShareIcon, Trash, TriangleAlertIcon } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
 import { useMutation } from '@tanstack/react-query';
 import { deleteCourseService } from '@/services/course.service';
@@ -66,7 +66,8 @@ const Course = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className='py-4'>
+      <div>
+        <p className='my-4 flex items-center gap-2 cursor-pointer' onClick={() => router.push("/studio/course-management")}><ArrowLeftIcon size={16} /> Back</p>
         {
           isFetching ?
             <CourseDetailsSkeleton /> :

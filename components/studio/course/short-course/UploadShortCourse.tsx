@@ -76,7 +76,7 @@ const UploadShortCourseMedia = ({ description, onUploadSuccess, courseId }: Uplo
         <DialogTrigger className="bg-primary border-0 p-2 text-sm cursor-pointer rounded-lg text-white basis-3/12 font-medium leading-6">
           Upload content
         </DialogTrigger>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle></DialogTitle>
             <form onSubmit={handleSubmit}>
