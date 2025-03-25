@@ -101,7 +101,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   return (
     <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative">
       {/* Main Post Container */}
-      <div className="bg-black text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
+      <div className=" text-white sm:rounded-xl rounded-none overflow-hidden flex-grow">
         <div className="relative">
           {/* Main Image */}
           <div className="aspect-[12.5/16] relative">
