@@ -14,6 +14,7 @@ import { useUserPosts } from "@/hooks/posts/useUserPosts"
 import { useUserLearning } from "@/hooks/useUserLearning"
 import { generalHelpers } from "@/helpers"
 import { useWebSocket } from "@/context/WebSocket"
+import { RouterSpinner } from "@/components/Loaders/RouterSpinner"
 
 const Profile = () => {
   const router = useRouter()
@@ -98,9 +99,7 @@ const Profile = () => {
 
   if (profileLoading) {
     return (
-      <div className="bg-white rounded">
-        <Loading />
-      </div>
+      <RouterSpinner />
     )
   }
 
@@ -115,7 +114,7 @@ const Profile = () => {
     <ProtectedRoute requireAuth={true} requireVerification={true} requireProfileSetup={false}>
       <div className="w-full flex-col min-h-[83vh] flex my-px p-3">
         <ProfileHeader
-          key={userProfile?.id || "profile-header"} 
+          key={userProfile?.id || "profile-header"}
           userProfile={userProfile}
           isCurrentUser={isCurrentUser}
           onFollow={handleFollow}
