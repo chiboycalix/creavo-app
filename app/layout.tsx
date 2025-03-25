@@ -40,15 +40,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={manrope.className}>
-        <NetworkStatusWrapper>
-          <ReactQueryProvider>
-            <ReduxProvider>
-              <AuthProvider>
-                <MarketProvider>
-                  <SettingsProvider>
-                    <WebSocketProvider>
-                      <Suspense fallback={<div>hello</div>}>
-                        <ClientLayout>
+        <Suspense fallback={<div>hello</div>}>
+          <ClientLayout>
+            <NetworkStatusWrapper>
+              <ReactQueryProvider>
+                <ReduxProvider>
+                  <AuthProvider>
+                    <MarketProvider>
+                      <SettingsProvider>
+                        <WebSocketProvider>
+
                           <MainLayout>
                             <ToastProvider>
                               <PostProvider>
@@ -61,16 +62,16 @@ export default function RootLayout({
                               </PostProvider>
                             </ToastProvider>
                           </MainLayout>
-                        </ClientLayout>
-                      </Suspense>
-                    </WebSocketProvider>
-                  </SettingsProvider>
-                </MarketProvider>
-              </AuthProvider>
-            </ReduxProvider>
-          </ReactQueryProvider>
-        </NetworkStatusWrapper>
 
+                        </WebSocketProvider>
+                      </SettingsProvider>
+                    </MarketProvider>
+                  </AuthProvider>
+                </ReduxProvider>
+              </ReactQueryProvider>
+            </NetworkStatusWrapper>
+          </ClientLayout>
+        </Suspense>
       </body>
     </html>
   );

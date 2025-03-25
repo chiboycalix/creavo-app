@@ -14,6 +14,7 @@ const CourseManagement = () => {
   const router = useRouter()
   const currentUser = getCurrentUser();
   const { data: courses, isFetching } = useFetchCourses(currentUser?.id);
+
   if (isFetching) {
     return <div className="grid grid-cols-3 gap-4">
       {[...Array(6)].map((_, index) => (
@@ -21,7 +22,6 @@ const CourseManagement = () => {
       ))}
     </div>
   }
-
 
   return (
     <ProtectedRoute
