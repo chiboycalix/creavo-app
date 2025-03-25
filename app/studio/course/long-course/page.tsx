@@ -242,14 +242,12 @@ const CreateLongCourse = () => {
           </div>
 
           <div className='flex flex-col gap-3 mt-4'>
-
             <Checkbox
               checked={isSelected}
               onCheckedChange={(isChecked: boolean) => setIsSelected(isChecked)}
               label="Upload promotional video/images to Explore"
               className=""
             />
-            <Checkbox label="List to marketplace" className="" />
           </div>
 
           <div className='w-full mt-12'>
