@@ -78,7 +78,7 @@ const CourseProduct: React.FC<CourseProductProps> = ({ product, comments }) => {
             {product?.modules?.map((module) => (
               <div
                 key={module.id}
-                className="border-2 p-2 rounded-lg items-center"
+                className="border p-2 rounded-lg items-center"
               >
                 <Disclosure as="div" className="" defaultOpen={true}>
                   <DisclosureButton className="group flex w-full items-center justify-between py-4">
@@ -89,7 +89,7 @@ const CourseProduct: React.FC<CourseProductProps> = ({ product, comments }) => {
                   </DisclosureButton>
 
                   <DisclosurePanel className="text-black">
-                    <div className="flex flex-col border-t-2 border-gray-200">
+                    <div className="flex flex-col border-t border-gray-200">
                       {module?.media?.length > 0 ? (
                         module?.media?.map((mediaItem) => (
                           <div
