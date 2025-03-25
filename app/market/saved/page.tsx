@@ -7,19 +7,20 @@ const SavedProducts = () => {
   const { savedProducts, isSaved, handleToggleSave } = useMarketContext();
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <div>
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between mb-5">
+        <div className="font-semibold">Saved</div>
         <input
           type="text"
-          placeholder="Search for products"
-          className="w-1/2 p-2 border-2 border-gray-300 rounded-md"
+          placeholder="Search"
+          className="w-48 p-1 pl-3 border rounded-lg border-[#DCF4FF] bg-[#FAFDFF]"
         />
       </div>
-      <div className="mt-10 flex flex-wrap gap-4 ">
+      <div className=" flex flex-wrap gap-4 ">
         {savedProducts?.length > 0 ? (
           savedProducts?.map((product: any) => (
             <ProductCard
-              key={product.id}
+              key={product?.id}
               product={product}
               isSaved={true}
               handleToggleSave={handleToggleSave}
