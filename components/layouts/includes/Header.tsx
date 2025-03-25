@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import NotificationsPopover from '@/components/notifications';
-import QuickActions from '@/components/quickactions';
-import { Input } from '@/components/Input';
-import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { User, Search, ChevronDown, X, Menu, Grip } from 'lucide-react';
-import { HeaderButton, NavItem } from '@/types/navigation';
-import { useSidebar } from '@/context/SidebarContext';
-import { useAuth } from '@/context/AuthContext';
+import Link from "next/link";
+import Image from "next/image";
+import NotificationsPopover from "@/components/notifications";
+import QuickActions from "@/components/quickactions";
+import { Input } from "@/components/Input";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { User, Search, ChevronDown, X, Menu, Grip, SettingsIcon, Settings2Icon } from "lucide-react";
+import { HeaderButton, NavItem } from "@/types/navigation";
+import { useSidebar } from "@/context/SidebarContext";
+import { useAuth } from "@/context/AuthContext";
 import {
   Menu as NavMenu,
   Transition,
@@ -18,12 +18,13 @@ import {
   MenuItems,
   MenuButton,
   MenuItem,
-} from '@headlessui/react';
-import { Fragment } from 'react';
-import { FaUser, FaBookmark, FaSignOutAlt, FaMoon } from 'react-icons/fa';
-import { Button } from '@/components/ui/button';
-import SearchInput from '@/components/search/search-input';
-import { useUserProfile } from '@/hooks/useUserProfile';
+} from "@headlessui/react";
+import { Fragment } from "react";
+import { FaUser, FaBookmark, FaSignOutAlt, FaMoon } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
+import SearchInput from "@/components/search/search-input";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useSettings } from "@/context/SettingsContext";
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;
@@ -39,7 +40,10 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const { currentUser, isAuthenticated, signOut } = useAuth();
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
-  const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(
+    currentUser?.id
+  );
+  const {setOpenSettingsModal} = useSettings()
 
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
@@ -53,8 +57,13 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   }, [currentUser]);
 
   const isButtonActive = (navItems: NavItem[]) => {
-    return navItems.some(item => pathname.startsWith(item.href));
+    return navItems.some((item) => pathname.startsWith(item.href));
   };
+
+  const handleOpenSettingsModal = (e:any) => {
+    e.preventDefault()
+    setOpenSettingsModal?.(true)
+  }
 
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 
@@ -65,8 +74,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
 
   return (
     <header
-      className={`bg-white fixed top-0 right-0 z-30 ${isCommunityRoute ? "left-16" : "left-0 md:left-72"
-        }`}
+      className={`bg-white fixed top-0 right-0 z-30 ${
+        isCommunityRoute ? "left-16" : "left-0 md:left-72"
+      }`}
     >
       <div className="pr-4 sm:pr-6 lg:pr-6 w-full">
         <div className="flex h-20 justify-between items-center w-full gap-4">
@@ -105,13 +115,23 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                   }}
                   className={`p-2 sm:px-3 lg:px-4 lg:py-2 rounded-lg transition-all flex flex-col items-center space-x-2 space-y-0`}
                 >
-                  <div className={`px-6 rounded-full py-1.5 ${isActive ? "bg-primary-700" : "bg-gray-100"}`}>
+                  <div
+                    className={`px-6 rounded-full py-1.5 ${
+                      isActive ? "bg-primary-700" : "bg-gray-100"
+                    }`}
+                  >
                     <Icon
                       size={20}
-                      className={`${isActive ? 'text-white' : 'text-gray-500'} transition-colors`}
+                      className={`${
+                        isActive ? "text-white" : "text-gray-500"
+                      } transition-colors`}
                     />
                   </div>
-                  <span className={`${isActive ? 'text-primary-500' : 'text-gray-700'} text-sm hidden lg:inline transition-colors`}>
+                  <span
+                    className={`${
+                      isActive ? "text-primary-500" : "text-gray-700"
+                    } text-sm hidden lg:inline transition-colors`}
+                  >
                     {button.label}
                   </span>
                 </button>
@@ -171,7 +191,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                           {({ active }) => (
                             <Link
                               href={"/socials/profile"}
-                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <FaUser className="mr-3 h-4 w-4 text-gray-500" />
                               View Profile
@@ -182,7 +204,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                           {({ active }) => (
                             <Link
                               href={"/socials/profile?tab=saved videos"}
-                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <FaBookmark className="mr-3 h-4 w-4 text-gray-500" />
                               Saved
@@ -192,7 +216,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                         <MenuItem>
                           {({ active }) => (
                             <div
-                              className={`${active ? 'bg-gray-50' : ''} flex items-center justify-between px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center justify-between px-4 py-2 text-sm text-gray-700`}
                             >
                               <div className="flex items-center">
                                 <FaMoon className="mr-3 h-4 w-4 text-gray-500" />
@@ -201,10 +227,14 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                               <Switch
                                 checked={darkMode}
                                 onChange={setDarkMode}
-                                className={`${darkMode ? 'bg-primary-600' : 'bg-gray-200'} relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none`}
+                                className={`${
+                                  darkMode ? "bg-primary-600" : "bg-gray-200"
+                                } relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none`}
                               >
                                 <span
-                                  className={`${darkMode ? 'translate-x-5' : 'translate-x-1'} inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
+                                  className={`${
+                                    darkMode ? "translate-x-5" : "translate-x-1"
+                                  } inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
                                 />
                               </Switch>
                             </div>
@@ -214,11 +244,30 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                       <div className="py-1">
                         <MenuItem>
                           {({ active }) => (
+                            <button
+                              onClick={(e)=>handleOpenSettingsModal(e) }
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center px-4 py-2 text-sm text-gray-700`}
+                            >
+                              <span className="flex  items-center mr-3 h-4 w-4 text-gray-500items-center">
+                                <SettingsIcon/>
+                              </span>
+                              Settings
+                            </button>
+                          )}
+                        </MenuItem>
+                        <MenuItem>
+                          {({ active }) => (
                             <Link
                               href="#"
-                              className={`${active ? 'bg-gray-50' : ''} flex items-center px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
-                              <span className="mr-3 h-4 w-4 text-gray-500">📱</span>
+                              <span className="mr-3 h-4 w-4 text-gray-500">
+                                📱
+                              </span>
                               Get Crevoe App
                             </Link>
                           )}
@@ -228,9 +277,11 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                             <button
                               onClick={async () => {
                                 await signOut();
-                                router.push('/auth?tab=signin');
+                                router.push("/auth?tab=signin");
                               }}
-                              className={`${active ? 'bg-gray-50' : ''} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex w-full items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <FaSignOutAlt className="mr-3 h-4 w-4 text-gray-500" />
                               Sign Out
@@ -244,7 +295,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
               </>
             ) : (
               <Button
-                onClick={() => router.push('/auth?tab=signin')}
+                onClick={() => router.push("/auth?tab=signin")}
                 className="min-w-24 sm:min-w-32 text-sm text-white px-4 py-1 rounded-lg h-10 sm:h-12"
                 aria-label="Sign In"
               >

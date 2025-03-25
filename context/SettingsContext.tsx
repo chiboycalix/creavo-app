@@ -31,6 +31,8 @@ interface SettingsType {
   mutedUsers?: any;
   blockedUsers?: any;
   setBankAccountDetails?: (bankDetails: any) => void;
+  openSettingsModal?: boolean; 
+  setOpenSettingsModal?: (openSettingsModal: any) => void
 }
 
 export interface PrivacyType {
@@ -67,6 +69,8 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
     fetchSettings: async () => { },
     updateSetting: () => { },
   });
+
+  const [openSettingsModal, setOpenSettingsModal] = useState(false)
 
   const [userPrivacy, setUserPrivacy] = useState<boolean>(true);
   const [mutedUsers, setMutedUsers] = useState<any>([]);
@@ -286,6 +290,8 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
         blockedUsers,
         mutedUsers,
         setBankAccountDetails,
+        openSettingsModal, 
+        setOpenSettingsModal,
       }}
     >
       {children}

@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import ProfileSettings from "./SettingsPage";
+import { useSettings } from "@/context/SettingsContext";
 
 interface Profile {
   firstName: string;
@@ -47,6 +48,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [showFollowingCard, setShowFollowingCard] = useState(false);
 
   const [profileSettingsModal, setProfileSettingsModal] = useState(false);
+  const { openSettingsModal, setOpenSettingsModal } = useSettings();
 
   const [followingAnchorRect, setfollowingAnchorRect] =
     useState<DOMRect | null>(null);
@@ -66,12 +68,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
 
   const handleSettingsModal = () => {
-    setProfileSettingsModal(true);
+    setOpenSettingsModal?.(true);
   };
 
   const handleClose = () => {
-    setProfileSettingsModal(false);
-  }
+    setOpenSettingsModal?.(false);
+  };
 
   const handleCloseEditUserProfileModal = () => {
     setIsOpen(false);
@@ -95,9 +97,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="flex justify-center items-center gap-3">
           <h1 className="text-sm font-semibold">
             {userProfile?.profile?.firstName &&
-              userProfile?.profile?.lastName === "None"
+            userProfile?.profile?.lastName === "None"
               ? userProfile?.username
-              : `${userProfile?.profile?.firstName || ""} ${userProfile?.profile?.lastName || ""
+              : `${userProfile?.profile?.firstName || ""} ${
+                  userProfile?.profile?.lastName || ""
                 }`.trim()}
           </h1>
           <p className="text-sm">@{userProfile?.username}</p>
@@ -180,19 +183,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         />
       )}
 
-      {profileSettingsModal && (
+      {openSettingsModal && (
         <ProfileSettings
-          isModalOpen={profileSettingsModal}
+          isModalOpen={openSettingsModal}
           handleClose={handleClose}
         />
       )}
 
-      {profileSettingsModal && (
-        <ProfileSettings
-          isModalOpen={profileSettingsModal}
-          handleClose={handleClose}
-        />
-      )}
     </div>
   );
 };
