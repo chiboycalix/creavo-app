@@ -7,6 +7,7 @@ import { apiClient } from "@/lib/apiClient"
 import { LearnerDetails } from "./LearnerDetails"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import PageTitle from "../PageTitle"
+import Image from "next/image"
 
 
 export interface QuizAttempt {
@@ -316,7 +317,8 @@ export function CohortTable() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Users className="h-3 w-3 text-gray-600 cursor-pointer" />
+              {/* <Users className="h-3 w-3 text-gray-600 cursor-pointer" /> */}
+              <Image height={27} alt="." width={27} src="/assets/comunity.svg"/>
             </TooltipTrigger>
             <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">
               Add to community
@@ -325,7 +327,9 @@ export function CohortTable() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Share className="h-3 w-3 text-gray-600 cursor-pointer" />
+              {/* <Share className="h-3 w-3 text-gray-600 cursor-pointer" /> */}
+              <Image height={17} alt="." width={17} src="/assets/export.svg"/>
+
             </TooltipTrigger>
             <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Share</TooltipContent>
           </Tooltip>
@@ -354,7 +358,7 @@ export function CohortTable() {
                 <th className="p-3 text-left">Email Address</th>
                 <th className="p-3 text-left">Date Enrolled</th>
                 <th className="p-3 text-left">Demographic</th>
-                <th className="p-3 text-left">Progress</th>
+                <th className="p-3 text-left">Progress (%) </th>
                 <th className="p-3 text-left">Action</th>
               </tr>
             </thead>
