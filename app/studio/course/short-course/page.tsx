@@ -127,6 +127,7 @@ const CreateShortCourse = () => {
                 variant="text"
                 label="Course Name"
                 maxLength={54}
+                className=' rounded-xl'
                 placeholder="Enter course title"
                 value={createCourseStateValues?.title}
                 onChange={(e) => {
@@ -142,6 +143,7 @@ const CreateShortCourse = () => {
               <Input
                 variant="textarea"
                 label="Course Description"
+                className=' rounded-xl'
                 maxLength={365}
                 placeholder="Enter your course description"
                 value={createCourseStateValues?.description}
@@ -163,7 +165,7 @@ const CreateShortCourse = () => {
                 }}
                 placeholder="#fun #tiktok #post"
                 errorMessage={errors.tags}
-                className="w-full py-2.5"
+                className="w-full py-2.5 rounded-xl"
               />
             </div>
             <div className='mb-4 flex items-center gap-4'>
@@ -192,7 +194,7 @@ const CreateShortCourse = () => {
                     }
                   ]}
                   errorMessage={errors.difficultyLevel}
-                  className='py-0.5'
+                  className='py-0.5 rounded-xl'
                 />
               </div>
 

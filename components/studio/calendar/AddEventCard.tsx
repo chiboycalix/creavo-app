@@ -363,115 +363,8 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-md font-medium">Additional Information</h3>
-
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <DatePicker
-                      selected={startDate}
-                      onChange={(date: Date | null) => setStartDate(date)}
-                      dateFormat="dd/MM/yyyy"
-                      className="w-full border-primary-100 border-2 p-2 py-2.5 rounded"
-                      placeholderText="Select Start Date"
-                    />
-
-                    <SelectInput
-                      value={startTime}
-                      onChange={setStartTime}
-                      options={timeOptions}
-                      selectTextClass="truncate"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <DatePicker
-                      selected={endDate}
-                      onChange={(date: Date | null) => setEndDate(date)}
-                      dateFormat="dd/MM/yyyy"
-                      className="w-full border-primary-100 border-2 p-2 py-2.5 rounded"
-                      placeholderText="Select End Date"
-                    />
-                    <SelectInput
-                      value={endTime}
-                      onChange={setEndTime}
-                      options={timeOptions}
-                      selectTextClass="truncate"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-
-                {/* Modify the timezone selection div to include the dropdown toggle functionality */}
-                <div className="space-y-2">
-                  <Label htmlFor="timezone">Timezone</Label>
-                  <div className="relative">
-                    <div className="relative mb-2">
-                      <Input
-                        type="text"
-                        placeholder="Search timezone..."
-                        value={searchQuery} // Always show what user types
-                        onChange={(e) => {
-                          setSearchQuery(e.target.value)
-                          setTimezone("") // Clear selected timezone when typing
-                          setIsTimezoneDropdownOpen(true)
-                        }}
-                        className="pl-10"
-                        onFocus={() => setIsTimezoneDropdownOpen(true)}
-                      />
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    </div>
-                    {isTimezoneDropdownOpen && (
-                      <div className="absolute z-10 w-full max-h-40 overflow-y-auto border rounded-md bg-white shadow-md">
-                        {isLoading ? (
-                          <div className="p-2 text-center text-gray-500">Loading timezones...</div>
-                        ) : error ? (
-                          <div className="p-2 text-center text-red-500">{error}</div>
-                        ) : filteredTimezones.length > 0 ? (
-                          filteredTimezones.map((tz) => (
-                            <div
-                              key={tz}
-                              className={`p-2 cursor-pointer hover:bg-gray-100 ${
-                                timezone === tz ? "bg-primary-50 text-primary-600" : ""
-                              }`}
-                              onClick={() => {
-                                setTimezone(tz) // Store selected timezone
-                                setSearchQuery(tz) // Display in input
-                                setIsTimezoneDropdownOpen(false) // Close dropdown
-                              }}
-                            >
-                              {tz}
-                            </div>
-                          ))
-                        ) : (
-                          <div className="p-2 text-center text-gray-500">No timezones found</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="allDay"
-                    checked={isAllDay}
-                    onCheckedChange={(checked) => setIsAllDay(checked === true)}
-                  />
-                  <Label htmlFor="allDay">All Day</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="repeat"
-                    checked={isRepeating}
-                    onCheckedChange={(checked) => setIsRepeating(checked === true)}
-                  />
-                  <Label htmlFor="repeat">Repeat Event</Label>
-                </div>
-                <div className="flex items-center space-x-2">
+                <h3 className="text-md  mb-8 font-medium">Additional Information</h3>
+                <div className="flex items-center  space-x-2">
                   <Checkbox
                     id="webinar"
                     checked={isWebinar}
@@ -479,23 +372,9 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                   />
                   <Label htmlFor="webinar">Video Conferencing </Label>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label>Event Color</Label>
-                <div className="flex flex-wrap gap-2">
-                  {colorOptions.map((option) => (
-                    <div
-                      key={option.value}
-                      className={`w-8 h-8 rounded-full cursor-pointer ${option.value} ${
-                        color === option.value ? "ring-2 ring-primary-600 ring-offset-2" : ""
-                      }`}
-                      onClick={() => setColor(option.value)}
-                    />
-                  ))}
-                </div>
-              </div>
-              {isWebinar && (
+
+                {isWebinar && (
                 <div className="space-y-4">
                   <h3 className="text-md font-medium">Participants</h3>
 
@@ -622,6 +501,130 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
                   )}
                 </div>
               )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="startDate">Start Date</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <DatePicker
+                      selected={startDate}
+                      onChange={(date: Date | null) => setStartDate(date)}
+                      dateFormat="dd/MM/yyyy"
+                      className="w-full border-primary-100 border-2 p-2 py-2.5 rounded"
+                      placeholderText="Select Start Date"
+                    />
+
+                    <SelectInput
+                      value={startTime}
+                      onChange={setStartTime}
+                      options={timeOptions}
+                      selectTextClass="truncate"
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="endDate">End Date</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <DatePicker
+                      selected={endDate}
+                      onChange={(date: Date | null) => setEndDate(date)}
+                      dateFormat="dd/MM/yyyy"
+                      className="w-full border-primary-100 border-2 p-2 py-2.5 rounded"
+                      placeholderText="Select End Date"
+                    />
+                    <SelectInput
+                      value={endTime}
+                      onChange={setEndTime}
+                      options={timeOptions}
+                      selectTextClass="truncate"
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+
+                {/* Modify the timezone selection div to include the dropdown toggle functionality */}
+                <div className="space-y-2">
+                  <Label htmlFor="timezone">Timezone</Label>
+                  <div className="relative">
+                    <div className="relative mb-2">
+                      <Input
+                        type="text"
+                        placeholder="Search timezone..."
+                        value={searchQuery} // Always show what user types
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value)
+                          setTimezone("") // Clear selected timezone when typing
+                          setIsTimezoneDropdownOpen(true)
+                        }}
+                        className="pl-10"
+                        onFocus={() => setIsTimezoneDropdownOpen(true)}
+                      />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    </div>
+                    {isTimezoneDropdownOpen && (
+                      <div className="absolute z-10 w-full max-h-40 overflow-y-auto border rounded-md bg-white shadow-md">
+                        {isLoading ? (
+                          <div className="p-2 text-center text-gray-500">Loading timezones...</div>
+                        ) : error ? (
+                          <div className="p-2 text-center text-red-500">{error}</div>
+                        ) : filteredTimezones.length > 0 ? (
+                          filteredTimezones.map((tz) => (
+                            <div
+                              key={tz}
+                              className={`p-2 cursor-pointer hover:bg-gray-100 ${
+                                timezone === tz ? "bg-primary-50 text-primary-600" : ""
+                              }`}
+                              onClick={() => {
+                                setTimezone(tz) // Store selected timezone
+                                setSearchQuery(tz) // Display in input
+                                setIsTimezoneDropdownOpen(false) // Close dropdown
+                              }}
+                            >
+                              {tz}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-2 text-center text-gray-500">No timezones found</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="allDay"
+                    checked={isAllDay}
+                    onCheckedChange={(checked) => setIsAllDay(checked === true)}
+                  />
+                  <Label htmlFor="allDay">All Day</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="repeat"
+                    checked={isRepeating}
+                    onCheckedChange={(checked) => setIsRepeating(checked === true)}
+                  />
+                  <Label htmlFor="repeat">Repeat Event</Label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Event Color</Label>
+                <div className="flex flex-wrap gap-2">
+                  {colorOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      className={`w-8 h-8 rounded-full cursor-pointer ${option.value} ${
+                        color === option.value ? "ring-2 ring-primary-600 ring-offset-2" : ""
+                      }`}
+                      onClick={() => setColor(option.value)}
+                    />
+                  ))}
+                </div>
+              </div>
+              
             </div>
 
             <div className="p-4 border-t border-gray-200">

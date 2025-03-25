@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
@@ -69,7 +68,10 @@ const EngagementMetrics = () => {
           completions: course.completions || 0,
           totalEnrollment: course.totalEnrollment || 0,
           enrollmentThisMonth: course.enrollmentThisMonth || 0,
-          completionRate: course.completionRate || { completed: 0, incomplete: 0 },
+          completionRate: course.completionRate || {
+            completed: 0,
+            incomplete: 0,
+          },
           totalMinutesWatched: course.totalMinutesWatched || 0,
         }));
 
@@ -92,7 +94,8 @@ const EngagementMetrics = () => {
   );
 
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handleNextPage = () =>
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -114,16 +117,26 @@ const EngagementMetrics = () => {
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : loading ? (
-          <p className="text-center text-gray-500 text-sm py-10">Loading courses...</p>
+          <p className="text-center text-gray-500 text-sm py-10">
+            Loading courses...
+          </p>
         ) : filteredCourses.length === 0 ? (
           <div className="flex items-center justify-center flex-col my-20">
-            <p className="text-center text-black font-semibold text-lg">No courses available yet.</p>
-            <p>Once you publish your course, come here to learn about your course engagement.</p>
+            <p className="text-center text-black font-semibold text-lg">
+              No courses available yet.
+            </p>
+            <p>
+              Once you publish your course, come here to learn about your course
+              engagement.
+            </p>
           </div>
         ) : (
-          <div className="bg-gray-50 gap-2 flex flex-col rounded-lg shadow overflow-hidden">
+          <div className="bg-gray-50 w-full gap-2 flex flex-col rounded-lg shadow overflow-hidden">
             {filteredCourses.map((course, i) => (
-              <div key={course.id} className="p-6 hover:bg-white shadow transition-colors">
+              <div
+                key={course.id}
+                className="p-6 hover:bg-white shadow transition-colors"
+              >
                 <div className="flex items-center space-x-6">
                   <div className="flex w-8 text-gray-400 font-medium">
                     {String(i + 1).padStart(2, "0")}
@@ -131,15 +144,27 @@ const EngagementMetrics = () => {
                   <div className="grid grid-cols-4 items-start space-x-4">
                     <div className="flex items-center gap-5">
                       <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={course?.image}
-                          alt={course?.title}
-                          className="object-cover w-full h-full"
-                        />
+                        {course?.image?.includes(".mp4") ||
+                        course?.image?.includes(".webm") ? (
+                          <video
+                            src={course.image}
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <img
+                            src={course.image}
+                            alt={course.title}
+                            className="object-cover w-full h-full"
+                          />
+                        )}
                       </div>
                       <div className="flex flex-col w-10/12">
-                        <h3 className="font-semibold text-xs text-gray-900">{course.title}</h3>
-                        <span className="text-xs text-gray-500">Difficulty: {course.difficulty}</span>
+                        <h3 className="font-semibold text-xs text-gray-900">
+                          {course.title}
+                        </h3>
+                        <span className="text-xs text-gray-500">
+                          Difficulty: {course.difficulty}
+                        </span>
                       </div>
                     </div>
                     <div className="flex items-center justify-center gap-3 flex-col">
@@ -149,7 +174,9 @@ const EngagementMetrics = () => {
                       <p className="text-xs text-gray-500">Date uploaded</p>
                     </div>
                     <div className="text-start flex gap-3 flex-col items-start">
-                      <p className="font-semibold text-xs text-gray-900">{course.completions}</p>
+                      <p className="font-semibold text-xs text-gray-900">
+                        {course.completions}
+                      </p>
                       <p className="text-xs text-gray-500">Completions Count</p>
                     </div>
                     <button
@@ -180,13 +207,21 @@ const EngagementMetrics = () => {
               </select>
             </div>
             <div className="flex items-center space-x-2">
-              <button onClick={handlePrevPage} disabled={currentPage === 1} className="p-2 rounded-full">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className="p-2 rounded-full"
+              >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <span className="text-sm font-medium text-gray-700">
                 Page {currentPage} of {totalPages}
               </span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages} className="p-2 rounded-full">
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-full"
+              >
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
@@ -194,9 +229,14 @@ const EngagementMetrics = () => {
         )}
       </div>
 
-      {selectedCourse && <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />}
+      {selectedCourse && (
+        <CourseModal
+          course={selectedCourse}
+          onClose={() => setSelectedCourse(null)}
+        />
+      )}
     </div>
   );
-}
+};
 
 export default EngagementMetrics;

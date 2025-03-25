@@ -94,7 +94,7 @@ export const TagsInput = ({
           onKeyDown={handleAddTag}
           placeholder={tags.length === 0 ? placeholder : ""}
           className={cn(
-            "flex-1 outline-none bg-transparent text-gray-800 text-sm placeholder:text-gray-400",
+            "flex-1 outline-none rounded-4xl bg-transparent text-gray-800 text-sm placeholder:text-gray-400",
             "disabled:cursor-not-allowed"
           )}
           {...rest}
