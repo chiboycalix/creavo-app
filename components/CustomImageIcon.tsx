@@ -12,6 +12,7 @@ const CustomImageIcon = ({ imageUrl, className, alt, ...props }: CustomImageIcon
       src={imageUrl}
       alt="Custom Icon"
       className={cn("w-6 h-6 rounded-full", className)}
+      loading="lazy"
       {...props}
     />
   );

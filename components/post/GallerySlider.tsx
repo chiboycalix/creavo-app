@@ -5,7 +5,6 @@ import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils'
-import { Loader } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useMediaDimensions } from '@/hooks/useDimensions'
 
@@ -76,7 +75,7 @@ const GallerySlider = ({
         <div className={` h-full overflow-hidden sm:rounded-xl rounded-none`}>
           {!loaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-200 max-w-full">
-              <Loader className="animate-spin w-12 h-12 text-black" />
+              <span className="loader"></span>
             </div>
           )}
 

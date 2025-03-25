@@ -52,7 +52,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     useState<DOMRect | null>(null);
   const [followersAnchorRect, setfollowersAnchorRect] =
     useState<DOMRect | null>(null);
-
+  const [isOpen, setIsOpen] = useState(false);
   const handleFollowersClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const buttonRect = event.currentTarget.getBoundingClientRect();
     setfollowersAnchorRect(buttonRect);
@@ -70,8 +70,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
 
   const handleClose = () => {
-    setProfileSettingsModal(false)
+    setProfileSettingsModal(false);
   }
+
+  const handleCloseEditUserProfileModal = () => {
+    setIsOpen(false);
+  };
 
   return (
     <div className="flex flex-col items-center w-full p-4 relative">
@@ -100,7 +104,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
         <div className="flex items-center justify-center gap-2 mt-2 mx-auto">
           {isCurrentUser ? (
-            <Dialog>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger className="bg-primary-700 px-6 py-2.5 text-white flex text-sm items-center rounded-md max-w-8/12 font-medium border hover:bg-primary-600">
                 <BsPencil className="mr-1" />
                 <span className="text-xs">Edit Profile</span>
@@ -112,6 +116,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     userProfile={userProfile}
                     aria-label="Edit user profile modal"
                     onProfileUpdate={onProfileUpdate}
+                    onClose={handleCloseEditUserProfileModal}
                   />
                 </DialogHeader>
               </DialogContent>

@@ -225,7 +225,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                             <button
                               onClick={async () => {
                                 await signOut();
-                                router.push('/');
+                                router.push('/auth?tab=signin');
                               }}
                               className={`${active ? 'bg-gray-50' : ''} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
                             >

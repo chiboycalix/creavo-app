@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect } from 'react'
 import PostModal from './post-modal'
 import { usePost } from '@/context/PostContext'

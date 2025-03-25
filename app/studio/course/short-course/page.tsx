@@ -266,7 +266,6 @@ const CreateShortCourse = () => {
                 label="Upload promotional video/images to Explore"
                 className=""
               />
-              <Checkbox label="List to marketplace" className="" />
             </div>
             <div className='w-full mt-12'>
               <Button

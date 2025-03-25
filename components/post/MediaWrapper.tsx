@@ -7,7 +7,6 @@ import { useVideoPlayback } from '@/context/VideoPlaybackContext';
 import { baseUrl } from '@/utils/constant';
 import { getMimeTypeFromCloudinaryUrl } from '@/utils';
 import { cn } from '@/lib/utils';
-import { Loader } from 'lucide-react';
 import { useMediaDimensions } from '@/hooks/useDimensions';
 
 type MediaWrapperProps = {
@@ -57,19 +56,19 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
 
     const handleWaiting = () => {
       if (isPlaying) {
-        setIsBuffering(true); // Show loading indicator when buffering
+        setIsBuffering(true);
       }
     };
 
     const handlePlaying = () => {
-      setIsBuffering(false); // Hide loading indicator when playback resumes
+      setIsBuffering(false);
     };
 
     const video = videoRef.current;
     if (video) {
       video.addEventListener('timeupdate', updateProgress);
-      video.addEventListener('waiting', handleWaiting); // Detect buffering
-      video.addEventListener('playing', handlePlaying); // Detect when buffering ends
+      video.addEventListener('waiting', handleWaiting);
+      video.addEventListener('playing', handlePlaying);
     }
 
     return () => {
@@ -182,7 +181,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
           >
             {isBuffering ? (
               <div className="flex items-center justify-center">
-                <Loader className='w-12 h-12 rounded-full animate-spin-slow' />
+                <span className="loader"></span>
               </div>
             ) : (
               <button

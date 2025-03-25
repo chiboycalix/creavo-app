@@ -1,4 +1,3 @@
-import MainLayout from "@/components/layouts/MainLayout";
 import ReactQueryProvider from "@/context/QueryContext";
 import ReduxProvider from "@/context/ReduxContext";
 import ClientLayout from "@/components/ClientLayout";
@@ -17,6 +16,11 @@ import { SettingsProvider } from "@/context/SettingsContext";
 import { Suspense } from 'react';
 import { RouterSpinner } from "@/components/Loaders/RouterSpinner";
 import "./globals.css";
+import dynamic from "next/dynamic";
+
+const MainLayout = dynamic(() => import('../components/layouts/MainLayout'), {
+  loading: () => <RouterSpinner />,
+});
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -36,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={manrope.className}>
-        <Suspense fallback={<RouterSpinner />}>
+        <Suspense fallback={<div>hello</div>}>
           <ClientLayout>
             <NetworkStatusWrapper>
               <ReactQueryProvider>
@@ -45,6 +49,7 @@ export default function RootLayout({
                     <MarketProvider>
                       <SettingsProvider>
                         <WebSocketProvider>
+
                           <MainLayout>
                             <ToastProvider>
                               <PostProvider>
@@ -57,6 +62,7 @@ export default function RootLayout({
                               </PostProvider>
                             </ToastProvider>
                           </MainLayout>
+
                         </WebSocketProvider>
                       </SettingsProvider>
                     </MarketProvider>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Socket from "@/components/Socket";
-import Image from "next/image";
-import Toastify from "@/components/Toastify";
+import ButtonLoader from "@/components/ButtonLoader";
 import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { AUTH_API } from "@/lib/api";
@@ -10,9 +9,7 @@ import { cloudinaryCloudName, cloudinaryUploadPreset } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
 import { Input } from "@/components/Input";
 import { TextareaInput } from "@/components/Input/TextareaInput";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import ButtonLoader from "@/components/ButtonLoader";
 
 interface UserProfile {
   id: number;
@@ -28,15 +25,16 @@ interface UserProfile {
 interface EditUserInputModalProps {
   userProfile: UserProfile & { profile?: UserProfile["profile"] };
   onProfileUpdate?: (updatedProfile: UserProfile) => void;
+  onClose: () => void;
 }
 
 const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
   userProfile,
-  onProfileUpdate
+  onProfileUpdate,
+  onClose
 }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(true);
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -72,7 +70,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
 
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setOpen(false);
+        onClose();
       }
     };
     setUser(userProfile);
@@ -81,7 +79,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
     return () => {
       window.removeEventListener("keydown", handleEsc);
     };
-  }, [fetchUser, userProfile,]);
+  }, [fetchUser, userProfile, onClose]);
 
   const uploadImageToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -128,7 +126,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
       }
       toast.success("Update was successful")
       setLoading(false);
-
+      onClose();
       setUser((prev) => {
         if (!prev) return null;
         return {
@@ -142,8 +140,6 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
           }
         };
       });
-
-      setOpen(false);
 
       ws?.emit("profileUpdated", updatedUserData);
 
@@ -159,10 +155,8 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
           }
         });
       }
-
     } catch (error: any) {
       setLoading(false);
-      console.log({ error })
       toast.error(error?.data[0])
     }
   };
@@ -236,7 +230,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
                 className="w-full bg-white"
               />
 
-              {username && <Socket username={username} />}
+              {/* {username && <Socket username={username} />} */}
             </div>
             <div className="mb-8">
               <TextareaInput
