@@ -3,11 +3,9 @@
 import { useEffect, useState } from 'react';
 import NetworkError from './NetworkError';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { RouterSpinner } from './Loaders/RouterSpinner';
 
 export default function NetworkStatusWrapper({ children }: { children: React.ReactNode }) {
   const [isOnline, setIsOnline] = useState(true); // Assume online initially
-  const [isLoading, setIsLoading] = useState(false); // For route changes
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -50,11 +48,7 @@ export default function NetworkStatusWrapper({ children }: { children: React.Rea
     checkNetworkQuality();
   }, [pathname, searchParams]); // Re-check on route change
 
-  // Handle route transitions
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 100); // Simulate loading
-    return () => clearTimeout(timer);
   }, [pathname, searchParams]);
 
   if (!isOnline) {
@@ -63,8 +57,7 @@ export default function NetworkStatusWrapper({ children }: { children: React.Rea
 
   return (
     <>
-      {isLoading && <RouterSpinner />}
-      {!isLoading && children}
+      {children}
     </>
   );
 }
