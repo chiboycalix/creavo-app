@@ -45,7 +45,7 @@ const PasswordUpdate = () => {
 
       if (response.ok) {
         setAlert(data.message);
-        router.push(`/PasswordCongrat?email=${data.data.email}`);
+        router.push(`/auth/reset-success?email=${data.data.email}`);
         setTimeout(() => { }, 600);
       } else {
         setAlert(
