@@ -25,7 +25,7 @@ const RenderQuestionList = ({ setIsAddingQuiz, setQuestions, setQuestionData, se
     return <QuizSkeletonLoader />
   }
 
-  if (quiz?.questions?.length === undefined) {
+  if (quiz?.questions?.length === 0) {
     return (
       <>
         <div className="h-full text-sm mb-4 flex flex-col justify-center items-center mt-10">
