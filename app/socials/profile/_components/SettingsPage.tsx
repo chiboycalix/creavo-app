@@ -20,8 +20,10 @@ import AccountSettings from "./AccountSettings";
 import PrivacySettings from "./PrivacySettings";
 import NotificationSettings from "./NotificationSettings";
 import PaymentSettings from "./PaymentSettings";
+import { useSettings } from "@/context/SettingsContext";
 
-const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
+const ProfileSettings = ({ handleClose }: any) => {
+  const {openSettingsModal} = useSettings()
   const tabsMenu = [
     { title: "Account", icon: UserRoundIcon },
     { title: "Privacy", icon: GlobeLockIcon },
@@ -33,9 +35,9 @@ const ProfileSettings = ({ isModalOpen, handleClose }: any) => {
 
   return (
     <AnimatePresence>
-      {isModalOpen && (
+      {openSettingsModal && (
         <Dialog
-          open={isModalOpen}
+          open={openSettingsModal}
           as="div"
           className=" bg-white fixed inset-0 z-50 flex items-center justify-center"
           onClose={() => console.log(open)}

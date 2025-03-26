@@ -131,14 +131,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             className="inline-flex items-center rounded-md px-3 py-1.5 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
           >
-            <img src="/assets/profile/share.svg" alt="" />
+            <img src="/assets/profile/share.svg" alt="image" />
           </span>
           <span
             className="inline-flex items-center rounded-md px-3 py-1.5 bg-gray-300 cursor-pointer"
             aria-label="Share this profile"
             onClick={handleSettingsModal}
           >
-            <img src="/assets/profile/settings.svg" alt="" />
+            <img src="/assets/profile/settings.svg" alt="image" />
           </span>
         </div>
       </div>
