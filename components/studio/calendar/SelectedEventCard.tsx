@@ -175,20 +175,20 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
 
             {/* Title with actions */}
             <div className="flex justify-between items-start mb-6">
-              <h1 className="text-xl font-medium pr-4">{fetchedData?.title || "Untitled Event"}</h1>
+              <h1 className="text-md font-medium pr-4">{fetchedData?.title || "Untitled Event"}</h1>
               <div className="flex space-x-2">
-                <button className="text-blue-500">
+                <button className="text-primary">
                   <Edit size={18} />
                 </button>
-                <button>
+                {/* <button>
                   <MoreVertical size={18} />
-                </button>
+                </button> */}
               </div>
             </div>
 
             {/* Date and Time */}
-            <div className="space-y-1 mb-4">
-              <div className="flex">
+            <div className="space-y-1 text-sm mb-4">
+              <div className="flex  ">
                 <span className="w-16 font-medium">Date:</span>
                 <span>{fetchedData?.startTime ? formatDate(fetchedData.startTime) : "Date not available"}</span>
               </div>
@@ -209,7 +209,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
             {/* Join Meeting Section */}
             <div className="bg-blue-50 p-4 rounded-md mb-6">
               <div className="flex items-start">
-                <Video className="text-blue-500 mt-1 mr-3" size={20} />
+                <Video className="text-primary mt-1 mr-3" size={20} />
                 <div className="flex-1">
                   <div className="font-medium mb-1">Join meeting</div>
                   <div ref={linkRef} className="text-sm text-gray-700 mb-3 break-all">
@@ -219,7 +219,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 hover:bg-blue-100"
+                      className="text-primary border-blue-200 hover:bg-blue-100"
                       onClick={copyMeetingLink}
                       disabled={!fetchedData?.meetingLink && !fetchedData?.meetingCode}
                     >
@@ -227,7 +227,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-primary hover:bg-blue-700 text-white"
                       onClick={joinMeeting}
                       disabled={!fetchedData?.meetingLink}
                     >
@@ -239,7 +239,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
             </div>
 
             {/* Event Creation Details */}
-            <div className="space-y-1 mb-6">
+            <div className="space-y-1 text-sm mb-6">
               <div className="flex">
                 <span className="w-32 font-medium">Event Created by:</span>
                 <span>{fetchedData?.createdBy?.name || "Unknown"}</span>
@@ -251,16 +251,16 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
             </div>
 
             {/* Participants Section */}
-            <div className="mb-4 flex justify-between items-center">
+            <div className="mb-4 text-sm flex justify-between items-center">
               <h3 className="font-medium">Invited Members ({fetchedData?.participants?.length || 0})</h3>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button size="sm" className="bg-primary hover:bg-blue-700 text-white">
                 <Plus size={16} className="mr-1" /> Add Member
               </Button>
             </div>
 
             {/* Participants List */}
             {fetchedData?.participants && fetchedData.participants.length > 0 ? (
-              <div className="space-y-3">
+              <div className=" text-sm space-y-3">
                 {fetchedData.participants.map((participant: Member, index: number) => (
                   <div key={participant.id || index} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">

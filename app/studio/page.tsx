@@ -219,7 +219,7 @@ const StudioDashboard = () => {
       <div className="w-full flex items-center justify-between">
         <PageTitle>
           {profileLoading ? (
-            <span className="animate-pulse bg-gray-300 text-gray-300 px-3 py-1 rounded-md">
+            <span className="animate-pulse bg-gray-300 text-gray-300 px-3 rounded-md">
               Loading...
             </span>
           ) : (
@@ -228,14 +228,18 @@ const StudioDashboard = () => {
           }{" "}  👋
         </PageTitle>
 
+        <PageTitle>
+
         <Button>
-          <Link href="/studio/course" className="flex items-center gap-2">
+          <Link href="/studio/course" className="flex items-center">
             <PlusSquareIcon /> Create Course
           </Link>
         </Button>
+        </PageTitle>
+
 
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10 w-full mt-6 sm:mt-8 lg:mt-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10 w-full mt-8">
         {overviewData.map((data) => {
           return <StatisticsCard key={data.id} {...data} />;
         })}

@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { baseUrl } from "@/utils/constant"
 import { toast } from "sonner"
 import { toggleBookmark } from "@/services/bookmark.service"
-
+import { useRouter } from "next/navigation"
 interface BookmarksResponse {
   data: {
     posts: BookmarkItem[]
@@ -64,6 +64,9 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
   const [limit] = useState(initialLimit)
   const [totalPages, setTotalPages] = useState(1)
   const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+  const router = useRouter(
+
+  )
 
   const fetchUserIdFromPosts = useCallback(async () => {
     try {
@@ -214,7 +217,7 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
             <div
               key={bookmark.id}
               className="hover:bg-gray-100 transition-colors rounded-lg cursor-pointer overflow-hidden"
-              onClick={() => (window.location.href = `/posts/${bookmark.id}`)}
+              onClick={() => router.push(`/socials/posts/${bookmark.id}`)}
             >
               <div className="relative aspect-video w-full">
                 {bookmark.media && bookmark.media.length > 0 ? (

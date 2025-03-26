@@ -213,7 +213,7 @@ export function CohortTable() {
     if (course.id !== selectedCourse?.id) {
       console.log("User selected course:", course.title, "ID:", course.id)
       setSelectedCourse(course)
-      fetchLearnerData(course.id) // Add this line to fetch data when course changes
+      fetchLearnerData(course.id) 
     }
     setShowCourseDropdown(false)
   }
@@ -331,7 +331,7 @@ export function CohortTable() {
               <Image height={17} alt="." width={17} src="/assets/export.svg"/>
 
             </TooltipTrigger>
-            <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Share</TooltipContent>
+            <TooltipContent className="bg-gray-900 text-white px-3 py-1.5 rounded-md text-sm">Export</TooltipContent>
           </Tooltip>
         </div>
       </TooltipProvider>
