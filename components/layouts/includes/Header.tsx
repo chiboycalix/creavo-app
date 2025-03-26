@@ -7,7 +7,16 @@ import QuickActions from "@/components/quickactions";
 import { Input } from "@/components/Input";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { User, Search, ChevronDown, X, Menu, Grip, SettingsIcon, Settings2Icon } from "lucide-react";
+import {
+  User,
+  Search,
+  ChevronDown,
+  X,
+  Menu,
+  Grip,
+  SettingsIcon,
+  Settings2Icon,
+} from "lucide-react";
 import { HeaderButton, NavItem } from "@/types/navigation";
 import { useSidebar } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
@@ -25,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import SearchInput from "@/components/search/search-input";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useSettings } from "@/context/SettingsContext";
+import ProfileSettings from "@/app/socials/profile/_components/SettingsPage";
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;
@@ -43,7 +53,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
   const { data: profileData, isLoading: profileLoading } = useUserProfile(
     currentUser?.id
   );
-  const {setOpenSettingsModal} = useSettings()
+  const { setOpenSettingsModal, openSettingsModal } = useSettings();
 
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
@@ -60,10 +70,18 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
     return navItems.some((item) => pathname.startsWith(item.href));
   };
 
-  const handleOpenSettingsModal = (e:any) => {
-    e.preventDefault()
-    setOpenSettingsModal?.(true)
-  }
+  const handleClose = () => {
+    setOpenSettingsModal?.(false);
+  };
+
+  const handleOpenSettingsModal = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ): Promise<void> => {
+    e.preventDefault();
+    await router.push("/socials/profile")
+
+    if (setOpenSettingsModal) await setOpenSettingsModal?.(true);
+  };
 
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 
@@ -245,13 +263,15 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                         <MenuItem>
                           {({ active }) => (
                             <button
-                              onClick={(e)=>handleOpenSettingsModal(e) }
+                              onClick={(e) => {
+                                handleOpenSettingsModal(e);
+                              }}
                               className={`${
                                 active ? "bg-gray-50" : ""
-                              } flex items-center px-4 py-2 text-sm text-gray-700`}
+                              } flex items-center px-4 py-2 text-sm text-gray-700 w-full`}
                             >
                               <span className="flex  items-center mr-3 h-4 w-4 text-gray-500items-center">
-                                <SettingsIcon/>
+                                <SettingsIcon />
                               </span>
                               Settings
                             </button>
@@ -320,6 +340,12 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
           </div>
         </Transition>
       </div>
+      {/* {openSettingsModal && (
+        <ProfileSettings
+          isModalOpen={openSettingsModal}
+          handleClose={handleClose}
+        />
+      )} */}
     </header>
   );
 }

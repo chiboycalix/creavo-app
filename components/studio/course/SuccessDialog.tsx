@@ -11,7 +11,7 @@ const SuccessDialog = ({ closeDialog, courseId }: any) => {
   }
   return (
     <div className="flex flex-col items-center justify-center">
-      <img src="/success.svg" alt="" />
+      <img src="/success.svg" alt="image" />
       <h2 className='text-xl font-semibold mb-2'>Your Course is Now Live!</h2>
       <p className='text-center mb-6 text-sm'>Congratulations! Your course has been successfully published and is now available to learners. </p>
       <Button className='w-11/12 mx-auto' onClick={handleViewCourse}>View Course</Button>

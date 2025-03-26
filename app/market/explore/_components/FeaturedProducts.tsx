@@ -75,21 +75,26 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
 
       {productCategories.map((tab) => (
         <TabsContent key={tab.category} value={tab.category}>
-          {/* <h2 className="mb-3 font-bold">Featured Products</h2> */}
           <div className="flex flex-wrap gap-4 ">
             {products
               ?.filter(
                 (product: any) =>
                   tab.category === "All" || product.category === tab.category
               )
-              .map((product: any) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isSaved={isSaved}
-                  handleToggleSave={handleToggleSave}
-                />
-              ))}
+              .map((product: any) => {
+                const isProductSaved = savedProducts?.some(
+                  (savedProduct: any) => savedProduct?.id === product?.id
+                );
+
+                return (
+                  <ProductCard
+                    key={product?.id}
+                    product={product}
+                    isSaved={isProductSaved}
+                    handleToggleSave={handleToggleSave}
+                  />
+                );
+              })}
           </div>
         </TabsContent>
       ))}
