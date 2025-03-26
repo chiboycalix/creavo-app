@@ -16,6 +16,7 @@ import { Suspense } from 'react';
 import { RouterSpinner } from "@/components/Loaders/RouterSpinner";
 import "./globals.css";
 import MainLayout from "@/components/layouts/MainLayout";
+import NextTopLoader from 'nextjs-toploader';
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -48,6 +49,8 @@ export default function RootLayout({
                             <PostProvider>
                               <VideoConferencingProvider>
                                 <VideoPlaybackProvider>
+                                  <NextTopLoader
+                                  />
                                   {children}
                                 </VideoPlaybackProvider>
                                 <Toaster richColors expand />
