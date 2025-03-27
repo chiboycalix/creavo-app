@@ -5,11 +5,11 @@ import { AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { AUTH_API } from "@/lib/api";
 import { STATUS_CODES } from "@/constants/statusCodes";
-import { cloudinaryCloudName, cloudinaryUploadPreset } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
 import { Input } from "@/components/Input";
 import { TextareaInput } from "@/components/Input/TextareaInput";
 import { toast } from "sonner";
+import { uploadImageToCloudinary } from "@/utils";
 
 interface UserProfile {
   id: number;
@@ -81,25 +81,6 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
     };
   }, [fetchUser, userProfile, onClose]);
 
-  const uploadImageToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", cloudinaryUploadPreset || "");
-    formData.append("cloud_name", cloudinaryCloudName || "");
-    formData.append("folder", "Stridez/profiles");
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/upload`,
-      { method: "POST", body: formData }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to upload image");
-    }
-
-    const data = await response.json();
-    return data.secure_url;
-  };
 
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -8,8 +8,8 @@ export const PasswordInput = (props: TextInputProps) => {
 
   return (
     <TextInput
-      type={!showPassword ? "text" : "password"}
-      rightIcon={showPassword ? <EyeOff /> : <Eye />}
+      type={showPassword ? "text" : "password"}
+      rightIcon={!showPassword ? <EyeOff /> : <Eye />}
       onRightIconClick={() => setShowPassword(!showPassword)}
       {...props}
     />

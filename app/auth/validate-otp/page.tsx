@@ -5,24 +5,24 @@ import React, {
   FormEvent,
   useEffect,
 } from "react";
-import Toastify from "@/components/Toastify";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AUTH_API } from "@/lib/api/auth";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/context/ToastContext";
 
 export default function OtpContent() {
   const router = useRouter();
   const queryParams = useSearchParams();
   const email = queryParams.get("email") || "";
-  const [alert, setAlert] = useState<string>("");
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(300);
   const [isResending, setIsResending] = useState(false)
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
   const { setAuth } = useAuth();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,14 +33,26 @@ export default function OtpContent() {
       })) as any;
 
       if (data.code === 200) {
-        setAlert(data.message);
+        showToast(
+          'success',
+          "Validate OTP",
+          data.message
+        );
         setAuth(true, data.data, data.data.token);
         router.push(`/auth/welcome?email=${email}`);
       } else {
-        setAlert(data.message);
+        showToast(
+          'error',
+          "An error occurred",
+          data.message
+        );
       }
     } catch (error: any) {
-      setAlert(String(error.message));
+      showToast(
+        'error',
+        "Something went wrong",
+        error.message
+      );
     } finally {
       setIsVerifyingOtp(false)
     }
@@ -53,12 +65,24 @@ export default function OtpContent() {
       const data = (await AUTH_API.resendOTP(email)) as any;
 
       if (data.code === 200) {
-        setAlert(data.message);
+        showToast(
+          'success',
+          "Resend OTP",
+          data.message
+        );
       } else {
-        setAlert(data.message);
+        showToast(
+          'error',
+          "An error occurred",
+          data.message
+        );
       }
-    } catch (error) {
-      setAlert(String(error));
+    } catch (error: any) {
+      showToast(
+        'error',
+        "Something went wrong",
+        error.message
+      );
     } finally {
       setIsResending(false)
     }
@@ -78,12 +102,11 @@ export default function OtpContent() {
 
   return (
     <div className="max-w-lg mx-auto w-full">
-      <Toastify message={alert} />
 
       <div className="w-full bg-white">
         <div className="w-full">
-          <p className="font-bold text-2xl text-center">Hey, {email} </p>
-          <p className="text-center">An Otp has been sent to your email, please enter the 6 digits below</p>
+          <p className="font-semibold text-center">Hey, {email} </p>
+          <p className="text-center text-sm mt-3">An OTP has been sent to your email, please enter the 6 digits below</p>
           <form onSubmit={handleSubmit} className="w-full">
             <section className="w-full mt-6 sm:mt-8 md:mt-10">
               <InputOTP
@@ -105,7 +128,7 @@ export default function OtpContent() {
               <div className="mt-4">
                 <Button
                   type="submit"
-                  className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
+                  className="bg-primary border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
                 >
                   {
                     isVerifyingOtp ? <Loader2 className="text-white animate-spin" size={60} /> : "Confirm"
