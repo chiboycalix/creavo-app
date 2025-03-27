@@ -1,17 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import Toastify from "@/components/Toastify";
 import Link from "next/link";
 import { Input } from "@/components/Input";
 import { useRouter } from "next/navigation.js";
 import { baseUrl } from "@/utils/constant";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/context/ToastContext";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [alert, setAlert] = useState<string>("");
   const router = useRouter();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,25 +30,36 @@ export default function ForgotPassword() {
 
       const data = await response.json();
       if (response.ok) {
-        setAlert(data.message);
+        showToast(
+          'success',
+          "Forgot Password",
+          data.message
+        );
         router.push(`/auth/reset-password?email=${email}`);
       } else {
-        setAlert(data.message);
+        showToast(
+          'error',
+          "An error occured",
+          data.message
+        );
       }
-    } catch (error) {
-      setAlert(`${error}`);
+    } catch (error: any) {
+      showToast(
+        'error',
+        "Something went wrong",
+        error.message
+      );
     }
   };
 
   return (
     <div className="flex-1 max-w-md mx-auto w-full">
-      <Toastify message={alert} />
       <div className="w-full">
         <div className="text-center mb-8">
           <h1 className="font-bold text-2xl">Forgot Password?</h1>
         </div>
-        <p className="text-center">Enter your email address and we&apos;ll send you instructions to reset your password.</p>
-        <div className="w-full">
+        <p className="text-center text-sm">Enter your email address and we&apos;ll send you instructions to reset your password.</p>
+        <div className="w-full mt-3">
           <form
             onSubmit={handleSubmit}
             className="mx-auto mb-0 mt-1 w-full space-y-3"
