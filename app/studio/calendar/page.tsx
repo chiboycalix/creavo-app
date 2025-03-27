@@ -512,7 +512,7 @@ const Calendar = () => {
       {showEventsDetailsCard && (
         <SelectedEventCard
           isOpen={showEventsDetailsCard}
-          onClose={() => setShowEventsDetailsCard(false)}
+          onClose={() => {setShowEventsDetailsCard(false); fetchMeetings() }}
           anchorRect={eventsDetailsAnchorRect}
           data={selectedEventForTime}
         />

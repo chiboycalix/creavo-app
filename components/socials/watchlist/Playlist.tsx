@@ -7,10 +7,7 @@ import React from 'react'
 
 const Playlist = ({ value }: { value: number }) => {
   return (
-    <div className='w-64 relative'>
-      <div className='absolute top-2 text-sm left-2 bg-red-600 text-white px-2 py-1 rounded-bl-md rounded-tr-md'>
-        Basic
-      </div>
+    <div className='w-52 relative'>
       <Image src={Thumbnail} alt="Thumbnail" />
 
       <div>
@@ -26,9 +23,6 @@ const Playlist = ({ value }: { value: number }) => {
         <Link href='/socials/watchlist/playlist' className='text-sm hover:underline'>
           View
         </Link>
-      </div>
-      <div className='absolute bottom-[50%] text-sm right-2 bg-gray-700 text-white px-2 py-1 rounded-tr-md rounded-bl-md'>
-        15:00 mins
       </div>
     </div>
   )

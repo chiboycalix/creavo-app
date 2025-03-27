@@ -60,8 +60,7 @@ const PasswordUpdate = () => {
           "Password Update",
           data.message
         );
-        router.push(`/PasswordCongrat?email=${data.data.email}`);
-        setTimeout(() => { }, 600);
+        router.push(`/auth/reset-success?email=${data.data.email}`);
       } else {
         showToast(
           'error',
