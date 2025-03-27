@@ -1,4 +1,9 @@
 import moment from "moment";
+import {
+  baseUrl,
+  cloudinaryCloudName,
+  cloudinaryUploadPreset,
+} from "@/utils/constant";
 
 export const formatDate = (dateString: string): string => {
   const now = new Date();
@@ -130,3 +135,26 @@ export async function getMediaDimensionsClientSide(url: string): Promise<{
     }
   });
 }
+export const uploadImageToCloudinary = async (
+  avatar: File
+): Promise<string | undefined> => {
+  try {
+    const data = new FormData();
+    data.append("file", avatar);
+    data.append("upload_preset", cloudinaryUploadPreset as string);
+    data.append("cloud_name", cloudinaryCloudName as string);
+    data.append("folder", "Stridez/profile-images");
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/upload`,
+      { method: "POST", body: data }
+    );
+
+    if (!response.ok) throw new Error("Failed to upload image");
+
+    const result = await response.json();
+    return result.secure_url;
+  } catch (error) {
+    throw error;
+  }
+};

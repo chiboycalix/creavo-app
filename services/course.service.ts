@@ -10,7 +10,7 @@ export interface CreateCourseForm {
   difficultyLevel: string | undefined;
   amount?: string;
   currency?: string;
-  promotionalUrl?: any;
+  promotionalUrl: any;
   isPaid: boolean;
   tags: string[];
   promote?: boolean;

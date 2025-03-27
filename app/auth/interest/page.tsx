@@ -1,14 +1,13 @@
 "use client"
-import "react-toastify/dist/ReactToastify.css";
 import React, { useState, useEffect } from "react";
-import Spinner from "@/components/Spinner";
-import Toastify from "@/components/Toastify";
+import ButtonLoader from "@/components/ButtonLoader";
 import Cookies from "js-cookie";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/Input";
+import { useToast } from "@/context/ToastContext";
 
 const topicsList = [
   "Product design",
@@ -30,8 +29,7 @@ export default function TopicSelection() {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState("");
-
+  const { showToast } = useToast();
   const router = useRouter();
   const { getCurrentUser, setAuth } = useAuth();
 
@@ -80,15 +78,22 @@ export default function TopicSelection() {
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message);
+        showToast(
+          'error',
+          "An error occured",
+          data.message
+        );
       }
 
-      setAlert(data.message);
       setAuth(true, data.data);
 
       router.push("/");
-    } catch (error) {
-      setAlert(`${error}`);
+    } catch (error: any) {
+      showToast(
+        'error',
+        "An error occured",
+        error.message
+      );
     } finally {
       setLoading(false);
     }
@@ -96,11 +101,10 @@ export default function TopicSelection() {
 
   return (
     <>
-      <Toastify message={alert} />
       <div className="h-screen flex flex-col items-center w-full">
-        <div className="max-w-lg w-full px-8 py-24">
-          <h2 className="text-2xl font-semibold mb-3">Almost done!</h2>
-          <p className="mb-3 text-gray-600">
+        <div className="w-full px-8 py-24">
+          <h2 className="text-2xl font-semibold mb-3 text-center">Almost done!</h2>
+          <p className="mb-3 text-gray-600 text-sm text-center">
             Select topics of your interest to personalize your experience.
           </p>
 
@@ -128,18 +132,22 @@ export default function TopicSelection() {
           </div>
 
           <Button
+            disabled={loading}
             onClick={handleSave}
-            className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
+            className="border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
           >
-            {loading ? <Spinner className="text-white" /> : "Save and Continue"}
+            <ButtonLoader
+              isLoading={loading}
+              caption="Save and Continue"
+            />
           </Button>
 
-          <button
+          <Button
             onClick={handleSkip}
-            className="w-full mt-3 py-2.5 text-sm bg-transparent border border-gray-200 hover:bg-gray-200 text-gray-600 rounded-md"
+            className="w-full mt-3 text-sm bg-transparent border border-primary-100 hover:bg-gray-200 text-gray-600 rounded-md"
           >
             Skip for now
-          </button>
+          </Button>
 
           <p className="mt-4 text-center text-gray-600 text-sm">
             You can skip this for now and set up your profile later in the

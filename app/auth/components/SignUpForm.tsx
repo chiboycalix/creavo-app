@@ -60,7 +60,6 @@ export default function SignUpForm() {
       } else {
         showToast(
           'error',
-          "Something went wrong",
           data.message
         );
       }
@@ -75,8 +74,8 @@ export default function SignUpForm() {
       }
       showToast(
         'error',
-        "Something went wrong",
-        error.message
+        "An error occurred",
+        error?.data[0] || "An error occurred"
       );
     } finally {
       setLoading(false);

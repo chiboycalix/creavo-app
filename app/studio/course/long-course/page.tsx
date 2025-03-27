@@ -238,6 +238,7 @@ const CreateLongCourse = () => {
                 updateCreateCourse({ promotionalUrl: uploads[0] })
               }}
               className='py-10'
+              
             />
           </div>
 
