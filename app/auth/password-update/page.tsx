@@ -1,30 +1,41 @@
 "use client";
 
 import React, { useState } from "react";
-import Toastify from "@/components/Toastify";
 import { Input } from "@/components/Input";
 import { useRouter, useSearchParams } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
 import { LockIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/context/ToastContext";
+
+const MIN_PASSWORD_LENGTH = 8
 
 const PasswordUpdate = () => {
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
-  const [alert, setAlert] = useState("");
   const queryParams = useSearchParams();
   const tempToken = queryParams.get("otp");
   const router = useRouter();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (password1 !== password2) {
-      setAlert("Passwords do not match.");
+      showToast(
+        'error',
+        "Password Update",
+        "Passwords do not match"
+      );
+
       return;
     }
-    if (password1.length < 6) {
-      setAlert("Passwords length must be atleast 6.");
+    if (password1.length < MIN_PASSWORD_LENGTH) {
+      showToast(
+        'error',
+        "Password Update",
+        `Passwords length must be atleast ${MIN_PASSWORD_LENGTH}`
+      );
       return;
     }
 
@@ -44,22 +55,30 @@ const PasswordUpdate = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setAlert(data.message);
+        showToast(
+          'success',
+          "Password Update",
+          data.message
+        );
         router.push(`/auth/reset-success?email=${data.data.email}`);
-        setTimeout(() => { }, 600);
       } else {
-        setAlert(
+        showToast(
+          'error',
+          "Password Update",
           data.message || "Failed to update password. Please try again."
         );
       }
-    } catch (error) {
-      setAlert(String(error));
+    } catch (error: any) {
+      showToast(
+        'error',
+        "Password Update",
+        error.message || "Something went wrong"
+      );
     }
   };
 
   return (
     <div className="flex-1 max-w-md mx-auto w-full">
-      <Toastify message={alert} />
       <div className="w-full">
         <h2 className="font-bold text-3xl py-4 text-center">Update Password</h2>
         <div className="gap-y-4">

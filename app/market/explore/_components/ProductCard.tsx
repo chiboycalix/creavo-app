@@ -48,10 +48,9 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   handleToggleSave,
+  isSaved,
 }) => {
-  const { savedProducts } = useMarketContext();
   const isVideo = product?.promotionalUrl?.endsWith(".mp4") ?? false;
-  const [isSaved, setIsSaved] = useState(false);
 
   return (
     <Link
@@ -63,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="w-full h-44 overflow-hidden bg-gray-100">
         {isVideo ? (
           <video
-            src={product?.promotionalUrl}
+            src={product?.promotionalUrl || undefined}
             className="w-full h-full object-cover transition-opacity duration-200 hover:opacity-80"
             autoPlay
             loop
@@ -71,8 +70,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           />
         ) : (
           <img
-            src={product?.promotionalUrl}
-            alt="product image"
+            src={product?.promotionalUrl || undefined}
+            alt={product?.title || "image"}
             className="w-full h-full object-cover transition-opacity duration-200 hover:opacity-80"
           />
         )}

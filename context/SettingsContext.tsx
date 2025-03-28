@@ -70,8 +70,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
     updateSetting: () => { },
   });
 
-  const [openSettingsModal, setOpenSettingsModal] = useState(false)
-
+  const [openSettingsModal, setOpenSettingsModal] = useState<boolean>(false)
   const [userPrivacy, setUserPrivacy] = useState<boolean>(true);
   const [mutedUsers, setMutedUsers] = useState<any>([]);
   const [blockedUsers, setBlockedUsers] = useState<any>([]);
@@ -90,7 +89,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
         }
       );
       const data = await response.json();
-      console.log("data settings", data);
       setSettings((prev) => ({
         ...prev,
         ...data?.data,
@@ -192,7 +190,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
       }
 
       const data = await response.json();
-      console.log("muted users", data);
       const mutedUsers = data?.data;
       return mutedUsers;
     } catch (error) {
@@ -218,7 +215,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
       }
 
       const data = await response.json();
-      console.log("blocked users", data);
       const blockedUsers = data?.data;
       return blockedUsers;
     } catch (error) {
@@ -244,11 +240,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({
           }),
         }
       );
-
-      console.log("bank details", bankDetails);
-
-      console.log("response", response);
-
       if (!response.ok) {
         throw new Error("Failed to update bank details");
       }

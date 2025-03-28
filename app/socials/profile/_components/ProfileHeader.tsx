@@ -122,7 +122,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ userProfile, isCurrentUse
             aria-label="Share this profile"
             onClick={handleSettingsModal}
           >
-            <img src="/assets/profile/settings.svg" alt="" />
+            <img src="/assets/profile/settings.svg" alt="image" />
           </span>
         </div>
       </div>

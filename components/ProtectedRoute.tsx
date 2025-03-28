@@ -27,7 +27,7 @@ export default function ProtectedRoute({
     }
 
     if (requireVerification && currentUser?.userVerified === false) {
-      router.push('/socials/setup');
+      router.push('/auth/setup');
       return;
     }
   }, [

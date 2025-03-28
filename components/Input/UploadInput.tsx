@@ -237,7 +237,7 @@ export const UploadInput = ({
                       <img
                         src={upload.url || upload.previewUrl}
                         alt={upload.file.name}
-                        className="w-full h-full object-cover rounded"
+                        className="w-full h-full object-contain rounded"
                       />
                     ) : (
                       <video
