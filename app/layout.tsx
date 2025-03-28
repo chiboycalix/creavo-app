@@ -38,31 +38,32 @@ export default function RootLayout({
       <body className={manrope.className}>
         <Suspense fallback={<RouterSpinner />}>
           {/* <NetworkStatusWrapper> */}
-          <ReactQueryProvider>
-            <ReduxProvider>
-              <AuthProvider>
-                <MarketProvider>
-                  <SettingsProvider>
-                    <WebSocketProvider>
-                      <MainLayout>
-                        <ToastProvider>
-                          <PostProvider>
-                            <VideoConferencingProvider>
-                              <VideoPlaybackProvider>
-                                <NextTopLoader />
-                                {children}
-                              </VideoPlaybackProvider>
-                              <Toaster richColors expand />
-                            </VideoConferencingProvider>
-                          </PostProvider>
-                        </ToastProvider>
-                      </MainLayout>
-                    </WebSocketProvider>
-                  </SettingsProvider>
-                </MarketProvider>
-              </AuthProvider>
-            </ReduxProvider>
-          </ReactQueryProvider>
+            <ReactQueryProvider>
+              <ReduxProvider>
+                <AuthProvider>
+                  <MarketProvider>
+                    <SettingsProvider>
+                      <WebSocketProvider>
+                        <MainLayout>
+                          <ToastProvider>
+                            <PostProvider>
+                              <VideoConferencingProvider>
+                                <VideoPlaybackProvider>
+                                  <NextTopLoader
+                                  />
+                                  {children}
+                                </VideoPlaybackProvider>
+                                <Toaster richColors expand />
+                              </VideoConferencingProvider>
+                            </PostProvider>
+                          </ToastProvider>
+                        </MainLayout>
+                      </WebSocketProvider>
+                    </SettingsProvider>
+                  </MarketProvider>
+                </AuthProvider>
+              </ReduxProvider>
+            </ReactQueryProvider>
           {/* </NetworkStatusWrapper> */}
         </Suspense>
       </body>
