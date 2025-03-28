@@ -4,12 +4,12 @@ import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
 import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
-import { getMimeTypeFromCloudinaryUrl } from '@/utils'
-import { cn } from '@/lib/utils'
-import { useMediaDimensions } from '@/hooks/useDimensions'
+import { getMimeTypeFromCloudinaryUrl } from '@/utils';
+import { cn } from '@/lib/utils';
+import { useMediaDimensions } from '@/hooks/useDimensions';
 
 type GallerySliderTypes = {
-  galleryImgs: PostMediaType[]
+  galleryImgs: PostMediaType[];
   className: string
   imageClass?: string
   navigation?: boolean
@@ -99,7 +99,7 @@ const GallerySlider = ({
                     src={currentMedia?.url}
                     alt="listing card gallery"
                     className={cn(`w-full`,
-                      isMultiMedia ? "md:max-h-[85vh] h-[calc(87vh)]" : "md:max-h-[88vh] h-[calc(87vh)] ",
+                      isMultiMedia ? "md:max-h-[85vh] md:h-[calc(87vh)] h-[calc(79vh)]" : "md:max-h-[88vh] md:h-[calc(87vh)] h-[calc(79vh)]",
                       isLandscape ? "object-contain" : "object-cover")
                     }
                     onLoad={() => {
@@ -109,7 +109,7 @@ const GallerySlider = ({
                 ) : (
                   <video
                     src={currentMedia?.url}
-                    className={cn(`h-screen w-full`, isLandscape ? "object-contain" : "object-cover")}
+                    className={cn(`md:h-screen w-full h-[calc(79vh)]`, isLandscape ? "object-contain" : "object-cover")}
                     onLoad={() => {
                       setLoaded(true)
                     }}
@@ -141,4 +141,4 @@ const GallerySlider = ({
   )
 }
 
-export default GallerySlider
+export default GallerySlider;

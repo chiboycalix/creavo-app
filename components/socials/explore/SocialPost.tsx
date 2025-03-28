@@ -42,7 +42,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       setIsDownloaded(true);
     }
   };
-
+  console.log({ post })
   useEffect(() => {
     if (isDownloaded) {
       const timer = setTimeout(() => {

@@ -49,8 +49,7 @@ export default function RootLayout({
                           <PostProvider>
                             <VideoConferencingProvider>
                               <VideoPlaybackProvider>
-                                <NextTopLoader
-                                />
+                                <NextTopLoader />
                                 {children}
                               </VideoPlaybackProvider>
                               <Toaster richColors expand />

@@ -44,12 +44,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
-  // Default avatar URL
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
-
-  // Determine the avatar URL to use
   const avatarUrl = profileLoading
-    ? defaultAvatar // Show default while loading
+    ? defaultAvatar
     : profileData?.data?.profile?.avatar || defaultAvatar;
 
   const headerButtons: HeaderButton[] = React.useMemo(
@@ -124,7 +121,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         ],
       },
     ],
-    [avatarUrl] // Recompute when avatarUrl changes
+    [avatarUrl]
   );
 
   const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(headerButtons[0].navItems);
@@ -175,40 +172,42 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-gray-50 pb-14 overflow-hidden">
+      <div className="flex flex-col min-h-screen bg-gray-50">
         <aside className="fixed left-0 top-0 h-full z-50">
           {loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} dashboardItems={currentDashboardItems} />}
         </aside>
 
-        <div className={`flex-1 ${isCommunityRoute ? "lg:ml-16" : "lg:ml-72"}`}>
+        <div className={`flex-1 ${isCommunityRoute ? "lg:ml-16" : "lg:ml-72"} flex flex-col relative`}>
           <header className={`fixed top-0 right-0 z-30 ${isCommunityRoute ? "left-16" : "left-0 lg:left-72"}`}>
             <Header
               onButtonClick={setCurrentNavItems}
               headerButtons={headerButtons}
             />
           </header>
-          <main className="relative h-full mt-16 overflow-y-auto">
+
+          <main className="flex-1 mt-16 overflow-y-auto">
             <div
               className={cn(
                 "p-0",
                 pathname === "/socials" || pathname === "/socials/following"
                   ? "py-0 md:py-6 sm:px-16"
-                  : "sm:p-12"
+                  : "sm:p-12",
+                "pb-[60px] md:pb-0"
               )}
             >
               {children}
             </div>
           </main>
-          <footer className="bg-red-600 fixed bottom-0 right-0 w-full">
+
+          {/* Fixed Footer visible only on mobile */}
+          <footer className="fixed bottom-0 left-0 right-0 z-20 block md:hidden">
             <Footer
               onButtonClick={setCurrentNavItems}
               headerButtons={headerButtons}
             />
           </footer>
         </div>
-
       </div>
-
     </SidebarProvider>
   );
 }
