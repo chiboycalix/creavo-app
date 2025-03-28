@@ -170,7 +170,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
           <video
             ref={videoRef}
             src={postMedia?.[0]?.url}
-            className={cn("w-full h-[87vh]", isLandscape ? "object-contain" : "object-cover")}
+            className={cn("w-full h-[79vh] md:h-[87vh]", isLandscape ? "object-contain" : "object-cover")}
             loop
             playsInline
           />
@@ -192,7 +192,7 @@ const MediaWrapper: React.FC<MediaWrapperProps> = ({
               </button>
             )}
           </div>
-          <div className={cn("absolute left-[0.3rem] bottom-[0.07rem] w-[98.5%] ml-[0.5%] z-50 h-1 bg-gray-400 rounded-b-full")}>
+          <div className={cn("absolute left-0 ml-0 md:left-[0.3rem] w-full bottom-[0.07rem] md:w-[98.5%] md:ml-[0.5%] z-50 h-1 bg-gray-400 rounded-none md:rounded-b-full")}>
             <div
               className="h-full bg-red-600 transition-all duration-300"
               style={{ width: `${progress}%` }}
