@@ -133,13 +133,18 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           >
             <img src="/assets/profile/share.svg" alt="image" />
           </span>
-          <span
-            className="inline-flex items-center rounded-md px-3 py-1.5 bg-gray-300 cursor-pointer"
-            aria-label="Share this profile"
-            onClick={handleSettingsModal}
-          >
-            <img src="/assets/profile/settings.svg" alt="image" />
-          </span>
+
+          {isCurrentUser ? (
+            <span
+              className="inline-flex items-center rounded-md px-3 py-1.5 bg-gray-300 cursor-pointer"
+              aria-label="Share this profile"
+              onClick={handleSettingsModal}
+            >
+              <img src="/assets/profile/settings.svg" alt="image" />
+            </span>
+          ) : (
+            ""
+          )}
         </div>
       </div>
       <div className="flex space-x-4 mt-3">
@@ -189,7 +194,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           handleClose={handleClose}
         />
       )}
-
     </div>
   );
 };

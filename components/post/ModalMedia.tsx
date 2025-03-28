@@ -11,7 +11,11 @@ type VideoMediaProps = {
   media: string;
 };
 
-export default function VideoMedia({ postMedia, size,media }: VideoMediaProps) {
+export default function VideoMedia({
+  postMedia,
+  size,
+  media,
+}: VideoMediaProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -20,6 +24,14 @@ export default function VideoMedia({ postMedia, size,media }: VideoMediaProps) {
     postMedia &&
     postMedia.length > 0 &&
     /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(postMedia[0]?.url);
+
+  const isValidUrl =
+    Array.isArray(postMedia) &&
+    postMedia.length > 0 &&
+    typeof postMedia[0]?.url === "string" &&
+    /^(https?:\/\/)?([\w-]+(\.[\w-]+)+)(\/[\w-./?%&=]*)?$/i.test(
+      postMedia[0].url
+    );
 
   const togglePlay = () => {
     if (!videoRef.current) return;
@@ -58,7 +70,7 @@ export default function VideoMedia({ postMedia, size,media }: VideoMediaProps) {
   }, []);
 
   useEffect(() => {
-    const video = videoRef.current
+    const video = videoRef.current;
     return () => {
       if (video) {
         video.pause();
@@ -67,7 +79,7 @@ export default function VideoMedia({ postMedia, size,media }: VideoMediaProps) {
     };
   }, []);
 
-  if (isImage) {
+  if (isImage || isValidUrl) {
     return (
       <div className={`${size} relative overflow-hidden flex items-center`}>
         <GallerySlider

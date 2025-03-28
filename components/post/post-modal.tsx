@@ -73,9 +73,9 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
     //   alt: "pinned",
     // },
     post &&
-      post?.mediaResource?.[0]?.mimeType === "video" && {
+      post?.media?.[0]?.mimeType === "video" && {
         icon: <FaEye />,
-        value: post?.mediaResource?.[0]?.metadata?.viewsCount || 0,
+        value: post?.media?.[0]?.metadata?.viewsCount || 0,
         alt: "views",
       },
   ].filter(Boolean);
@@ -92,7 +92,7 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
       );
       const data = await response.json();
       setPostComments(data?.data?.comments);
-      console.log(` post ${post}`)
+      console.log(` post ${post}`);
     } catch (error) {
       console.error("Error fetching post comments:", error);
     }
@@ -272,7 +272,7 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
                     title={post?.title}
                     size="w-fit min-w-[25rem] bg-gray-100 max-w-[40rem] max-h-[20rem] h-full md:min-h-[84vh] max-h-[84vh] rounded-lg object-cover"
                     media={post?.thumbnailUrl || ""}
-                    postMedia={post?.mediaResource}
+                    postMedia={post?.media}
                     postId={post?.id}
                   />
                 </motion.div>
@@ -281,14 +281,20 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
                   <div className="w-full flex flex-col">
                     <div className="p-4 border-b">
                       <div className="flex items-center">
-                        <Image
-                          src={post?.user_profile_avatar}
-                          alt={post?.user_profile_firstName}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
-                        <span className="ml-3 font-semibold">{`${post?.user_profile_firstName} ${post?.user_profile_lastName}`}</span>
+                        {post?.avatar ? (
+                          <Image
+                            src={post?.avatar}
+                            alt={post?.firstName}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full object-cover font-bold border inline-flex justify-center items-center text-center p-1">
+                            {post?.firstName[0] + post?.lastName[0]}
+                          </div>
+                        )}
+                        <span className="ml-3 font-semibold">{`${post?.firstName} ${post?.lastName}`}</span>
                       </div>
                     </div>
                     <div className="flex-grow overflow-y-auto p-4">

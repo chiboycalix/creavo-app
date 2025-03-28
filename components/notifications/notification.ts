@@ -41,15 +41,8 @@ export const transformNotifications = (notifications: any[]) => {
   sortedNotifications?.forEach((notification: any) => {
     if (!notification?.data) return;
 
-    const {
-      id,
-      event,
-      createdAt,
-      content,
-      user_profile_firstName,
-      user_profile_lastName,
-      user_profile_avatar,
-    } = notification.data;
+    const { id, event, createdAt, content, firstName, lastName, avatar } =
+      notification.data;
 
     const {
       category,
@@ -69,9 +62,9 @@ export const transformNotifications = (notifications: any[]) => {
 
     const formattedNotification = {
       id: id.toString(),
-      userImage: user_profile_avatar || "/assets/Pupil.png",
-      userName: `${user_profile_firstName || ""} ${
-        user_profile_lastName || ""
+      userImage: avatar || "/assets/Pupil.png",
+      userName: `${firstName || ""} ${
+        lastName || ""
       }`.trim(),
       action,
       timestamp: time,

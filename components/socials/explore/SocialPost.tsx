@@ -11,8 +11,11 @@ import { useComments } from "@/context/CommentsContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { formatCommentDate } from "@/utils";
+import Link from "next/link";
 
-const BookmarkButton = dynamic(() => import("./BookmarkButton"), { ssr: false });
+const BookmarkButton = dynamic(() => import("./BookmarkButton"), {
+  ssr: false,
+});
 const LikeButton = dynamic(() => import("./LikeButton"), { ssr: false });
 const FollowButton = dynamic(() => import("./FollowButton"), { ssr: false });
 
@@ -30,12 +33,22 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const { toggleComments } = useComments();
   const currentUserId = getCurrentUser()?.id;
   const router = useRouter();
-  const hashtagFromCourse = post?.hashtag.match(/##(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
-  const hashtagFromPost = post?.hashtag.match(/#(\w+)/g)?.map((tag: string) => tag.replace("##", "")) || [];
-  const tags = hashtagFromCourse.length > 0 ? hashtagFromCourse : hashtagFromPost;
+  const hashtagFromCourse =
+    post?.hashtag
+      .match(/##(\w+)/g)
+      ?.map((tag: string) => tag.replace("##", "")) || [];
+  const hashtagFromPost =
+    post?.hashtag
+      .match(/#(\w+)/g)
+      ?.map((tag: string) => tag.replace("##", "")) || [];
+  const tags =
+    hashtagFromCourse.length > 0 ? hashtagFromCourse : hashtagFromPost;
   const [isLandscape, setIsLandscape] = useState(false);
 
-  const handleDownloadStatusChange = (downloading: boolean, progress: number) => {
+  const handleDownloadStatusChange = (
+    downloading: boolean,
+    progress: number
+  ) => {
     setIsDownloading(downloading);
     setDownloadProgress(progress);
     if (!downloading && progress === 100) {
@@ -83,7 +96,10 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         />
       ),
     },
-    { icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />, count: post?.viewsCount },
+    {
+      icon: <VscEye className="w-8 h-8 text-white sm:text-[#BFBFBF]" />,
+      count: post?.viewsCount,
+    },
     {
       icon: (
         <ShareButton
@@ -101,7 +117,11 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   };
 
   return (
-    <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative">
+    <div
+      data-post-id={post.id}
+      ref={ref}
+      className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative"
+    >
       {/* Main Post Container */}
       <div className=" text-white sm:rounded-xl rounded-none overflow-hidden flex-grow bg-black">
         <div className="relative">
@@ -118,13 +138,16 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
             <FollowButton
               followedId={post?.userId}
-              avatar={post?.user_profile_avatar || "/assets/display.jpg"}
+              avatar={post?.avatar || "/assets/display.jpg"}
               initialFollowStatus={post?.followed}
               isMyPost={Number(post.userId) === currentUserId}
+              userInitial={`${post?.firstName[0] + post?.lastName[0]}`}
             />
             {metrics.map((metric, index) => (
               <div key={index} className="flex flex-col items-center mb-4">
-                <div className="text-sm rounded-full cursor-pointer">{metric.icon}</div>
+                <div className="text-sm rounded-full cursor-pointer">
+                  {metric.icon}
+                </div>
                 <span className="text-xs font-semibold">{metric.count}</span>
               </div>
             ))}
@@ -136,24 +159,38 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 pt-4">
                   <h3 className="font-semibold inline-flex gap-1 items-center">
-                    <span> {post?.user_username}</span>
+                    <Link href={`/socials/profile/${post.userId}`}>
+                      <span> {post?.username}</span>
+                    </Link>
                     <span className="text-xs text-gray-300 mt-0.5">
                       {formatCommentDate(post.createdAt)}
                     </span>
                   </h3>
                   {post?.metadata !== null && (
-                    <Button className="cursor-pointer" onClick={() => handleNavigateToCourse(post?.metadata?.courseId)}>
+                    <Button
+                      className="cursor-pointer"
+                      onClick={() =>
+                        handleNavigateToCourse(post?.metadata?.courseId)
+                      }
+                    >
                       Learn more
                     </Button>
                   )}
                 </div>
                 <div className="relative w-full">
-                  <div className={`flex flex-wrap gap-2 mt-1 ${!showAllTags && "max-h-[1.6rem]"} overflow-hidden transition-all duration-300`}>
+                  <div
+                    className={`flex flex-wrap gap-2 mt-1 ${
+                      !showAllTags && "max-h-[1.6rem]"
+                    } overflow-hidden transition-all duration-300`}
+                  >
                     <div>
                       <p className="text-xs leading-6">{post.body}</p>
                     </div>
                     {tags.map((tag: any, index: number) => (
-                      <span key={index} className="text-gray-400 text-xs leading-6">
+                      <span
+                        key={index}
+                        className="text-gray-400 text-xs leading-6"
+                      >
                         #{tag}
                       </span>
                     ))}
@@ -187,14 +224,20 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         <div className="flex flex-col gap-4 mt-auto">
           <FollowButton
             followedId={post?.userId}
-            avatar={post?.user_profile_avatar || "/assets/display.jpg"}
+            avatar={post?.avatar || "/assets/display.jpg"}
             initialFollowStatus={post?.followed}
             isMyPost={Number(post.userId) === currentUserId}
+            userInitial={`${post?.firstName[0] + post?.lastName[0]}`}
           />
+
           {metrics.map((metric, index) => (
             <div key={index} className="flex flex-col items-center mb-0">
-              <div className="text-sm rounded-full cursor-pointer transition-colors">{metric.icon}</div>
-              <span className="text-xs text-gray-800 font-semibold">{metric.count}</span>
+              <div className="text-sm rounded-full cursor-pointer transition-colors">
+                {metric.icon}
+              </div>
+              <span className="text-xs text-gray-800 font-semibold">
+                {metric.count}
+              </span>
             </div>
           ))}
         </div>

@@ -1,173 +1,182 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { getUserBookmarks } from "@/services/bookmark.service"
-import { Bookmark, AlertCircle, Heart } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { baseUrl } from "@/utils/constant"
-import { toast } from "sonner"
-import { toggleBookmark } from "@/services/bookmark.service"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useCallback } from "react";
+import { getUserBookmarks } from "@/services/bookmark.service";
+import { Bookmark, AlertCircle, Heart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { baseUrl } from "@/utils/constant";
+import { toast } from "sonner";
+import { toggleBookmark } from "@/services/bookmark.service";
+import { useRouter } from "next/navigation";
 interface BookmarksResponse {
   data: {
-    posts: BookmarkItem[]
-  }
+    posts: BookmarkItem[];
+  };
   meta: {
-    currentPage: number
-    totalPages: number
-    totalItems: number
-  }
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+  };
 }
 
 interface BookmarkItem {
-  id: number
-  hashtag: string
-  body: string
-  userId: number
-  status: string
-  isPrivate: boolean
-  metadata: any
-  likesCount: number
-  commentsCount: number
-  viewsCount: number
-  sharesCount: number
-  bookmarkCount: number
-  isDeleted: boolean
-  createdAt: string
-  updatedAt: string
-  user_username: string
-  user_profile_firstName: string | "None"
-  user_profile_lastName: string | "None"
-  user_profile_avatar: string
+  id: number;
+  hashtag: string;
+  body: string;
+  userId: number;
+  status: string;
+  isPrivate: boolean;
+  metadata: any;
+  likesCount: number;
+  commentsCount: number;
+  viewsCount: number;
+  sharesCount: number;
+  bookmarkCount: number;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  username: string;
+  firstName: string | "None";
+  lastName: string | "None";
+  avatar: string;
   media: {
-    id: number
-    description: string
-    title: string
-    url: string
-    thumbnailUrl: string | "None"
-    mimeType: string
-    metadata: any
-  }[]
+    id: number;
+    description: string;
+    title: string;
+    url: string;
+    thumbnailUrl: string | "None";
+    mimeType: string;
+    metadata: any;
+  }[];
 }
 
 interface UserBookmarksProps {
-  userId?: number
-  initialLimit?: number
+  userId?: number;
+  initialLimit?: number;
 }
 
-export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmarksProps) {
-  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [page, setPage] = useState(1)
-  const [limit] = useState(initialLimit)
-  const [totalPages, setTotalPages] = useState(1)
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
-  const router = useRouter(
-
-  )
+export default function UserBookmarks({
+  userId,
+  initialLimit = 10,
+}: UserBookmarksProps) {
+  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(initialLimit);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const router = useRouter();
 
   const fetchUserIdFromPosts = useCallback(async () => {
     try {
-      const response = await fetch(`${baseUrl}/posts?page=1&limit=1`)
-      const data = await response.json()
+      const response = await fetch(`${baseUrl}/posts?page=1&limit=1`);
+      const data = await response.json();
       if (data?.data?.posts && data.data.posts.length > 0) {
-        const firstPost = data.data.posts[0]
-        return firstPost.userId
+        const firstPost = data.data.posts[0];
+        return firstPost.userId;
       }
-      return null
+      return null;
     } catch (err) {
-      console.error("Error fetching userId from posts:", err)
-      return null
+      console.error("Error fetching userId from posts:", err);
+      return null;
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const initUserId = async () => {
       if (userId !== undefined) {
-        setCurrentUserId(userId)
+        setCurrentUserId(userId);
       } else {
-        const fetchedUserId = await fetchUserIdFromPosts()
-        setCurrentUserId(fetchedUserId || 1)
+        const fetchedUserId = await fetchUserIdFromPosts();
+        setCurrentUserId(fetchedUserId || 1);
       }
-    }
+    };
 
-    initUserId()
-  }, [userId, fetchUserIdFromPosts])
+    initUserId();
+  }, [userId, fetchUserIdFromPosts]);
 
   const fetchBookmarks = useCallback(async () => {
-    if (currentUserId === null) return
+    if (currentUserId === null) return;
     try {
-      setLoading(true)
-      setError(null)
-      const response = await getUserBookmarks(currentUserId, page, limit)
+      setLoading(true);
+      setError(null);
+      const response = await getUserBookmarks(currentUserId, page, limit);
       if (response && response.data && Array.isArray(response.data.posts)) {
-        setBookmarks(response.data.posts)
+        setBookmarks(response.data.posts);
         if (response.meta) {
-          setTotalPages(response.meta.totalPages || 1)
+          setTotalPages(response.meta.totalPages || 1);
         }
       } else {
-        console.error("Invalid response structure:", response)
-        setBookmarks([])
-        setTotalPages(1)
+        console.error("Invalid response structure:", response);
+        setBookmarks([]);
+        setTotalPages(1);
       }
     } catch (err) {
-      setError("Failed to load bookmarks. Please try again later.")
-      console.error("Error fetching bookmarks:", err)
+      setError("Failed to load bookmarks. Please try again later.");
+      console.error("Error fetching bookmarks:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [currentUserId, page, limit])
+  }, [currentUserId, page, limit]);
 
   useEffect(() => {
     if (currentUserId !== null) {
-      fetchBookmarks()
+      fetchBookmarks();
     }
-  }, [fetchBookmarks, currentUserId])
+  }, [fetchBookmarks, currentUserId]);
 
   const handlePreviousPage = () => {
     if (page > 1) {
-      setPage(page - 1)
+      setPage(page - 1);
     }
-  }
+  };
 
   const handleNextPage = () => {
     if (page < totalPages) {
-      setPage(page + 1)
+      setPage(page + 1);
     }
-  }
+  };
 
   const handleRemoveBookmark = async (bookmarkId: number) => {
     try {
-      await toggleBookmark(bookmarkId)
-      setBookmarks(bookmarks.filter((bookmark) => bookmark.id !== bookmarkId))
+      await toggleBookmark(bookmarkId);
+      setBookmarks(bookmarks.filter((bookmark) => bookmark.id !== bookmarkId));
 
       toast.success("Bookmark removed", {
         description: "The bookmark has been successfully removed.",
-      })
+      });
     } catch (err) {
-      console.error("Error removing bookmark:", err)
-      setError("Failed to remove bookmark. Please try again.")
+      console.error("Error removing bookmark:", err);
+      setError("Failed to remove bookmark. Please try again.");
 
       toast.error("Bookmark error", {
         description: "Fail to remove.",
-      })
+      });
     }
-  }
+  };
+
+  const isImage = (postMedia: any) => {
+    return (
+      postMedia &&
+      postMedia.length > 0 &&
+      /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(postMedia[0]?.url)
+    );
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   return (
     <div className="w-full mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-bold">Your Bookmarks</h2>
+        {/* <h2 className="font-bold">Your Bookmarks</h2> */}
         <Badge variant="outline" className="px-3 py-1">
           <Bookmark className="w-4 h-4 mr-2" />
           {loading ? "..." : bookmarks.length} saved
@@ -207,7 +216,8 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
             <Bookmark className="h-12 w-12 text-muted-foreground" />
             <h3 className="font-semibold mt-2">No bookmarks found</h3>
             <p className="text-muted-foreground">
-              You haven&apos;t saved any posts yet. Start bookmarking content you want to revisit later.
+              You haven&apos;t saved any posts yet. Start bookmarking content
+              you want to revisit later.
             </p>
           </div>
         </div>
@@ -223,7 +233,10 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
                 {bookmark.media && bookmark.media.length > 0 ? (
                   <img
                     src={
-                      bookmark.media[0].thumbnailUrl !== "None" ? bookmark.media[0].thumbnailUrl : bookmark.media[0].url
+                      (!isImage(bookmark.media) &&
+                      bookmark.media[0].thumbnailUrl !== "None"
+                        ? bookmark.media[0].thumbnailUrl
+                        : bookmark.media[0].url) || ""
                     }
                     alt={bookmark.body}
                     className="w-full h-full object-cover"
@@ -236,17 +249,26 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
               </div>
               <div className="p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <img
-                    src={bookmark.user_profile_avatar || "/placeholder.svg"}
-                    alt={bookmark.user_username}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                  <h3 className="font-medium text-sm truncate">{bookmark.hashtag || bookmark.user_username}</h3>
+                  {bookmark.avatar ? (
+                    <img
+                      src={bookmark.avatar || "/placeholder.svg"}
+                      alt={bookmark?.username[0]}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full object-cover font-bold border inline-flex justify-center items-center text-center p-1">
+                      {bookmark?.firstName[0] + bookmark?.lastName[0]}
+                    </div>
+                  )}
+                  <h3 className="font-medium text-sm truncate">
+                    {bookmark.hashtag || bookmark.username}
+                  </h3>
                 </div>
                 <p className="text-sm mb-2 line-clamp-2">{bookmark.body}</p>
                 <div className="flex items-center text-sm text-gray-500 mt-1">
                   <span className="flex items-center">
-                    <Heart className="w-3 h-3 mr-1" /> {bookmark.likesCount} likes
+                    <Heart className="w-3 h-3 mr-1" /> {bookmark.likesCount}{" "}
+                    likes
                   </span>
                   <span className="mx-2">•</span>
                   <span>{formatDate(bookmark.createdAt)}</span>
@@ -274,5 +296,5 @@ export default function UserBookmarks({ userId, initialLimit = 10 }: UserBookmar
         </button>
       </div>
     </div>
-  )
+  );
 }
