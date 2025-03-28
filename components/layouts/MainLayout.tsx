@@ -31,6 +31,7 @@ import { shouldUseMainLayout } from "@/utils/path-utils";
 import { RiHome8Fill } from "react-icons/ri";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { cn } from "@/lib/utils";
+import Footer from "./includes/Footer";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -191,15 +192,23 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               className={cn(
                 "p-0",
                 pathname === "/socials" || pathname === "/socials/following"
-                  ? "sm:py-6 sm:px-16"
+                  ? "py-0 md:py-6 sm:px-16"
                   : "sm:p-12"
               )}
             >
               {children}
             </div>
           </main>
+          <footer className="bg-red-600 fixed bottom-0 right-0 w-full">
+            <Footer
+              onButtonClick={setCurrentNavItems}
+              headerButtons={headerButtons}
+            />
+          </footer>
         </div>
+
       </div>
+
     </SidebarProvider>
   );
 }

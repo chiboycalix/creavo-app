@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useWebSocket } from "@/context/WebSocket";
-
+import { useToast } from "@/context/ToastContext";
 interface SocketProps {
   username: string;
 }
@@ -15,9 +15,9 @@ const Socket: React.FC<SocketProps> = ({ username }) => {
   const ws = useWebSocket();
   const [suggestedUsernames, setSuggestedUsernames] = useState<string[]>([]);
   const [response, setResponse] = useState<WebSocketResponse | null>(null);
-  const [alert, setAlert] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const wsRef = useRef<typeof ws | null>(null);
+  const { showToast, removeToast } = useToast();
 
   useEffect(() => {
     wsRef.current = ws;
@@ -26,7 +26,11 @@ const Socket: React.FC<SocketProps> = ({ username }) => {
         ws.connect();
 
         ws.on("auth_error", (error: string) => {
-          setAlert(error);
+          showToast(
+            'error',
+            'Suggest Username Error',
+            error
+          );
         });
 
         ws.on("suggested_username_response", (response: WebSocketResponse) => {
@@ -36,13 +40,25 @@ const Socket: React.FC<SocketProps> = ({ username }) => {
         });
 
         ws.on("connect_error", (error) => {
-          setAlert(`${error}`);
+          console.log({ error })
+          showToast(
+            'error',
+            'Suggest Username Error',
+            "Connection error"
+          );
           setLoading(false);
         });
       }
-    } catch (error) {
-      setAlert(String(error));
+    } catch (error: any) {
+      showToast(
+        'error',
+        'Something went wrong',
+        error?.message
+      );
       setLoading(false);
+    } finally {
+      setLoading(false);
+      removeToast(10000);
     }
   }, [ws]);
 
@@ -85,74 +101,3 @@ const Socket: React.FC<SocketProps> = ({ username }) => {
 };
 
 export default Socket;
-
-// const Socket: React.FC<SocketProps> = ({ username }) => {
-//   const ws = useWebSocket();
-//   const [suggestedUsernames, setSuggestedUsernames] = useState<string[]>([]);
-//   const [response, setResponse] = useState<WebSocketResponse | null>(null);
-//   const [alert, setAlert] = useState<string | null>(null);
-//   const [loading, setLoading] = useState<boolean>(false);
-
-//   const LoadingMessage: React.FC = () => (
-//     <p className="text-sm">Loading...</p>
-//   );
-
-//   const SuccessMessage: React.FC<{ message: string; usernames: string[] }> = ({ message, usernames }) => (
-//     <div>
-//       <p className="text-sm text-[#37169C] font-medium">{message}</p>
-//       <ul className="text-sm italic list-disc list-inside">
-//         {usernames?.length > 0 && usernames?.map((username, index) => (
-//           <li key={`${username}-${index}`}>{username}</li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-
-//   const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
-//     <div>
-//       <p className="text-sm text-[#37169C] font-medium">😔 {message}</p>
-//     </div>
-//   );
-
-//   useEffect(() => {
-//     if (ws) {
-//       ws.connect();
-
-//       ws.on("auth_error", (error: string) => {
-//         setAlert(error);
-//         console.error("WebSocket authentication error:", error);
-//       });
-
-//       ws.on("suggested_username_response", (response: WebSocketResponse) => {
-//         setResponse(response);
-//         setLoading(false);
-//         setSuggestedUsernames(response.data || []);
-//       });
-
-//       ws.on("connect_error", (error) => {
-//         setAlert(`${error}`);
-//         setLoading(false);
-//         console.error("WebSocket connection error:", error);
-//       });
-//     }
-//   }, [ws]);
-
-//   useEffect(() => {
-//     if (username.length > 0 && ws) {
-//       setLoading(true);
-//       ws?.emit("suggest_username_request", username, () => {});
-//     }
-//   }, [username, ws]);
-
-//   return (
-//     <div className="px-3 pt-2">
-//       {loading && <LoadingMessage />}
-//       {!loading && response?.status === "Success" && suggestedUsernames.length > 0 && (
-//         <SuccessMessage message={response?.message} usernames={suggestedUsernames} />
-//       )}
-//       {!loading && response?.status === "Error" && <ErrorMessage message={response.message} />}
-//     </div>
-//   );
-// };
-
-// export default Socket;

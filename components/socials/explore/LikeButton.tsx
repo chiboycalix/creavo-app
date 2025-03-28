@@ -154,11 +154,11 @@ const LikeButton: React.FC<LikeButtonProps> = ({
           className={`w-8 h-8 transition-colors duration-200 
             ${isLiked
               ? "fill-red-500 stroke-red-500"
-              : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
+              : "md:hover:stroke-red-500 md:stroke-white md:fill-gray-400 md:hover:fill-red-500 fill-gray-300 stroke-gray-300"
             }`}
         />
       </button>
-      <span className="text-xs font-semibold">{likesCount}</span>
+      <span className="text-xs font-semibold text-gray-200">{likesCount}</span>
     </div>
   );
 };

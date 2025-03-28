@@ -80,7 +80,7 @@ const GallerySlider = ({
           )}
 
           <Link
-            className={`relative flex items-center justify-center h-full`}
+            className={`relative flex items-center justify-center h-full overflow-x-hidden`}
             href={''}
           >
             <AnimatePresence initial={false} custom={direction}>

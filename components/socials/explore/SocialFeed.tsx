@@ -131,19 +131,19 @@ const SocialFeed = ({ initialPosts }: any) => {
 
   const getPostHeight = () => {
     if (typeof window !== 'undefined') {
-      if (window.innerWidth < 768) return 'calc(100vh - 4rem)'
+      if (window.innerWidth < 768) return 'calc(100vh - 5.3rem)'
       return 'calc(100vh - 6rem)'
     }
     return 'calc(100vh - 4rem)'
   }
 
   return (
-    <div className="w-full min-h-screen">
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className={`${isMobileView ? 'w-full' : 'md:w-8/12 lg:w-6/12'} order-1 md:order-none`}>
+    <div className="w-full min-h-screen overflow-x-hidden">
+      <div className="flex flex-col md:flex-row gap-6 overflow-x-hidden">
+        <div className={`${isMobileView ? 'w-full' : 'md:w-8/12 lg:w-6/12'} order-1 md:order-none overflow-x-hidden`}>
           <div
             ref={containerRef}
-            className="overflow-y-auto snap-y snap-mandatory no-scrollbar"
+            className="overflow-y-auto snap-y snap-mandatory no-scrollbar overflow-x-hidden"
             style={{
               height: getPostHeight(),
               overflowY: 'auto',
