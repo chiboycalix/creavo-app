@@ -87,11 +87,11 @@ const PostItem = ({ post }: PostItemType) => {
     //   alt: "pinned",
     // },
     post &&
-    post?.mediaResource?.[0]?.mimeType === "video/*" && {
-      icon: <FaEye />,
-      value: post?.mediaResource?.[0]?.metadata?.viewsCount || 0,
-      alt: "views",
-    },
+      post?.media?.[0]?.mimeType === "video/*" && {
+        icon: <FaEye />,
+        value: post?.media?.[0]?.metadata?.viewsCount || 0,
+        alt: "views",
+      },
   ].filter(Boolean);
 
   const shareOptionsMenu = [
@@ -126,7 +126,7 @@ const PostItem = ({ post }: PostItemType) => {
     if (liked !== null) {
       setIsLiked(JSON.parse(liked));
     }
-  }, [isLiked, post.id,]);
+  }, [isLiked, post.id]);
 
   return (
     <div className="mx-auto p-3 shadow-md border rounded-2xl bg-white w-full max-w-[28rem] sm:max-w-[30rem] md:max-w-[32rem]">
@@ -135,13 +135,19 @@ const PostItem = ({ post }: PostItemType) => {
         <div className="flex justify-between items-center mb-2 w-full">
           <div className="flex items-start">
             {/* User Avatar */}
-            <Image
-              width={40}
-              height={40}
-              src={post.user_profile_avatar}
-              alt={`${post.username}'s avatar`}
-              className="w-10 h-10 rounded-full mr-3"
-            />
+            {post.avatar ? (
+              <Image
+                width={40}
+                height={40}
+                src={post.avatar}
+                alt={`${post.username}'s avatar`}
+                className="w-10 h-10 rounded-full mr-3"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full object-cover font-bold border inline-flex justify-center items-center text-center p-1">
+                {post?.firstName[0] + post?.lastName[0]}
+              </div>
+            )}
             {/* User Info */}
             <div>
               <div className="flex flex-col gap-1">
@@ -177,7 +183,7 @@ const PostItem = ({ post }: PostItemType) => {
             postId={post.id}
             title={post.title}
             size="w-full h-auto aspect-square rounded-2xl"
-            postMedia={post.mediaResource}
+            postMedia={post.media}
           />
         </div>
 

@@ -8,12 +8,14 @@ import { baseUrl } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface FollowButtonProps {
   followedId: number | string;
   avatar: string;
   initialFollowStatus?: boolean;
   isMyPost: boolean;
+  userInitial: string;
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({
@@ -21,6 +23,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   avatar,
   isMyPost,
   initialFollowStatus = false,
+  userInitial,
 }) => {
   const queryClient = useQueryClient();
   const { getAuth } = useAuth();
@@ -49,7 +52,10 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       const result = await response.json();
 
       if (ws && ws.connected) {
-        const request = { userId: followedId, notificationId: result?.data?.id };
+        const request = {
+          userId: followedId,
+          notificationId: result?.data?.id,
+        };
         ws.emit("follow", request);
       } else {
         console.log("Failed to follow user", followedId);
@@ -61,17 +67,25 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       await queryClient.cancelQueries({ queryKey: ["user-followers"] });
       await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
 
-      const previousFollowersData = queryClient.getQueryData(["user-followers", followedId]);
-      queryClient.setQueryData(["user-followers", followedId], (oldData: any) => {
-        if (!oldData?.pages) return oldData;
-        const updatedPages = oldData.pages.map((page: any) => ({
-          ...page,
-          followers: page.followers.map((follower: any) =>
-            follower.userId === followedId ? { ...follower, followed: true } : follower
-          ),
-        }));
-        return { ...oldData, pages: updatedPages };
-      });
+      const previousFollowersData = queryClient.getQueryData([
+        "user-followers",
+        followedId,
+      ]);
+      queryClient.setQueryData(
+        ["user-followers", followedId],
+        (oldData: any) => {
+          if (!oldData?.pages) return oldData;
+          const updatedPages = oldData.pages.map((page: any) => ({
+            ...page,
+            followers: page.followers.map((follower: any) =>
+              follower.userId === followedId
+                ? { ...follower, followed: true }
+                : follower
+            ),
+          }));
+          return { ...oldData, pages: updatedPages };
+        }
+      );
 
       // Optimistically update posts data
       const previousPostsData = queryClient.getQueryData(["infinite-posts"]);
@@ -93,7 +107,10 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     },
     onError: (err, _, context) => {
       // Revert on error
-      queryClient.setQueryData(["user-followers", followedId], context?.previousFollowersData);
+      queryClient.setQueryData(
+        ["user-followers", followedId],
+        context?.previousFollowersData
+      );
       queryClient.setQueryData(["infinite-posts"], context?.previousPostsData);
       setIsFollowing(initialFollowStatus);
     },
@@ -119,17 +136,25 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
 
       // Optimistically update followers data
-      const previousFollowersData = queryClient.getQueryData(["user-followers", followedId]);
-      queryClient.setQueryData(["user-followers", followedId], (oldData: any) => {
-        if (!oldData?.pages) return oldData;
-        const updatedPages = oldData.pages.map((page: any) => ({
-          ...page,
-          followers: page.followers.map((follower: any) =>
-            follower.userId === followedId ? { ...follower, followed: false } : follower
-          ),
-        }));
-        return { ...oldData, pages: updatedPages };
-      });
+      const previousFollowersData = queryClient.getQueryData([
+        "user-followers",
+        followedId,
+      ]);
+      queryClient.setQueryData(
+        ["user-followers", followedId],
+        (oldData: any) => {
+          if (!oldData?.pages) return oldData;
+          const updatedPages = oldData.pages.map((page: any) => ({
+            ...page,
+            followers: page.followers.map((follower: any) =>
+              follower.userId === followedId
+                ? { ...follower, followed: false }
+                : follower
+            ),
+          }));
+          return { ...oldData, pages: updatedPages };
+        }
+      );
 
       // Optimistically update posts data
       const previousPostsData = queryClient.getQueryData(["infinite-posts"]);
@@ -149,7 +174,10 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       return { previousFollowersData, previousPostsData };
     },
     onError: (err, _, context) => {
-      queryClient.setQueryData(["user-followers", followedId], context?.previousFollowersData);
+      queryClient.setQueryData(
+        ["user-followers", followedId],
+        context?.previousFollowersData
+      );
       queryClient.setQueryData(["infinite-posts"], context?.previousPostsData);
       setIsFollowing(initialFollowStatus);
     },
@@ -169,13 +197,24 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   };
 
   return (
-    <div className={cn("relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center", isMyPost ? "md:mb-0 mb-4" : "mb-4")}>
-      <Avatar className="w-12 h-12">
-        <AvatarImage src={avatar} alt="User avatar" className="object-cover " />
-        <AvatarFallback>.</AvatarFallback>
-      </Avatar>
-      {
-        !isMyPost && <button
+    <div
+      className={cn(
+        "relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center",
+        isMyPost ? "mb-0" : "mb-4"
+      )}
+    >
+      <Link href={`/socials/profile/${followedId}`}>
+        <Avatar className="w-12 h-12">
+          <AvatarImage
+            src={avatar}
+            alt="User avatar"
+            className="object-cover "
+          />
+          <AvatarFallback> {userInitial}</AvatarFallback>
+        </Avatar>
+      </Link>
+      {!isMyPost && (
+        <button
           onClick={handleToggleFollow}
           aria-label={isFollowing ? "Unfollow this user" : "Follow this user"}
           disabled={followMutation.isPending || unfollowMutation.isPending}
@@ -187,8 +226,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
             <Plus className="text-sm text-white w-5 h-5" />
           )}
         </button>
-      }
-
+      )}
     </div>
   );
 };

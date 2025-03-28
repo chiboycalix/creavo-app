@@ -46,17 +46,17 @@ const NotificationsPopover = () => {
       isRead: notification.data?.isRead ?? false,
       createdAt: notification.data?.createdAt || notification.createdAt,
       updatedAt: notification.data?.updatedAt || notification.updatedAt,
-      user_username:
-        notification.data?.user_username || notification.user_username,
-      user_profile_firstName:
-        notification.data?.user_profile_firstName ||
-        notification.user_profile_firstName,
-      user_profile_lastName:
-        notification.data?.user_profile_lastName ||
-        notification.user_profile_lastName,
-      user_profile_avatar:
-        notification.data?.user_profile_avatar ||
-        notification.user_profile_avatar,
+      username:
+        notification.data?.username || notification.username,
+      firstName:
+        notification.data?.firstName ||
+        notification.firstName,
+      lastName:
+        notification.data?.lastName ||
+        notification.lastName,
+      avatar:
+        notification.data?.avatar ||
+        notification.avatar,
       isFollowing: notification.event === "FOLLOW" ? true : undefined,
     },
   });
