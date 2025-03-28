@@ -1,56 +1,55 @@
-import React, { useState } from "react";
-import Cookies from "js-cookie";
-import { X, Copy, Facebook, Instagram, Twitter, Linkedin, Video, MessageCircle, Send, DownloadIcon } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import { baseUrl } from "@/utils/constant";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/Input";
-import { RiShareForwardFill } from "react-icons/ri";
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import Cookies from "js-cookie"
+import { X, Copy, Facebook, Instagram, Twitter, Linkedin, Video, MessageCircle, Send, DownloadIcon } from "lucide-react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useAuth } from "@/context/AuthContext"
+import { useRouter } from "next/navigation"
+import { baseUrl } from "@/utils/constant"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/Input"
+import { RiShareForwardFill } from "react-icons/ri"
 
 interface ShareButtonProps {
-  postId: number;
-  initialShareCount: number;
-  post: any;
-  onDownloadStatusChange?: (isDownloading: boolean, progress: number) => void; // New prop
+  postId: number
+  initialShareCount?: number
+  type: "post" | "profile"
+  post?: any // Post or profile data
+  onDownloadStatusChange?: (isDownloading: boolean, progress: number) => void
 }
 
-const ShareButton: React.FC<ShareButtonProps> = ({
-  postId,
-  initialShareCount,
-  post,
-  onDownloadStatusChange,
-}) => {
-  const queryClient = useQueryClient();
-  const { getAuth } = useAuth();
-  const router = useRouter();
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [copySuccess, setCopySuccess] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0);
+const ShareButton: React.FC<ShareButtonProps> = ({ postId, initialShareCount, type, post, onDownloadStatusChange }) => {
+  const queryClient = useQueryClient()
+  const { getAuth } = useAuth()
+  const router = useRouter()
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const [copySuccess, setCopySuccess] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState(0)
 
-  const shareUrl = `${window.location.origin}/socials/posts/${postId}`;
+  // Generate appropriate share URL based on type
+  const shareUrl =
+    type === "post"
+      ? `${window.location.origin}/socials/posts/${postId}`
+      : `${window.location.origin}/profile/${postId}`
 
   const handleDownload = async () => {
-    const media = post.media[0];
-    if (!media) return;
+    if (type !== "post" || !post || !post.media || !post.media[0]) return
 
-    const token = Cookies.get("accessToken");
+    const media = post.media[0]
+    const token = Cookies.get("accessToken")
     if (!token) {
-      console.error("No access token found");
-      return;
+      console.error("No access token found")
+      return
     }
 
-    setIsDownloading(true);
-    setIsPopoverOpen(false);
-    setDownloadProgress(0);
-    onDownloadStatusChange?.(true, 0);
+    setIsDownloading(true)
+    setIsPopoverOpen(false)
+    setDownloadProgress(0)
+    onDownloadStatusChange?.(true, 0)
 
     try {
       const response = await fetch(`${baseUrl}/watermark`, {
@@ -65,119 +64,130 @@ const ShareButton: React.FC<ShareButtonProps> = ({
           mediaType: media.mimeType.startsWith("image") ? "image" : "video",
           username: post.user_username,
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Download failed");
+        throw new Error("Download failed")
       }
 
-      const totalSize = response.headers.get("content-length");
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error("Failed to read response body");
+      const totalSize = response.headers.get("content-length")
+      const reader = response.body?.getReader()
+      if (!reader) throw new Error("Failed to read response body")
 
-      const chunks = [];
-      let receivedLength = 0;
+      const chunks = []
+      let receivedLength = 0
 
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const { done, value } = await reader.read()
+        if (done) break
 
-        chunks.push(value);
-        receivedLength += value.length;
+        chunks.push(value)
+        receivedLength += value.length
 
         if (totalSize) {
-          const progress = Math.round((receivedLength / parseInt(totalSize)) * 100);
-          setDownloadProgress(progress);
-          onDownloadStatusChange?.(true, progress);
+          const progress = Math.round((receivedLength / Number.parseInt(totalSize)) * 100)
+          setDownloadProgress(progress)
+          onDownloadStatusChange?.(true, progress)
         } else {
-          const progress = Math.min(90, downloadProgress + 10);
-          setDownloadProgress(progress);
-          onDownloadStatusChange?.(true, progress);
+          const progress = Math.min(90, downloadProgress + 10)
+          setDownloadProgress(progress)
+          onDownloadStatusChange?.(true, progress)
         }
       }
 
-      const blob = new Blob(chunks);
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `post-${post.id}.${media.mimeType.startsWith("image") ? "jpg" : "mp4"}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      const blob = new Blob(chunks)
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `post-${post.id}.${media.mimeType.startsWith("image") ? "jpg" : "mp4"}`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
 
-      setDownloadProgress(100);
-      onDownloadStatusChange?.(true, 100);
+      setDownloadProgress(100)
+      onDownloadStatusChange?.(true, 100)
       setTimeout(() => {
-        setIsDownloading(false);
-        onDownloadStatusChange?.(false, 100);
-      }, 500);
+        setIsDownloading(false)
+        onDownloadStatusChange?.(false, 100)
+      }, 500)
     } catch (error) {
-      console.error("Download failed:", error);
-      setIsDownloading(false);
-      onDownloadStatusChange?.(false, 0);
+      console.error("Download failed:", error)
+      setIsDownloading(false)
+      onDownloadStatusChange?.(false, 0)
     }
-  };
+  }
 
-  const sharePostMutation = useMutation({
+  const shareMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`${baseUrl}/posts/${postId}/share`, {
+      const endpoint = type === "post" ? `${baseUrl}/posts/${postId}/share` : `${baseUrl}/profiles/${postId}/share`
+
+      const response = await fetch(endpoint, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
         },
-      });
+      })
 
-      if (!response.ok) throw new Error("Failed to share post");
-      return response.json();
+      if (!response.ok) throw new Error(`Failed to share ${type}`)
+      return response.json()
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["posts"] });
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId
-            ? { ...post, shareCount: (post.shareCount || initialShareCount) + 1 }
-            : post
-        );
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
-      });
-      return { previousShareCount: initialShareCount };
+      const queryKey = type === "post" ? ["posts"] : ["profiles"]
+      await queryClient.cancelQueries({ queryKey })
+
+      if (type === "post") {
+        queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
+          if (!oldData?.data?.posts) return oldData
+          const updatedPosts = oldData.data.posts.map((p: any) =>
+            p.id === postId ? { ...p, shareCount: (p.shareCount || initialShareCount) + 1 } : p,
+          )
+          return { ...oldData, data: { ...oldData.data, posts: updatedPosts } }
+        })
+      } 
+
+      return { previousShareCount: initialShareCount }
     },
     onError: (_, __, context) => {
-      queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
-        if (!oldData?.data?.posts) return oldData;
-        const updatedPosts = oldData.data.posts.map((post: any) =>
-          post.id === postId
-            ? { ...post, shareCount: context?.previousShareCount }
-            : post
-        );
-        return { ...oldData, data: { ...oldData.data, posts: updatedPosts } };
-      });
+      if (type === "post") {
+        queryClient.setQueriesData({ queryKey: ["posts"] }, (oldData: any) => {
+          if (!oldData?.data?.posts) return oldData
+          const updatedPosts = oldData.data.posts.map((p: any) =>
+            p.id === postId ? { ...p, shareCount: context?.previousShareCount } : p,
+          )
+          return { ...oldData, data: { ...oldData.data, posts: updatedPosts } }
+        })
+      } else {
+        // Handle profile share count error rollback if needed
+      }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      const queryKey = type === "post" ? ["posts"] : ["profiles"]
+      queryClient.invalidateQueries({ queryKey })
     },
-  });
+  })
 
   const handleShareClick = () => {
     if (!getAuth()) {
-      router.push("/auth?tab=signin");
-      return;
+      router.push("/auth?tab=signin")
+      return
     }
-    setIsPopoverOpen(true);
-    sharePostMutation.mutate();
-  };
+    setIsPopoverOpen(true)
+    shareMutation.mutate()
+  }
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    }).catch((err) => {
-      console.error("Failed to copy link:", err);
-    });
-  };
+    navigator.clipboard
+      .writeText(shareUrl)
+      .then(() => {
+        setCopySuccess(true)
+        setTimeout(() => setCopySuccess(false), 2000)
+      })
+      .catch((err) => {
+        console.error("Failed to copy link:", err)
+      })
+  }
 
   const socialMediaShareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
@@ -187,16 +197,19 @@ const ShareButton: React.FC<ShareButtonProps> = ({
     tiktok: `https://www.tiktok.com/`,
     whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(shareUrl)}`,
     telegram: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=Check%20this%20out!`,
-  };
+  }
 
   const handleSocialShare = (platform: keyof typeof socialMediaShareLinks) => {
-    window.open(socialMediaShareLinks[platform], "_blank", "noopener,noreferrer");
-  };
+    window.open(socialMediaShareLinks[platform], "_blank", "noopener,noreferrer")
+  }
 
+  // Get current share count based on type
   const currentShareCount =
-    queryClient
-      .getQueryData<{ data: { posts: { id: number; shareCount: number }[] } }>(["posts"])
-      ?.data.posts.find((post) => post.id === postId)?.shareCount ?? initialShareCount;
+    type === "post"
+      ? (queryClient
+          .getQueryData<{ data: { posts: { id: number; shareCount: number }[] } }>(["posts"])
+          ?.data.posts.find((p) => p.id === postId)?.shareCount ?? initialShareCount)
+      : initialShareCount // For profiles, you might need to adjust this based on your data structure
 
   return (
     <div className="relative flex flex-col items-center gap-2">
@@ -204,9 +217,9 @@ const ShareButton: React.FC<ShareButtonProps> = ({
         <PopoverTrigger asChild>
           <button
             onClick={handleShareClick}
-            disabled={sharePostMutation.isPending}
+            disabled={shareMutation.isPending}
             className="flex items-center focus:outline-none transition-opacity disabled:opacity-50"
-            aria-label="Share post"
+            aria-label={`Share ${type}`}
           >
             <RiShareForwardFill
               className={`w-8 h-8 transition-colors duration-200 
@@ -224,7 +237,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
           </button>
 
           <div className="p-4">
-            <h3 className="text-lg font-semibold mb-2">Share this post</h3>
+            <h3 className="text-lg font-semibold mb-2">Share this {type}</h3>
             <div className="flex items-center gap-2 mb-4">
               <div className="basis-10/12">
                 <Input
@@ -247,50 +260,82 @@ const ShareButton: React.FC<ShareButtonProps> = ({
               </div>
             </div>
             <div className="grid grid-cols-8 gap-4">
-              <button onClick={() => handleSocialShare("facebook")} className="flex flex-col items-center hover:text-blue-600" aria-label="Share on Facebook">
+              <button
+                onClick={() => handleSocialShare("facebook")}
+                className="flex flex-col items-center hover:text-blue-600"
+                aria-label="Share on Facebook"
+              >
                 <Facebook className="w-6 h-6" />
                 <span className="text-xs mt-1">Facebook</span>
               </button>
-              <button onClick={() => handleSocialShare("twitter")} className="flex flex-col items-center hover:text-blue-400" aria-label="Share on Twitter">
+              <button
+                onClick={() => handleSocialShare("twitter")}
+                className="flex flex-col items-center hover:text-blue-400"
+                aria-label="Share on Twitter"
+              >
                 <Twitter className="w-6 h-6" />
                 <span className="text-xs mt-1">Twitter</span>
               </button>
-              <button onClick={() => handleSocialShare("linkedin")} className="flex flex-col items-center hover:text-blue-700" aria-label="Share on LinkedIn">
+              <button
+                onClick={() => handleSocialShare("linkedin")}
+                className="flex flex-col items-center hover:text-blue-700"
+                aria-label="Share on LinkedIn"
+              >
                 <Linkedin className="w-6 h-6" />
                 <span className="text-xs mt-1">LinkedIn</span>
               </button>
-              <button onClick={() => handleSocialShare("instagram")} className="flex flex-col items-center hover:text-pink-500" aria-label="Share on Instagram">
+              <button
+                onClick={() => handleSocialShare("instagram")}
+                className="flex flex-col items-center hover:text-pink-500"
+                aria-label="Share on Instagram"
+              >
                 <Instagram className="w-6 h-6" />
                 <span className="text-xs mt-1">Instagram</span>
               </button>
-              <button onClick={() => handleSocialShare("tiktok")} className="flex flex-col items-center hover:text-black" aria-label="Share on TikTok">
+              <button
+                onClick={() => handleSocialShare("tiktok")}
+                className="flex flex-col items-center hover:text-black"
+                aria-label="Share on TikTok"
+              >
                 <Video className="w-6 h-6" />
                 <span className="text-xs mt-1">TikTok</span>
               </button>
-              <button onClick={() => handleSocialShare("whatsapp")} className="flex flex-col items-center hover:text-green-500" aria-label="Share on WhatsApp">
+              <button
+                onClick={() => handleSocialShare("whatsapp")}
+                className="flex flex-col items-center hover:text-green-500"
+                aria-label="Share on WhatsApp"
+              >
                 <MessageCircle className="w-6 h-6" />
                 <span className="text-xs mt-1">WhatsApp</span>
               </button>
-              <button onClick={() => handleSocialShare("telegram")} className="flex flex-col items-center hover:text-blue-500" aria-label="Share on Telegram">
+              <button
+                onClick={() => handleSocialShare("telegram")}
+                className="flex flex-col items-center hover:text-blue-500"
+                aria-label="Share on Telegram"
+              >
                 <Send className="w-6 h-6" />
                 <span className="text-xs mt-1">Telegram</span>
               </button>
-              <button
-                onClick={handleDownload}
-                disabled={isDownloading}
-                className="flex flex-col items-center hover:text-primary-500 disabled:opacity-50"
-                aria-label="Download media"
-              >
-                <DownloadIcon className="w-6 h-6" />
-                <span className="text-xs mt-1">Download</span>
-              </button>
+              {/* Only show download button for posts, not profiles */}
+              {type === "post" && (
+                <button
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className="flex flex-col items-center hover:text-primary-500 disabled:opacity-50"
+                  aria-label="Download media"
+                >
+                  <DownloadIcon className="w-6 h-6" />
+                  <span className="text-xs mt-1">Download</span>
+                </button>
+              )}
             </div>
           </div>
         </PopoverContent>
       </Popover>
       <span className="text-xs font-semibold">{currentShareCount}</span>
     </div>
-  );
-};
+  )
+}
 
-export default ShareButton;
+export default ShareButton
+
