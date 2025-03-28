@@ -54,10 +54,10 @@ type PostDetails = {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
-  user_username: string;
-  user_profile_firstName: string;
-  user_profile_lastName: string;
-  user_profile_avatar: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
   media: Media[];
 };
 
@@ -336,10 +336,10 @@ export default function PostModal({ postId, isOpen, onClose }: PostModalProps) {
                 <div className="p-4 border-b">
                   <div className="flex gap-3">
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-500 flex-shrink-0">
-                      {post.user_profile_avatar ? (
+                      {post.avatar ? (
                         <Image
-                          src={post.user_profile_avatar}
-                          alt={post.user_username}
+                          src={post.avatar}
+                          alt={post.username}
                           width={40}
                           height={40}
                           className="object-cover w-full h-full"
@@ -347,16 +347,16 @@ export default function PostModal({ postId, isOpen, onClose }: PostModalProps) {
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-white">
                           <span className="text-lg font-semibold">
-                            {post.user_profile_firstName?.charAt(0) || post.user_username?.charAt(0) || "U"}
+                            {post.firstName?.charAt(0) || post.username?.charAt(0) || "U"}
                           </span>
                         </div>
                       )}
                     </div>
                     <div>
                       <h4 className="font-semibold">
-                        {post.user_profile_firstName && post.user_profile_lastName
-                          ? `${post.user_profile_firstName} ${post.user_profile_lastName}`
-                          : post.user_username || "Anonymous"}
+                        {post.firstName && post.lastName
+                          ? `${post.firstName} ${post.lastName}`
+                          : post.username || "Anonymous"}
                       </h4>
                       <p className="mt-1 text-sm">{post.body}</p>
                       {post.hashtag && (

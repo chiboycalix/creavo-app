@@ -62,7 +62,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ postId, initialShareCount, ty
           postId: post.id,
           mediaUrl: media.url,
           mediaType: media.mimeType.startsWith("image") ? "image" : "video",
-          username: post.user_username,
+          username: post.username,
         }),
       })
 

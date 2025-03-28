@@ -102,7 +102,7 @@ const EditPostModal = ({ post, onClose }: EditPostModalProps) => {
                 >
                   <div>
                     <img
-                      src={postInfo?.mediaResource[0].url}
+                      src={postInfo?.media[0].url}
                       alt="post"
                       className="w-full h-64 object-cover rounded-lg"
                     />

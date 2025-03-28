@@ -24,6 +24,7 @@ export const LAYOUT_PATHS = [
   "/socials",
   "/socials/following",
   "/socials/profile",
+  "/socials/profile/*",
   "/socials/watchlist",
   "/socials/uploads",
   "/socials/edit-post",

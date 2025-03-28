@@ -263,14 +263,20 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
                   <div className="w-full flex flex-col">
                     <div className="p-4 border-b">
                       <div className="flex items-center">
-                        <Image
-                          src={post?.user_profile_avatar || "/placeholder.svg"}
-                          alt={post?.user_profile_firstName || "User profile"}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
-                        <span className="ml-3 font-semibold">{`${post?.user_profile_firstName} ${post?.user_profile_lastName}`}</span>
+                        {post?.avatar ? (
+                          <Image
+                            src={post?.avatar}
+                            alt={post?.firstName}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full object-cover font-bold border inline-flex justify-center items-center text-center p-1">
+                            {post?.firstName[0] + post?.lastName[0]}
+                          </div>
+                        )}
+                        <span className="ml-3 font-semibold">{`${post?.firstName} ${post?.lastName}`}</span>
                       </div>
                     </div>
                     <div className="flex-grow overflow-y-auto p-4">
