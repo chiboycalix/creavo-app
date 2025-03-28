@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { baseUrl } from "@/utils/constant";
 import { useWebSocket } from "@/context/WebSocket";
 
-
 interface LikeButtonProps {
   postId: number;
   initialLikesCount: number;
@@ -31,12 +30,15 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
   const likePostMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`${baseUrl}/posts/${postId}/like-post`, {
-        method: "PATCH",
+      const response = await fetch(`${baseUrl}/posts/${postId}/likes`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
         },
+        body: JSON.stringify({
+          postId,
+        }),
       });
 
       if (!response.ok) throw new Error("Failed to like post");
@@ -87,8 +89,8 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
   const unlikePostMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`${baseUrl}/posts/${postId}/unlike-post`, {
-        method: "PATCH",
+      const response = await fetch(`${baseUrl}/posts/${postId}/likes`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
@@ -152,9 +154,10 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       >
         <Heart
           className={`w-8 h-8 transition-colors duration-200 
-            ${isLiked
-              ? "fill-red-500 stroke-red-500"
-              : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
+            ${
+              isLiked
+                ? "fill-red-500 stroke-red-500"
+                : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
             }`}
         />
       </button>
