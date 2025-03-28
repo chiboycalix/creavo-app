@@ -98,7 +98,7 @@ const FollowingCard = ({
                 data?.pages.map((page, i) => (
                   <div key={i}>
                     {page.followers.map((follower: Follower) => (
-                      <Link href={`/socials/profile/${follower.userId}`}>
+                      <Link key={i} href={`/socials/profile/${follower.userId}`}>
                         <div
                           key={follower.id}
                           className="flex items-center gap-2 mb-4"

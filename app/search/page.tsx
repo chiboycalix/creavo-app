@@ -290,7 +290,7 @@ export default function SearchResults() {
         return results.accounts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {results.accounts.map((account) => (
-              <Link href={`/socials/profile/${account.data.id}`}>
+              <Link  key={account.id} href={`/socials/profile/${account.data.id}`}>
                 <>
                   <div
                     key={account.id}
