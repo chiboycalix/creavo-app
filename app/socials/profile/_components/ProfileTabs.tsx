@@ -38,10 +38,10 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
     const baseTabs = [
       `posts (${posts && posts?.length || 0})`,
       `courses (${courses?.length || 0})`,
-      `saved videos (${myLearning?.length || 0})`
+      // `saved videos (${myLearning?.length || 0})`
     ];
     return baseTabs;
-  }, [courses, posts, myLearning]);
+  }, [courses, posts, ]);
 
   const initialTab = (searchParams.get("tab") as string) || tabs[0];
   const [selectedTab, setSelectedTab] = useState(tabs.indexOf(initialTab));
