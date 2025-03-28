@@ -37,7 +37,7 @@ export const UploadInput = ({
   accept = "video/*,image/*",
   maxFiles = 5,
   nextPath,
-  placeholder = `Max ${maxFiles} files per upload`,
+  placeholder = `Max ${maxFiles} pictures files per upload`,
   footerText = "Supports MP4, MOV, FLV videos and common image formats",
   onChange, // Destructured new prop
   ...rest

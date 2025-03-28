@@ -197,24 +197,15 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   };
 
   return (
-    <div
-      className={cn(
-        "relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center",
-        isMyPost ? "mb-0" : "mb-4"
-      )}
-    >
+    <div className={cn("relative bg-white border-white border-2 rounded-full flex flex-col items-center justify-center", isMyPost ? "md:mb-0 mb-4" : "mb-4")}>
       <Link href={`/socials/profile/${followedId}`}>
         <Avatar className="w-12 h-12">
-          <AvatarImage
-            src={avatar}
-            alt="User avatar"
-            className="object-cover "
-          />
-          <AvatarFallback> {userInitial}</AvatarFallback>
+          <AvatarImage src={avatar} alt="User avatar" className="object-cover " />
+            <AvatarFallback> {userInitial}</AvatarFallback>
         </Avatar>
-      </Link>
-      {!isMyPost && (
-        <button
+     </Link>
+      {
+        !isMyPost && <button
           onClick={handleToggleFollow}
           aria-label={isFollowing ? "Unfollow this user" : "Follow this user"}
           disabled={followMutation.isPending || unfollowMutation.isPending}

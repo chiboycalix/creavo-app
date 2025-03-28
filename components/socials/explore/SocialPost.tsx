@@ -55,7 +55,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
       setIsDownloaded(true);
     }
   };
-
+  console.log({ post })
   useEffect(() => {
     if (isDownloaded) {
       const timer = setTimeout(() => {
@@ -103,6 +103,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     {
       icon: (
         <ShareButton
+        type="post"
           postId={post.id}
           initialShareCount={post?.sharesCount}
           post={post}
@@ -117,16 +118,12 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   };
 
   return (
-    <div
-      data-post-id={post.id}
-      ref={ref}
-      className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative"
-    >
+    <div data-post-id={post.id} ref={ref} className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative  overflow-x-hidden">
       {/* Main Post Container */}
-      <div className=" text-white sm:rounded-xl rounded-none overflow-hidden flex-grow bg-black">
+      <div className=" text-white sm:rounded-xl rounded-none overflow-hidden flex-grow bg-black border-none md:border">
         <div className="relative">
           {/* Main Image */}
-          <div className="w-full h-full relative">
+          <div className="w-full h-full relative overflow-x-hidden">
             <MediaWrapper
               postId={post?.id}
               title={post?.title}
@@ -154,7 +151,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           </div>
 
           {/* Profile Section */}
-          <div className="absolute w-[80%] md:w-full bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+          <div className="absolute w-full bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 pt-4">
@@ -191,7 +188,8 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
                         key={index}
                         className="text-gray-400 text-xs leading-6"
                       >
-                        #{tag}
+
+                        {tag.startsWith("#") ? tag : `#${tag}`}
                       </span>
                     ))}
                   </div>

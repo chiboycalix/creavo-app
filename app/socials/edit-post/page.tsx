@@ -63,6 +63,7 @@ const PostEditPage = () => {
       toast.error("Error creating post")
     },
   });
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
 

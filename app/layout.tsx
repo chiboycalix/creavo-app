@@ -37,7 +37,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={manrope.className}>
         <Suspense fallback={<RouterSpinner />}>
-          <NetworkStatusWrapper>
+          {/* <NetworkStatusWrapper> */}
             <ReactQueryProvider>
               <ReduxProvider>
                 <AuthProvider>
@@ -64,7 +64,7 @@ export default function RootLayout({
                 </AuthProvider>
               </ReduxProvider>
             </ReactQueryProvider>
-          </NetworkStatusWrapper>
+          {/* </NetworkStatusWrapper> */}
         </Suspense>
       </body>
     </html>
