@@ -116,7 +116,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const handleNavigateToCourse = (id: any) => {
     router.push(`/market/product/${id}`);
   };
-
+  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   return (
     <div
       data-post-id={post.id}
@@ -139,7 +139,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
             <FollowButton
               followedId={post?.userId}
-              avatar={post?.avatar || "/assets/display.jpg"}
+              avatar={post?.avatar || defaultAvatar}
               initialFollowStatus={post?.followed}
               isMyPost={Number(post.userId) === currentUserId}
               userInitial={`${post?.firstName[0] + post?.lastName[0]}`}
@@ -180,9 +180,8 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
                 </div>
                 <div className="relative w-full">
                   <div
-                    className={`flex flex-wrap gap-2 mt-1 ${
-                      !showAllTags && "max-h-[1.6rem]"
-                    } overflow-hidden transition-all duration-300`}
+                    className={`flex flex-wrap gap-2 mt-1 ${!showAllTags && "max-h-[1.6rem]"
+                      } overflow-hidden transition-all duration-300`}
                   >
                     <div>
                       <p className="text-xs leading-6">{post.body}</p>

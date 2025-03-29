@@ -26,6 +26,7 @@ export type PostMediaType = {
   title: string;
   description: string;
   url: string;
+  viewsCount: number;
   metadata: MetadataType;
 };
 
@@ -158,7 +159,7 @@ export const PostProvider = ({ children }: PostProviderProps) => {
       console.log("Error liking post:", error);
     }
   };
-
+  console.log({ posts })
   const followUser = async (userId: number) => {
     try {
       await fetch(`${baseUrl}/users/follows`, {
@@ -189,19 +190,19 @@ export const PostProvider = ({ children }: PostProviderProps) => {
       prevPosts.map((post) =>
         post.id === postId
           ? {
-              ...post,
-              media: post?.media?.map((media: PostMediaType, index) =>
-                index === 0
-                  ? {
-                      ...media,
-                      metadata: {
-                        ...media.metadata,
-                        viewsCount: updater(media.metadata.viewsCount || 0),
-                      },
-                    }
-                  : media
-              ),
-            }
+            ...post,
+            media: post?.media?.map((media: PostMediaType, index) =>
+              index === 0
+                ? {
+                  ...media,
+                  metadata: {
+                    ...media.metadata,
+                    viewsCount: updater(media?.viewsCount || 0),
+                  },
+                }
+                : media
+            ),
+          }
           : post
       )
     );
