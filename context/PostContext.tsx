@@ -159,7 +159,7 @@ export const PostProvider = ({ children }: PostProviderProps) => {
       console.log("Error liking post:", error);
     }
   };
-  console.log({ posts })
+
   const followUser = async (userId: number) => {
     try {
       await fetch(`${baseUrl}/users/follows`, {

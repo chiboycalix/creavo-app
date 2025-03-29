@@ -136,7 +136,7 @@ const SocialFeed = ({ initialPosts }: any) => {
     }
     return 'calc(100vh - 4rem)'
   }
-  console.log(window.innerWidth, "window.innerWidth")
+
   return (
     <div className="w-full min-h-screen overflow-x-hidden">
       <div className="flex flex-col md:flex-row gap-6 overflow-x-hidden">

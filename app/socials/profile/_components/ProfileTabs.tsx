@@ -41,7 +41,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
       // `saved videos (${myLearning?.length || 0})`
     ];
     return baseTabs;
-  }, [courses, posts, ]);
+  }, [courses, posts,]);
 
   const initialTab = (searchParams.get("tab") as string) || tabs[0];
   const [selectedTab, setSelectedTab] = useState(tabs.indexOf(initialTab));
@@ -116,7 +116,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                               <p></p>
                             </div>
                             <div className="mt-1 flex items-center justify-between">
-                              <p className="font-semibold text-xs flex items-center gap-2"><EyeIcon className="w-4" /> {post.viewsCount} view</p>
+                              <p className="font-semibold text-xs flex items-center gap-2"><EyeIcon className="w-4" /> {post?.viewsCount} view</p>
                               <p className="text-xs">{formatCommentDate(post?.createdAt)}</p>
                             </div>
                           </div>
