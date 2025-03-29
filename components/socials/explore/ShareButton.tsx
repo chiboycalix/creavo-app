@@ -145,7 +145,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ postId, initialShareCount, ty
           )
           return { ...oldData, data: { ...oldData.data, posts: updatedPosts } }
         })
-      } 
+      }
 
       return { previousShareCount: initialShareCount }
     },
@@ -207,8 +207,8 @@ const ShareButton: React.FC<ShareButtonProps> = ({ postId, initialShareCount, ty
   const currentShareCount =
     type === "post"
       ? (queryClient
-          .getQueryData<{ data: { posts: { id: number; shareCount: number }[] } }>(["posts"])
-          ?.data.posts.find((p) => p.id === postId)?.shareCount ?? initialShareCount)
+        .getQueryData<{ data: { posts: { id: number; shareCount: number }[] } }>(["posts"])
+        ?.data.posts.find((p) => p.id === postId)?.shareCount ?? initialShareCount)
       : initialShareCount // For profiles, you might need to adjust this based on your data structure
 
   return (
@@ -218,11 +218,11 @@ const ShareButton: React.FC<ShareButtonProps> = ({ postId, initialShareCount, ty
           <button
             onClick={handleShareClick}
             disabled={shareMutation.isPending}
-            className="flex items-center focus:outline-none transition-opacity disabled:opacity-50"
+            className="flex items-center justify-center focus:outline-none transition-opacity disabled:opacity-50"
             aria-label={`Share ${type}`}
           >
             <RiShareForwardFill
-              className={`w-8 h-8 transition-colors duration-200 
+              className={`w-7 h-6 mt-1.5 transition-colors duration-200 
                 md:hover:stroke-primary-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-primary-500`}
             />
           </button>

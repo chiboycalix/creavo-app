@@ -80,7 +80,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const handleCloseEditUserProfileModal = () => {
     setIsOpen(false);
   };
-
+  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   return (
     <div className="flex flex-col items-center w-full p-4 relative">
       <Image
@@ -89,9 +89,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         className="w-24 h-24 rounded-full bg-gray-400 object-cover"
         src={
           userProfile?.profile?.avatar ||
-          `https://ui-avatars.com/api/?name=${
-            encodeURIComponent(userProfile?.username) || "/placeholder.svg"
-          }&background=random`
+          defaultAvatar
         }
         alt={`${userProfile?.username || "User"}'s profile avatar`}
       />
@@ -99,10 +97,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="flex justify-center items-center gap-3">
           <h1 className="text-sm font-semibold">
             {userProfile?.profile?.firstName &&
-            userProfile?.profile?.lastName === "None"
+              userProfile?.profile?.lastName === "None"
               ? userProfile?.username
-              : `${userProfile?.profile?.firstName || ""} ${
-                  userProfile?.profile?.lastName || ""
+              : `${userProfile?.profile?.firstName || ""} ${userProfile?.profile?.lastName || ""
                 }`.trim()}
           </h1>
           <p className="text-sm">@{userProfile?.username}</p>

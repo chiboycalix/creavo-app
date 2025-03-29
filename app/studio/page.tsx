@@ -118,9 +118,6 @@ const tableData = [
   },
 ];
 
-// const tableData = [
-
-// ] as any;
 
 const StudioDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -140,11 +137,6 @@ const StudioDashboard = () => {
       setUserProfile(profileData.data);
     }
   }, [profileData]);
-
-
-  // console.log(currentUser)
-
-
 
   const revenueData = [42, 43, 60, 45, 55, 53, 52, 83, 48, 52, 68, 65, 60, 58];
   const subscribersData = [
@@ -219,9 +211,7 @@ const StudioDashboard = () => {
       <div className="w-full flex items-center justify-between">
         <PageTitle>
           {profileLoading ? (
-            <span className="animate-pulse bg-gray-300 text-gray-300 px-3 rounded-md">
-              Loading...
-            </span>
+            <div className="animate-pulse bg-gray-300 text-gray-300 px-3 rounded-md h-2 roundex-md w-full" />
           ) : (
             <><span>Hey, {userProfile?.profile?.firstName || "Guest"}</span></>
           )
@@ -230,11 +220,11 @@ const StudioDashboard = () => {
 
         <PageTitle>
 
-        <Button>
-          <Link href="/studio/course" className="flex items-center">
-            <PlusSquareIcon /> Create Course
-          </Link>
-        </Button>
+          <Button>
+            <Link href="/studio/course" className="flex items-center gap-2">
+              <PlusSquareIcon /> Create Course
+            </Link>
+          </Button>
         </PageTitle>
 
 
