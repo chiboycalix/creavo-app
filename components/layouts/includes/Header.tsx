@@ -99,17 +99,20 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
         <div className="flex h-20 justify-between items-center w-full gap-4">
           {/* Left Section with Menu Toggle and Search */}
           <div className="flex items-center space-x-4 basis-4/12">
-            <button
-              onClick={toggle}
-              className="md:hidden p-2 rounded-lg text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
-            </button>
+            <div className="md:hidden p-2 rounded-lg text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-1">
+              <button
+                onClick={toggle}
+
+                aria-label="Toggle menu"
+              >
+                {isOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5 inline-block" />
+                )}
+              </button>
+              <img src="/assets/crevoe.svg" alt="" className="inline-block -mt-2" />
+            </div>
 
             {/* Search - Hidden on Mobile */}
             <div className="hidden md:block w-64 lg:w-80">
