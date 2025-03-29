@@ -47,7 +47,7 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
     ((post?.mediaResource && post?.mediaResource[0]?.mimeType === "video") ||
       ((post as any)?.media && (post as any).media[0]?.mimeType === "video")) && {
       icon: <FaEye />,
-      value: post?.mediaResource?.[0]?.metadata?.viewsCount || (post as any)?.media?.[0]?.metadata?.viewsCount || 0,
+      value: post?.mediaResource?.[0]?.viewsCount || (post as any)?.media?.[0]?.viewsCount || 0,
       alt: "views",
     },
   ].filter(Boolean)
@@ -191,14 +191,14 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
-       <motion.div
-       initial={{ opacity: 0 }}
-       animate={{ opacity: 1 }}
-       exit={{ opacity: 0 }}
-       transition={{ delay: 0.1 }}
-       className="fixed inset-0 z-30 overflow-y-auto bg-black/20 backdrop-blur-lg backdrop-saturate-150 shadow-lg"
-       onClick={handleModalClose}
-     >     
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ delay: 0.1 }}
+          className="fixed inset-0 z-30 overflow-y-auto bg-black/20 backdrop-blur-lg backdrop-saturate-150 shadow-lg"
+          onClick={handleModalClose}
+        >
           <div className="min-h-screen px-4 text-center">
             <span className="inline-block lg:h-screen align-middle" aria-hidden="true">
               &#8203;
@@ -224,39 +224,39 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
                   {/* Check for both media and mediaResource properties */}
                   {((post?.mediaResource && post.mediaResource.length > 0) ||
                     ((post as any)?.media && (post as any).media.length > 0)) && (
-                    <div className="relative w-full h-full min-h-[20rem] flex items-center justify-center">
-                      {/* Use mediaResource if available, otherwise use media */}
-                      {(() => {
-                        const mediaItem = post?.mediaResource?.[0] || (post as any)?.media?.[0]
-                        if (!mediaItem) return null
+                      <div className="relative w-full h-full min-h-[20rem] flex items-center justify-center">
+                        {/* Use mediaResource if available, otherwise use media */}
+                        {(() => {
+                          const mediaItem = post?.mediaResource?.[0] || (post as any)?.media?.[0]
+                          if (!mediaItem) return null
 
-                        if (mediaItem.mimeType.startsWith("image")) {
-                          return (
-                            <Image
-                              src={mediaItem.url || "/placeholder.svg"}
-                              alt={mediaItem.title || mediaItem.description || "Post media"}
-                              width={800}
-                              height={800}
-                              className="object-contain max-h-[80vh]"
-                            />
-                          )
-                        } else if (mediaItem.mimeType.startsWith("video")) {
-                          return (
-                            <video
-                              src={mediaItem.url}
-                              controls
-                              className="max-h-[80vh] max-w-full"
-                              autoPlay={isModalVideoPlaying}
-                              onPlay={() => setIsModalVideoPlaying(true)}
-                              onPause={() => setIsModalVideoPlaying(false)}
-                            />
-                          )
-                        } else {
-                          return <div className="p-4 text-center">Unsupported media type</div>
-                        }
-                      })()}
-                    </div>
-                  )}
+                          if (mediaItem.mimeType.startsWith("image")) {
+                            return (
+                              <Image
+                                src={mediaItem.url || "/placeholder.svg"}
+                                alt={mediaItem.title || mediaItem.description || "Post media"}
+                                width={800}
+                                height={800}
+                                className="object-contain max-h-[80vh]"
+                              />
+                            )
+                          } else if (mediaItem.mimeType.startsWith("video")) {
+                            return (
+                              <video
+                                src={mediaItem.url}
+                                controls
+                                className="max-h-[80vh] max-w-full"
+                                autoPlay={isModalVideoPlaying}
+                                onPlay={() => setIsModalVideoPlaying(true)}
+                                onPause={() => setIsModalVideoPlaying(false)}
+                              />
+                            )
+                          } else {
+                            return <div className="p-4 text-center">Unsupported media type</div>
+                          }
+                        })()}
+                      </div>
+                    )}
                 </motion.div>
 
                 <div className="w-full md:w-[30rem] flex">
@@ -346,14 +346,13 @@ const PostModal = ({ isOpen, onClose, post, currentUser }: PostModalProps) => {
                               <MenuItem key={index}>
                                 {({ active }) => (
                                   <button
-                                    className={`${
-                                      active ? "bg-gray-200 text-gray-900" : "text-gray-700"
-                                    } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                                    className={`${active ? "bg-gray-200 text-gray-900" : "text-gray-700"
+                                      } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                     onClick={
                                       option === "Delete Post"
                                         ? () => {
-                                            handleSetViewOpen()
-                                          }
+                                          handleSetViewOpen()
+                                        }
                                         : undefined
                                     }
                                   >
