@@ -34,7 +34,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ postId, initialShareCount, ty
   const shareUrl =
     type === "post"
       ? `${window.location.origin}/socials/posts/${postId}`
-      : `${window.location.origin}/profile/${postId}`
+      : `${window.location.origin}/socials/profile/${postId}`
 
   const handleDownload = async () => {
     if (type !== "post" || !post || !post.media || !post.media[0]) return
