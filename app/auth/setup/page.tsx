@@ -20,6 +20,7 @@ import { TextareaInput } from "@/components/Input/TextareaInput";
 import { User, X } from "lucide-react";
 import { uploadImageToCloudinary } from "@/utils";
 import { useToast } from "@/context/ToastContext";
+import { updateProfileService } from "@/services/profile.service";
 
 const ProfileSetup = () => {
   const { getAuth, currentUser } = useAuth();
@@ -47,7 +48,7 @@ const ProfileSetup = () => {
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
-
+  console.log({ profileData })
   const handleUpdateProfile = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -63,33 +64,15 @@ const ProfileSetup = () => {
     };
 
     try {
-      const response = await fetch(`${baseUrl}/profiles`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${Cookies.get("accessToken")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestPayload),
-      });
-
-      const result = await response.json();
+      await updateProfileService(requestPayload)
       setLoading(false);
 
-      if (!response.ok) {
-        showToast(
-          'error',
-          "Profile Setup",
-          result.message
-        );
-
-      } else {
-        showToast(
-          'success',
-          "Profile Setup",
-          "Profile updated successfully!"
-        );
-        router.push(ROUTES.SELECT_INTERESTS);
-      }
+      showToast(
+        'success',
+        "Profile Setup",
+        "Profile updated successfully!"
+      );
+      router.push(ROUTES.SELECT_INTERESTS);
     } catch (error) {
       showToast(
         'error',
