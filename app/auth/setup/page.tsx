@@ -221,8 +221,8 @@ const ProfileSetup = () => {
                   caption="Save and Continue"
                 />
               </Button>
-              <Button variant={"outline"} className="w-full mt-3 border border-primary-100">
-                <Link href={"/"}>Skip to do these later</Link>
+              <Button type="button" variant={"outline"} className="w-full mt-3 border border-primary-100" onClick={() => router.push(ROUTES.SELECT_INTERESTS)}>
+                Skip to do these later
               </Button>{" "}
             </div>
           </form>
