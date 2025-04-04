@@ -84,6 +84,7 @@ export const PhoneInput = ({
           className={cn("rounded-l-none border-l-0", className)}
           placeholder="Phone No."
           {...rest}
+          onClick={undefined} // Ensure onClick matches the expected type or is omitted
         />
 
         {maxLength !== undefined && (

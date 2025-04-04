@@ -21,6 +21,7 @@ import { User, X } from "lucide-react";
 import { uploadImageToCloudinary } from "@/utils";
 import { useToast } from "@/context/ToastContext";
 import { updateProfileService } from "@/services/profile.service";
+import Avatar from "@/components/Avatar";
 
 const ProfileSetup = () => {
   const { getAuth, currentUser } = useAuth();
@@ -92,12 +93,6 @@ const ProfileSetup = () => {
     }
   };
 
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
-
-  // Determine the avatar URL to use
-  const urlAvatar = profileLoading
-    ? defaultAvatar // Show default while loading
-    : profileData?.data?.profile?.avatar || defaultAvatar;
 
   return (
     <>
@@ -112,10 +107,10 @@ const ProfileSetup = () => {
                 Avatar
               </label>
               <div className="flex items-center gap-3 py-3">
-                <img
-                  src={imagePreview || urlAvatar}
-                  alt="Profile"
-                  className="w-20 h-20 rounded-full bg-blue-200"
+                <Avatar
+                  profileLoading={profileLoading}
+                  profileData={profileData}
+                  className="border-2 border-primary-500"
                 />
                 <input
                   type="file"
