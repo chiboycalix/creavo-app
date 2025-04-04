@@ -117,7 +117,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     router.push(`/market/product/${id}`);
   };
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
-  console.log({ post })
+
   return (
     <div
       data-post-id={post.id}

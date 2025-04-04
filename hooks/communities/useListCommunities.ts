@@ -14,5 +14,6 @@ export function useListCommunities() {
       return response.json();
     },
     placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
   });
 }
