@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import AddEventCard from "@/components/studio/calendar/AddEventCard";
+// import AddEventCard from "@/components/studio/calendar/AddEventCard";
+import AddEventCard from "@/components/_events/AddEventCard";
 import SelectedEventCard from "@/components/studio/calendar/SelectedEventCard";
 import { Button } from "@/components/ui/button";
 import { baseUrl } from "@/utils/constant";

@@ -1,93 +1,50 @@
-"use client";
-import React from "react";
-import { Input } from "@/components/Input";
-import { Checkbox } from "@/components/ui/check-box";
-import { Switch } from "@/components/ui/switch";
-import { X } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { BiCaretDown } from "react-icons/bi";
-import { Button } from "@/components/ui/button";
+"use client"
 
-export default function Schedule() {
-  const router = useRouter();
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import EventForm from "@/components/_events/EventForm"
+import { baseUrl } from "@/utils/constant"
+import Cookies from "js-cookie"
+import type { EventFormData } from "@/components/_events/EventForm"
+
+export default function CreateEventPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (eventData: EventFormData) => {
+    setIsSubmitting(true)
+    try {
+      const response = await fetch(`${baseUrl}/meetings/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
+        body: JSON.stringify(eventData),
+      })
+
+      if (!response.ok) throw new Error(`Error: ${response.statusText}`)
+
+      alert("Event created successfully!")
+    } catch (error) {
+      console.error("Failed to create event:", error)
+      alert("Failed to create event. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
-    <div className="p-8 bg-white flex items-start justify-between">
-      <div className="basis-3/12">
-        <button
-          onClick={() => router.push("/meeting")}
-          className="bg-gray-100 hover:text-gray-700 rounded-full p-2"
-        >
-          <X size={20} />
-        </button>
-      </div>
-      <div className="flex-1">
-        <form>
-          <div className="mb-7">
-            <Input label="Add webinar Title" />
-          </div>
-          <div className="mb-7">
-            <Input
-              label="Add Description"
-              variant="textarea"
-              placeholder="Meeting description"
-            />
-          </div>
+    <div className="container mx-auto py-8">
 
-          <div className="mb-7">
-            <Input
-              variant="datePicker"
-              label="Date"
-              rightIcon={<BiCaretDown />}
-              className="w-full"
-            />
-          </div>
-
-          <div className="mb-7">
-            <Input
-              variant="timeRangePicker"
-              label="Select Time Range"
-              onTimeRangeSelect={(range) => {
-                console.log("Selected time range:", range);
-              }}
-              selectedTimeRange={{
-                from: "",
-                to: "",
-              }}
-              className="w-full"
-            />
-          </div>
-          <div className="mb-7">
-            <div className="flex items-center gap-2 group hover:bg-primary-600 cursor-pointer px-2 py-1 rounded-sm w-2/12">
-              <Checkbox checkIconClass="group-hover:text-primary group-hover:bg-white" />
-              <p className="text-sm group-hover:text-white">All Day</p>
-            </div>
-          </div>
-
-          <div className="mb-7">
-            <div className="flex items-center gap-2 group hover:bg-primary-600 cursor-pointer px-2 py-1 rounded-sm w-2/12">
-              <Checkbox checkIconClass="group-hover:text-primary group-hover:bg-white" />
-              <p className="text-sm group-hover:text-white">Repeat Event</p>
-            </div>
-          </div>
-          <div className="mb-7">
-            <Input
-              label="Add Guest"
-              variant="textarea"
-              placeholder="Enter Guests"
-              resize="none"
-            />
-          </div>
-          <div className="flex items-center justify-between mb-7">
-            <p>Add Payment</p>
-            <Switch />
-          </div>
-          <div>
-            <Button className="w-full">Save</Button>
-          </div>
-        </form>
-      </div>
-      <div className="basis-3/12"></div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Event Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EventForm onSubmit={handleSubmit} submitButtonText={isSubmitting ? "Saving..." : "Create Event"} />
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }
+

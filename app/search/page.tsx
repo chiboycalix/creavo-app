@@ -137,7 +137,7 @@ export default function SearchResults() {
     };
 
     fetchSearchResults();
-  }, [query]);
+  }, [query, activeContentTab]);
 
   const renderContent = () => {
     if (isLoading) {

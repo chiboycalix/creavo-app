@@ -1,3 +1,4 @@
+import { color } from "framer-motion";
 import { apiClient } from "../apiClient";
 
 type Meeting = {
@@ -5,15 +6,16 @@ type Meeting = {
   statusCode: number;
   status: string;
   data: {
-    roomCode: string;
+    meetingCode: string;
     startTime: string;
     userId: number;
   };
 };
 export const MEETINGS_API = {
   createInstantMeeting: async (): Promise<Meeting> => {
-    return apiClient.post("/rooms/create-instant-meeting", {
-      roomType: "instant",
+    return apiClient.post("/meetings", {
+      type: "INSTANT",
+      startTime: new Date().toISOString(),
     });
   },
 };

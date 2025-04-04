@@ -13,12 +13,13 @@ import { ROUTES } from "@/constants/routes";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/context/ToastContext";
 import { STATUS_CODES } from "@/constants/statusCodes";
+import { LoadingSpinner } from "@/components/Loaders/LoadingSpinner";
 
 export default function VideoConferencing() {
   const router = useRouter();
   const [handleJoinMeeting, setHandleJoinMeeting] = useState(false);
   const [handleCreateMeeting, setHandleCreateMeeting] = useState(false);
-  const { setChannelName, channelName } = useVideoConferencing();
+  const { setChannelName, channelName, isWaiting } = useVideoConferencing();
   const { showToast } = useToast();
 
   const handleCreateInstantMeeting = async () => {
@@ -26,29 +27,18 @@ export default function VideoConferencing() {
       const data = await MEETINGS_API.createInstantMeeting();
 
       if (data.code === STATUS_CODES.CREATED) {
-        showToast(
-          'success',
-          'Success',
-          'Meeting Created successfully'
-        );
+        showToast("success", "Success", "Meeting Created successfully");
 
-        setChannelName(data.data.roomCode);
+        setChannelName(data.data.meetingCode);
+        // console.log({ data: data.data.meetingCode  });
         router.push(
-          `${ROUTES.VIDEO_CONFERENCING.MEETING}/${data.data.roomCode}`
+          `${ROUTES.VIDEO_CONFERENCING.MEETING}/${data.data.meetingCode}`
         );
       } else {
-        showToast(
-          'error',
-          'Error',
-          'Meeting not created'
-        );
+        showToast("error", "Error", "Meeting not created");
       }
     } catch (error: any) {
-      showToast(
-        'error',
-        'Something went wrong',
-        error.message
-      );
+      showToast("error", "Something went wrong", error.message);
     }
   };
 
@@ -58,11 +48,7 @@ export default function VideoConferencing() {
 
   const handleJoinWaitingRoom = async () => {
     try {
-      router.push(
-        `${ROUTES.VIDEO_CONFERENCING.MEETING_CHANNEL(
-          channelName
-        )}`
-      );
+      router.push(`${ROUTES.VIDEO_CONFERENCING.MEETING_CHANNEL(channelName)}`);
     } catch (error: any) {
       console.log(error);
     }
@@ -82,9 +68,9 @@ export default function VideoConferencing() {
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className='flex flex-col items-center justify-center md:h-[88vh] h-[85vh] bg-white'>
-        <div className='max-w-3xl mx-auto'>
-          <p className='text-black text-xl text-center'>
+      <div className="flex flex-col items-center justify-center md:h-[88vh] h-[85vh] bg-white">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-black text-xl text-center">
             You&apos;re all set! start your streaming now
           </p>
           <div className="w-full border-b my-8"></div>
@@ -95,8 +81,9 @@ export default function VideoConferencing() {
             </div>
             <div className="mt-4 w-full relative">
               <Button
-                 className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
-                onClick={handleSheduleMeeting}>
+                className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
+                onClick={handleSheduleMeeting}
+              >
                 Create Video Conferencing
               </Button>
               <AnimatePresence>
@@ -166,7 +153,7 @@ export default function VideoConferencing() {
                         className="w-1/4 mt-2"
                         onClick={handleJoinWaitingRoom}
                       >
-                        Join
+                        {isWaiting ? <LoadingSpinner /> : "Joinss"}
                       </Button>
                     </div>
                   </motion.div>

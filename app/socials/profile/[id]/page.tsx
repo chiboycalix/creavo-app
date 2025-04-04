@@ -74,7 +74,7 @@ const Profile = () => {
         ws.off(`profile_updated_${currentUser.id}`);
       };
     }
-  }, [ws, currentUserId, refetchProfile]);
+  }, [ws, currentUserId, refetchProfile, id, router, currentUser.id]);
 
   const handleFollow = () => {
     if (!getAuth()) {

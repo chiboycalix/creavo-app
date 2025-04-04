@@ -19,10 +19,11 @@ const ParticipantList = ({ allParticipants }: any) => {
     sendCoHostPermission,
     removeRemoteUser,
     meetingConfig,
+    channelName
   } = useVideoConferencing();
 
   useEffect(() => {
-    fetchMeetingRoomData();
+    fetchMeetingRoomData(channelName);
     setUserIsCoHost(userIsCoHost);
   }, [userIsCoHost]);
 
