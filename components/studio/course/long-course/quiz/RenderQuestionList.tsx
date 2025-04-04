@@ -14,7 +14,6 @@ const RenderQuestionList = ({ setIsAddingQuiz, setQuestions, setQuestionData, se
       const data = await fetchQuizService({
         moduleId: selectedModule?.id,
       });
-      console.log("Refetching quiz", data);
       return data;
     },
     enabled: !!selectedModule?.id,

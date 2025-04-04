@@ -5,7 +5,7 @@ import RenderQuestionList from './RenderQuestionList';
 import ModulesList from './ModulesList';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Pen } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
 import { useAppDispatch } from '@/hooks/useStore.hook';
 import { updateSelectedModuleData } from '@/redux/slices/module.slice';
@@ -377,10 +377,9 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                           setEditingQuestionIndex(null);
                           handleSubmitChanges();
                         }}
-                        variant="outline"
                         type="button"
                       >
-                        Submit Changes
+                        Submit Edit
                       </Button>
                     )}
                     <Button
