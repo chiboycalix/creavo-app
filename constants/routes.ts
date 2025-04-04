@@ -24,7 +24,7 @@ export const ROUTES = {
     MEETING: "/studio/event/meeting",
     MEETING_CHANNEL: (channelName: string) =>
       `/studio/event/meeting/${channelName}`,
-    SCHEDULE: "/studio/meeting/schedule",
+    SCHEDULE: "/studio/event/meeting/schedule",
     LIVE: "/studio/meeting/live",
     LEAVE_MEETING: "/studio/event/meeting/leave-meeting",
   },
