@@ -35,7 +35,6 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
       if (onSubmit) {
         await onSubmit(eventData)
       } else {
-        // Default submission logic
         const response = await fetch(`${baseUrl}/meetings/`, {
           method: "POST",
           headers: {

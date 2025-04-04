@@ -57,7 +57,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
       if (!data?.id) return;
       setIsLoading(true);
       try {
-        const response = await fetch(`${baseUrl}/meetings/${data.id}`, {
+        const response = await fetch(`${baseUrl}/meetings/${data.id}?action=get`, {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
             "Content-Type": "application/json",
@@ -69,7 +69,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
         }
 
         const result = await response.json();
-        setFetchedData(result.data.meeting);
+        setFetchedData(result.data);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to fetch event details"
@@ -94,8 +94,6 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
         });
         if (!response.ok) throw new Error("Failed to fetch timezones");
         const responseData = await response.json();
-
-        // Check if response has data property and it's an array
         if (responseData.data && Array.isArray(responseData.data)) {
           // Extract only the name field from each timezone object
           const timezoneNames = responseData.data.map(

@@ -103,9 +103,9 @@ const Calendar = () => {
       const lastDay = new Date(currentYear, currentMonth + 1, 0);
 
       const response = await fetch(
-        `${baseUrl}/user/${currentUser?.id}/meetings?page=1&limit=10
+        `${baseUrl}/users/${currentUser?.id}/meetings?page=1&limit=10
         &startDate=${firstDay.toISOString().split("T")[0]
-        }&endDate=${lastDay.toISOString().split("T")[0]}&action=join`,
+        }&endDate=${lastDay.toISOString().split("T")[0]}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
@@ -151,7 +151,7 @@ const Calendar = () => {
       const formattedDate = selectedDate.toISOString().split("T")[0];
 
       const response = await fetch(
-        `${baseUrl}/user/${currentUser?.id}/meetings?page=1&limit=10&date=${formattedDate}&action=get`,
+        `${baseUrl}/users/${currentUser?.id}/meetings?page=1&limit=10&date=${formattedDate}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
