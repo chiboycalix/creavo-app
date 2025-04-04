@@ -15,6 +15,7 @@ import {
   useLayoutEffect,
   useRef,
   useCallback,
+  SetStateAction,
 } from "react";
 import { agoraGetAppData } from "@/lib";
 import { IRemoteAudioTrack, IRemoteVideoTrack } from "agora-rtc-sdk-ng";
@@ -23,8 +24,9 @@ import VirtualBackgroundExtension from "agora-extension-virtual-background";
 import { useAuth } from "./AuthContext";
 import { baseUrl } from "@/utils/constant";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ROUTES } from "@/constants/routes";
+import { useWebSocket } from "./WebSocket";
 
 interface RemoteParticipant {
   name: string;
@@ -35,6 +37,11 @@ interface RemoteParticipant {
   videoEnabled?: boolean;
   isScreenShare?: boolean;
 }
+
+type JoinRequest = {
+  id: string;
+  name: string;
+};
 
 interface ChatMessage {
   id: string;
@@ -66,6 +73,8 @@ interface VideoConferencingContextContextType {
   releaseMediaResources: () => void;
   publishLocalMediaTracks: () => void;
   joinMeetingRoom: () => Promise<void>;
+  setMeetingConfig: (config: SetStateAction<Options>) => void;
+  setRtcScreenShareOptions: (config: SetStateAction<Options>) => void;
   setMeetingStage: (meetingStage: string) => void;
   setChannelName: (meetingStage: string) => void;
   channelName: string;
@@ -77,6 +86,8 @@ interface VideoConferencingContextContextType {
   setHasJoinedMeeting: (join: boolean) => void;
   username: string;
   speakingParticipants: any;
+  isWaiting: boolean;
+  setIsWaiting: (isWaiting: boolean) => void;
   handleShareScreen: any;
   handleEndScreenShare: any;
   isSharingScreen: any;
@@ -97,8 +108,11 @@ interface VideoConferencingContextContextType {
   sendCoHostPermission: (uid: any) => Promise<void>;
   sendChatMessage: (content: string, type: "text" | "emoji") => Promise<void>;
   muteRemoteUser: (uid: any) => void;
-  fetchMeetingRoomData: () => void;
+  fetchMeetingRoomData: (channelName: string) => void;
   removeRemoteUser: (uid: string | number) => Promise<void>;
+  setMeetingRoomData: (data: any) => void;
+  setJoinRequests: (jRequest: SetStateAction<JoinRequest[]>) => void;
+  joinRequests: JoinRequest[] | [];
 }
 
 let rtcClient: IAgoraRTCClient;
@@ -143,6 +157,7 @@ export function VideoConferencingProvider({
   const [meetingRoomData, setMeetingRoomData] = useState<any | null>(null);
   const [userIsHost, setUserIsHost] = useState(false);
   const [userIsCoHost, setUserIsCoHost] = useState(false);
+  const [isWaiting, setIsWaiting] = useState<boolean>(true);
   const [isSharingScreen, setIsSharingScreen] = useState<string | null>(null);
   const [screenSharingUser, setScreenSharingUser] = useState<{
     uid: string;
@@ -151,8 +166,19 @@ export function VideoConferencingProvider({
   } | null>(null);
   const [raisedHands, setRaisedHands] = useState<Record<string, boolean>>({});
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
   const { currentUser } = useAuth();
   const router = useRouter();
+  const ws = useWebSocket();
+  const wsRef = useRef(ws);
+
+  const [microphoneDevices, setMicrophoneDevices] = useState<
+    MediaDeviceInfo[] | []
+  >([]);
+  const [speakerDevices, setSpeakerDevices] = useState<MediaDeviceInfo[] | []>(
+    []
+  );
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[] | []>([]);
 
   useEffect(() => {
     AgoraRTC.setLogLevel(4);
@@ -330,7 +356,8 @@ export function VideoConferencingProvider({
                 console.log("Before state update:", userIsCoHost);
 
                 // Update local participant state
-                fetchMeetingRoomData();
+                meetingConfig.channel &&
+                  fetchMeetingRoomData(meetingConfig.channel);
                 handleMeetingHostAndCohost();
 
                 updateRemoteParticipant(uid, {
@@ -485,53 +512,126 @@ export function VideoConferencingProvider({
     remoteScreenShareParticipantsRef.current = remoteScreenShareParticipants;
   }, [remoteScreenShareParticipants]);
 
-  const fetchMeetingRoomData = useCallback(async () => {
+  const fetchMeetingRoomData = useCallback(
+    async (channelName: string) => {
+      try {
+        const data = await agoraGetAppData(channelName);
+        setMeetingRoomData(data?.meeting);
+      } catch (error) {
+        console.log("Error fetching meeting room data:", error);
+      }
+    },
+    [channelName]
+  );
+
+  const fetchAgoraData = async (channelName: string) => {
     try {
-      const data = await agoraGetAppData(channelName);
-      setMeetingRoomData(data);
+      const rtcData = await agoraGetAppData(channelName);
+      const { client, meeting } = rtcData;
+
+      setMeetingConfig((prev) => ({
+        ...prev,
+        appid: client[0].appId,
+        rtcToken: client[0].rtcToken,
+        rtmToken: client[0].rtmToken,
+        certificate: client[0].appCertificate,
+        uid: client[0].uid,
+        channel: client[0].channelName,
+      }));
+
+      setRtcScreenShareOptions((prev) => ({
+        ...prev,
+        appid: client[1].appId,
+        rtcToken: client[1].rtcToken,
+        rtmToken: client[1].rtmToken,
+        certificate: client[1].appCertificate,
+        uid: client[1].uid,
+        channel: client[1].channelName,
+      }));
+
+      setMeetingRoomData(meeting);
+      setUsername(currentUser?.username);
+      setIsWaiting(false);
     } catch (error) {
-      console.log("Error fetching meeting room data:", error);
+      console.log("lobby, Error fetching Agora data:", error);
     }
-  }, [channelName]);
+  };
 
   useEffect(() => {
-    if (channelName) {
-      const fetchAgoraData = async () => {
-        try {
-          console.log("Error before meeting room data:");
-          const rtcData = await agoraGetAppData(channelName);
+    wsRef.current = ws;
 
-          const { client } = rtcData;
+    if (ws && currentUser?.id) {
+      if (!ws.connected) {
+        ws.connect();
+      }
 
-          setMeetingConfig((prev) => ({
-            ...prev,
-            appid: client[0].appId,
-            rtcToken: client[0].rtcToken,
-            rtmToken: client[0].rtmToken,
-            certificate: client[0].appCertificate,
-            uid: client[0].uid,
-            channel: client[0].channelName,
-          }));
-
-          setRtcScreenShareOptions((prev) => ({
-            ...prev,
-            appid: client[1].appId,
-            rtcToken: client[1].rtcToken,
-            rtmToken: client[1].rtmToken,
-            certificate: client[1].appCertificate,
-            uid: client[1].uid,
-            channel: client[1].channelName,
-          }));
-        } catch (error) {
-          console.log("Error fetching Agora data:", error);
+      ws.emit(
+        "lobby",
+        { userId: currentUser.id, meetingCode: channelName },
+        () => {
+          setIsWaiting(true);
         }
-      };
+      );
 
-      fetchAgoraData();
-      fetchMeetingRoomData();
-      setUsername(currentUser?.username);
+      ws.on(`lobby`, async (data) => {
+        const { type, user } = data;
+        switch (type) {
+          case "meeting-request-granted":
+            if (user.isAdmin) {
+              user.meetingCode &&
+                (await fetchAgoraData(user.meetingCode as string));
+            } else {
+              user?.meetingCode &&
+                (await fetchAgoraData(user.meetingCode as string));
+              await initializeLocalMediaTracks();
+            }
+            break;
+          case "join-meeting-request":
+            console.log("lobby, join-meeting-request, before", { data });
+            setJoinRequests((requests: any) => [
+              ...requests,
+              { id: user?.userId, name: user?.username || "Anonymous" },
+            ]);
+            console.log("lobby, after: In meeting-request--");
+            break;
+          case "meeting-not-started":
+            // setIsLoading(false);
+            break;
+          case "meeting-not-found":
+            // setIsLoading(false);
+            break;
+          case "meeting-ended":
+            // setIsLoading(false);
+            break;
+        }
+        console.log("Real-time profile update received:", { lobby: data });
+      });
     }
-  }, [channelName, username, fetchMeetingRoomData, currentUser?.username]);
+  }, [ws, currentUser?.id]);
+
+  useEffect(() => {
+    if (!ws || !isWaiting) return;
+
+    const interval = setInterval(() => {
+      console.log("lobby, Pinging backend to inform admin again 1", {
+        channelName,
+      });
+
+      if (channelName) {
+        console.log("lobby, Pinging backend to inform admin again 2");
+
+        ws.emit(
+          "lobby",
+          { userId: currentUser?.id, meetingCode: channelName },
+          () => {
+            setIsWaiting(false);
+          }
+        );
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isWaiting, channelName, ws, currentUser?.id]);
 
   useEffect(() => {
     handleMeetingHostAndCohost();
@@ -813,14 +913,19 @@ export function VideoConferencingProvider({
 
   const initializeLocalMediaTracks = async () => {
     try {
+      const audioDevices = await AgoraRTC.getMicrophones();
+      const videoDevices = await AgoraRTC.getCameras();
+      const speakers = await AgoraRTC.getPlaybackDevices();
+
       const [audioTrack, videoTrack] = await Promise.all([
         AgoraRTC.createMicrophoneAudioTrack({
-          // encoderConfig: "music_standard",
-          encoderConfig: {
-            sampleRate: 48000,
-            stereo: true,
-            bitrate: 128,
-          },
+          encoderConfig: "high_quality",
+
+          // encoderConfig: {
+          //   sampleRate: 48000,
+          //   stereo: true,
+          //   bitrate: 128,
+          // },
           AEC: true,
           ANS: true,
           AGC: true,
@@ -832,6 +937,21 @@ export function VideoConferencingProvider({
         audioTrack.setEnabled(isMicrophoneEnabled),
         videoTrack.setEnabled(isCameraEnabled),
       ]);
+
+      if (audioDevices && audioDevices.length > 0) {
+        setMicrophoneDevices(audioDevices);
+      }
+
+      if (videoDevices && videoDevices.length > 0) {
+        setVideoDevices(videoDevices);
+      }
+
+      if (speakerDevices && speakerDevices.length > 0) {
+        setSpeakerDevices(speakers);
+      }
+
+      console.log("tracking", { audioDevices, videoDevices, speakerDevices });
+
       setLocalUserTrack({
         audioTrack,
         videoTrack,
@@ -981,7 +1101,8 @@ export function VideoConferencingProvider({
     try {
       if (localUserTrack?.videoTrack) {
         const newState = !isCameraEnabled;
-        await localUserTrack.videoTrack.setEnabled(newState);
+        await localUserTrack.videoTrack.setMuted(newState);
+
         // if (hasJoinedMeeting && rtcClient) {
         //   if (newState) {
         //     const isPublished = rtcClient.localTracks.includes(localUserTrack.videoTrack);
@@ -1089,7 +1210,7 @@ export function VideoConferencingProvider({
           });
           await broadcastCurrentMediaStates();
         }
-        fetchMeetingRoomData();
+        channelName && fetchMeetingRoomData(channelName);
       } catch (error) {
         console.log("Error handling participant join:", error);
       }
@@ -1150,7 +1271,7 @@ export function VideoConferencingProvider({
         delete remoteUsersRef.current[memberId];
 
         // Fetch updated meeting room data to reflect new participant list
-        await fetchMeetingRoomData();
+        channelName && (await fetchMeetingRoomData(channelName));
       } catch (error) {
         console.error("Error handling member disconnection:", error);
       }
@@ -1606,7 +1727,10 @@ export function VideoConferencingProvider({
 
   const joinMeetingRoom = async () => {
     try {
-      if (!meetingConfig) return;
+      if (!meetingConfig) {
+        console.log("lobby, Returning cos there is nio meeting config");
+        return;
+      }
       await connectToMeetingRoom();
 
       if (rtmChannel) {
@@ -1696,7 +1820,7 @@ export function VideoConferencingProvider({
           uid,
         }),
       });
-      fetchMeetingRoomData();
+      meetingConfig.channel && fetchMeetingRoomData(meetingConfig.channel);
     } catch (error) {
       console.error("Error sending cohost permission:", error);
     }
@@ -1768,6 +1892,8 @@ export function VideoConferencingProvider({
       value={{
         currentStep,
         setCurrentStep,
+        setMeetingConfig,
+        setRtcScreenShareOptions,
         meetingRoomId,
         setMeetingRoomId,
         isMicrophoneEnabled,
@@ -1776,6 +1902,8 @@ export function VideoConferencingProvider({
         toggleCamera,
         localUserTrack,
         meetingConfig,
+        isWaiting,
+        setIsWaiting,
         videoRef,
         initializeLocalMediaTracks,
         setLocalUserTrack,
@@ -1815,7 +1943,10 @@ export function VideoConferencingProvider({
         sendCoHostPermission,
         muteRemoteUser,
         fetchMeetingRoomData,
+        setMeetingRoomData,
         removeRemoteUser,
+        setJoinRequests,
+        joinRequests,
       }}
     >
       {children}

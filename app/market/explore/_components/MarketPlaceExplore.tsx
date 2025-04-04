@@ -146,7 +146,7 @@ const MarketPlaceExplore = () => {
     };
     fetchAndSetProducts();
     setCourses(courses);
-  }, [activeTab, fetchCourseProducts, fetchPopularCourses]);
+  }, [activeTab, fetchCourseProducts, fetchPopularCourses, products, setProducts]);
 
   // Listen for changes in the URL to update the active tab
   useEffect(() => {
