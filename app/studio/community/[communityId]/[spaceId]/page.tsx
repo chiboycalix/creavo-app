@@ -1,13 +1,17 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button'
 import { Check, Plus, Settings } from 'lucide-react'
 import { useParams } from 'next/navigation';
 import { useListCommunities } from '@/hooks/communities/useListCommunities';
 import { useListSpaces } from '@/hooks/communities/useListSpaces';
-import ProtectedRoute from '@/components/ProtectedRoute';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useAuth } from '@/context/AuthContext';
+import { TextInput } from '@/components/Input/TextInput';
+import { TextareaInput } from '@/components/Input/TextareaInput';
 
 const Space = () => {
   const { data: communityData, isFetching } = useListCommunities();
@@ -16,20 +20,42 @@ const Space = () => {
   const params = useParams();
   const spaceId = params?.spaceId as string;
   const [addMember, setAddMember] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isManualDialogOpen, setIsManualDialogOpen] = useState(false);
+  const [isCourseDialogOpen, setIsCourseDialogOpen] = useState(false);
+  const { currentUser } = useAuth();
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(
+    currentUser?.id
+  );
+  const [isInputDialogOpen, setIsInputDialogOpen] = useState(false);
 
   const currentSpace = data?.data?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0]
 
-
-  const handleAddMemeber = () => {
+  const handleAddMember = () => {
     setAddMember(!addMember);
   };
 
-  useEffect(() => {
-    if (isOpen) {
+  const handleManualAdd = () => {
+    setAddMember(false);
+    setIsManualDialogOpen(true);
+  };
 
-    }
-  }, [])
+  const handleLinkCourse = () => {
+    setAddMember(false);
+    setIsCourseDialogOpen(true);
+  };
+
+  const handleInputClick = () => {
+    setIsInputDialogOpen(true); // Open dialog when TextInput is clicked
+  };
+
+
+  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
+
+
+  // Determine the avatar URL to use
+  const avatarUrl = profileLoading
+    ? defaultAvatar // Show default while loading
+    : profileData?.data?.profile?.avatar || defaultAvatar;
 
   return (
     <ProtectedRoute
@@ -37,7 +63,7 @@ const Space = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className="w-full">
+      <div className="w-full h-[87vh] relative">
         <div className="border-b p-4 shadow-md shadow-primary-50 flex justify-between items-center">
           <div>
             <p className="font-semibold text-sm">{currentSpace?.displayName}</p>
@@ -49,27 +75,29 @@ const Space = () => {
           </div>
         </div>
 
-        <div className="p-4 py-10 bg-gray-100 w-[50%] mx-auto mt-20 rounded-md flex items-center flex-col">
-          <p>Looks like you&apos;re leading the way</p>
-          <p>Start a discussion by creating a new post</p>
-          <div className="mt-4 w-6/12 relative">
-            <Button className="w-full" onClick={handleAddMemeber}>
-              <Plus />
-              Add member</Button>
-            <AnimatePresence>
-              {addMember && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden w-full rounded-md shadow-lg mt-4 border border-gray-100 absolute top-8 left-0 z-[100]"
-                >
-                  <div className="px-4 py-2 bg-white">
-                    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                      <DialogTrigger>
+        <div className='max-h-[87vh] flex flex-col justify-between'>
+          <div>
+            <div className="p-4 py-10 bg-gray-100 w-[50%] mx-auto mt-20 rounded-md flex items-center flex-col">
+              <p>Looks like you&apos;re leading the way</p>
+              <p>Start a discussion by creating a new post</p>
+              <div className="mt-4 w-6/12 relative">
+                <Button className="w-full" onClick={handleAddMember}>
+                  <Plus />
+                  Add member
+                </Button>
+                <AnimatePresence>
+                  {addMember && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden w-full rounded-md shadow-lg mt-4 border border-gray-100 absolute top-8 left-0 z-[100]"
+                    >
+                      <div className="px-4 py-2 bg-white">
                         <div
                           className="flex items-center gap-2 group hover:bg-primary-600 cursor-pointer px-2 py-1 rounded-sm"
+                          onClick={handleManualAdd}
                         >
                           <div className="w-3 h-3 hidden group-hover:inline-block">
                             <Check className="text-primary group-hover:bg-white w-3 h-3" />
@@ -78,33 +106,86 @@ const Space = () => {
                             Add manually
                           </span>
                         </div>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-xl">
-                        <DialogHeader>
-                          <DialogTitle>Edit Profile</DialogTitle>
-                        </DialogHeader>
-                      </DialogContent>
-                    </Dialog>
 
-                    {/* second link */}
-                    <div
-                      className="group flex items-center gap-2 hover:bg-primary-600 cursor-pointer px-2 py-1 rounded-sm"
-                      onClick={() => { }}
-                    >
-                      <div className="w-3 h-3 hidden group-hover:inline-block">
-                        <Check className="text-primary group-hover:bg-white w-3 h-3" />
+                        <div
+                          className="group flex items-center gap-2 hover:bg-primary-600 cursor-pointer px-2 py-1 rounded-sm"
+                          onClick={handleLinkCourse}
+                        >
+                          <div className="w-3 h-3 hidden group-hover:inline-block">
+                            <Check className="text-primary group-hover:bg-white w-3 h-3" />
+                          </div>
+                          <span className="group-hover:text-white text-sm inline-block">
+                            Link a course
+                          </span>
+                        </div>
                       </div>
-                      <span className="group-hover:text-white text-sm inline-block">
-                        Link a course
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
 
+            {/* Manual Add Dialog */}
+            <Dialog open={isManualDialogOpen} onOpenChange={setIsManualDialogOpen}>
+              <DialogContent className="max-w-xl">
+                <DialogHeader>
+                  <DialogTitle></DialogTitle>
+                </DialogHeader>
+                <form>
+                  <div>
+                    <TextInput
+                      label="Enter user email address"
+                      placeholder='johndoe@creveo'
+                      value={""}
+                      onChange={() => { }}
+                    />
+                  </div>
+                  <div className='w-full mt-4'>
+                    <Button className='w-full'>
+                      Invite
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            {/* Link Course Dialog */}
+            <Dialog open={isCourseDialogOpen} onOpenChange={setIsCourseDialogOpen}>
+              <DialogContent className="max-w-xl">
+                <DialogHeader>
+                  <DialogTitle>Link a Course</DialogTitle>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+
+          </div>
+          <div className='w-full px-8 flex items-center gap-2 absolute bottom-3'>
+            <div className='basis-0.5/12 bg-gray-200 p-1 rounded-full'>
+              <img
+                src={avatarUrl}
+                alt="User Avatar"
+                className="rounded-full object-cover w-12"
+              />
+            </div>
+            <TextInput
+              placeholder='Write a general post'
+              value={""}
+              className='flex-1'
+              isClickable={true}
+              onClick={handleInputClick}
+            />
+          </div>
         </div>
+
+        <Dialog open={isInputDialogOpen} onOpenChange={setIsInputDialogOpen}>
+          <DialogContent className="max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Input Selection</DialogTitle>
+            </DialogHeader>
+            <p>This dialog opened from clicking the TextInput!</p>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </ProtectedRoute>
   )

@@ -12,9 +12,11 @@ export type TextInputProps = {
   rightIconClassName?: string;
   onLeftIconClick?: () => void;
   onRightIconClick?: () => void;
-  maxLength?: number; // Add maxLength prop
-  value?: string; // Ensure value is controlled
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Ensure onChange is typed correctly
+  maxLength?: number;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isClickable?: boolean; // New prop to make input clickable
+  onClick?: () => void;  // New prop for click handler
 } & React.ComponentProps<'input'>;
 
 export const TextInput = ({
@@ -29,8 +31,10 @@ export const TextInput = ({
   onLeftIconClick,
   onRightIconClick,
   maxLength,
-  value = "", // Default to empty string
+  value = "",
   onChange,
+  isClickable = false, // Default to false
+  onClick,
   ...rest
 }: TextInputProps) => {
   const remainingChars = maxLength ? maxLength - value.length : null;
@@ -65,11 +69,14 @@ export const TextInput = ({
             (icon || leftIcon) ? "pl-10" : "pl-3",
             rightIcon ? "pr-10" : "pr-3",
             errorMessage ? "bg-red-100" : "bg-primary-50/25",
+            isClickable && "cursor-pointer", // Add pointer cursor when clickable
             className
           )}
           value={value}
           onChange={onChange}
           maxLength={maxLength}
+          onClick={isClickable ? onClick : undefined} // Only attach onClick when isClickable is true
+          readOnly={isClickable} // Prevent typing when clickable
           {...rest}
         />
         {rightIcon && (

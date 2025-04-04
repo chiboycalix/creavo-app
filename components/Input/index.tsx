@@ -43,9 +43,10 @@ type Props = {
 } & React.ComponentProps<'input'> & React.ComponentProps<'textarea'>;
 
 export const Input = ({ variant = "text", ...props }: Props) => {
+  const { onClick, ...restProps } = props;
   switch (variant) {
     case "password":
-      return <PasswordInput {...props} />;
+      return <PasswordInput {...restProps} />;
     case "select":
       const {
         label,
@@ -100,6 +101,6 @@ export const Input = ({ variant = "text", ...props }: Props) => {
       return <SearchInput {...props} />;
     case "text":
     default:
-      return <TextInput {...props} />;
+      return <TextInput {...restProps} />;
   }
 };

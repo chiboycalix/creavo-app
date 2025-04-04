@@ -121,7 +121,7 @@ const CourseDetailsInputModal = ({
             "cloud_name",
             process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!
           );
-          data.append("folder", "Stridez/courses");
+          data.append("folder", "Crevoe/courses");
           const response = await fetch(
             `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
             {

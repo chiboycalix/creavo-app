@@ -143,7 +143,7 @@ export const uploadImageToCloudinary = async (
     data.append("file", avatar);
     data.append("upload_preset", cloudinaryUploadPreset as string);
     data.append("cloud_name", cloudinaryCloudName as string);
-    data.append("folder", "Stridez/profile-images");
+    data.append("folder", "Crevoe/profile-images");
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/upload`,
