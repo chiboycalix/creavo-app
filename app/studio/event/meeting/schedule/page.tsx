@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import EventForm from "@/components/_events/EventForm"
 import { baseUrl } from "@/utils/constant"
@@ -9,6 +11,7 @@ import type { EventFormData } from "@/components/_events/EventForm"
 
 export default function CreateEventPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (eventData: EventFormData) => {
     setIsSubmitting(true)
@@ -24,10 +27,15 @@ export default function CreateEventPage() {
 
       if (!response.ok) throw new Error(`Error: ${response.statusText}`)
 
-      alert("Event created successfully!")
+      toast.success("Event created successfully!")
+
+      setTimeout(() => {
+        router.push("/studio/calendar")
+      }, 1000)
+
     } catch (error) {
       console.error("Failed to create event:", error)
-      alert("Failed to create event. Please try again.")
+      toast.error("Failed to create event. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -35,7 +43,6 @@ export default function CreateEventPage() {
 
   return (
     <div className="container mx-auto py-8">
-
       <Card>
         <CardHeader>
           <CardTitle>Event Details</CardTitle>
@@ -47,4 +54,3 @@ export default function CreateEventPage() {
     </div>
   )
 }
-
