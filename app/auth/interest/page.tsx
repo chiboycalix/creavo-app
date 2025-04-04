@@ -143,6 +143,7 @@ export default function TopicSelection() {
           </Button>
 
           <Button
+            type="button"
             onClick={handleSkip}
             className="w-full mt-3 text-sm bg-transparent border border-primary-100 hover:bg-gray-200 text-gray-600 rounded-md"
           >

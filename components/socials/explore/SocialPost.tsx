@@ -11,6 +11,7 @@ import { useComments } from "@/context/CommentsContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { formatCommentDate } from "@/utils";
+import Link from "next/link";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), {
   ssr: false,
@@ -102,7 +103,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
     {
       icon: (
         <ShareButton
-        type="post"
+          type="post"
           postId={post.id}
           initialShareCount={post?.sharesCount}
           post={post}
@@ -115,18 +116,19 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const handleNavigateToCourse = (id: any) => {
     router.push(`/market/product/${id}`);
   };
-
+  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
+  console.log({ post })
   return (
     <div
       data-post-id={post.id}
       ref={ref}
-      className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative"
+      className="flex items-end gap-4 w-full md:max-w-xl mx-auto h-full mb-0 relative  overflow-x-hidden"
     >
       {/* Main Post Container */}
-      <div className=" text-white sm:rounded-xl rounded-none overflow-hidden flex-grow bg-black">
+      <div className=" text-white sm:rounded-xl rounded-none overflow-hidden flex-grow bg-black border-none md:border">
         <div className="relative">
           {/* Main Image */}
-          <div className="w-full h-full relative">
+          <div className="w-full h-full relative overflow-x-hidden">
             <MediaWrapper
               postId={post?.id}
               title={post?.title}
@@ -138,9 +140,10 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
             <FollowButton
               followedId={post?.userId}
-              avatar={post?.user_profile_avatar || "/assets/display.jpg"}
+              avatar={post?.avatar || defaultAvatar}
               initialFollowStatus={post?.followed}
               isMyPost={Number(post.userId) === currentUserId}
+              userInitial={`${post?.firstName[0] + post?.lastName[0]}`}
             />
             {metrics.map((metric, index) => (
               <div key={index} className="flex flex-col items-center mb-4">
@@ -153,12 +156,14 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           </div>
 
           {/* Profile Section */}
-          <div className="absolute w-[80%] md:w-full bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+          <div className="absolute w-full bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 pt-4">
                   <h3 className="font-semibold inline-flex gap-1 items-center">
-                    <span> {post?.user_username}</span>
+                    <Link href={`/socials/profile/${post.userId}`}>
+                      <span> {post?.username}</span>
+                    </Link>
                     <span className="text-xs text-gray-300 mt-0.5">
                       {formatCommentDate(post.createdAt)}
                     </span>
@@ -176,9 +181,8 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
                 </div>
                 <div className="relative w-full">
                   <div
-                    className={`flex flex-wrap gap-2 mt-1 ${
-                      !showAllTags && "max-h-[1.6rem]"
-                    } overflow-hidden transition-all duration-300`}
+                    className={`flex flex-wrap gap-2 mt-1 ${!showAllTags && "max-h-[1.6rem]"
+                      } overflow-hidden transition-all duration-300`}
                   >
                     <div>
                       <p className="text-xs leading-6">{post.body}</p>
@@ -221,10 +225,12 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         <div className="flex flex-col gap-4 mt-auto">
           <FollowButton
             followedId={post?.userId}
-            avatar={post?.user_profile_avatar || "/assets/display.jpg"}
+            avatar={post?.avatar || defaultAvatar}
             initialFollowStatus={post?.followed}
             isMyPost={Number(post.userId) === currentUserId}
+            userInitial={`${post?.firstName[0] + post?.lastName[0]}`}
           />
+
           {metrics.map((metric, index) => (
             <div key={index} className="flex flex-col items-center mb-0">
               <div className="text-sm rounded-full cursor-pointer transition-colors">

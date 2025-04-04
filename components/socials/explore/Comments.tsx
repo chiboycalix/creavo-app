@@ -53,6 +53,12 @@ export function Comments({ postId }: { postId: number; }) {
       postId
     });
   };
+  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
+
+  // Determine the avatar URL to use
+  const urlAvatar = profileLoading
+    ? defaultAvatar // Show default while loading
+    : profileData?.data?.profile?.avatar || defaultAvatar;
 
   return (
     <div className="relative h-full w-full">
@@ -82,10 +88,7 @@ export function Comments({ postId }: { postId: number; }) {
           {currentUser ? (
             <div className="flex items-center justify-between gap-2 w-full">
               <div className="basis-1.5/12">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={profileData?.data?.profile?.avatar} alt="User avatar" />
-                  <AvatarFallback>😂</AvatarFallback>
-                </Avatar>
+                <img src={urlAvatar} alt="urlAvatar" className="w-10 h-10 rounded-full" />
               </div>
               <div className="flex-1">
                 <Input

@@ -127,23 +127,23 @@ const SocialFeed = ({ initialPosts }: any) => {
     }
   }, [inView, debouncedFetchNextPage])
 
-  const isEmpty = !data?.pages[0]?.posts?.length
+  const isEmpty = !data?.pages[0]?.posts?.length;
 
   const getPostHeight = () => {
     if (typeof window !== 'undefined') {
-      if (window.innerWidth < 768) return 'calc(100vh - 4rem)'
+      if (window.innerWidth < 768) return 'calc(100vh - 9rem)'
       return 'calc(100vh - 6rem)'
     }
     return 'calc(100vh - 4rem)'
   }
 
   return (
-    <div className="w-full min-h-screen">
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className={`${isMobileView ? 'w-full' : 'md:w-8/12 lg:w-6/12'} order-1 md:order-none`}>
+    <div className="w-full min-h-screen overflow-x-hidden">
+      <div className="flex flex-col md:flex-row gap-6 overflow-x-hidden">
+        <div className={`${isMobileView ? 'w-full' : 'md:w-8/12 lg:w-6/12'} order-1 md:order-none overflow-x-hidden`}>
           <div
             ref={containerRef}
-            className="overflow-y-auto snap-y snap-mandatory no-scrollbar"
+            className="overflow-y-auto snap-y snap-mandatory no-scrollbar overflow-x-hidden"
             style={{
               height: getPostHeight(),
               overflowY: 'auto',
@@ -167,10 +167,10 @@ const SocialFeed = ({ initialPosts }: any) => {
                     className="aspect-square w-24 md:w-40"
                   />
                   <div className="text-center">
-                    <h3 className="text-base md:text-lg font-semibold pb-px">
+                    <h3 className="text-base md:text-lg font-semibold">
                       No posts available
                     </h3>
-                    <p className="text-xs pt-px">Refresh or upload post</p>
+                    <p className="text-xs">Refresh or upload post</p>
                   </div>
                 </div>
               </div>
@@ -212,7 +212,7 @@ const SocialFeed = ({ initialPosts }: any) => {
                 )
               })
             )}
-            <div ref={ref} className="py-1 text-center w-full flex items-center ml-[13rem] mb-10 mt-2">
+            <div ref={ref} className="py-1 text-center w-full flex items-center md:ml-[13rem] mb-10 mt-2 ml-[11rem]">
               {queryIsFetchingNextPage ? (
                 <div className=''>
                   <Loader className='animate-spin' />

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import IconButton from "./IconButton";
 import CallOptionsMenu from "./CallOptionsMenu";
 import VolumeControlPopup from "./VolumeControlPopup";
@@ -35,11 +35,7 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-
-type JoinRequest = {
-  id: string;
-  name: string;
-};
+import { useWebSocket } from "@/context/WebSocket";
 
 const LiveStreamInterface = () => {
   const [showInviteModal, setShowInviteModal] = useState(true);
@@ -58,7 +54,6 @@ const LiveStreamInterface = () => {
   const [volumeAnchorRect, setVolumeAnchorRect] = useState<DOMRect | null>(
     null
   );
-  const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
   const {
     isMicrophoneEnabled,
     isCameraEnabled,
@@ -75,23 +70,44 @@ const LiveStreamInterface = () => {
     channelName,
     toggleRaiseHand,
     raisedHands,
-    screenSharingUser
+    screenSharingUser,
+    setJoinRequests,
+    joinRequests,
   } = useVideoConferencing();
   const totalParticipants = Object.keys(remoteParticipants || {}).length + 1;
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const { getCurrentUser } = useAuth();
+  const { getCurrentUser, currentUser } = useAuth();
   const username = getCurrentUser()?.username;
   const isRaised = raisedHands[String(meetingConfig.uid)];
+  const ws = useWebSocket();
+  const wsRef = useRef(ws);
 
-  const newRequest = {
-    id: "unique-id",
-    name: "Matthew",
-  } as any;
+  // useEffect(() => {
+  //   wsRef.current = ws;
+
+  //   if (ws && currentUser?.id) {
+  //     if (!ws.connected) {
+  //       ws.connect();
+  //     }
+
+  //     ws.on(`lobby`, async (data) => {
+  //       const { type, user } = data;
+  //       switch (type) {
+          
+  //         default:
+  //           break;
+  //       }
+  //       console.log("Real-time profile update received:", { lobby: data });
+  //     });
+
+  //     // return () => {
+  //     //   ws.off(`profile_updated_${currentUser.id}`);
+  //     // };
+  //   }
+  // }, [ws, currentUser?.id]);
 
   useEffect(() => {
-    if (newRequest) {
-      setJoinRequests((requests: any) => [...requests, newRequest]);
-    }
+    setJoinRequests((requests: any) => [...requests]);
   }, []);
 
   useEffect(() => {
@@ -99,6 +115,16 @@ const LiveStreamInterface = () => {
   }, [remoteParticipants]);
 
   const handleAllow = (requesterId: string) => {
+    wsRef.current = ws;
+
+    // Emitting event after admin grants user access to join
+    wsRef?.current?.emit(`lobby`, {
+      userId: requesterId,
+      meetingCode: channelName,
+      action: "grant",
+    });
+
+    // Removing user from join requests list
     setJoinRequests((requests: any) =>
       requests.filter((request: any) => request.id !== requesterId)
     );
@@ -143,13 +169,14 @@ const LiveStreamInterface = () => {
     setShowEmojiPopup(true);
   };
 
-  const handleEmojiSelect = (emoji: string) => {
-  };
+  const handleEmojiSelect = (emoji: string) => {};
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[150] bg-[#1A1C1D]">
-      {
-        hasEndedCall ? <EndCallScreen /> : <div className="w-full h-full flex flex-col max-w-[1440px] mx-auto p-2 md:p-4 lg:p-6">
+      {hasEndedCall ? (
+        <EndCallScreen />
+      ) : (
+        <div className="w-full h-full flex flex-col max-w-[1440px] mx-auto p-2 md:p-4 lg:p-6">
           {/* Top Bar */}
 
           {/* Main Video Area */}
@@ -251,7 +278,7 @@ const LiveStreamInterface = () => {
                   <Button
                     className="w-1/3 flex items-center justify-center gap-1 bg-primary-600 text-white px-3 py-2 rounded-lg text-xs md:text-sm hover:bg-primary-700 transition-colors"
                     onClick={() => {
-                      toast.success("Meeting Link copied!")
+                      toast.success("Meeting Link copied!");
                       navigator.clipboard.writeText(
                         `${window.location.origin}${ROUTES.VIDEO_CONFERENCING.MEETING}/${channelName}`
                       );
@@ -320,7 +347,10 @@ const LiveStreamInterface = () => {
                   <IconButton
                     leftIcon={
                       isMicrophoneEnabled ? (
-                        <Mic size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                        <Mic
+                          size={14}
+                          className="md:w-4 md:h-4 lg:w-5 lg:h-5"
+                        />
                       ) : (
                         <MicOff
                           size={14}
@@ -330,7 +360,7 @@ const LiveStreamInterface = () => {
                     }
                     showDivider
                     onLeftClick={toggleMicrophone}
-                    onRightClick={() => { }}
+                    onRightClick={() => {}}
                     tooltip={
                       isMicrophoneEnabled
                         ? "Mute microphone"
@@ -354,7 +384,7 @@ const LiveStreamInterface = () => {
                     }
                     showDivider
                     onLeftClick={toggleCamera}
-                    onRightClick={() => { }}
+                    onRightClick={() => {}}
                     tooltip={
                       isCameraEnabled ? "Turn off camera" : "Turn on camera"
                     }
@@ -382,7 +412,7 @@ const LiveStreamInterface = () => {
                     onLeftClick={
                       isSharingScreen ? handleEndScreenShare : handleShareScreen
                     }
-                    onRightClick={() => { }}
+                    onRightClick={() => {}}
                     className=""
                     tooltip="Share screen"
                     rightTooltip="Screen sharing settings"
@@ -401,7 +431,10 @@ const LiveStreamInterface = () => {
                   />
                   <IconButton
                     leftIcon={
-                      <Smile size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                      <Smile
+                        size={14}
+                        className="md:w-4 md:h-4 lg:w-5 lg:h-5"
+                      />
                     }
                     onLeftClick={handleEmojiClick}
                     className={cn(showEmojiPopup && "bg-primary-900")}
@@ -444,12 +477,17 @@ const LiveStreamInterface = () => {
                       />
                     }
                     onLeftClick={() => setShowChat(!showChat)}
-                    className={cn(showChat && "bg-primary-900 text-primary-900")}
+                    className={cn(
+                      showChat && "bg-primary-900 text-primary-900"
+                    )}
                     tooltip="Toggle chat"
                   />
                   <IconButton
                     leftIcon={
-                      <Users size={14} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                      <Users
+                        size={14}
+                        className="md:w-4 md:h-4 lg:w-5 lg:h-5"
+                      />
                     }
                     showDivider
                     rightIcon={totalParticipants}
@@ -472,7 +510,7 @@ const LiveStreamInterface = () => {
             </div>
           </div>
         </div>
-      }
+      )}
 
       <CallOptionsMenu
         isOpen={showOptionsMenu}

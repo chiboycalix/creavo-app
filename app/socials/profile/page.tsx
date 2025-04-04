@@ -31,7 +31,7 @@ const Profile = () => {
 
   const { data: coursesData } = useUserCourses(currentUser?.id)
   const { data: postsData } = useUserPosts(currentUser?.id)
-  const isCurrentUser = currentUser?.id === profileData?.data?.id
+  const isCurrentUser = currentUser?.id === profileData?.data?.id;
   const { data: learningData } = useUserLearning(currentUser?.id, isCurrentUser)
 
   const [userProfile, setUserProfile] = useState(profileData?.data)

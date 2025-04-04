@@ -38,7 +38,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
       auth: { token: `Bearer ${token}` },
     });
 
-    socket.on("connect", () => console.log("WebSocket connected"));
+    socket.on("connect", () => console.log("WebSocket connected lobby", socket.id));
     socket.on("disconnect", () => console.log("WebSocket disconnected"));
 
     setWs(socket);

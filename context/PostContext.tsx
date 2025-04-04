@@ -26,23 +26,25 @@ export type PostMediaType = {
   title: string;
   description: string;
   url: string;
+  viewsCount: number;
   metadata: MetadataType;
 };
 
 export type PostType = {
   id: number;
-  user_profile_firstName: string;
-  user_profile_lastName: string;
+  firstName: string;
+  lastName: string;
   userId: number;
   title: string;
-  user_profile_avatar: string;
+  avatar: string;
+  media: PostMediaType[];
   mediaResource: PostMediaType[];
   username: string;
   metadata: MetadataType;
   createdAt: string;
   body: string;
   thumbnailUrl?: string;
-  url?:string;
+  url?: string;
 };
 
 interface PostContextType {
@@ -54,7 +56,7 @@ interface PostContextType {
   followUser: (userId: number) => Promise<void>;
   updateCommentsCount: (postId: number, newCount: number) => void;
   updateViewsCount: (postId: number, newCount: any) => void;
-  fetchPostById:(id: number) => Promise<PostType | null>;
+  fetchPostById: (id: number) => Promise<PostType | null>;
 }
 
 const PostContext = createContext<PostContextType | undefined>(undefined);
@@ -94,15 +96,14 @@ export const PostProvider = ({ children }: PostProviderProps) => {
     fetchPosts();
   }, [fetchPosts]);
 
- 
   const fetchPostById = useCallback(async (id: number) => {
     try {
       setLoading(true);
-      const response = await fetch(`${baseUrl}/posts/${id}`);  // Ensure this is the correct endpoint for posts
+      const response = await fetch(`${baseUrl}/posts/${id}`); // Ensure this is the correct endpoint for posts
       const data = await response.json();
-      
+
       if (response.ok) {
-        return data.data;  // Return the post data
+        return data.data; // Return the post data
       }
     } catch (error) {
       console.log("Error fetching post by ID:", error);
@@ -111,26 +112,22 @@ export const PostProvider = ({ children }: PostProviderProps) => {
     }
     return null;
   }, []);
-  
-
 
   const fetchPostDetail = useCallback(
     (id: number): PostType | null => {
       try {
-        setLoading(false)
+        setLoading(false);
         const post = posts.find((p) => p.id === id);
         return post || null;
       } catch (error) {
         console.log("Error fetching post details:", error);
         return null;
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
     [posts]
   );
-
-  
 
   const handleSetLike = (postId: number, data: any) => {
     const postLike = {
@@ -194,17 +191,16 @@ export const PostProvider = ({ children }: PostProviderProps) => {
         post.id === postId
           ? {
             ...post,
-            mediaResource: post?.mediaResource?.map(
-              (media: PostMediaType, index) =>
-                index === 0
-                  ? {
-                    ...media,
-                    metadata: {
-                      ...media.metadata,
-                      viewsCount: updater(media.metadata.viewsCount || 0),
-                    },
-                  }
-                  : media
+            media: post?.media?.map((media: PostMediaType, index) =>
+              index === 0
+                ? {
+                  ...media,
+                  metadata: {
+                    ...media.metadata,
+                    viewsCount: updater(media?.viewsCount || 0),
+                  },
+                }
+                : media
             ),
           }
           : post
@@ -223,7 +219,7 @@ export const PostProvider = ({ children }: PostProviderProps) => {
         followUser,
         updateCommentsCount,
         updateViewsCount,
-        fetchPostById
+        fetchPostById,
       }}
     >
       {children}

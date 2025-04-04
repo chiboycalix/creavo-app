@@ -18,10 +18,10 @@ interface Post {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
-  user_username: string;
-  user_profile_firstName: string;
-  user_profile_lastName: string;
-  user_profile_avatar: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
   media: {
     id: number;
     description: string;

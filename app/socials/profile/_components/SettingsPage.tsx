@@ -23,7 +23,7 @@ import PaymentSettings from "./PaymentSettings";
 import { useSettings } from "@/context/SettingsContext";
 
 const ProfileSettings = ({ handleClose }: any) => {
-  const {openSettingsModal} = useSettings()
+  const { openSettingsModal } = useSettings()
   const tabsMenu = [
     { title: "Account", icon: UserRoundIcon },
     { title: "Privacy", icon: GlobeLockIcon },

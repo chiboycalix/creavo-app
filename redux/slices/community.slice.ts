@@ -1,4 +1,4 @@
-import { CreateCommunityForm, CreateModuleForm } from "@/types";
+import { CreateCommunityForm } from "@/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {

@@ -272,7 +272,7 @@ const AddEventCard: React.FC<AddEventCardProps> = ({ isOpen, onClose, eventToEdi
         }),
       }
 
-      const response = await fetch(`${baseUrl}/meetings/`, {
+      const response = await fetch(`${baseUrl}/meetings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

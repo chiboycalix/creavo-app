@@ -14,13 +14,20 @@ import moduleReducer from "./slices/module.slice";
 import courseReducer from "./slices/course.slice";
 import uploadReducer from "./slices/upload.slice";
 import communityReducer from "./slices/community.slice";
+import spaceReducer from "./slices/space.slice";
 export type RootState = ReturnType<typeof rootReducer>;
 import { KEYS } from "@/types";
 
 const persistConfig = {
   key: KEYS.REDUX_STORE,
   storage: storageSession,
-  whitelist: ["moduleStore", "courseStore", "uploadStore", "communityStore"],
+  whitelist: [
+    "moduleStore",
+    "courseStore",
+    "uploadStore",
+    "communityStore",
+    "spaceStore",
+  ],
 };
 
 const rootReducer = combineReducers({
@@ -28,6 +35,7 @@ const rootReducer = combineReducers({
   courseStore: courseReducer,
   uploadStore: uploadReducer,
   communityStore: communityReducer,
+  spaceStore: spaceReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
