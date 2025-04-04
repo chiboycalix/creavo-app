@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import RenderQuestions from './RenderQuestions';
 import RenderQuestionList from './RenderQuestionList';
 import ModulesList from './ModulesList';
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { useFetchCourseData } from '@/hooks/courses/useFetchCourseData';
@@ -14,13 +14,15 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from '@/components/Input';
 import { toast } from 'sonner';
-import { addQuizToModuleService } from '@/services/quiz.service';
+import { addQuizToModuleService, updateQuizQuestionService } from '@/services/quiz.service';
 import { QuestionData, QuestionType, QuizData } from '@/types';
+import { RouterSpinner } from '@/components/Loaders/RouterSpinner';
 
 const Quiz = ({ courseId: id }: { courseId: any }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient(); // Use queryClient for invalidation
   const currentModule = searchParams.get("module");
   const courseId = searchParams.get("edit");
   const [selectedModule, setSelectedModule] = useState<any | null>(null);
@@ -65,11 +67,10 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
       setTitleError(null);
       setIsAddingQuiz(false);
       setEditingQuestionIndex(null);
-      if (!courseId) {
-        router.push(`?tab=quiz&module=${generalHelpers.convertToSlug(module.title)}`);
-      } else {
-        router.push(`?tab=quiz&edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`);
-      }
+      const url = courseId
+        ? `?tab=quiz&edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`
+        : `?tab=quiz&module=${generalHelpers.convertToSlug(module.title)}`;
+      router.push(url);
     },
     [courseId, router]
   );
@@ -100,8 +101,9 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
         questionText: "",
         optionValues: type === "multipleChoice" ? ["", "", "", ""] : [],
         selectedOption: null,
-        correctAnswer: "",
+        correctAnswer: "" as "" | "true" | "false",
         allocatedPoint: 1,
+        questionId: "",
       },
     ]);
     setShowQuestionOptions(true);
@@ -117,16 +119,34 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
 
   const { mutate: handleAddQuizToModule, isPending: isAddingModule } = useMutation({
     mutationFn: (payload: any) => addQuizToModuleService(payload),
-    onSuccess: (quiz) => {
+    onSuccess: () => {
       toast.success("Quiz added successfully");
       setQuestions([]);
       setQuestionData([]);
       setQuizTitle("");
       setShowQuestionOptions(false);
       setIsAddingQuiz(false);
+      queryClient.invalidateQueries({ queryKey: ["quizData", selectedModule?.id] }); // Invalidate quiz data
     },
     onError: (error: any) => {
       toast.error(error?.data?.[0] || "Failed to create quiz");
+    },
+  });
+
+  const { mutate: handleUpdateQuizQuestion, isPending: isUpdatingQuizQuestion } = useMutation({
+    mutationFn: (payload: any) => updateQuizQuestionService(payload),
+    onSuccess: () => {
+      toast.success("Question updated successfully");
+      setQuestions([]);
+      setQuestionData([]);
+      setQuizTitle("");
+      setShowQuestionOptions(false);
+      setIsAddingQuiz(false);
+      setEditingQuestionIndex(null);
+      queryClient.invalidateQueries({ queryKey: ["quizData", selectedModule?.id] }); // Invalidate quiz data
+    },
+    onError: (error: any) => {
+      toast.error(error?.data?.[0] || "Failed to update quiz question");
     },
   });
 
@@ -195,6 +215,54 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
     });
   };
 
+  const handleSubmitChanges = async () => {
+    const formattedQuestions = questionData.map((data, index) => {
+      const question = questions[index];
+      if (question.type === "multipleChoice") {
+        const options = data.optionValues.map((text, optIndex) => ({
+          text,
+          isCorrect: data.selectedOption === optIndex,
+        }));
+        const correctAnswer = data.selectedOption !== null ? data.optionValues[data.selectedOption] : "";
+        return {
+          questionId: data?.questionId,
+          text: data.questionText,
+          options,
+          type: "MCQ",
+          correctAnswer,
+          allocatedPoint: data.allocatedPoint,
+        };
+      } else {
+        const options = [
+          { text: "true", isCorrect: data.correctAnswer === "true" },
+          { text: "false", isCorrect: data.correctAnswer === "false" },
+        ];
+        return {
+          questionId: data?.questionId,
+          text: data.questionText,
+          options,
+          type: "T/F",
+          correctAnswer: data.correctAnswer,
+          allocatedPoint: data.allocatedPoint,
+        };
+      }
+    });
+    const finalQuizData = {
+      courseId: courseId || id,
+      text: formattedQuestions[0]?.text,
+      allocatedPoint: formattedQuestions[0]?.allocatedPoint,
+      type: formattedQuestions[0]?.type,
+      options: formattedQuestions[0].options,
+      correctAnswer: formattedQuestions[0]?.correctAnswer,
+      questionId: formattedQuestions[0]?.questionId,
+    };
+    handleUpdateQuizQuestion({ ...finalQuizData });
+  };
+
+  if (isUpdatingQuizQuestion) {
+    return <RouterSpinner />;
+  }
+
   const isSubmitDisabled =
     !quizTitle.trim() || questions.length === 0 || !areQuestionsComplete() || isAddingModule;
 
@@ -204,7 +272,6 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
         <CardHeader>
           <CardContent className="px-0 min-h-[67vh]">
             <aside className="h-full space-y-2">
-              {/* Use the ModulesList component */}
               <ModulesList
                 isFetchingCourse={isFetchingCourse}
                 courseData={courseData}
@@ -248,19 +315,17 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                       <p className="text-red-500 text-sm mt-1">{titleError}</p>
                     )}
                   </div>
-                  {
-                    questions?.map((question, index) => {
-                      return <div key={index} className="mb-4">
-                        <RenderQuestions
-                          question={question}
-                          setQuestionData={setQuestionData}
-                          questionData={questionData}
-                          index={index}
-                          deleteQuestion={deleteQuestion}
-                        />
-                      </div>
-                    })
-                  }
+                  {questions?.map((question, index) => (
+                    <div key={index} className="mb-4">
+                      <RenderQuestions
+                        question={question}
+                        setQuestionData={setQuestionData}
+                        questionData={questionData}
+                        index={index}
+                        deleteQuestion={deleteQuestion}
+                      />
+                    </div>
+                  ))}
                   <div className="flex gap-4 mt-4">
                     {showQuestionOptions ? (
                       <>
@@ -300,6 +365,24 @@ const Quiz = ({ courseId: id }: { courseId: any }) => {
                         "Submit Quiz"
                       )}
                     </Button>
+                    {editingQuestionIndex !== null && (
+                      <Button
+                        onClick={() => {
+                          setEditingQuestionIndex(null);
+                          setQuestions([]);
+                          setQuestionData([]);
+                          setQuizTitle("");
+                          setShowQuestionOptions(false);
+                          setIsAddingQuiz(false);
+                          setEditingQuestionIndex(null);
+                          handleSubmitChanges();
+                        }}
+                        variant="outline"
+                        type="button"
+                      >
+                        Submit Changes
+                      </Button>
+                    )}
                     <Button
                       onClick={() => {
                         setIsAddingQuiz(false);

@@ -95,7 +95,7 @@ const CreateLongCourse = () => {
       amount: createCourseStateValues.amount,
       isPaid: createCourseStateValues.isPaid,
       currency: createCourseStateValues.currency,
-      promotionalUrl: createCourseStateValues?.promotionalUrl,
+      promotionalUrl: createCourseStateValues?.promotionalUrl || "https://meet.google.com/eds-hoam-tkt",
       promote: isSelected
     }))
   }
@@ -238,7 +238,7 @@ const CreateLongCourse = () => {
                 updateCreateCourse({ promotionalUrl: uploads[0] })
               }}
               className='py-10'
-              
+
             />
           </div>
 

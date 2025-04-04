@@ -14,6 +14,7 @@ const RenderQuestionList = ({ setIsAddingQuiz, setQuestions, setQuestionData, se
       const data = await fetchQuizService({
         moduleId: selectedModule?.id,
       });
+      console.log("Refetching quiz", data);
       return data;
     },
     enabled: !!selectedModule?.id,
@@ -45,6 +46,7 @@ const RenderQuestionList = ({ setIsAddingQuiz, setQuestions, setQuestionData, se
 
   const formmattedQuestions = quiz?.questions?.map((question: any, index: number) => {
     return {
+      id: question?._id,
       type: question?.type === "MCQ" ? "multipleChoice" : "trueFalse",
       questionNumber: index + 1,
       questionText: question?.text,
@@ -88,6 +90,7 @@ const RenderQuestionList = ({ setIsAddingQuiz, setQuestions, setQuestionData, se
                 setQuestions([question]);
                 setQuizTitle(quiz?.quiz?.title)
                 setQuestionData([{
+                  questionId: question?.id,
                   questionText: question.questionText,
                   optionValues: question.optionValues,
                   selectedOption: question.selectedOption,

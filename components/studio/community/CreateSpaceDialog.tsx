@@ -10,45 +10,49 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from '@/components/Input'
-import { FormEvent } from "react"
+import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
-import { createCommunityService } from "@/services/community.service"
+import { createSpaceService, SpacePayload } from "@/services/community.service"
 import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook"
-import { useCreateCommunityValidator } from "@/helpers/validators/useCreateCommunityValidator"
-import { CreateCommunityForm } from "@/types"
-import { resetCreateCommunityForm, updatCreateCommunityForm } from "@/redux/slices/community.slice"
-import { generalHelpers } from "@/helpers"
+import { useCreateSpaceValidator } from "@/helpers/validators/useCreateSpace.validator"
+import { CreateSpaceForm } from "@/types"
+import { resetCreateSpaceForm, updateCreateSpaceForm } from "@/redux/slices/space.slice"
 import { Plus } from "lucide-react"
 
-const CreateSpaceDialog = () => {
-  const router = useRouter()
+const CreateSpaceDialog = ({ communityId }: { communityId: string }) => {
   const maxFiles = 1;
   const dispatch = useAppDispatch();
-  const { createCommunityForm: createCommunityStateValues } = useAppSelector((store) => store.communityStore);
-  const { validate, errors, validateField } = useCreateCommunityValidator({ store: createCommunityStateValues });
-  const updateCreateCommunity = (payload: Partial<CreateCommunityForm>) => dispatch(updatCreateCommunityForm(payload));
+  const { createSpaceForm: createSpaceStateValues } = useAppSelector((store) => store.spaceStore);
+  const { validate, errors, validateField } = useCreateSpaceValidator({ store: createSpaceStateValues });
+  const updateCreateSpace = (payload: Partial<CreateSpaceForm>) => dispatch(updateCreateSpaceForm(payload));
 
-  const { mutate: handleCreateCommunity, isPending: isCreatingCommunity } = useMutation({
-    mutationFn: (payload: any) => createCommunityService(payload),
+  const { mutate: handleCreateSpace, isPending: isCreatingSpace } = useMutation({
+    mutationFn: (payload: SpacePayload) => {
+      return createSpaceService(payload)
+    },
     onSuccess: async (data) => {
       toast.success("Space created successfully")
-      router.push(`/studio/community/${generalHelpers.convertToSlug(createCommunityStateValues?.name)}`)
-      dispatch(resetCreateCommunityForm())
+      dispatch(resetCreateSpaceForm())
     },
     onError: (error: any) => {
-      console.log({ error })
-      toast.error("Failed to create")
+      console.log(error, "error")
+      toast.error(error?.data[0])
     },
   });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    validate(() => handleCreateCommunity(createCommunityStateValues))
+    validate(() => handleCreateSpace({
+      name: createSpaceStateValues?.name,
+      description: createSpaceStateValues?.description,
+      logo: createSpaceStateValues?.logo,
+      communityId: communityId
+    }))
   }
 
-  const isDisabled = !createCommunityStateValues?.name || !createCommunityStateValues?.description || isCreatingCommunity
+  const isDisabled = !createSpaceStateValues?.name || !createSpaceStateValues?.description || isCreatingSpace;
 
   return (
     <Dialog>
@@ -65,10 +69,10 @@ const CreateSpaceDialog = () => {
                 label="Space name"
                 maxLength={54}
                 placeholder="Enter Community name"
-                value={createCommunityStateValues?.name}
+                value={createSpaceStateValues?.name}
                 onChange={(e) => {
                   validateField("name", e.target.value)
-                  updateCreateCommunity({ name: e.target.value });
+                  updateCreateSpace({ name: e.target.value });
                 }}
                 errorMessage={errors.name}
               />
@@ -81,10 +85,10 @@ const CreateSpaceDialog = () => {
                 label="Space Description"
                 maxLength={365}
                 placeholder="Enter your space description"
-                value={createCommunityStateValues?.description}
+                value={createSpaceStateValues?.description}
                 onChange={(e) => {
                   validateField("description", e.target.value)
-                  updateCreateCommunity({ description: e.target.value });
+                  updateCreateSpace({ description: e.target.value });
                 }}
                 errorMessage={errors.description}
                 rows={5}
@@ -98,7 +102,7 @@ const CreateSpaceDialog = () => {
                 placeholder={`Max 10 MB files are allowed`}
 
                 onChange={(uploads: any) => {
-                  updateCreateCommunity({ logo: uploads[0] })
+                  updateCreateSpace({ logo: uploads[0] })
                 }}
                 className="py-10"
                 footerText="Supports common image formats"
@@ -111,7 +115,7 @@ const CreateSpaceDialog = () => {
                 className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
               >
                 <ButtonLoader
-                  isLoading={isCreatingCommunity}
+                  isLoading={isCreatingSpace}
                   caption="Continue"
                 />
               </Button>
