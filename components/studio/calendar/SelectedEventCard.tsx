@@ -57,7 +57,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
       if (!data?.id) return;
       setIsLoading(true);
       try {
-        const response = await fetch(`${baseUrl}/meetings/${data.id}`, {
+        const response = await fetch(`${baseUrl}/meetings/${data.id}?action=get`, {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
             "Content-Type": "application/json",
@@ -69,7 +69,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
         }
 
         const result = await response.json();
-        setFetchedData(result.data.meeting);
+        setFetchedData(result.data);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to fetch event details"
@@ -94,8 +94,6 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
         });
         if (!response.ok) throw new Error("Failed to fetch timezones");
         const responseData = await response.json();
-
-        // Check if response has data property and it's an array
         if (responseData.data && Array.isArray(responseData.data)) {
           // Extract only the name field from each timezone object
           const timezoneNames = responseData.data.map(
@@ -547,8 +545,8 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
             {/* Event Creation Details */}
             <div className="space-y-1 text-sm mb-6">
               <div className="flex">
-                <span className="w-32 font-medium">Event Created by:</span>
-                <span>{fetchedData?.createdBy?.name || "Unknown"}</span>
+                {/* <span className="w-32 font-medium">Event Created by:</span>
+                <span>{fetchedData?.createdBy?.name || "Unknown"}</span> */}
               </div>
               <div className="flex">
                 <span className="w-32 font-medium">Date Created:</span>
@@ -587,7 +585,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
                         <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
                           {participant.avatar ? (
                             <Image
-                              src={participant.avatar || "/placeholder.svg"}
+                              src={participant.avatar}
                               alt={participant.firstName}
                               width={32}
                               height={32}

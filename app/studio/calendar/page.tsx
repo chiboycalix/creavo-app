@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { baseUrl } from "@/utils/constant";
 import Cookies from "js-cookie";
 import PageTitle from "@/components/PageTitle";
+import { useAuth } from "@/context/AuthContext";
 
 interface CalendarEvent {
   id: number;
@@ -79,6 +80,8 @@ const Calendar = () => {
   const [meetings, setMeetings] = useState<CalendarEvent[]>([]);
   const [monthMeetings, setMonthMeetings] = useState<CalendarEvent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const {getCurrentUser} = useAuth();
+  const currentUser = getCurrentUser()
 
   const daysOfWeek = ["m", "t", "w", "t", "f", "s", "s"];
   const timeSlots = Array.from(
@@ -100,7 +103,8 @@ const Calendar = () => {
       const lastDay = new Date(currentYear, currentMonth + 1, 0);
 
       const response = await fetch(
-        `${baseUrl}/meetings?page=1&limit=100&startDate=${firstDay.toISOString().split("T")[0]
+        `${baseUrl}/users/${currentUser?.id}/meetings?page=1&limit=10
+        &startDate=${firstDay.toISOString().split("T")[0]
         }&endDate=${lastDay.toISOString().split("T")[0]}`,
         {
           headers: {
@@ -147,7 +151,7 @@ const Calendar = () => {
       const formattedDate = selectedDate.toISOString().split("T")[0];
 
       const response = await fetch(
-        `${baseUrl}/meetings?page=1&limit=10&date=${formattedDate}`,
+        `${baseUrl}/users/${currentUser?.id}/meetings?page=1&limit=10&date=${formattedDate}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("accessToken")}`,
