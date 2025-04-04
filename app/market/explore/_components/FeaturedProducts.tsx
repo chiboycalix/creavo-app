@@ -41,14 +41,14 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
     } else {
       setSearchRoom(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, setSearchRoom]);
 
   useEffect(() => {
     const tabFromUrl = (searchParams.get("tab") as TabValue) || "All";
     if (tabFromUrl !== activeTab) {
       setActiveTab(tabFromUrl);
     }
-  }, [searchParams]);
+  }, [searchParams, activeTab]);
 
   return (
     <Tabs value={activeTab} className="w-auto">

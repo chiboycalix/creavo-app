@@ -96,7 +96,9 @@ export default function VideoInterface({
       }));
 
       setIsWaiting(false);
-      channelName && fetchMeetingRoomData(channelName);
+      if (channelName) {
+        fetchMeetingRoomData(channelName);
+      }
       setUsername(currentUser?.username);
     } catch (error) {
       console.log("lobby, Error fetching Agora data:", error);
@@ -130,7 +132,6 @@ export default function VideoInterface({
       ws.emit(`lobby`, request, () => {
         setIsWaiting(true);
       });
-
 
       // return () => {
       //   ws.off(`profile_updated_${currentUser.id}`);
