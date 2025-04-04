@@ -77,6 +77,7 @@ export type QuestionData = {
   selectedOption: number | null;
   correctAnswer: "true" | "false" | "";
   allocatedPoint: number;
+  questionId: string;
 };
 
 export type QuizData = {
@@ -89,6 +90,12 @@ export type QuizData = {
 };
 
 export interface CreateCommunityForm {
+  name: string;
+  description: string;
+  logo?: string;
+}
+
+export interface CreateSpaceForm {
   name: string;
   description: string;
   logo?: string;

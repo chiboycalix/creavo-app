@@ -48,8 +48,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 }: any) => {
   const [showFollowersCard, setShowFollowersCard] = useState(false);
   const [showFollowingCard, setShowFollowingCard] = useState(false);
-
-  const [profileSettingsModal, setProfileSettingsModal] = useState(false);
   const { openSettingsModal, setOpenSettingsModal } = useSettings();
 
   const [followingAnchorRect, setfollowingAnchorRect] =
