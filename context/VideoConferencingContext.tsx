@@ -919,19 +919,14 @@ export function VideoConferencingProvider({
 
       const [audioTrack, videoTrack] = await Promise.all([
         AgoraRTC.createMicrophoneAudioTrack({
-          encoderConfig: "high_quality",
-
-          // encoderConfig: {
-          //   sampleRate: 48000,
-          //   stereo: true,
-          //   bitrate: 128,
-          // },
+          encoderConfig: "high_quality_stereo",
           AEC: true,
           ANS: true,
           AGC: true,
         }),
         AgoraRTC.createCameraVideoTrack(),
       ]);
+      await audioTrack.setPlaybackDevice("default");
 
       await Promise.all([
         audioTrack.setEnabled(isMicrophoneEnabled),
@@ -1497,7 +1492,7 @@ export function VideoConferencingProvider({
           const audioTrack = user.audioTrack;
           if (audioTrack) {
             audioTrack.setVolume(100);
-            await audioTrack.play();
+            audioTrack.play();
             setRemoteParticipants((prev) => ({
               ...prev,
               [uid]: {
@@ -1868,7 +1863,7 @@ export function VideoConferencingProvider({
 
   useLayoutEffect(() => {
     if (localUserTrack && localUserTrack.audioTrack) {
-      localUserTrack.audioTrack.play();
+      // localUserTrack.audioTrack.play();
     }
 
     return () => {
