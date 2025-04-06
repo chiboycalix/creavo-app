@@ -20,7 +20,7 @@ const EndCallScreen = () => {
         </Button>
 
         <Button
-          onClick={() => window.location.href = "/studio/event/meeting"}
+          onClick={() => window.location.href = "/socials"}
           className="bg-primary-700 font-semibold hover:bg-primary-800 text-white hover:text-white px-6 py-2 rounded-lg flex items-center gap-2 border-none"
         >
           Return to Home
