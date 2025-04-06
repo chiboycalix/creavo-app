@@ -82,29 +82,6 @@ const LiveStreamInterface = () => {
   const ws = useWebSocket();
   const wsRef = useRef(ws);
 
-  // useEffect(() => {
-  //   wsRef.current = ws;
-
-  //   if (ws && currentUser?.id) {
-  //     if (!ws.connected) {
-  //       ws.connect();
-  //     }
-
-  //     ws.on(`lobby`, async (data) => {
-  //       const { type, user } = data;
-  //       switch (type) {
-          
-  //         default:
-  //           break;
-  //       }
-  //       console.log("Real-time profile update received:", { lobby: data });
-  //     });
-
-  //     // return () => {
-  //     //   ws.off(`profile_updated_${currentUser.id}`);
-  //     // };
-  //   }
-  // }, [ws, currentUser?.id]);
 
   useEffect(() => {
     setJoinRequests((requests: any) => [...requests]);

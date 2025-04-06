@@ -71,7 +71,6 @@ interface VideoConferencingContextContextType {
   initializeLocalMediaTracks: () => void;
   setLocalUserTrack: any;
   releaseMediaResources: () => void;
-  publishLocalMediaTracks: () => void;
   joinMeetingRoom: () => Promise<void>;
   setMeetingConfig: (config: SetStateAction<Options>) => void;
   setRtcScreenShareOptions: (config: SetStateAction<Options>) => void;
@@ -113,6 +112,8 @@ interface VideoConferencingContextContextType {
   setMeetingRoomData: (data: any) => void;
   setJoinRequests: (jRequest: SetStateAction<JoinRequest[]>) => void;
   joinRequests: JoinRequest[] | [];
+  setDeviceStream: (data: SetStateAction<MediaStream[]>) => void;
+  deviceStream: MediaStream[];
 }
 
 let rtcClient: IAgoraRTCClient;
@@ -167,6 +168,8 @@ export function VideoConferencingProvider({
   const [raisedHands, setRaisedHands] = useState<Record<string, boolean>>({});
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
+  const [deviceStream, setDeviceStream] = useState<MediaStream[]>([]);
+
   const { currentUser } = useAuth();
   const router = useRouter();
   const ws = useWebSocket();
@@ -565,26 +568,12 @@ export function VideoConferencingProvider({
         ws.connect();
       }
 
-      ws.emit(
-        "lobby",
-        { userId: currentUser.id, meetingCode: channelName },
-        () => {
-          setIsWaiting(true);
-        }
-      );
-
       ws.on(`lobby`, async (data) => {
         const { type, user } = data;
         switch (type) {
           case "meeting-request-granted":
-            if (user.isAdmin) {
-              user.meetingCode &&
-                (await fetchAgoraData(user.meetingCode as string));
-            } else {
-              user?.meetingCode &&
-                (await fetchAgoraData(user.meetingCode as string));
-              await initializeLocalMediaTracks();
-            }
+            await fetchAgoraData(user.meetingCode as string);
+            await initializeLocalMediaTracks();
             break;
           case "join-meeting-request":
             console.log("lobby, join-meeting-request, before", { data });
@@ -609,29 +598,30 @@ export function VideoConferencingProvider({
     }
   }, [ws, currentUser?.id]);
 
-  useEffect(() => {
-    if (!ws || !isWaiting) return;
+  // useEffect(() => {
+  //   if (!ws || !isWaiting) return;
 
-    const interval = setInterval(() => {
-      console.log("lobby, Pinging backend to inform admin again 1", {
-        channelName,
-      });
+  //   const interval = setInterval(() => {
+  //     console.log("lobby, Pinging backend to inform admin again 1", {
+  //       channelName,
+  //     });
 
-      if (channelName) {
-        console.log("lobby, Pinging backend to inform admin again 2");
+  //     if (channelName) {
+  //       console.log("lobby, Pinging backend to inform admin again 2");
 
-        ws.emit(
-          "lobby",
-          { userId: currentUser?.id, meetingCode: channelName },
-          () => {
-            setIsWaiting(false);
-          }
-        );
-      }
-    }, 2000);
+  //       // if()
+  //       ws.emit(
+  //         "lobby",
+  //         { userId: currentUser?.id, meetingCode: channelName },
+  //         () => {
+  //           setIsWaiting(false);
+  //         }
+  //       );
+  //     }
+  //   }, 6000);
 
-    return () => clearInterval(interval);
-  }, [isWaiting, channelName, ws, currentUser?.id]);
+  //   return () => clearInterval(interval);
+  // }, [isWaiting, channelName, ws, currentUser?.id]);
 
   useEffect(() => {
     handleMeetingHostAndCohost();
@@ -769,7 +759,7 @@ export function VideoConferencingProvider({
       rtcScreenShareClient.on("user-unpublished", handleUserUnpublishedScreen);
       rtcScreenShareClient.on(
         "connection-state-change",
-        (curState, prevState) => { }
+        (curState, prevState) => {}
       );
 
       const mode = rtcScreenShareOptions?.proxyMode ?? 0;
@@ -913,10 +903,6 @@ export function VideoConferencingProvider({
 
   const initializeLocalMediaTracks = async () => {
     try {
-      const audioDevices = await AgoraRTC.getMicrophones();
-      const videoDevices = await AgoraRTC.getCameras();
-      const speakers = await AgoraRTC.getPlaybackDevices();
-
       const [audioTrack, videoTrack] = await Promise.all([
         AgoraRTC.createMicrophoneAudioTrack({
           encoderConfig: "high_quality_stereo",
@@ -932,20 +918,6 @@ export function VideoConferencingProvider({
         audioTrack.setEnabled(isMicrophoneEnabled),
         videoTrack.setEnabled(isCameraEnabled),
       ]);
-
-      if (audioDevices && audioDevices.length > 0) {
-        setMicrophoneDevices(audioDevices);
-      }
-
-      if (videoDevices && videoDevices.length > 0) {
-        setVideoDevices(videoDevices);
-      }
-
-      if (speakerDevices && speakerDevices.length > 0) {
-        setSpeakerDevices(speakers);
-      }
-
-      console.log("tracking", { audioDevices, videoDevices, speakerDevices });
 
       setLocalUserTrack({
         audioTrack,
@@ -1094,39 +1066,40 @@ export function VideoConferencingProvider({
 
   const toggleCamera = useCallback(async () => {
     try {
-      if (localUserTrack?.videoTrack) {
-        const newState = !isCameraEnabled;
-        await localUserTrack.videoTrack.setMuted(newState);
+      if (!localUserTrack?.videoTrack) return;
+      const newState = !isCameraEnabled;
+      await localUserTrack?.videoTrack?.setEnabled(newState);
 
-        // if (hasJoinedMeeting && rtcClient) {
-        //   if (newState) {
-        //     const isPublished = rtcClient.localTracks.includes(localUserTrack.videoTrack);
-        //     if (!isPublished) {
-        //       await rtcClient.publish([localUserTrack.videoTrack]);
-        //     }
-        //   } else {
-        //     await rtcClient.unpublish([localUserTrack.videoTrack]);
-        //   }
-        // }
-
-        // if (rtmChannel) {
-        //   await sendRateLimitedMessage({
-        //     text: JSON.stringify({
-        //       type: 'video-state',
-        //       uid: meetingConfig.uid,
-        //       enabled: newState,
-        //       hasTrack: true,
-        //       timestamp: Date.now()
-        //     })
-        //   });
-        // }
-
-        setIsCameraEnabled(newState);
+      if (rtcClient) {
+        if (newState) {
+          const isPublished = rtcClient.localTracks.includes(
+            localUserTrack.videoTrack
+          );
+          if (!isPublished) {
+            await rtcClient.publish([localUserTrack.videoTrack]);
+          }
+        } else {
+          await rtcClient.unpublish([localUserTrack.videoTrack]);
+        }
       }
+
+      // if (rtmChannel) {
+      //   await sendRateLimitedMessage({
+      //     text: JSON.stringify({
+      //       type: 'video-state',
+      //       uid: meetingConfig.uid,
+      //       enabled: newState,
+      //       hasTrack: true,
+      //       timestamp: Date.now()
+      //     })
+      //   });
+      // }
+
+      setIsCameraEnabled(newState);
     } catch (error) {
       console.log("Error toggling video:", error);
     }
-  }, [isCameraEnabled, localUserTrack?.videoTrack]);
+  }, [isCameraEnabled, localUserTrack?.videoTrack, rtcClient]);
 
   useEffect(() => {
     rateLimiter.startResetTimer();
@@ -1388,29 +1361,6 @@ export function VideoConferencingProvider({
     [isSharingScreen, updateRemoteParticipant]
   );
 
-  const publishLocalMediaTracks = async () => {
-    if (!rtcClient) {
-      return;
-    }
-    try {
-      const tracksToPublish = [];
-
-      if (localUserTrack?.audioTrack && isMicrophoneEnabled) {
-        tracksToPublish.push(localUserTrack.audioTrack);
-      }
-
-      if (localUserTrack?.videoTrack && isCameraEnabled) {
-        tracksToPublish.push(localUserTrack.videoTrack);
-      }
-
-      if (tracksToPublish.length > 0) {
-        await rtcClient.publish(tracksToPublish);
-      }
-    } catch (error) {
-      console.log("Error publishing media tracks:", error);
-    }
-  };
-
   const onParticipantLeft = useCallback((user: any) => {
     const uid = String(user.uid);
 
@@ -1575,6 +1525,7 @@ export function VideoConferencingProvider({
         await rtcScreenShareClient.leave();
         rtcScreenShareClient.removeAllListeners();
       }
+
       setChatMessages([]);
       // setHasJoinedMeeting(false);
       setIsSharingScreen(null);
@@ -1679,7 +1630,7 @@ export function VideoConferencingProvider({
       rtcClient.on("user-published", onMediaStreamPublished);
       rtcClient.on("user-unpublished", onMediaStreamUnpublished);
       rtcClient.on("user-left", onParticipantLeft);
-      rtcClient.on("user-joined", (user) => { });
+      rtcClient.on("user-joined", (user) => {});
 
       await rtcClient.setClientRole("host");
       setupVolumeIndicator();
@@ -1703,9 +1654,13 @@ export function VideoConferencingProvider({
         meetingConfig.uid == null
       ) {
         alert("Meeting config not populated");
-        router.push(`/studio/meeting/${channelName}`);
+        router.push(`/studio/event/meeting/${channelName}`);
         return;
       }
+
+      await localUserTrack.audioTrack.setEnabled(true);
+      await localUserTrack.videoTrack.setEnabled(true);
+
       meetingConfig.uid = await rtcClient.join(
         meetingConfig.appid || "",
         meetingConfig.channel || "",
@@ -1720,34 +1675,87 @@ export function VideoConferencingProvider({
     }
   };
 
+  // const joinMeetingRoom = async () => {
+  //   try {
+  //     if (!meetingConfig) {
+  //       console.log("lobby, Returning cos there is nio meeting config");
+  //       return;
+  //     }
+  //     await connectToMeetingRoom();
+
+  //     if (rtmChannel) {
+  //       await rtmChannel.sendMessage({
+  //         text: JSON.stringify({
+  //           type: "user-info",
+  //           uid: meetingConfig.uid,
+  //           name: username,
+  //         }),
+  //       });
+  //     }
+
+  //     if (localUserTrack) {
+  //       const tracksToPublish = [];
+
+  //       // Only publish audio track if microphone is enabled
+  //       if (localUserTrack.audioTrack && isMicrophoneEnabled) {
+  //         await localUserTrack.audioTrack.setEnabled(true);
+  //         tracksToPublish.push(localUserTrack.audioTrack);
+  //       }
+  //       if (localUserTrack.videoTrack && isCameraEnabled) {
+  //         await localUserTrack.videoTrack.setEnabled(true);
+  //         tracksToPublish.push(localUserTrack.videoTrack);
+  //       }
+
+  //       if (tracksToPublish.length > 0) {
+  //         await rtcClient.publish(tracksToPublish);
+  //       }
+
+  //       await broadcastCurrentMediaStates();
+  //     }
+
+  //     setHasJoinedMeeting(true);
+  //     setMeetingStage("hasJoinedMeeting");
+  //     setMeetingConfig(meetingConfig);
+  //   } catch (error) {
+  //     console.log("Error joining meeting:", error);
+  //   }
+  // };
+
   const joinMeetingRoom = async () => {
     try {
       if (!meetingConfig) {
         console.log("lobby, Returning cos there is nio meeting config");
         return;
       }
+
+      if (!localUserTrack.audioTrack && !localUserTrack.videotrack) {
+        await initializeLocalMediaTracks();
+      }
+
       await connectToMeetingRoom();
 
-      if (rtmChannel) {
-        await rtmChannel.sendMessage({
-          text: JSON.stringify({
-            type: "user-info",
-            uid: meetingConfig.uid,
-            name: username,
-          }),
-        });
+      if (localUserTrack && localUserTrack.audioTrack) {
+        await localUserTrack.audioTrack?.setEnabled(isMicrophoneEnabled);
+      }
+      if (localUserTrack && localUserTrack.videotrack) {
+        await localUserTrack.videoTrack?.setEnabled(isCameraEnabled);
       }
 
       if (localUserTrack) {
         const tracksToPublish = [];
 
         // Only publish audio track if microphone is enabled
-        if (localUserTrack.audioTrack && isMicrophoneEnabled) {
-          await localUserTrack.audioTrack.setEnabled(true);
+        // if (localUserTrack.audioTrack) {
+        //   tracksToPublish.push(localUserTrack.audioTrack);
+        // }
+        // if (localUserTrack.videoTrack) {
+        //   tracksToPublish.push(localUserTrack.videoTrack);
+        // }
+
+        if (isMicrophoneEnabled) {
           tracksToPublish.push(localUserTrack.audioTrack);
         }
-        if (localUserTrack.videoTrack && isCameraEnabled) {
-          await localUserTrack.videoTrack.setEnabled(true);
+        if (isCameraEnabled) {
           tracksToPublish.push(localUserTrack.videoTrack);
         }
 
@@ -1755,6 +1763,15 @@ export function VideoConferencingProvider({
           await rtcClient.publish(tracksToPublish);
         }
 
+        if (rtmChannel) {
+          await rtmChannel.sendMessage({
+            text: JSON.stringify({
+              type: "user-info",
+              uid: meetingConfig.uid,
+              name: username,
+            }),
+          });
+        }
         await broadcastCurrentMediaStates();
       }
 
@@ -1862,10 +1879,6 @@ export function VideoConferencingProvider({
   }, [localUserTrack, meetingConfig]);
 
   useLayoutEffect(() => {
-    if (localUserTrack && localUserTrack.audioTrack) {
-      // localUserTrack.audioTrack.play();
-    }
-
     return () => {
       if (localUserTrack && localUserTrack.audioTrack) {
         localUserTrack.audioTrack.stop();
@@ -1904,7 +1917,6 @@ export function VideoConferencingProvider({
         setLocalUserTrack,
         releaseMediaResources,
         joinMeetingRoom,
-        publishLocalMediaTracks,
         setMeetingStage,
         meetingStage,
         setChannelName,
@@ -1942,6 +1954,8 @@ export function VideoConferencingProvider({
         removeRemoteUser,
         setJoinRequests,
         joinRequests,
+        setDeviceStream,
+        deviceStream,
       }}
     >
       {children}

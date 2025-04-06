@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useWebSocket } from "@/context/WebSocket";
 import { LoadingSpinner } from "../Loaders/LoadingSpinner";
-import { agoraGetAppData } from "@/lib";
+import VideoMutedDisplay from "./VideoMutedDisplay";
 
 export default function VideoInterface({
   allowMicrophoneAndCamera,
@@ -50,60 +50,9 @@ export default function VideoInterface({
     joinMeetingRoom,
     isWaiting,
     setIsWaiting,
-    setMeetingConfig,
-    setRtcScreenShareOptions,
-    setMeetingRoomData,
-    setJoinRequests,
   } = useVideoConferencing();
   const ws = useWebSocket();
   const wsRef = useRef(ws);
-
-  const fetchMeetingRoomData = useCallback(
-    async (channelName: string) => {
-      try {
-        const data = await agoraGetAppData(channelName);
-        setMeetingRoomData(data);
-      } catch (error) {
-        console.log("Error fetching meeting room data:", error);
-      }
-    },
-    [channelName]
-  );
-
-  const fetchAgoraData = async (channelName: string) => {
-    try {
-      const rtcData = await agoraGetAppData(channelName);
-      const { client } = rtcData;
-
-      setMeetingConfig((prev) => ({
-        ...prev,
-        appid: client[0].appId,
-        rtcToken: client[0].rtcToken,
-        rtmToken: client[0].rtmToken,
-        certificate: client[0].appCertificate,
-        uid: client[0].uid,
-        channel: client[0].channelName,
-      }));
-
-      setRtcScreenShareOptions((prev) => ({
-        ...prev,
-        appid: client[1].appId,
-        rtcToken: client[1].rtcToken,
-        rtmToken: client[1].rtmToken,
-        certificate: client[1].appCertificate,
-        uid: client[1].uid,
-        channel: client[1].channelName,
-      }));
-
-      setIsWaiting(false);
-      if (channelName) {
-        fetchMeetingRoomData(channelName);
-      }
-      setUsername(currentUser?.username);
-    } catch (error) {
-      console.log("lobby, Error fetching Agora data:", error);
-    }
-  };
 
   const handleJoinMeeting = async () => {
     setIsLoading(true);
@@ -117,32 +66,15 @@ export default function VideoInterface({
   };
 
   useEffect(() => {
-    wsRef.current = ws;
-
-    if (ws && currentUser?.id) {
-      if (!ws.connected) {
-        ws.connect();
-      }
-
-      const request = {
-        userId: currentUser.id,
-        meetingCode: channelName,
-        type: "notify-admin",
-      };
-      ws.emit(`lobby`, request, () => {
-        setIsWaiting(true);
-      });
-
-      // return () => {
-      //   ws.off(`profile_updated_${currentUser.id}`);
-      // };
-    }
-  }, [ws, currentUser?.id]);
-
-  useEffect(() => {
     setChannelName(channelName);
     setUsername(currentUser.username);
-  }, [channelName, setChannelName, username, setUsername, currentUser.usernam]);
+  }, [
+    channelName,
+    setChannelName,
+    username,
+    setUsername,
+    currentUser.username,
+  ]);
 
   return (
     <div>
@@ -171,9 +103,7 @@ export default function VideoInterface({
 
                 <div className="bg-red-500 text-white px-3 py-2 rounded-full mt-4 text-sm flex items-center gap-2">
                   <span className="inline-block w-3 h-3 rounded-full bg-white"></span>
-                  <p>
-                    LIVE {allowMicrophoneAndCamera ? "Conferencing" : "Stream"}
-                  </p>
+                  <p>LIVE {allowMicrophoneAndCamera ? "Conferencing" : "Stream"}</p>
                 </div>
 
                 {/* Video Preview Container */}
@@ -185,11 +115,17 @@ export default function VideoInterface({
                       <MicOff size={16} className="text-white" />
                     )}
                   </button>
-                  <StreamPlayer
-                    videoTrack={localUserTrack?.videoTrack || null}
-                    audioTrack={localUserTrack?.audioTrack || null}
-                    uid={meetingConfig?.uid || ""}
-                  />
+                  {isCameraEnabled ? (
+                    <StreamPlayer
+                      videoTrack={localUserTrack?.videoTrack || null}
+                      audioTrack={localUserTrack?.audioTrack || null}
+                      uid={meetingConfig?.uid || ""}
+                    />
+                  ) : (
+                    <VideoMutedDisplay
+                      participant={{ uid: "", name: "", isLocal: true }}
+                    />
+                  )}
                 </div>
 
                 {/* Controls Section */}
@@ -269,9 +205,7 @@ export default function VideoInterface({
                       />
                     </div>
                     <div className="sm:flex-1 w-full">
-                      {isWaiting && allowMicrophoneAndCamera && (
-                        <LoadingSpinner />
-                      )}
+                      {isWaiting && <LoadingSpinner />}
 
                       {!isWaiting && (
                         <Button

@@ -25,7 +25,7 @@ export const StreamPlayer: React.FC<StreamPlayerProps> = ({
   isScreenShare = false,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { isCameraEnabled, meetingConfig } = useVideoConferencing();
+  const { isCameraEnabled, meetingConfig, initializeLocalMediaTracks } = useVideoConferencing();
   const isLocalUser = uid === meetingConfig?.uid;
 
   useEffect(() => {
@@ -34,7 +34,10 @@ export const StreamPlayer: React.FC<StreamPlayerProps> = ({
         try {
           videoTrack.stop();
         } catch (error) {
-          console.error("[STREAM-PLAYER] Error cleaning up video track:", error);
+          console.error(
+            "[STREAM-PLAYER] Error cleaning up video track:",
+            error
+          );
         }
       }
     };
@@ -52,27 +55,16 @@ export const StreamPlayer: React.FC<StreamPlayerProps> = ({
 
   return (
     <div className="relative w-full h-full">
-
-      {/* <video
-        ref={videoRef}
-        playsInline
-        autoPlay
-        muted
-        className={`w-full h-full transition-opacity duration-300 ${shouldShowVideo ? "opacity-100" : "opacity-0"
-          }`}
-      />
-      {!shouldShowVideo && (
-        <VideoMutedDisplay participant={{ uid, name: "", isLocal: isLocalUser }} />
-      )} */}
-      {shouldShowVideo ? (
+      {shouldShowVideo && (
         <video
-          playsInline autoPlay muted
+          playsInline
+          autoPlay
+          muted
           ref={videoRef}
-          className={`w-full h-full transition-opacity duration-300 ${isScreenShare ? 'bg-black' : ''} ${shouldShowVideo ? "opacity-100" : "opacity-0"
-            }`}
+          className={`w-full h-full transition-opacity duration-300 ${
+            isScreenShare ? "bg-black" : ""
+          } ${shouldShowVideo ? "opacity-100" : "opacity-0"}`}
         />
-      ) : (
-        <VideoMutedDisplay participant={{ uid, name: '', isLocal: isLocalUser }} />
       )}
     </div>
   );
