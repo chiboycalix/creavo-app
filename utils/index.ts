@@ -1,9 +1,5 @@
 import moment from "moment";
-import {
-  baseUrl,
-  cloudinaryCloudName,
-  cloudinaryUploadPreset,
-} from "@/utils/constant";
+import { cloudinaryCloudName, cloudinaryUploadPreset } from "@/utils/constant";
 
 export const formatDate = (dateString: string): string => {
   const now = new Date();

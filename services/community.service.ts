@@ -13,6 +13,13 @@ export type AddMemberToSpacePayload = {
   members: string[];
 };
 
+export type CreatePostsPayload = {
+  text: string;
+  image_url?: string;
+  spaceId: string;
+  communityId: string;
+};
+
 export const createCommunityService = async (payload: any) => {
   try {
     const { data } = await apiClient.post(`/communities`, {
@@ -59,6 +66,21 @@ export const addMembersManuallyToSpaceService = async ({
       `/communities/${communityId}/spaces/${spaceId}/members`,
       {
         members,
+      }
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createPostService = async (payload: CreatePostsPayload) => {
+  const { communityId, spaceId, ...rest } = payload;
+  try {
+    const { data } = await apiClient.post(
+      `/communities/${communityId}/spaces/${spaceId}/messages`,
+      {
+        ...rest,
       }
     );
     return data;

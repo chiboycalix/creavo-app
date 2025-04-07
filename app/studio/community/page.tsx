@@ -2,11 +2,11 @@
 import PageTitle from "@/components/PageTitle";
 import React, { useEffect } from "react";
 import CommunityPageSkeleton from "@/components/sketetons/CommunityPageSkeleton";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import CreateCommunityDialog from "@/components/studio/community/CreateCommunityDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useListCommunities } from "@/hooks/communities/useListCommunities";
 import { useRouter } from "next/navigation";
-import ProtectedRoute from "@/components/ProtectedRoute";
 
 const Community = () => {
   const { data: communityData, isFetching } = useListCommunities();

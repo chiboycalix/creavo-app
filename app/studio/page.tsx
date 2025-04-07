@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import PageTitle from "@/components/PageTitle";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const overviewData = [
   {
@@ -207,74 +208,80 @@ const StudioDashboard = () => {
   ] as any;
 
   return (
-    <div className="w-full">
-      <div className="w-full flex items-center justify-between">
-        <PageTitle>
-          {profileLoading ? (
-            <div className="animate-pulse bg-gray-300 text-gray-300 px-3 rounded-md h-2 roundex-md w-full" />
-          ) : (
-            <><span>Hey, {userProfile?.profile?.firstName || "Guest"}</span></>
-          )
-          }{" "}  👋
-        </PageTitle>
+    <ProtectedRoute
+      requireAuth={true}
+      requireVerification={true}
+      requireProfileSetup={false}
+    >
+      <div className="w-full">
+        <div className="w-full flex items-center justify-between">
+          <PageTitle>
+            {profileLoading ? (
+              <div className="animate-pulse bg-gray-300 text-gray-300 px-3 rounded-md h-2 roundex-md w-full" />
+            ) : (
+              <><span>Hey, {userProfile?.profile?.firstName || "Guest"}</span></>
+            )
+            }{" "}  👋
+          </PageTitle>
 
-        <PageTitle>
+          <PageTitle>
 
-          <Button>
-            <Link href="/studio/course" className="flex items-center gap-2">
-              <PlusSquareIcon /> Create Course
-            </Link>
-          </Button>
-        </PageTitle>
+            <Button>
+              <Link href="/studio/course" className="flex items-center gap-2">
+                <PlusSquareIcon /> Create Course
+              </Link>
+            </Button>
+          </PageTitle>
 
 
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10 w-full mt-8">
-        {overviewData.map((data) => {
-          return <StatisticsCard key={data.id} {...data} />;
-        })}
-      </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10 w-full mt-8">
+          {overviewData.map((data) => {
+            return <StatisticsCard key={data.id} {...data} />;
+          })}
+        </div>
 
-      <div className="mt-10 flex gap-5 w-full ">
-        {/* <RevenueAndCompletionCharts /> */}
-        <div className="flex-1 bg-white py-3 px-2">
-          <ChartHeader title="Revenue" />
-          <LineChart
-            data={subscribersChartData}
-            highlightIndex={8}
-            highlightValue={83234}
-            title="Total Subscribers"
+        <div className="mt-10 flex gap-5 w-full ">
+          {/* <RevenueAndCompletionCharts /> */}
+          <div className="flex-1 bg-white py-3 px-2">
+            <ChartHeader title="Revenue" />
+            <LineChart
+              data={subscribersChartData}
+              highlightIndex={8}
+              highlightValue={83234}
+              title="Total Subscribers"
+            />
+          </div>
+          <div className="w-[30%] ">
+            <CompletionRate color="#82AFF3" />
+          </div>
+        </div>
+        <div className="mt-10">
+          <RecentCourses />
+        </div>
+
+        <div className="mt-10">
+          <DynamicTable
+            columns={columns}
+            data={tableData}
+            setCurrentPage={setCurrentPage}
+            setRowsPerPage={setRowsPerPage}
+            currentPage={currentPage}
+            rowsPerPage={rowsPerPage}
+            renderEmptyRecords={
+              <div className="flex flex-col w-full items-center justify-center h-[300px] mx-auto">
+                <h2 className="text-center font-semibold flex justify-center text-md">
+                  No Information yet!
+                </h2>
+                <p className="text-center text-sm">
+                  You currently don’t have any Subscriber
+                </p>
+              </div>
+            }
           />
         </div>
-        <div className="w-[30%] ">
-          <CompletionRate color="#82AFF3" />
-        </div>
       </div>
-      <div className="mt-10">
-        <RecentCourses />
-      </div>
-
-      <div className="mt-10">
-        <DynamicTable
-          columns={columns}
-          data={tableData}
-          setCurrentPage={setCurrentPage}
-          setRowsPerPage={setRowsPerPage}
-          currentPage={currentPage}
-          rowsPerPage={rowsPerPage}
-          renderEmptyRecords={
-            <div className="flex flex-col w-full items-center justify-center h-[300px] mx-auto">
-              <h2 className="text-center font-semibold flex justify-center text-md">
-                No Information yet!
-              </h2>
-              <p className="text-center text-sm">
-                You currently don’t have any Subscriber
-              </p>
-            </div>
-          }
-        />
-      </div>
-    </div>
+    </ProtectedRoute>
   );
 };
 

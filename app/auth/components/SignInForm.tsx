@@ -33,6 +33,8 @@ export default function SignInForm() {
       })) as any;
       if (data.code === STATUS_CODES.OK) {
         Cookies.set("accessToken", data.data.token, COOKIE_OPTIONS);
+        Cookies.set("rocketAuthToken", data?.data?.rocketAuth?.authToken)
+        Cookies.set("rocketUserId", data?.data?.rocketAuth?.userId)
         setAuth(true, data.data, data.data.token);
         showToast(
           'success',

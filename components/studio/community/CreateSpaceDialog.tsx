@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from '@/components/Input'
-import { FormEvent, useState } from "react"
+import { FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
 import { createSpaceService, SpacePayload } from "@/services/community.service"
@@ -23,6 +23,7 @@ import { Plus } from "lucide-react"
 
 const CreateSpaceDialog = ({ communityId }: { communityId: string }) => {
   const maxFiles = 1;
+  const router = useRouter()
   const dispatch = useAppDispatch();
   const { createSpaceForm: createSpaceStateValues } = useAppSelector((store) => store.spaceStore);
   const { validate, errors, validateField } = useCreateSpaceValidator({ store: createSpaceStateValues });
@@ -33,12 +34,13 @@ const CreateSpaceDialog = ({ communityId }: { communityId: string }) => {
       return createSpaceService(payload)
     },
     onSuccess: async (data) => {
+      console.log({ data })
       toast.success("Space created successfully")
+      router.push(`/studio/community/${communityId}/${data?.id}`)
       dispatch(resetCreateSpaceForm())
     },
     onError: (error: any) => {
-      console.log(error, "error")
-      toast.error(error?.data[0])
+      toast.error(error?.data[0] || "Something went wrong, contact admin")
     },
   });
 
