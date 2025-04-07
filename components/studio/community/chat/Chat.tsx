@@ -11,7 +11,7 @@ const initialMessages: Message[] = [
     user: {
       id: 'user1',
       name: 'Obaking',
-      avatar: '/lovable-uploads/528577e0-5da9-449c-b49c-de7f3df584d8.png',
+      avatar: "",
     },
     content: 'We have some other ping & group roles you can select as well! These do not open any additional channels but will be used to send you notifications.',
     timestamp: 'Oct 30, 2024 | 11:28 am',
@@ -25,7 +25,7 @@ const initialMessages: Message[] = [
     user: {
       id: 'user1',
       name: 'Obaking',
-      avatar: '/lovable-uploads/528577e0-5da9-449c-b49c-de7f3df584d8.png',
+      avatar: "",
     },
     content: 'You can still access all general channels without these roles.',
     timestamp: 'Oct 30, 2024 | 11:28 am',
@@ -40,7 +40,7 @@ const initialMessages: Message[] = [
     user: {
       id: 'user1',
       name: 'Obaking',
-      avatar: '/lovable-uploads/528577e0-5da9-449c-b49c-de7f3df584d8.png',
+      avatar: "",
     },
     content: 'We have some other ping & group roles you can select as well! These do not open any additional channels but will be used to send you notifications.',
     timestamp: 'Oct 30, 2024 | 11:28 am',
@@ -55,7 +55,7 @@ const initialMessages: Message[] = [
     user: {
       id: 'user1',
       name: 'Obaking',
-      avatar: '/lovable-uploads/528577e0-5da9-449c-b49c-de7f3df584d8.png',
+      avatar: "",
     },
     content: 'You can still access all general channels without these roles.',
     timestamp: 'Oct 30, 2024 | 11:28 am',
