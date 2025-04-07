@@ -34,7 +34,7 @@ const CreateCommunityPost = ({ spaceId, communityId }: { spaceId: string, commun
     e.preventDefault()
     handleCreatePost({
       text: post,
-      image_url: postImage,
+      imageUrl: postImage,
       spaceId,
       communityId
     })

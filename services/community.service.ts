@@ -15,7 +15,7 @@ export type AddMemberToSpacePayload = {
 
 export type CreatePostsPayload = {
   text: string;
-  image_url?: string;
+  imageUrl?: string;
   spaceId: string;
   communityId: string;
 };

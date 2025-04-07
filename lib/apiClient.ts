@@ -16,8 +16,8 @@ apiClient.interceptors.request.use(
     const rocketUserId = Cookies.get("rocketUserId");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      config.headers["rocketAuthToken"] = rocketAuthToken;
-      config.headers["rocketUserId"] = rocketUserId;
+      config.headers["rocket-auth-token"] = rocketAuthToken;
+      config.headers["rocket-user-id"] = rocketUserId;
     }
     return config;
   },
