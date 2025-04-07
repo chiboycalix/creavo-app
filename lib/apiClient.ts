@@ -12,12 +12,8 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = Cookies.get("accessToken");
-    const rocketAuthToken = Cookies.get("rocketAuthToken");
-    const rocketUserId = Cookies.get("rocketUserId");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      config.headers["rocket-auth-token"] = rocketAuthToken;
-      config.headers["rocket-user-id"] = rocketUserId;
     }
     return config;
   },
