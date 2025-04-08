@@ -57,12 +57,15 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
       if (!data?.id) return;
       setIsLoading(true);
       try {
-        const response = await fetch(`${baseUrl}/meetings/${data.id}?action=get`, {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${baseUrl}/meetings/${data.id}?action=get`,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("accessToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Failed to fetch event details: ${response.status}`);
@@ -200,14 +203,17 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
         isPaid: false, // Always set isPaid to false
       };
 
-      const response = await fetch(`${baseUrl}/meetings/${data.id}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${Cookies.get("accessToken")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `${baseUrl}/meetings/${data.id}?action=get`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to update meeting: ${response.status}`);
@@ -218,7 +224,7 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
       if (result.status === "OK" || result.statusCode === 200) {
         // Fetch the updated meeting data since the response doesn't include it
         const updatedDataResponse = await fetch(
-          `${baseUrl}/meetings/${data.id}`,
+          `${baseUrl}/meetings/${data.id}?action=get`,
           {
             headers: {
               Authorization: `Bearer ${Cookies.get("accessToken")}`,
@@ -235,11 +241,10 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
 
         const updatedData = await updatedDataResponse.json();
 
-        if (updatedData.data && updatedData.data.meeting) {
-          // Update the fetchedData state with the updated meeting data
-          setFetchedData(updatedData.data.meeting);
+        if (updatedData.data) {
+          setFetchedData(updatedData.data);
           // Exit edit mode
-          setIsEditMode(false);
+          setIsEditMode(!isEditMode);
           toast.success("Meeting updated successfully");
         } else {
           console.error("Unexpected response structure:", updatedData);
@@ -498,7 +503,9 @@ const SelectedEventCard = ({ isOpen, onClose, data }: EventDetailsProps) => {
                     {" "}
                     Timezone : {fetchedData?.timezone || "Not specified"}{" "}
                   </span>
-                  <span>{fetchedData?.recurrence || "One Time"}</span>
+
+                {/* <span>{fetchedData?.repeat || "One Time"}</span> */}
+
                 </div>
               </div>
             )}

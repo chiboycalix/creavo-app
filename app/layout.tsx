@@ -17,6 +17,7 @@ import { RouterSpinner } from "@/components/Loaders/RouterSpinner";
 import "./globals.css";
 import MainLayout from "@/components/layouts/MainLayout";
 import NextTopLoader from 'nextjs-toploader';
+import GoogleProviderWrapper from "@/context/GoogleProviderWrapper";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({
             <ReactQueryProvider>
               <ReduxProvider>
                 <AuthProvider>
+                  <GoogleProviderWrapper>
                   <MarketProvider>
                     <SettingsProvider>
                       <WebSocketProvider>
@@ -61,6 +63,7 @@ export default function RootLayout({
                       </WebSocketProvider>
                     </SettingsProvider>
                   </MarketProvider>
+                  </GoogleProviderWrapper>
                 </AuthProvider>
               </ReduxProvider>
             </ReactQueryProvider>
