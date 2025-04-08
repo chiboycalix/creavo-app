@@ -346,7 +346,7 @@ const Calendar = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col  bg-white">
       <header className="flex justify-between items-center px-6 py-4 border-b">
         <PageTitle>Calendar</PageTitle>
         <Button
