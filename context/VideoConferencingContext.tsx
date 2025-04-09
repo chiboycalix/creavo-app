@@ -359,8 +359,9 @@ export function VideoConferencingProvider({
                 console.log("Before state update:", userIsCoHost);
 
                 // Update local participant state
-                meetingConfig.channel &&
+                if (meetingConfig.channel) {
                   fetchMeetingRoomData(meetingConfig.channel);
+                }
                 handleMeetingHostAndCohost();
 
                 updateRemoteParticipant(uid, {
@@ -462,8 +463,8 @@ export function VideoConferencingProvider({
     rtmChannel.on("ChannelMessage", handleRTMMessage);
     rtmClient.on("MessageFromPeer", handleRTMMessage);
     return () => {
-      rtmChannel.off("ChannelMessage", handleRTMMessage);
-      rtmClient.off("MessageFromPeer", handleRTMMessage);
+      rtmChannel?.off("ChannelMessage", handleRTMMessage);
+      rtmClient?.off("MessageFromPeer", handleRTMMessage);
     };
   }, [handleRTMMessage]);
 
@@ -1178,7 +1179,9 @@ export function VideoConferencingProvider({
           });
           await broadcastCurrentMediaStates();
         }
-        channelName && fetchMeetingRoomData(channelName);
+        if (channelName) {
+          fetchMeetingRoomData(channelName);
+        }
       } catch (error) {
         console.log("Error handling participant join:", error);
       }
@@ -1189,6 +1192,7 @@ export function VideoConferencingProvider({
       remoteParticipants,
       broadcastCurrentMediaStates,
       fetchMeetingRoomData,
+      channelName,
     ]
   );
 
@@ -1239,12 +1243,14 @@ export function VideoConferencingProvider({
         delete remoteUsersRef.current[memberId];
 
         // Fetch updated meeting room data to reflect new participant list
-        channelName && (await fetchMeetingRoomData(channelName));
+        if (channelName) {
+          await fetchMeetingRoomData(channelName);
+        }
       } catch (error) {
         console.error("Error handling member disconnection:", error);
       }
     },
-    [meetingConfig.uid, isSharingScreen, fetchMeetingRoomData]
+    [meetingConfig.uid, isSharingScreen, fetchMeetingRoomData, channelName]
   );
 
   const fetchActiveMeetingParticipants = useCallback(async () => {
@@ -1832,7 +1838,9 @@ export function VideoConferencingProvider({
           uid,
         }),
       });
-      meetingConfig.channel && fetchMeetingRoomData(meetingConfig.channel);
+      if (meetingConfig?.channel) {
+        fetchMeetingRoomData(meetingConfig?.channel);
+      }
     } catch (error) {
       console.error("Error sending cohost permission:", error);
     }

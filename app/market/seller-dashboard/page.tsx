@@ -6,7 +6,6 @@ import { EllipsisVerticalIcon, StarIcon } from "lucide-react";
 const SellerDashboard = () => {
   const { listedCourses, isSaved, handleToggleSave } = useMarketContext();
 
-  console.log("listedCourses", listedCourses);
   const listingsSection = [
     {
       title: "Total Listings",
@@ -58,20 +57,38 @@ const SellerDashboard = () => {
       </div>
 
       <div>
-        {listedCourses?.map((item: any, index: any) => (
+        {listedCourses?.map((item: any, index: any) => {
+          const isVideo = item?.promotionalUrl?.endsWith(".mp4") ?? false;
+
           <div
             key={index}
             className="flex h-auto gap-10 bg-white p-4 shadow-md rounded-lg hover:border border-primary-100"
           >
             <div className="w-1/4">
-              <img src={item?.promotionalUrl} alt="img" />
+              {isVideo ? (
+                <video
+                  src={item?.promotionalUrl}
+                  autoPlay
+                  loop
+                  muted
+                  className="rounded-md"
+                />
+              ) : (
+                <img
+                  src={item?.promotionalUrl}
+                  alt="img"
+                  className="rounded-md"
+                />
+              )}
             </div>
             <div className="flex flex-col justify-between gap-5">
               <h2 className="font-bold">{item?.title}</h2>
               <p>{item?.description}</p>
               <div className="flex gap-5 justify-between items-center">
                 <div className="flex gap-2">
-                  <div className="border-r-2 pr-3 font-bold text-[#00B5FF]">Active</div>
+                  <div className="border-r-2 pr-3 font-bold text-[#00B5FF]">
+                    Active
+                  </div>
                   <div>0 Clicks</div>
                 </div>
                 <div className="bg-[#DFF8F6] px-2 py-1 rounded-md shadow-md">
@@ -87,8 +104,8 @@ const SellerDashboard = () => {
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          </div>;
+        })}
       </div>
     </div>
   );

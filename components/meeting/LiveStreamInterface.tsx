@@ -28,7 +28,7 @@ import {
   Hand,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useVideoConferencing } from "@/context/VideoConferencingContext";
 import { generalHelpers } from "@/helpers";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,8 @@ import { ROUTES } from "@/constants/routes";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { useWebSocket } from "@/context/WebSocket";
+import { Dialog, DialogPanel, TransitionChild } from "@headlessui/react";
+import TimeoutWarningDialog from "./TimeoutWarningDialog";
 
 const LiveStreamInterface = () => {
   const [showInviteModal, setShowInviteModal] = useState(true);
@@ -73,15 +75,17 @@ const LiveStreamInterface = () => {
     screenSharingUser,
     setJoinRequests,
     joinRequests,
+    meetingRoomData,
   } = useVideoConferencing();
   const totalParticipants = Object.keys(remoteParticipants || {}).length + 1;
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [timeOutWarning, setTimeOutWarning] = useState(false);
+
   const { getCurrentUser, currentUser } = useAuth();
   const username = getCurrentUser()?.username;
   const isRaised = raisedHands[String(meetingConfig.uid)];
   const ws = useWebSocket();
   const wsRef = useRef(ws);
-
 
   useEffect(() => {
     setJoinRequests((requests: any) => [...requests]);
@@ -90,6 +94,19 @@ const LiveStreamInterface = () => {
   useEffect(() => {
     remoteUsersRef.current = remoteParticipants;
   }, [remoteParticipants]);
+
+  useEffect(() => {
+    if (
+      meetingRoomData?.hasStarted &&
+      Object.keys(remoteParticipants).length === 0
+    ) {
+      const timeOut = setTimeout(() => {
+        setTimeOutWarning(true);
+      }, 5 * 60 * 1000);
+
+      return () => clearTimeout(timeOut);
+    }
+  }, [wsRef, remoteParticipants, meetingRoomData?.hasStarted]);
 
   const handleAllow = (requesterId: string) => {
     wsRef.current = ws;
@@ -514,6 +531,19 @@ const LiveStreamInterface = () => {
           colorPickeranchorRect={colorPickeranchorRect}
         />
       }
+
+      <AnimatePresence>
+        {timeOutWarning && (
+          <TimeoutWarningDialog
+            open={timeOutWarning}
+            onStay={() => setTimeOutWarning(false)}
+            onLeave={() => {
+              setTimeOutWarning(false);
+              handleEndCall();
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

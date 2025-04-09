@@ -76,9 +76,9 @@ const OtherCard: React.FC<ProductCardProps> = ({ item, handleToggleSave }) => {
       </div>
       <div className="absolute bg-opacity-90 bg-white top-2 right-2 rounded-full p-1">
         <SaveProductButton
-          productId={item?.id}
+          product={item}
           initialIsSaved={isSaved}
-          onToggleSave={() => handleToggleSave(item)}
+          onToggle={() => handleToggleSave(item)}
         />
       </div>
     </div>

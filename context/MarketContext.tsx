@@ -13,7 +13,7 @@ import { baseUrl } from "@/utils/constant";
 import Cookies from "js-cookie";
 
 export interface Product {
-  id: number;
+  id: any;
   name: string;
   price: number;
   description: string;
@@ -27,15 +27,14 @@ export interface Product {
 interface MarketContextType {
   products: Product[];
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
-  addProduct: (product: Product) => void;
   fetchListedCourses: () => void;
   listedCourses: any;
-  removeProduct: (id: number) => void;
   fetchCourseProducts: () => void;
   fetchPopularCourses: () => void;
   fetchPopularEvents: () => void;
   fetchOrders: () => any;
   fetchMyListings: () => any;
+  fetchSavedProducts: () => any;
   savedProducts: any;
   handleToggleSave: (product: any) => void;
   isSaved: boolean;
@@ -429,31 +428,93 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     ];
   };
 
-  const addProduct = (product: Product) => {
-    setProducts((prevProducts) => [...prevProducts, product]);
-  };
+  const fetchSavedProducts = useCallback(async () => {
+    try {
+      const response = await fetch(`${baseUrl}/users/${userId}/saved-courses`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
+      });
 
-  const removeProduct = (id: number) => {
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product.id !== id)
-    );
-  };
+      if (!response.ok) {
+        throw new Error("Failed to fetch courses");
+      }
 
-  const handleToggleSave = useCallback((product: Product) => {
-    setSavedProducts((prevSavedProducts: any) => {
-      const isCurrentlySaved = prevSavedProducts.some(
-        (p: Product) => p.id === product.id
+      const data = await response.json();
+      const courseProducts = data?.data?.courses;
+      return courseProducts;
+    } catch (error) {}
+  }, [userId]);
+
+  const handleToggleSave = useCallback(
+    async (product: any) => {
+      const isCurrentlySaved = savedProducts?.some(
+        (p: Product) => p.id == product?.id
       );
 
-      if (isCurrentlySaved) {
-        setIsSaved(false); // Product is being removed
-        return prevSavedProducts.filter((p: Product) => p.id !== product.id);
+      // Optimistically update savedProducts
+      const previousSaved = [...savedProducts];
+      let newSaved;
+
+      console.log("id", product?.id);
+      console.log("pro pro", product);
+
+      if (!isCurrentlySaved) {
+        newSaved = [...savedProducts, product];
+        setSavedProducts(newSaved);
+
+        try {
+          const response = await fetch(
+            `${baseUrl}/market-place/courses/save-course`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${Cookies.get("accessToken")}`,
+              },
+              body: JSON.stringify({
+                interactableId: product?.id,
+                interactableType: "COURSE",
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to save course");
+          }
+        } catch (error) {
+          console.error(error);
+          setSavedProducts(previousSaved);
+        }
       } else {
-        setIsSaved(true); // Product is being saved
-        return [...prevSavedProducts, product];
+        newSaved = savedProducts?.filter((p: any) => p.id != product?.id);
+        setSavedProducts(newSaved);
+
+        try {
+          const response = await fetch(
+            `${baseUrl}/market-place/courses/${product?.id}/delete-save-course`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${Cookies.get("accessToken")}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to unsave course");
+          }
+        } catch (error) {
+          console.error(error);
+          setSavedProducts(previousSaved);
+        }
       }
-    });
-  }, []);
+    },
+    [savedProducts, setSavedProducts]
+  );
 
   const fetchListedCourses = useCallback(async () => {
     try {
@@ -497,6 +558,23 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     getProducts();
   }, [fetchCourseProducts]);
 
+  // useEffect(() => {
+  //   const getSavedProducts = async () => {
+  //     const products = await fetchSavedProducts();
+  //     setSavedProducts(products);
+  //   };
+  //   getSavedProducts();
+  // }, [products, fetchSavedProducts]);
+
+  useEffect(() => {
+    const getSavedProducts = async () => {
+      const products = await fetchSavedProducts();
+      setSavedProducts(products);
+    };
+
+    getSavedProducts(); // Load once on mount
+  }, [fetchSavedProducts]);
+
   return (
     <MarketContext.Provider
       value={{
@@ -505,13 +583,12 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         fetchCourseProducts,
         fetchListedCourses,
         fetchSingleCourseProduct,
+        fetchSavedProducts,
         listedCourses,
         fetchPopularCourses,
         fetchPopularEvents,
         fetchOrders,
         fetchMyListings,
-        addProduct,
-        removeProduct,
         savedProducts,
         handleToggleSave,
         isSaved,
