@@ -66,8 +66,7 @@ const SocialButtons = () => {
           <ImSpinner2 className="animate-spin text-2xl text-gray-600" />
         </div>
       ) : (
-        <div className="w-full ">
-          <div className="bg-white   hover:bg-slate-300 flex justify-center items-center   p-2.5 text-sm cursor-pointer rounded-lg text-gray-800 w-full font-medium leading-6">
+        <div className="w-full mx-auto ">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => {
@@ -84,22 +83,8 @@ const SocialButtons = () => {
               logo_alignment="center"
             />
           </div>
-        </div>
       )}
 
-      <button
-        type="button"
-        disabled={loading}
-        className="bg-white mx-auto hover:bg-slate-300 flex justify-center border-gray-300 border items-center  py-2 text-sm cursor-pointer rounded-sm text-gray-800 w-[95%] font-medium leading-6"
-      >
-        {loading ? (
-          <ImSpinner2 className="animate-spin text-2xl text-gray-600" />
-        ) : (
-          <div className="flex items-center gap-2">
-            <BsLinkedin className="text-xl" /> Sign In with LinkedIn
-          </div>
-        )}
-      </button>
     </div>
   );
 };
