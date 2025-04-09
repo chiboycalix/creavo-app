@@ -50,7 +50,6 @@ const QuickActions = () => {
               className="basis-1/2 "
             />
             <Item
-              // link="/market/create-listing"
               link="#"
               title="Create Listing"
               description="Showcase your products or services in a few simple steps. Reach potential buyers effortlessly."
