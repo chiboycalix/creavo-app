@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { ImSpinner2 } from 'react-icons/im';
-import { BsLinkedin } from 'react-icons/bs';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+
 import { useAuth, COOKIE_OPTIONS } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { baseUrl } from '@/utils/constant';
 import { ROUTES } from '@/constants/routes';
 import { STATUS_CODES } from '@/constants/statusCodes';
 
+// 👇 TypeScript fix for window.google
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 const SocialButtons = () => {
   const { setAuth } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (window.google && window.google.accounts?.id?.disableAutoSelect) {
+      window.google.accounts.id.disableAutoSelect();
+    }
+  }, []);
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setLoading(true);
@@ -66,25 +79,22 @@ const SocialButtons = () => {
           <ImSpinner2 className="animate-spin text-2xl text-gray-600" />
         </div>
       ) : (
-        <div className="w-full mx-auto ">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => {
-                showToast('error', 'Google Login Failed', 'Login was unsuccessful');
-              }}
-              useOneTap={false}
-              text="signin_with"
-              width="100%"
-              size="large"
-              theme='outline'
-              containerProps={{
-                className: 'w-full outline-black shadow-none', 
-              }}
-              logo_alignment="center"
-            />
-          </div>
+        <div className="w-full mx-auto flex justify-center items-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => showToast('error', 'Google Login Failed', 'Login was unsuccessful')}
+            useOneTap={false}
+            text="signin_with"
+            width="100%"
+            size="large"
+            theme="outline"
+            containerProps={{
+              className: 'w-full outline-black shadow-none',
+            }}
+            logo_alignment="center"
+          />
+        </div>
       )}
-
     </div>
   );
 };
