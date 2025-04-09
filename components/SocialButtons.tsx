@@ -5,7 +5,6 @@ import { BsLinkedin } from 'react-icons/bs';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-
 import { useAuth, COOKIE_OPTIONS } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { baseUrl } from '@/utils/constant';
@@ -26,8 +25,6 @@ const SocialButtons = () => {
       const res = await axios.post(`${baseUrl}/auth/google`, { idToken });
       const data = res.data;
 
-      console.log('Google login response:', data); 
-
       const account = data?.data;
       const token = account?.token;
 
@@ -47,7 +44,7 @@ const SocialButtons = () => {
           router.push(ROUTES.HOME);
         }
 
-      } else if (data.code === "API_ERR_RESOURCE_NOT_FOUND") {
+      } else if (data.code === 'API_ERR_RESOURCE_NOT_FOUND') {
         showToast('info', 'Account not found', 'Please sign up to continue.');
       } else if (data.code && data.message) {
         showToast('error', 'Google Login Failed', data.message);
@@ -69,19 +66,31 @@ const SocialButtons = () => {
           <ImSpinner2 className="animate-spin text-2xl text-gray-600" />
         </div>
       ) : (
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={() => {
-            showToast('error', 'Google Login Failed', 'Login was unsuccessful');
-          }}
-          logo_alignment="center"
-        />
+        <div className="w-full ">
+          <div className="bg-white   hover:bg-slate-300 flex justify-center items-center   p-2.5 text-sm cursor-pointer rounded-lg text-gray-800 w-full font-medium leading-6">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                showToast('error', 'Google Login Failed', 'Login was unsuccessful');
+              }}
+              useOneTap={false}
+              text="signin_with"
+              width="100%"
+              size="large"
+              theme='outline'
+              containerProps={{
+                className: 'w-full outline-black shadow-none', 
+              }}
+              logo_alignment="center"
+            />
+          </div>
+        </div>
       )}
 
       <button
         type="button"
         disabled={loading}
-        className="bg-white hover:bg-slate-300 flex justify-center border-gray-600 border p-2.5 text-sm cursor-pointer rounded-lg text-gray-800 w-full font-medium leading-6"
+        className="bg-white mx-auto hover:bg-slate-300 flex justify-center border-gray-300 border items-center  py-2 text-sm cursor-pointer rounded-sm text-gray-800 w-[95%] font-medium leading-6"
       >
         {loading ? (
           <ImSpinner2 className="animate-spin text-2xl text-gray-600" />
