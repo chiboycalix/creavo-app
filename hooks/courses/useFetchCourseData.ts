@@ -18,5 +18,12 @@ export function useFetchCourseData(courseId: string | undefined) {
     enabled: !!courseId,
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    retry: 1,
+    retryDelay: 1000,
+    refetchInterval: 0,
+    refetchIntervalInBackground: false,
+    refetchOnMount: true,
   });
 }

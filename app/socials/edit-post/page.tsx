@@ -6,7 +6,7 @@ import { Input } from "@/components/Input";
 import { TextareaInput } from "@/components/Input/TextareaInput";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreatePostPayload, createPostService } from "@/services/post.service";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { getMimeTypeFromCloudinaryUrl } from "@/utils";
 import { TagsInput } from "@/components/Input/TagsInput";
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 
 const PostEditPage = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
   const [hashtags, setHashtags] = useState<any>([]);
@@ -57,6 +58,7 @@ const PostEditPage = () => {
     mutationFn: (payload: CreatePostPayload) => createPostService(payload),
     onSuccess: async (data) => {
       toast.success("Post created successfully")
+      await queryClient.invalidateQueries({ queryKey: ["infinite-posts"] });
       router.push("/socials")
     },
     onError: (error: any) => {
@@ -87,7 +89,7 @@ const PostEditPage = () => {
       deviceId: deviceId
     })
   }
-  console.log({ urls })
+
   return (
     <Card className="mt-20 border-none">
       <CardHeader>

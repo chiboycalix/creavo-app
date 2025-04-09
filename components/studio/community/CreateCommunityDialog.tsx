@@ -33,7 +33,7 @@ const CreateCommunityDialog = () => {
     mutationFn: (payload: any) => createCommunityService(payload),
     onSuccess: async (data) => {
       toast.success("Community created successfully")
-      router.push(`/studio/community${data?.id}`)
+      router.push(`/studio/community/${data?.id}`)
       dispatch(resetCreateCommunityForm())
     },
     onError: (error: any) => {

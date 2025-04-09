@@ -49,12 +49,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, spaceId, com
       onSubmit={handleSubmit}
       className="py-2 border-t border-gray-200 bg-white"
     >
-      <div className='w-full px-8 flex items-center gap-2'>
+      <div className='w-full px-4 flex items-center gap-2'>
         <div className='basis-0.5/12 bg-gray-200 p-1 rounded-full'>
           <Avatar
             profileLoading={profileLoading}
             profileData={profileData}
-            className="border-2 border-primary-500"
+            className="border-2 border-primary-500 w-12 h-12"
           />
         </div>
         <TextInput

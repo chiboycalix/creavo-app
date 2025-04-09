@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserAvatarStack from '@/components/studio/community/UserAvatarStack';
+import UserAvatarStackSkeleton from '@/components/sketetons/UserAvatarStackSkeleton';
+import Chat from '@/components/studio/community/chat/Chat';
 import ButtonLoader from '@/components/ButtonLoader';
-import Avatar from '@/components/Avatar';
 import { Button } from '@/components/ui/button'
 import { Check, Loader2, Plus, Settings } from 'lucide-react'
 import { useParams } from 'next/navigation';
@@ -11,9 +12,6 @@ import { useListCommunities } from '@/hooks/communities/useListCommunities';
 import { useListSpaces } from '@/hooks/communities/useListSpaces';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { useAuth } from '@/context/AuthContext';
-import { TextInput } from '@/components/Input/TextInput';
 import { UserBadge } from '@/components/meeting/InvitePeople/UserBadge';
 import { useFetchUserByUsername } from '@/hooks/profile/useFetchUserByUsername';
 import { SearchInput } from '@/components/Input/SearchInput';
@@ -21,9 +19,6 @@ import { useMutation } from '@tanstack/react-query';
 import { addMembersManuallyToSpaceService, AddMemberToSpacePayload } from '@/services/community.service';
 import { toast } from 'sonner';
 import { useListSpaceMembers } from '@/hooks/communities/useListSpaceMembers';
-import UserAvatarStackSkeleton from '@/components/sketetons/UserAvatarStackSkeleton';
-import CreateCommunityPost from '@/components/studio/community/CreateCommunityPost';
-import Chat from '@/components/studio/community/chat/Chat';
 
 const Space = () => {
   const { data: communityData, isFetching: isFetchingCommunity } = useListCommunities();

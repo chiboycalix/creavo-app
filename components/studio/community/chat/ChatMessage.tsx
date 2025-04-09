@@ -37,7 +37,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           <div className="flex justify-between items-start">
             <div>
               <h3 className="font-semibold text-lg">{message.user.name}</h3>
-              <p className="text-gray-500 text-sm">{message.timestamp}</p>
+              <p className="text-gray-500 text-xs">{message.timestamp}</p>
             </div>
             <button className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100">
               <MoreVertical size={20} />
@@ -45,7 +45,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           </div>
 
           <div className="mt-2 space-y-3">
-            <p className="text-gray-800">{message.content}</p>
+            <p className="text-gray-800 text-sm">{message.content}</p>
             {message.image && (
               <div className="mt-2 rounded-lg overflow-hidden border border-gray-200 max-w-xs">
                 <img
