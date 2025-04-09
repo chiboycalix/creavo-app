@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
   images: {
-    domains: ["ui-avatars.com", "avatar.iran.liara.run", "some-url.com","https://566f-102-210-168-37.ngrok-free.app"],
+    domains: ["ui-avatars.com", "avatar.iran.liara.run", "some-url.com","https://566f-102-210-168-37.ngrok-free.app" , "lh3.googleusercontent.com"],
     remotePatterns: [
       {
         protocol: "https",
