@@ -53,7 +53,6 @@ const FollowersCard = ({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {(error as Error).message}</div>;
 
   if (!anchorRect) return null;
@@ -143,8 +142,8 @@ const FollowersCard = ({
                 {isFetchingNextPage
                   ? "Loading more..."
                   : hasNextPage
-                  ? "Load More"
-                  : "No more followers"}
+                    ? "Load More"
+                    : "No more followers"}
               </div>
             )}
           </motion.div>
