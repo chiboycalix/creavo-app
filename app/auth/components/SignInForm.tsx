@@ -52,7 +52,7 @@ export default function SignInForm() {
         showToast(
           'error',
           error.message,
-          'Please check you email and password'
+          'Please check your email and password'
         );
         return;
       }
@@ -77,7 +77,7 @@ export default function SignInForm() {
   };
 
   const OrSeparator = () => (
-    <div className="flex items-center gap-x-4 w-full mx-auto px-1.5 text-sm text-gray-400">
+    <div className="flex items-center gap-x-4 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto px-4 text-sm text-gray-400">
       <div className="h-[0.1rem] w-full bg-gray-300" />
       <div>OR</div>
       <div className="h-[0.1rem] w-full bg-gray-300" />
@@ -85,14 +85,14 @@ export default function SignInForm() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="">
+    <div className="w-full space-y-6">
+      <div className="w-full">
         <SocialButtons />
         <OrSeparator />
       </div>
 
       <form
-        className="mx-auto mb-0 mt-1 w-full space-y-3"
+        className="mx-auto mb-0 mt-4 w-full space-y-4"
         onSubmit={handleSubmit}
       >
         <Input
@@ -104,7 +104,7 @@ export default function SignInForm() {
           placeholder="johndoe@strides.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full"
+          className="w-full text-sm sm:text-base"
         />
         <Input
           leftIcon={<LockIcon className="h-5 w-5 text-gray-400" />}
@@ -115,30 +115,41 @@ export default function SignInForm() {
           placeholder="*****"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full text-sm sm:text-base"
         />
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
           <div className="text-sm flex items-center gap-2">
             <Checkbox />
             <span>Remember Password</span>
           </div>
           <div
             onClick={() => router.push("/auth/forgot-password")}
-            className="text-primary text-sm hover:cursor-pointer font-semibold"
+            className="text-primary text-sm hover:cursor-pointer font-semibold hover:underline"
           >
             Forgot password?
           </div>
         </div>
+
         <Button
           type="submit"
           disabled={loading || !email || !password}
-          className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
+          className="bg-primary h-12 sm:h-[50px] border-0 p-2.5 text-sm sm:text-base cursor-pointer rounded-lg text-white w-full font-medium leading-6 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? <Spinner /> : "Sign In with Crevoe"}
         </Button>
 
         <div>
-          <p className="text-[10px] text-center w-10/12 mx-auto leading-5">By creating an account, you agree to our Terms of Service and Privacy & Cookie Statement.</p>
+          <p className="text-[10px] sm:text-xs text-center w-full mx-auto leading-5 text-gray-600">
+            By creating an account, you agree to our{" "}
+            <a href="#" className="font-semibold text-gray-800 hover:underline">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="#" className="font-semibold text-gray-800 hover:underline">
+              Privacy & Cookie Statement
+            </a>.
+          </p>
         </div>
       </form>
     </div>

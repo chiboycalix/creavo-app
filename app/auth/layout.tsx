@@ -30,7 +30,6 @@ const carouselTexts: CarouselText[] = [
   }
 ];
 
-
 export default function AuthLayout({
   children,
 }: {

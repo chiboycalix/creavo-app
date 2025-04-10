@@ -2,37 +2,6 @@ import Cookies from "js-cookie";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { baseUrl } from "@/utils/constant";
 
-interface Post {
-  id: number;
-  hashtag: string;
-  body: string;
-  userId: number;
-  status: string;
-  isPrivate: boolean;
-  metadata: null | any;
-  likesCount: number;
-  commentsCount: number;
-  viewsCount: number;
-  sharesCount: number;
-  bookmarkCount: number;
-  isDeleted: boolean;
-  createdAt: string;
-  updatedAt: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  avatar: string;
-  media: {
-    id: number;
-    description: string;
-    title: string;
-    url: string;
-    thumbnailUrl: string;
-    mimeType: string;
-    metadata: null | any;
-  }[];
-}
-
 export const useFetchInfinitePosts = (options = {}) => {
   return useInfiniteQuery({
     queryKey: ["infinite-posts"],
@@ -44,7 +13,6 @@ export const useFetchInfinitePosts = (options = {}) => {
 
       const response = await fetch(
         `${baseUrl}/posts?page=${pageParam}&limit=10`,
-        // `${baseUrl}/users/${10}/posts?page=1&limit=10`,
         {
           headers: { ...header },
         }
@@ -72,8 +40,13 @@ export const useFetchInfinitePosts = (options = {}) => {
     },
     initialPageParam: 1,
     ...options,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     staleTime: 5 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
+    refetchInterval: 0,
+    refetchIntervalInBackground: false,
+    refetchOnMount: true,
   });
 };

@@ -30,6 +30,7 @@ export const generalHelpers: GeneralHelpers = {
       .replace(/[^\w\s-]/g, "")
       .replace(/[\s_]+/g, "-");
   },
+
   convertFromSlug: (slug: string) => {
     return slug
       .replace(/-/g, " ")

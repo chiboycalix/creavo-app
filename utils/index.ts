@@ -1,9 +1,16 @@
 import moment from "moment";
-import {
-  baseUrl,
-  cloudinaryCloudName,
-  cloudinaryUploadPreset,
-} from "@/utils/constant";
+import { cloudinaryCloudName, cloudinaryUploadPreset } from "@/utils/constant";
+import { Message } from "@/types/chat";
+export interface RawMessage {
+  _id: string;
+  uId: string;
+  rUid: string;
+  roomId: string;
+  mId: string;
+  text: string;
+  imageUrl: string | null;
+  date: string;
+}
 
 export const formatDate = (dateString: string): string => {
   const now = new Date();
@@ -135,6 +142,7 @@ export async function getMediaDimensionsClientSide(url: string): Promise<{
     }
   });
 }
+
 export const uploadImageToCloudinary = async (
   avatar: File
 ): Promise<string | undefined> => {
@@ -157,4 +165,59 @@ export const uploadImageToCloudinary = async (
   } catch (error) {
     throw error;
   }
+};
+
+export const transformAndGroupMessages = (
+  rawMessages: RawMessage[],
+  profileData: any
+): Message[] => {
+  const groupedByDate: { [key: string]: RawMessage[] } = {};
+
+  rawMessages?.forEach((msg) => {
+    const dateKey = new Date(msg.date).toISOString().split("T")[0];
+    if (!groupedByDate[dateKey]) {
+      groupedByDate[dateKey] = [];
+    }
+    groupedByDate[dateKey].push(msg);
+  });
+
+  const transformedMessages: Message[] = [];
+  Object.entries(groupedByDate)
+    .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+    .forEach(([date, messages]) => {
+      transformedMessages.push({
+        id: `date-${date}`,
+        content: "",
+        timestamp: date,
+        user: { name: "", avatar: "" },
+        reactions: { likes: 0, loves: 0 },
+        date: new Date(date).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+      });
+
+      messages
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .forEach((msg) => {
+          transformedMessages.push({
+            id: msg._id,
+            content: msg.text,
+            image: msg.imageUrl,
+            timestamp: new Date(msg.date).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            user: {
+              name: `${profileData?.firstName} ${profileData?.lastName}`,
+              avatar: `${profileData?.avatar}`,
+            },
+            reactions: { likes: 0, loves: 0 },
+          });
+        });
+    });
+
+  return transformedMessages;
 };

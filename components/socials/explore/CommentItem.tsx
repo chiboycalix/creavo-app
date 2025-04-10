@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import moment from "moment";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Flag, MessageSquare, MoreHorizontalIcon, Trash2Icon, X } from "lucide-react";
 import { BiLike } from "react-icons/bi";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,9 +28,9 @@ interface Comment {
   _user: User;
   body: string;
   createdAt: string;
-  likes?: number; // Made optional to match reply structure
-  replies?: Comment[]; // Made optional since we'll use fetched replies
-  commentId?: number; // Added for replies (parent comment ID)
+  likes?: number;
+  replies?: Comment[];
+  commentId?: number;
 }
 
 interface CommentItemProps {
@@ -58,7 +57,6 @@ const CommentItem = ({
   const [commentReply, setCommentReply] = useState("");
   const ws = useWebSocket();
   const isCommentInputVisible = activeCommentId === comment.id;
-
   const { data: replies } = useFetchCommentReplies(post?.data?.id, comment?.id);
 
   const { mutate: handleDeleteComment } = useMutation({
@@ -92,49 +90,103 @@ const CommentItem = ({
     onToggleCommentInput(comment.id);
   };
 
+  // Animation variants
+  const commentVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: {
+        duration: 0.2
+      }
+    }
+  };
+
+  const inputVariants = {
+    hidden: { opacity: 0, height: 0 },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    }
+  };
+
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 mb-4">
-      <div className={`flex items-start gap-3 ${depth > 0 ? "pl-12 mt-2" : ""}`}>
-        <img
+    <motion.div
+      variants={commentVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="mb-4"
+    >
+      <div
+        className={`flex items-start gap-3 ${depth > 0 ? "pl-12 mt-2" : ""}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <motion.img
+          whileHover={{ scale: 1.05 }}
           src={comment._user?.avatar}
           alt={comment._user.firstName}
           className="w-10 h-10 rounded-full flex-shrink-0"
         />
-        <div
+        <motion.div
           className="flex-1 min-w-0 flex gap-4"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          whileHover={{ backgroundColor: "" }}
+          transition={{ duration: 0.2 }}
         >
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-sm group cursor-pointer hover:underline">
+              <motion.h3
+                className="font-semibold text-sm group cursor-pointer hover:underline"
+                whileHover={{ color: "#3b82f6" }}
+              >
                 {comment._user.firstName} {comment._user.lastName}
-              </h3>
+              </motion.h3>
               {post?.data?.userId === comment._user.id && (
                 <span className="text-primary-700 font-bold text-sm">Creator</span>
               )}
             </div>
             <p className="text-sm text-gray-800 mt-1">{comment?.body}</p>
-            <span className="text-[10px] text-gray-500">
+            <motion.span
+              className="text-[10px] text-gray-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
               {formatCommentDate(comment.createdAt)}
-            </span>
+            </motion.span>
           </div>
           <div className="flex gap-4 flex-shrink-0">
             <div className="flex items-center gap-1">
               <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                 <PopoverTrigger asChild>
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
                     className={`text-gray-500 hover:text-red-500 mr-4 transition-opacity duration-200 ${isIconVisible ? "opacity-100" : "opacity-0 pointer-events-none"
                       }`}
                     onClick={() => setIsPopoverOpen(!isPopoverOpen)}
                   >
                     <MoreHorizontalIcon className="w-4 h-4" />
-                  </button>
+                  </motion.button>
                 </PopoverTrigger>
                 <PopoverContent className="w-32" sideOffset={4}>
                   <div>
                     {currentUser?.id === comment._user.id && (
-                      <button
+                      <motion.button
+                        whileHover={{ x: 5 }}
                         onClick={() =>
                           handleDeleteComment({
                             postId: activePostId as any,
@@ -145,26 +197,34 @@ const CommentItem = ({
                       >
                         <Trash2Icon size={16} />
                         Delete
-                      </button>
+                      </motion.button>
                     )}
                     {currentUser?.id !== comment._user.id && (
-                      <button className="text-gray-500 hover:text-red-500 w-full flex gap-2 items-center text-sm">
+                      <motion.button
+                        whileHover={{ x: 5 }}
+                        className="text-gray-500 hover:text-red-500 w-full flex gap-2 items-center text-sm"
+                      >
                         <Flag className="w-4 h-4" />
                         Report
-                      </button>
+                      </motion.button>
                     )}
                   </div>
                 </PopoverContent>
               </Popover>
-              <motion.button whileTap={{ scale: 0.9 }} className="text-gray-500 hover:text-red-500">
+              <motion.button
+                whileHover={{ scale: 1.2, rotate: 10 }}
+                whileTap={{ scale: 0.9 }}
+                className="text-gray-500 hover:text-red-500"
+              >
                 <BiLike className="w-4 h-4" />
               </motion.button>
               <span className="text-xs text-gray-500">{comment.likes ?? 0}</span>
             </div>
-            {/* Only show reply button for top-level comments (depth === 0) */}
+
             {depth === 0 && (
               <div className="flex items-center gap-1">
                 <motion.button
+                  whileHover={{ scale: 1.2 }}
                   whileTap={{ scale: 0.9 }}
                   className="text-gray-500 hover:text-gray-700"
                   onClick={() => onToggleCommentInput(comment.id)}
@@ -175,33 +235,46 @@ const CommentItem = ({
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
-      {/* Comment input for top-level comments */}
-      {isCommentInputVisible && depth === 0 && (
-        <div className="flex items-center">
-          <div className="basis-1/12"></div>
-          <div className="flex-1">
-            <Input
-              variant="comment"
-              buttonCaption="Post"
-              onButtonClick={handleSubmit}
-              value={commentReply}
-              onChange={(e) => setCommentReply(e.target.value)}
-              placeholder="Write a reply..."
-              className="rounded-full w-full mx-auto bg-white"
-              isLoading={isReplyingComment}
-            />
-          </div>
-          <div>
-            <X className="cursor-pointer" onClick={() => onToggleCommentInput(comment.id)} />
-          </div>
-        </div>
-      )}
-      {/* Render fetched replies */}
-      {depth < maxDepth && replies?.data?.comments?.length > 0 && (
-        replies?.data?.comments?.map((reply: any) => {
-          return (
+
+      {/* Animated comment input */}
+      <AnimatePresence>
+        {isCommentInputVisible && depth === 0 && (
+          <motion.div
+            variants={inputVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="flex items-center mt-2"
+          >
+            <div className="basis-1/12"></div>
+            <div className="flex-1">
+              <Input
+                variant="comment"
+                buttonCaption="Post"
+                onButtonClick={handleSubmit}
+                value={commentReply}
+                onChange={(e) => setCommentReply(e.target.value)}
+                placeholder="Write a reply..."
+                className="rounded-full w-full mx-auto bg-white"
+                isLoading={isReplyingComment}
+              />
+            </div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <X className="cursor-pointer" onClick={() => onToggleCommentInput(comment.id)} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Animated replies */}
+      <AnimatePresence>
+        {depth < maxDepth && replies?.data?.comments?.length > 0 && (
+          replies?.data?.comments?.map((reply: any) => (
             <CommentItem
               key={reply?.id}
               comment={{
@@ -215,10 +288,10 @@ const CommentItem = ({
               activeCommentId={activeCommentId}
               onToggleCommentInput={onToggleCommentInput}
             />
-          )
-        })
-      )}
-    </div>
+          ))
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

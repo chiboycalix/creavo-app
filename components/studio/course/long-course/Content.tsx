@@ -1,4 +1,5 @@
 "use client";
+import ButtonLoader from "@/components/ButtonLoader";
 import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Spinner from "@/components/Spinner";
 import UploadMedia from "./UploadMedia";
@@ -17,7 +18,6 @@ import { generalHelpers } from "@/helpers";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { useFetchCourseData } from "@/hooks/courses/useFetchCourseData";
-import ButtonLoader from "@/components/ButtonLoader";
 
 const Content = ({ courseId: id }: any) => {
   const dispatch = useAppDispatch();
@@ -29,7 +29,7 @@ const Content = ({ courseId: id }: any) => {
   const [showCreateModule, setShowCreateModule] = useState(false);
   const [selectedModule, setSelectedModule] = useState<any | null>(null);
 
-  const { data: courseData, isFetching: isFetchingCourse } = useFetchCourseData(courseId || id as any);
+  const { data: courseData, isFetching: isFetchingCourse, refetch } = useFetchCourseData(courseId || id as any);
 
   const { createModuleForm: createModuleStateValues, selectedModuleData } = useAppSelector((store) => store.moduleStore);
 
@@ -49,6 +49,11 @@ const Content = ({ courseId: id }: any) => {
     enabled: !!id && !!courseData?.data?.course?.id && !!selectedModuleData?.id,
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
+    refetchInterval: 0,
+    refetchIntervalInBackground: true,
+    refetchOnMount: true,
   });
 
   const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
@@ -58,72 +63,82 @@ const Content = ({ courseId: id }: any) => {
       dispatch(resetCreateModuleForm());
       setShowCreateModule(false);
       setSelectedModule(newModule);
-      if (!courseId) {
-        router.push(`?module=${generalHelpers.convertToSlug(newModule.title)}`);
-      } else {
-        router.push(`?edit=${courseId}&module=${generalHelpers.convertToSlug(newModule.title)}`);
-      }
-
-      queryClient.setQueryData(["useFetchCourseData", courseId || courseData?.data?.course?.id], (oldData: any) => {
-        if (!oldData?.data?.course) return oldData;
-        return {
-          ...oldData,
-          data: {
-            ...oldData.data,
-            course: {
-              ...oldData.data.course,
-              modules: [...oldData.data.course.modules, newModule],
+      dispatch(updateSelectedModuleData(newModule));
+      refetch()
+      queryClient.setQueryData(
+        ["useFetchCourseData", courseId || courseData?.data?.course?.id],
+        (oldData: any) => {
+          if (!oldData?.data?.course) return oldData;
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              course: {
+                ...oldData.data.course,
+                modules: [...oldData.data.course.modules, newModule],
+              },
             },
-          },
-        };
-      });
+          };
+        }
+      );
 
-      // Invalidate related queries to ensure consistency
+      queryClient.setQueryData(
+        ["courseModulesData", newModule.id],
+        (oldData: any) => ({
+          ...oldData,
+          module: newModule,
+        })
+      );
+
       queryClient.invalidateQueries({
         queryKey: ["useFetchCourseData", courseId || courseData?.data?.course?.id],
-        exact: true
+        exact: true,
       });
+      queryClient.invalidateQueries({
+        queryKey: ["courseModulesData", newModule.id],
+        exact: true,
+      });
+
+      const slug = generalHelpers.convertToSlug(newModule.title);
+      if (!courseId) {
+        router.push(`?module=${slug}`);
+      } else {
+        router.push(`?edit=${courseId}&module=${slug}`);
+      }
     },
     onError: (error: any) => {
       toast.error(error?.data?.[0] || "Failed to create module");
     },
   });
+  const updateCreateModule = useCallback((payload: Partial<CreateModuleForm>) =>
+    dispatch(updatCreateModuleForm(payload)), [dispatch]);
 
-  const updateCreateModule = useCallback(
-    (payload: Partial<CreateModuleForm>) => dispatch(updatCreateModuleForm(payload)),
-    [dispatch]
-  );
+  const updateSelectedModule = useCallback((payload: Partial<any>) =>
+    dispatch(updateSelectedModuleData(payload)), [dispatch]);
 
-  const updateSelectedModule = useCallback(
-    (payload: Partial<any>) => dispatch(updateSelectedModuleData(payload)),
-    [dispatch]
-  );
-
-  const handleSubmit = useCallback(
-    (e: FormEvent) => {
-      e.preventDefault();
-      validate(() =>
-        handleAddModule({
-          courseId: Number(courseId) || Number(id) || Number(courseData?.data?.course?.id),
-          difficultyLevel: courseModulesData?.module?.course?.difficultyLevel || courseData?.data?.course?.difficultyLevel,
-          title: createModuleStateValues?.title,
-          description: courseModulesData?.description || createModuleStateValues?.description,
-        })
-      );
-    },
+  const handleSubmit = useCallback((e: FormEvent) => {
+    e.preventDefault();
+    validate(() =>
+      handleAddModule({
+        courseId: Number(courseId) || Number(id) || Number(courseData?.data?.course?.id),
+        difficultyLevel: courseModulesData?.module?.course?.difficultyLevel || courseData?.data?.course?.difficultyLevel,
+        title: createModuleStateValues?.title,
+        description: courseModulesData?.description || createModuleStateValues?.description,
+      })
+    );
+  },
     [validate, handleAddModule, id, courseId, courseData?.data?.course?.id, courseData?.data?.course?.difficultyLevel, courseModulesData?.module?.course?.difficultyLevel, courseModulesData?.description, createModuleStateValues?.title, createModuleStateValues?.description]
   );
 
-  const handleClickModule = useCallback(
-    (module: any) => {
-      setShowCreateModule(false);
-      setSelectedModule(module);
-      if (!courseId) {
-        router.push(`?tab=content&module=${generalHelpers.convertToSlug(module.title)}`);
-      } else {
-        router.push(`?tab=content&edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`);
-      }
-    },
+  const handleClickModule = useCallback((module: any) => {
+    setShowCreateModule(false);
+    setSelectedModule(module);
+    if (!courseId) {
+      router.push(`?tab=content&module=${generalHelpers.convertToSlug(module.title)}`);
+    } else {
+      router.push(`?tab=content&edit=${courseId}&module=${generalHelpers.convertToSlug(module.title)}`);
+    }
+  },
     [courseId, router]
   );
 
@@ -156,8 +171,7 @@ const Content = ({ courseId: id }: any) => {
     }
 
     return courseData?.data?.course.modules.map((module: any, index: number) => {
-      const isActive =
-        generalHelpers.convertFromSlug(currentModule || courseData?.data?.course?.modules[0]?.title) ===
+      const isActive = generalHelpers.convertFromSlug(currentModule || courseData?.data?.course?.modules[0]?.title) ===
         generalHelpers.capitalizeWords(module.title);
 
       return (
