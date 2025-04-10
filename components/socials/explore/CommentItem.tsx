@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import moment from "moment";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flag, MessageSquare, MoreHorizontalIcon, Trash2Icon, X } from "lucide-react";
 import { BiLike } from "react-icons/bi";

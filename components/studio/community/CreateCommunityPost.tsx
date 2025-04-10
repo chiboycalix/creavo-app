@@ -3,16 +3,13 @@ import ButtonLoader from '@/components/ButtonLoader';
 import { Input } from '@/components/Input'
 import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button';
-import { useAppDispatch } from '@/hooks/useStore.hook';
 import { createPostService, CreatePostsPayload } from '@/services/community.service';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-const CreateCommunityPost = ({ spaceId, communityId }: { spaceId: string, communityId: string }) => {
+const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { spaceId: string, communityId: string, setIsInputDialogOpen: any }) => {
   const maxFiles = 1;
-  const router = useRouter()
-  const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const [post, setPost] = useState("")
   const [postImage, setPostImage] = useState("")
 
@@ -21,9 +18,9 @@ const CreateCommunityPost = ({ spaceId, communityId }: { spaceId: string, commun
       return createPostService(payload)
     },
     onSuccess: async (data) => {
-      console.log({ data })
       toast.success("Message sent successfully")
-      // router.push(`/studio/community/${communityId}/${data?.id}`)
+      setIsInputDialogOpen(false)
+      await queryClient.invalidateQueries({ queryKey: ["listMessages"] });
     },
     onError: (error: any) => {
       toast.error(error?.data[0] || "Something went wrong, contact admin")

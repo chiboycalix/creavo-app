@@ -88,3 +88,20 @@ export const createPostService = async (payload: CreatePostsPayload) => {
     throw error;
   }
 };
+
+export const listSpaceMessagesService = async ({
+  communityId,
+  spaceId,
+}: {
+  communityId: string;
+  spaceId: string;
+}) => {
+  try {
+    const { data } = await apiClient.get(
+      `/communities/${communityId}/spaces/${spaceId}/messages`
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

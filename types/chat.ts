@@ -11,13 +11,16 @@ export interface Reaction {
 
 export interface Message {
   id: string;
-  user: User;
   content: string;
+  image?: string | null;
   timestamp: string;
-  date?: string;
-  image?: string;
+  user: {
+    name: string;
+    avatar: string;
+  };
   reactions: {
     likes: number;
     loves: number;
   };
+  date?: string;
 }
