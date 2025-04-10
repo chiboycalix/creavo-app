@@ -19,6 +19,7 @@ import { useMutation } from '@tanstack/react-query';
 import { addMembersManuallyToSpaceService, AddMemberToSpacePayload } from '@/services/community.service';
 import { toast } from 'sonner';
 import { useListSpaceMembers } from '@/hooks/communities/useListSpaceMembers';
+import SpaceSettings from '@/components/studio/community/SpaceSettings';
 
 const Space = () => {
   const { data: communityData, isFetching: isFetchingCommunity } = useListCommunities();
@@ -31,6 +32,8 @@ const Space = () => {
   const [isCourseDialogOpen, setIsCourseDialogOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [invitedUsers, setInvitedUsers] = useState<any[]>([]);
+  const [showSpaceSettingsCard, setShowSpaceSettingsCard] = useState(false);
+  const [spaceSettingsAnchorRect, setSpaceSettingsAnchorRect] = useState<DOMRect | null>(null);
 
   const currentSpace = data?.data?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0];
 
@@ -91,6 +94,13 @@ const Space = () => {
     }
   })
 
+  const handleSpaceSettingsClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setSpaceSettingsAnchorRect(buttonRect);
+    setShowSpaceSettingsCard(true);
+  };
+
+
   return (
     <ProtectedRoute
       requireAuth={true}
@@ -106,11 +116,29 @@ const Space = () => {
           <div className="flex gap-8 items-center">
             {
               isFetchingSpaceMembers || isFetchingCommunity ?
-                <UserAvatarStackSkeleton maxVisible={5} itemCount={6} /> :
-                <UserAvatarStack items={members || []} maxVisible={5} />
+                <UserAvatarStackSkeleton maxVisible={5} itemCount={5} /> :
+                <UserAvatarStack
+                  items={members || []} maxVisible={5}
+                  handleLinkCourse={handleLinkCourse}
+                  handleManualAdd={handleManualAdd}
+                />
             }
             <div className='flex items-center gap-2'>
-              <span className="bg-gray-100 p-1 rounded-full cursor-pointer"><Settings className="cursor-pointer" /></span>
+              <span className="bg-gray-100 p-1 rounded-full cursor-pointer" onClick={handleSpaceSettingsClick}>
+                <Settings className="cursor-pointer" />
+              </span>
+
+              {showSpaceSettingsCard && currentSpace && (
+                <SpaceSettings
+                  isOpen={showSpaceSettingsCard}
+                  onClose={() => setShowSpaceSettingsCard(false)}
+                  anchorRect={spaceSettingsAnchorRect}
+                  userId={"id"}
+                  currentSpace={currentSpace}
+                  members={members}
+                  isFetchingSpaceMembers={isFetchingSpaceMembers}
+                />
+              )}
             </div>
           </div>
         </div>

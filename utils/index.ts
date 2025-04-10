@@ -174,7 +174,7 @@ export const transformAndGroupMessages = (
   const groupedByDate: { [key: string]: RawMessage[] } = {};
 
   rawMessages?.forEach((msg) => {
-    const dateKey = new Date(msg.date).toISOString().split("T")[0];
+    const dateKey = new Date(msg?.date)?.toISOString().split("T")[0];
     if (!groupedByDate[dateKey]) {
       groupedByDate[dateKey] = [];
     }

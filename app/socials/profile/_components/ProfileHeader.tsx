@@ -55,6 +55,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [followersAnchorRect, setfollowersAnchorRect] =
     useState<DOMRect | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+
   const handleFollowersClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const buttonRect = event.currentTarget.getBoundingClientRect();
     setfollowersAnchorRect(buttonRect);

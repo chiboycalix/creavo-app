@@ -28,7 +28,6 @@ const CreateCommunityDialog = () => {
   const { validate, errors, validateField } = useCreateCommunityValidator({ store: createCommunityStateValues });
   const updateCreateCommunity = (payload: Partial<CreateCommunityForm>) => dispatch(updatCreateCommunityForm(payload));
 
-
   const { mutate: handleCreateCommunity, isPending: isCreatingCommunity } = useMutation({
     mutationFn: (payload: any) => createCommunityService(payload),
     onSuccess: async (data) => {

@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Message } from "@/types/chat";
-import { MessageSquare, MoreVertical, ThumbsUp, Heart } from "lucide-react";
+import { Edit2, MessageSquare, MoreVertical, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { motion, AnimatePresence } from "framer-motion";
 interface ChatMessageProps {
   message: Message;
 }
@@ -11,6 +13,7 @@ interface ChatMessageProps {
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const { currentUser } = useAuth();
   const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = profileLoading
@@ -37,9 +40,31 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                 <h3 className="font-semibold text-sm">{message.user.name}</h3>
                 <p className="text-gray-500 text-xs">{message.timestamp}</p>
               </div>
-              <button className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100">
-                <MoreVertical size={20} />
-              </button>
+              <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`text-gray-500 mr-4 transition-opacity duration-200`}
+                    onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+                  >
+                    <MoreVertical size={20} />
+                  </motion.button>
+                </PopoverTrigger>
+                <PopoverContent className="w-40" sideOffset={4}>
+                  <div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer">
+                      <Edit2 size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">Edit</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer">
+                      <Trash2 size={16} className="text-gray-500" />
+                      <span className="text-sm text-gray-700">Delete</span>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
             </div>
 
             <div className="mt-2 space-y-3">
@@ -88,8 +113,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
