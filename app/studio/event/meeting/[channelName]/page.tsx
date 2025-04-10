@@ -89,8 +89,8 @@ export default function WaitingRoom() {
     }
 
     return () => {
-      deviceStream[0].getTracks().forEach((track) => track.stop());
-      deviceStream[1].getTracks().forEach((track) => track.stop());
+      deviceStream[0]?.getTracks()?.forEach((track) => track?.stop());
+      deviceStream[1]?.getTracks()?.forEach((track) => track?.stop());
     };
   }, [hasPermissions]);
 

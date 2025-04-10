@@ -1,10 +1,12 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useMarketContext } from "@/context/MarketContext";
 import ProductCard from "../explore/_components/ProductCard";
 
 const SavedProducts = () => {
-  const { savedProducts, isSaved, handleToggleSave } = useMarketContext();
+  const { savedProducts, isSaved, handleToggleSave, } = useMarketContext();
+
+  console.log("Saved Products", savedProducts);
 
   return (
     <div className="flex flex-col">
@@ -18,12 +20,12 @@ const SavedProducts = () => {
       </div>
       <div className=" flex flex-wrap gap-4 ">
         {savedProducts?.length > 0 ? (
-          savedProducts?.map((product: any) => (
+          savedProducts?.map((product: any, index:any) => (
             <ProductCard
-              key={product?.id}
+              key={index}
               product={product}
               isSaved={true}
-              handleToggleSave={handleToggleSave}
+              handleToggleSave={() => handleToggleSave(product)}
             />
           ))
         ) : (
