@@ -118,7 +118,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           { title: "Notifications", href: "/market/notifications", icon: BellIcon },
         ],
         dashboardItems: [
-          { title: "Seller dashboard", href: ROUTES?.MARKET.SAVED, icon: LayoutDashboardIcon },
+          { title: "Seller dashboard", href: ROUTES?.MARKET.SELLER_DASHBOARD, icon: LayoutDashboardIcon },
         ],
       },
     ],
