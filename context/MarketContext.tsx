@@ -29,6 +29,7 @@ interface MarketContextType {
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   fetchListedCourses: () => void;
   listedCourses: any;
+  setListedCourses: React.Dispatch<React.SetStateAction<any>>;
   fetchCourseProducts: () => void;
   fetchPopularCourses: () => void;
   fetchPopularEvents: () => void;
@@ -534,9 +535,10 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
       }
 
       const data = await response.json();
-      const promoCourses = data?.data.courses.filter(
-        (course: any) => course.promote === true
-      );
+      const promoCourses = data?.data.courses
+      // .filter(
+      //   (course: any) => course.promote === true
+      // );
       return promoCourses;
     } catch (error) {}
   }, [userId]);
@@ -558,21 +560,13 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
     getProducts();
   }, [fetchCourseProducts]);
 
-  // useEffect(() => {
-  //   const getSavedProducts = async () => {
-  //     const products = await fetchSavedProducts();
-  //     setSavedProducts(products);
-  //   };
-  //   getSavedProducts();
-  // }, [products, fetchSavedProducts]);
-
   useEffect(() => {
     const getSavedProducts = async () => {
       const products = await fetchSavedProducts();
       setSavedProducts(products);
     };
 
-    getSavedProducts(); // Load once on mount
+    getSavedProducts(); 
   }, [fetchSavedProducts]);
 
   return (
@@ -585,6 +579,7 @@ export const MarketProvider: React.FC<MarketProviderProps> = ({ children }) => {
         fetchSingleCourseProduct,
         fetchSavedProducts,
         listedCourses,
+        setListedCourses,
         fetchPopularCourses,
         fetchPopularEvents,
         fetchOrders,

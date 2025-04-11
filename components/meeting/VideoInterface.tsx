@@ -36,7 +36,7 @@ export default function VideoInterface({
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [handleSelectMicrophone, setHandleSelectMicrophone] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [timeOutWarning, setTimeOutWarning] = useState(false)
+  const [timeOutWarning, setTimeOutWarning] = useState(false);
 
   const {
     isMicrophoneEnabled,
@@ -79,7 +79,6 @@ export default function VideoInterface({
     setUsername,
     currentUser.username,
   ]);
- 
 
   return (
     <div>
@@ -163,7 +162,7 @@ export default function VideoInterface({
                             {handleSelectMicrophone &&
                               localUserTrack?.audioTrack && (
                                 <MicSelect
-                                  audioTrack={localUserTrack.audioTrack}
+                                  audioTrack={localUserTrack?.audioTrack}
                                   setHandleSelectMicrophone={
                                     setHandleSelectMicrophone
                                   }
@@ -240,6 +239,12 @@ export default function VideoInterface({
                       <p className="text-sm ">You can now join this call</p>
                     </div>
                   )}
+
+                  {!meetingRoomData?.hasStarted  && (
+                    <div className=" w-full flex justify-center mt-3">
+                      <p className="text-sm ">Meeting has not started ...</p>
+                    </div>
+                  )}
                 </div>
 
                 <SettingsModal
@@ -251,7 +256,11 @@ export default function VideoInterface({
           )}
         </>
       )}
-      {timeOutWarning && <div className="w-full h-64 bg-blue-300 text-black">There is no other perosn here, Do you want to leave the call?</div>}
+      {timeOutWarning && (
+        <div className="w-full h-64 bg-blue-300 text-black">
+          There is no other perosn here, Do you want to leave the call?
+        </div>
+      )}
     </div>
   );
 }

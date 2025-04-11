@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import SaveProductButton from "@/components/marketplace/SaveProductButton";
 import { useMarketContext } from "@/context/MarketContext";
 import Link from "next/link";
+import { ROUTES } from "@/constants/routes";
 
 interface Product {
   id: any;
@@ -54,7 +55,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <Link
-      href={`/market/product/${product?.id}`}
+      href={ROUTES.MARKET.PRODUCT(product?.id)}
       key={product?.id}
       className="relative flex flex-col items-center gap-3 bg-white rounded-lg border border-gray-200 shadow-sm transition-transform transform hover:scale-105 hover:shadow-lg w-[calc(25%-16px)] min-w-[200px] max-w-[300px]"
     >
