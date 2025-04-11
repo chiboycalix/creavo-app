@@ -37,9 +37,9 @@ const CreateCourse = () => {
               alt="ShortCourse"
               className="w-10 h-10"
             />
-            <p className="font-semibold mt-4">Short course</p>
+            <p className="font-semibold mt-4">Short Series</p>
             <p className="mt-4 text-xs leading-5 flex-1">
-              A short course is a quick, focused learning program that teaches a specific skill in a short time. It’s ideal for upskilling efficiently without long-term commitment.
+              A short series is a quick, focused learning program that teaches a specific skill in a short time. It’s ideal for upskilling efficiently without long-term commitment.
             </p>
           </div>
           <div
