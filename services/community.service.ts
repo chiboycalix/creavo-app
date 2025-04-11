@@ -25,6 +25,13 @@ export type CreatePostsPayload = {
   spaceId: string;
   communityId: string;
 };
+export type EditPostsPayload = {
+  text: string;
+  imageUrl?: string;
+  spaceId: string;
+  communityId: string;
+  messageId: string;
+};
 
 export const createCommunityService = async (payload: any) => {
   try {
@@ -105,6 +112,20 @@ export const listSpaceMessagesService = async ({
   try {
     const { data } = await apiClient.get(
       `/communities/${communityId}/spaces/${spaceId}/messages`
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const editPostService = async (payload: EditPostsPayload) => {
+  const { communityId, spaceId, messageId, ...rest } = payload;
+  try {
+    const { data } = await apiClient.patch(
+      `/communities/${communityId}/spaces/${spaceId}/messages/${messageId}`,
+      {
+        ...rest,
+      }
     );
     return data;
   } catch (error) {

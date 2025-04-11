@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import EditCommunityPost from "./EditCommunityPost";
 import { Message } from "@/types/chat";
 import { Edit2, Loader2, MessageSquare, MoreVertical, Trash2, TriangleAlertIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeleteMessagePayload, deleteMessageService } from "@/services/community.service";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from "sonner";
 interface ChatMessageProps {
   message: Message;
@@ -27,11 +29,15 @@ interface ChatMessageProps {
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message, communityId, spaceId }) => {
+  const queryClient = useQueryClient();
   const { currentUser } = useAuth();
   const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const queryClient = useQueryClient();
+  const [isInputDialogOpen, setIsInputDialogOpen] = useState(false);
 
+  const handleEditClick = () => {
+    setIsInputDialogOpen(true);
+  };
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = profileLoading
     ? defaultAvatar
@@ -88,7 +94,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, communityId, spaceId
                 </PopoverTrigger>
                 <PopoverContent className="w-40" sideOffset={4}>
                   <div className="w-full">
-                    <div className="flex items-center gap-2 p-2 cursor-pointer">
+                    <div
+                      className="flex items-center gap-2 p-2 cursor-pointer"
+                      onClick={handleEditClick}
+                    >
                       <Edit2 size={16} className="text-gray-500" />
                       <span className="text-sm text-gray-700">Edit</span>
                     </div>
@@ -127,7 +136,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, communityId, spaceId
                   </div>
                 </PopoverContent>
               </Popover>
-
             </div>
 
             <div className="mt-2 space-y-3">
@@ -175,10 +183,23 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, communityId, spaceId
               </button>
             </div>
           </div>
+
+          <Dialog open={isInputDialogOpen} onOpenChange={setIsInputDialogOpen}>
+            <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className='text-sm'>Edit post</DialogTitle>
+              </DialogHeader>
+              <EditCommunityPost
+                spaceId={spaceId!}
+                communityId={communityId!}
+                setIsInputDialogOpen={setIsInputDialogOpen}
+                message={message}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 };
 
