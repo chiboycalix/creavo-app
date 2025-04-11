@@ -45,7 +45,7 @@ export const useFetchInfinitePosts = (options = {}) => {
     staleTime: 5 * 60 * 1000,
     retry: 1,
     retryDelay: 1000,
-    refetchInterval: 0,
+    // refetchInterval: 0,
     refetchIntervalInBackground: false,
     refetchOnMount: true,
   });

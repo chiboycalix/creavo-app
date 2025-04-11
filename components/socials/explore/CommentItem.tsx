@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
+import LikeCommentButton from "./LikeCommentButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flag, MessageSquare, MoreHorizontalIcon, Trash2Icon, X } from "lucide-react";
-import { BiLike } from "react-icons/bi";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
 import { useComments } from "@/context/CommentsContext";
@@ -31,6 +31,7 @@ interface Comment {
   likes?: number;
   replies?: Comment[];
   commentId?: number;
+  likesCount?: number;
 }
 
 interface CommentItemProps {
@@ -90,7 +91,6 @@ const CommentItem = ({
     onToggleCommentInput(comment.id);
   };
 
-  // Animation variants
   const commentVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -211,18 +211,22 @@ const CommentItem = ({
                   </div>
                 </PopoverContent>
               </Popover>
-              <motion.button
-                whileHover={{ scale: 1.2, rotate: 10 }}
-                whileTap={{ scale: 0.9 }}
-                className="text-gray-500 hover:text-red-500"
-              >
-                <BiLike className="w-4 h-4" />
-              </motion.button>
-              <span className="text-xs text-gray-500">{comment.likes ?? 0}</span>
             </div>
 
             {depth === 0 && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="text-gray-500 hover:text-red-500"
+                >
+                  <LikeCommentButton
+                    commentId={Number(activeCommentId)}
+                    initialIsLiked={true}
+                    initialLikesCount={Number(comment?.likesCount)}
+                    likedId={4}
+                  />
+                </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.2 }}
                   whileTap={{ scale: 0.9 }}
@@ -274,21 +278,23 @@ const CommentItem = ({
       {/* Animated replies */}
       <AnimatePresence>
         {depth < maxDepth && replies?.data?.comments?.length > 0 && (
-          replies?.data?.comments?.map((reply: any) => (
-            <CommentItem
-              key={reply?.id}
-              comment={{
-                id: reply?.id?.toString(),
-                _user: reply?._user,
-                body: reply?.body,
-                createdAt: reply?.createdAt,
-                likes: reply?.likesCount,
-              }}
-              depth={depth + 1}
-              activeCommentId={activeCommentId}
-              onToggleCommentInput={onToggleCommentInput}
-            />
-          ))
+          replies?.data?.comments?.map((reply: any) => {
+            return (
+              <CommentItem
+                key={reply?.id}
+                comment={{
+                  id: reply?.id?.toString(),
+                  _user: reply?._user,
+                  body: reply?.body,
+                  createdAt: reply?.createdAt,
+                  likes: reply?.likesCount,
+                }}
+                depth={depth + 1}
+                activeCommentId={activeCommentId}
+                onToggleCommentInput={onToggleCommentInput}
+              />
+            )
+          })
         )}
       </AnimatePresence>
     </motion.div>

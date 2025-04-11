@@ -7,6 +7,12 @@ export type SpacePayload = {
   logo?: string;
 };
 
+export type DeleteMessagePayload = {
+  communityId: string;
+  spaceId: string;
+  messageId: string;
+};
+
 export type AddMemberToSpacePayload = {
   communityId: string;
   spaceId: string;
@@ -103,5 +109,20 @@ export const listSpaceMessagesService = async ({
     return data;
   } catch (error) {
     throw error;
+  }
+};
+
+export const deleteMessageService = async ({
+  communityId,
+  spaceId,
+  messageId,
+}: DeleteMessagePayload) => {
+  try {
+    const response = await apiClient.delete(
+      `/communities/${communityId}/spaces/${spaceId}/messages/${messageId}`
+    );
+    return response;
+  } catch (error: any) {
+    return Promise.reject(error?.response?.data || "An error occurred");
   }
 };

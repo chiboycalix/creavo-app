@@ -1,24 +1,59 @@
 import React, { useState } from "react";
 import { Message } from "@/types/chat";
-import { Edit2, MessageSquare, MoreVertical, Trash2 } from "lucide-react";
+import { Edit2, Loader2, MessageSquare, MoreVertical, Trash2, TriangleAlertIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DeleteMessagePayload, deleteMessageService } from "@/services/community.service";
+import { toast } from "sonner";
 interface ChatMessageProps {
   message: Message;
+  communityId?: string;
+  spaceId?: string;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, communityId, spaceId }) => {
   const { currentUser } = useAuth();
   const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = profileLoading
     ? defaultAvatar
     : profileData?.data?.profile?.avatar || defaultAvatar;
+
+  const { mutate: handleDeleteMessage, isPending: isDeletingMessage } = useMutation({
+    mutationFn: (payload: DeleteMessagePayload) => deleteMessageService(payload),
+    onSuccess: async (data) => {
+      toast.success("Message deleted successfully")
+      queryClient.invalidateQueries({
+        queryKey: ["listMessages", communityId, spaceId],
+        exact: true,
+      });
+    },
+    onError: (error: any) => {
+      toast.error("Error deleting message")
+    },
+  });
+
+  const handleDelete = async () => {
+    handleDeleteMessage({ communityId: communityId!, spaceId: spaceId!, messageId: message?.id })
+  }
 
   return (
     <div className="animate-fade-in">
@@ -52,15 +87,43 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                   </motion.button>
                 </PopoverTrigger>
                 <PopoverContent className="w-40" sideOffset={4}>
-                  <div>
-                    <div className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer">
+                  <div className="w-full">
+                    <div className="flex items-center gap-2 p-2 cursor-pointer">
                       <Edit2 size={16} className="text-gray-500" />
                       <span className="text-sm text-gray-700">Edit</span>
                     </div>
-                    <div className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer">
-                      <Trash2 size={16} className="text-gray-500" />
-                      <span className="text-sm text-gray-700">Delete</span>
-                    </div>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger>
+                        <div className="w-full flex items-center gap-2 p-2 cursor-pointer">
+                          <Trash2 size={16} className="text-gray-500" />
+                          <span className="text-sm text-gray-700">Delete</span>
+                        </div>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className='flex flex-col items-center justify-center'>
+                        <AlertDialogHeader className='w-full inline-flex flex-col items-center justify-center'>
+                          <AlertDialogTitle className='flex items-center justify-center text-center'>
+                            <TriangleAlertIcon className='text-red-500' size={40} />
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className='font-semibold text-center'>
+                            Are you sure you want to delete this message?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDelete}
+                            className='bg-red-600 text-white' disabled={isDeletingMessage}>
+                            {
+                              isDeletingMessage ? <Loader2 className='text-white animate-spin' /> : "Delete"
+                            }
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
+
+
                   </div>
                 </PopoverContent>
               </Popover>
