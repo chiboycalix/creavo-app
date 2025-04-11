@@ -53,7 +53,11 @@ const Chat = ({ communityId, spaceId }: { communityId: string, spaceId: string }
             </div>
           )
         }
-        <ChatFeed messages={transformedMessage} />
+        <ChatFeed
+          messages={transformedMessage}
+          communityId={communityId}
+          spaceId={spaceId}
+        />
       </div>
       <MessageInput communityId={communityId} spaceId={spaceId} />
     </div>

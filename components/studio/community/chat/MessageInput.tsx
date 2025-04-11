@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CreateCommunityPost from '../CreateCommunityPost';
+import CreateCommunityPost from './CreateCommunityPost';
 import Avatar from '@/components/Avatar';
 import { TextInput } from '@/components/Input/TextInput';
 import { useAuth } from '@/context/AuthContext';

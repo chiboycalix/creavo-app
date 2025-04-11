@@ -7,6 +7,12 @@ export type SpacePayload = {
   logo?: string;
 };
 
+export type DeleteMessagePayload = {
+  communityId: string;
+  spaceId: string;
+  messageId: string;
+};
+
 export type AddMemberToSpacePayload = {
   communityId: string;
   spaceId: string;
@@ -18,6 +24,13 @@ export type CreatePostsPayload = {
   imageUrl?: string;
   spaceId: string;
   communityId: string;
+};
+export type EditPostsPayload = {
+  text: string;
+  imageUrl?: string;
+  spaceId: string;
+  communityId: string;
+  messageId: string;
 };
 
 export const createCommunityService = async (payload: any) => {
@@ -103,5 +116,34 @@ export const listSpaceMessagesService = async ({
     return data;
   } catch (error) {
     throw error;
+  }
+};
+export const editPostService = async (payload: EditPostsPayload) => {
+  const { communityId, spaceId, messageId, ...rest } = payload;
+  try {
+    const { data } = await apiClient.patch(
+      `/communities/${communityId}/spaces/${spaceId}/messages/${messageId}`,
+      {
+        ...rest,
+      }
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteMessageService = async ({
+  communityId,
+  spaceId,
+  messageId,
+}: DeleteMessagePayload) => {
+  try {
+    const response = await apiClient.delete(
+      `/communities/${communityId}/spaces/${spaceId}/messages/${messageId}`
+    );
+    return response;
+  } catch (error: any) {
+    return Promise.reject(error?.response?.data || "An error occurred");
   }
 };

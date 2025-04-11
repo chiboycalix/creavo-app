@@ -42,12 +42,13 @@ const SpaceSettings = ({
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = currentSpace?.logo || defaultAvatar;
   const [isOpenMembers, setIsOpenMembers] = useState(true)
-  const [isOpenAccessControl, setIsOpenAccessControl] = useState(false)
+  const [isOpenAccessControl, setIsOpenAccessControl] = useState(true)
   if (error) return <div>Error: {(error as Error).message}</div>;
 
   if (!anchorRect) return null;
 
   console.log({ currentSpace, isFetchingSpaceMembers, members })
+
   return (
     <AnimatePresence>
       {isOpen && (
