@@ -95,19 +95,6 @@ const LiveStreamInterface = () => {
     remoteUsersRef.current = remoteParticipants;
   }, [remoteParticipants]);
 
-  useEffect(() => {
-    if (
-      meetingRoomData?.hasStarted &&
-      Object.keys(remoteParticipants).length === 0
-    ) {
-      const timeOut = setTimeout(() => {
-        setTimeOutWarning(true);
-      }, 5 * 60 * 1000);
-
-      return () => clearTimeout(timeOut);
-    }
-  }, [wsRef, remoteParticipants, meetingRoomData?.hasStarted]);
-
   const handleAllow = (requesterId: string) => {
     wsRef.current = ws;
 
@@ -164,6 +151,33 @@ const LiveStreamInterface = () => {
   };
 
   const handleEmojiSelect = (emoji: string) => {};
+
+  useEffect(() => {
+    let initialTimeout: NodeJS.Timeout;
+    let secondaryTimeout: NodeJS.Timeout;
+
+    if (
+      meetingRoomData?.hasStarted &&
+      Object.keys(remoteParticipants).length === 0
+    ) {
+      // First timeout — show warning after 2 minutes
+      initialTimeout = setTimeout(() => {
+        setTimeOutWarning(true);
+
+        // Second timeout — auto end call if user takes no action
+        secondaryTimeout = setTimeout(async () => {
+          setTimeOutWarning(false);
+          await handleEndCall();
+          return;
+        }, 2 * 60 * 1000);
+      }, 4 * 60 * 1000);
+    }
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearTimeout(secondaryTimeout);
+    };
+  }, [wsRef, remoteParticipants, meetingRoomData?.hasStarted]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[150] bg-[#1A1C1D]">
