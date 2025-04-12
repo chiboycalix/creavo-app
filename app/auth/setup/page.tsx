@@ -49,7 +49,7 @@ const ProfileSetup = () => {
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
-  console.log({ profileData })
+
   const handleUpdateProfile = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
