@@ -90,7 +90,8 @@ const Space = () => {
     return {
       id: member?.userId,
       name: `${member?.firstName} ${member?.lastName}`,
-      image: member?.avatar
+      image: member?.avatar,
+      username: member?.username,
     }
   })
 
@@ -99,7 +100,6 @@ const Space = () => {
     setSpaceSettingsAnchorRect(buttonRect);
     setShowSpaceSettingsCard(true);
   };
-
 
   return (
     <ProtectedRoute
@@ -133,8 +133,8 @@ const Space = () => {
                   isOpen={showSpaceSettingsCard}
                   onClose={() => setShowSpaceSettingsCard(false)}
                   anchorRect={spaceSettingsAnchorRect}
-                  userId={"id"}
                   currentSpace={currentSpace}
+                  communityId={community && community?.id}
                   members={members}
                   isFetchingSpaceMembers={isFetchingSpaceMembers}
                 />

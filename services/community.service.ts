@@ -7,6 +7,14 @@ export type SpacePayload = {
   logo?: string;
 };
 
+export type EditSpacePayload = {
+  communityId: string;
+  spaceId: string;
+  name: string;
+  description: string;
+  logo?: string;
+};
+
 export type DeleteMessagePayload = {
   communityId: string;
   spaceId: string;
@@ -69,6 +77,22 @@ export const createSpaceService = async (payload: SpacePayload) => {
   }
 };
 
+export const editSpaceService = async (payload: EditSpacePayload) => {
+  try {
+    const { data } = await apiClient.patch(
+      `/communities/${payload?.communityId}/spaces/${payload?.spaceId}`,
+      {
+        name: payload?.name,
+        description: payload?.description,
+        logo: payload?.logo,
+      }
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const addMembersManuallyToSpaceService = async ({
   members,
   communityId,
@@ -118,6 +142,7 @@ export const listSpaceMessagesService = async ({
     throw error;
   }
 };
+
 export const editPostService = async (payload: EditPostsPayload) => {
   const { communityId, spaceId, messageId, ...rest } = payload;
   try {

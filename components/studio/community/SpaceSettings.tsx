@@ -1,21 +1,21 @@
 "use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, X } from "lucide-react";
 import { SearchInput } from "@/components/Input/SearchInput";
-import { useFetchFollowers } from "@/hooks/profile/useFetchFollowers";
 import FollowerSkeleton from "@/components/sketetons/FollowerSkeleton";
 import { Button } from "@/components/ui/button";
 import { Collapsible } from "@radix-ui/react-collapsible";
 import { CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
+import EditSpace from "./EditSpace";
 
 type SpaceSettingsProps = {
   isOpen: boolean;
   onClose: () => void;
   anchorRect?: DOMRect | null;
-  userId: string;
   currentSpace?: any;
+  communityId?: string;
   members?: any;
   isFetchingSpaceMembers: boolean;
 };
@@ -24,30 +24,31 @@ const SpaceSettings = ({
   isOpen,
   onClose,
   anchorRect,
-  userId,
   currentSpace,
   members,
   isFetchingSpaceMembers
 }: SpaceSettingsProps) => {
+
+  const [showEditSpaceCard, setShowEditSpaceCard] = useState(false);
+  const [editSpaceAnchorRect, setEditSpaceAnchorRect] = useState<DOMRect | null>(null);
+
   const menuPosition = {
     top: 2,
     right: 0,
   };
-  const {
-    data,
-    isLoading,
-    error,
-  } = useFetchFollowers(userId);
 
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = currentSpace?.logo || defaultAvatar;
   const [isOpenMembers, setIsOpenMembers] = useState(true)
   const [isOpenAccessControl, setIsOpenAccessControl] = useState(true)
-  if (error) return <div>Error: {(error as Error).message}</div>;
+
+  const handleEditSpaceClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setEditSpaceAnchorRect(buttonRect);
+    setShowEditSpaceCard(true);
+  };
 
   if (!anchorRect) return null;
-
-  console.log({ currentSpace, isFetchingSpaceMembers, members })
 
   return (
     <AnimatePresence>
@@ -88,7 +89,7 @@ const SpaceSettings = ({
                 <span className="font-bold text-md">{currentSpace?.displayName}</span>
                 <span className="text-sm">{currentSpace?.description}</span>
 
-                <div className="mt-3">
+                <div className="mt-3" onClick={handleEditSpaceClick}>
                   <Button className="py-4 rounded-lg" size={"sm"}>
                     Edit Space
                   </Button>
@@ -101,7 +102,7 @@ const SpaceSettings = ({
                 <div className='inline-flex justify-between items-center gap-4 w-full mt-8'>
                   <CollapsibleTrigger className="w-full">
                     <div className="flex items-center justify-between text-sm font-semibold cursor-pointer">
-                      <span>Members(502)</span>
+                      <span>Members({`${members?.length}`})</span>
 
                       {isOpenMembers ? (
                         <ChevronUp className="h-4 w-4" />
@@ -117,10 +118,32 @@ const SpaceSettings = ({
                     <SearchInput placeholder="Search" className="rounded-lg" />
                   </div>
                   <div className="mt-4">
-                    {isLoading ? (
+                    {isFetchingSpaceMembers ? (
                       <FollowerSkeleton count={10} />
                     ) : (
-                      <div>calix</div>
+                      <div>
+                        {members?.map((member: any) => (
+                          <div key={member.id} className="flex items-center gap-2 mb-4">
+                            <img
+                              src={member.avatar || defaultAvatar}
+                              alt={`${member.username}'s avatar`}
+                              style={{
+                                width: "30px",
+                                height: "30px",
+                                borderRadius: "50%",
+                              }}
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-sm inline-block">
+                                {member?.name}
+                              </span>
+                              <span className="text-xs inline-block">
+                                @{member?.username}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </CollapsibleContent>
@@ -156,6 +179,15 @@ const SpaceSettings = ({
               </Collapsible>
             </div>
           </motion.div>
+
+          {showEditSpaceCard && currentSpace && (
+            <EditSpace
+              isOpen={showEditSpaceCard}
+              onClose={() => setShowEditSpaceCard(false)}
+              anchorRect={editSpaceAnchorRect}
+              currentSpace={currentSpace}
+            />
+          )}
         </>
       )}
     </AnimatePresence>
