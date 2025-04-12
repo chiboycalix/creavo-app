@@ -41,6 +41,12 @@ export type EditPostsPayload = {
   messageId: string;
 };
 
+export type RemoveMemberFromSpacePayload = {
+  communityId: string;
+  spaceId: string;
+  members: string[];
+};
+
 export const createCommunityService = async (payload: any) => {
   try {
     const { data } = await apiClient.post(`/communities`, {
@@ -166,6 +172,24 @@ export const deleteMessageService = async ({
   try {
     const response = await apiClient.delete(
       `/communities/${communityId}/spaces/${spaceId}/messages/${messageId}`
+    );
+    return response;
+  } catch (error: any) {
+    return Promise.reject(error?.response?.data || "An error occurred");
+  }
+};
+
+export const removeMemberFromSpaceService = async ({
+  communityId,
+  spaceId,
+  members,
+}: RemoveMemberFromSpacePayload) => {
+  try {
+    const response = await apiClient.patch(
+      `/communities/${communityId}/spaces/${spaceId}/members`,
+      {
+        members,
+      }
     );
     return response;
   } catch (error: any) {

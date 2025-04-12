@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Edit, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, Trash2, X } from "lucide-react";
 import { SearchInput } from "@/components/Input/SearchInput";
 import FollowerSkeleton from "@/components/sketetons/FollowerSkeleton";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,9 @@ import { Collapsible } from "@radix-ui/react-collapsible";
 import { CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import EditSpace from "./EditSpace";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { RemoveMemberFromSpacePayload, removeMemberFromSpaceService } from "@/services/community.service";
+import { toast } from "sonner";
 
 type SpaceSettingsProps = {
   isOpen: boolean;
@@ -28,7 +31,7 @@ const SpaceSettings = ({
   members,
   isFetchingSpaceMembers
 }: SpaceSettingsProps) => {
-
+  const queryClient = useQueryClient();
   const [showEditSpaceCard, setShowEditSpaceCard] = useState(false);
   const [editSpaceAnchorRect, setEditSpaceAnchorRect] = useState<DOMRect | null>(null);
 
@@ -46,6 +49,29 @@ const SpaceSettings = ({
     const buttonRect = event.currentTarget.getBoundingClientRect();
     setEditSpaceAnchorRect(buttonRect);
     setShowEditSpaceCard(true);
+  };
+
+  const { mutate: handleRemoveMemberFomSpace, isPending: isRemovingMemberFromSpace } = useMutation({
+    mutationFn: (payload: RemoveMemberFromSpacePayload) => removeMemberFromSpaceService(payload),
+    onSuccess: async (data) => {
+      toast.success("Member removed successfully");
+      queryClient.invalidateQueries({ queryKey: ["useListSpaces"] })
+      queryClient.invalidateQueries({ queryKey: ["spaceId-communityId", currentSpace?.communityId, currentSpace?.id] })
+      queryClient.invalidateQueries({ queryKey: ["useListSpaceMembers"] })
+    },
+    onError: (error: any) => {
+      console.log({ error })
+      toast.error(`Something went wrong`);
+    },
+  });
+
+  console.log({ members })
+  const handleRemoveMember = async (member: any) => {
+    await handleRemoveMemberFomSpace({
+      communityId: currentSpace?.communityId,
+      spaceId: currentSpace?.id,
+      members: [member?.username],
+    });
   };
 
   if (!anchorRect) return null;
@@ -117,29 +143,34 @@ const SpaceSettings = ({
                   <div className="">
                     <SearchInput placeholder="Search" className="rounded-lg" />
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 max-h-[40vh] overflow-y-auto">
                     {isFetchingSpaceMembers ? (
                       <FollowerSkeleton count={10} />
                     ) : (
                       <div>
                         {members?.map((member: any) => (
-                          <div key={member.id} className="flex items-center gap-2 mb-4">
-                            <img
-                              src={member.avatar || defaultAvatar}
-                              alt={`${member.username}'s avatar`}
-                              style={{
-                                width: "30px",
-                                height: "30px",
-                                borderRadius: "50%",
-                              }}
-                            />
-                            <div className="flex flex-col">
-                              <span className="text-sm inline-block">
-                                {member?.name}
-                              </span>
-                              <span className="text-xs inline-block">
-                                @{member?.username}
-                              </span>
+                          <div key={member.id} className="flex group items-start justify-between">
+                            <div className="flex items-center gap-2 mb-4 cursor-pointer">
+                              <img
+                                src={member.avatar || defaultAvatar}
+                                alt={`${member.username}'s avatar`}
+                                style={{
+                                  width: "30px",
+                                  height: "30px",
+                                  borderRadius: "50%",
+                                }}
+                              />
+                              <div className="flex flex-col">
+                                <span className="text-sm inline-block">
+                                  {member?.name}
+                                </span>
+                                <span className="text-xs inline-block">
+                                  @{member?.username}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="group-hover:block hidden cursor-pointer" onClick={() => handleRemoveMember(member)}>
+                              <Trash2 />
                             </div>
                           </div>
                         ))}

@@ -232,7 +232,7 @@ const Space = () => {
                   )}
                   <div className='w-full mt-4'>
                     <Button className='w-full' disabled={isAddingMemberMannually}>
-                      <ButtonLoader isLoading={isAddingMemberMannually} caption={`Invite ${invitedUsers.length > 0 ? `(${invitedUsers.length})` : ''}`} />
+                      <ButtonLoader isLoading={isAddingMemberMannually} caption={`Add ${invitedUsers.length > 0 ? `(${invitedUsers.length})` : ''}`} />
                     </Button>
                   </div>
                 </form>
