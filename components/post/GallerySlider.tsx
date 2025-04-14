@@ -2,11 +2,29 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useSwipeable } from 'react-swipeable'
-import { variants } from '@/utils/animationVariants'
 import { PostMediaType } from '@/context/PostContext'
 import { getMimeTypeFromCloudinaryUrl } from '@/utils';
 import { cn } from '@/lib/utils';
 import { useMediaDimensions } from '@/hooks/useDimensions';
+
+export const variants = (x = 1000, opacity = 0) => ({
+  enter: (direction: number) => {
+    return {
+      x: direction > 0 ? x : -x,
+      opacity,
+    };
+  },
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => {
+    return {
+      x: direction < 0 ? x : -x,
+      opacity,
+    };
+  },
+});
 
 type GallerySliderTypes = {
   galleryImgs: PostMediaType[];

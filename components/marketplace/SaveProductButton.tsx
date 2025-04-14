@@ -5,36 +5,38 @@ import { Heart } from "lucide-react";
 import { useMarketContext } from "@/context/MarketContext";
 
 interface LikeButtonProps {
-  productId?: number;
+  productId?: any;
   initialIsSaved?: boolean;
   savedId?: number;
-  onToggleSave: (product: any) => void;
+  onToggle: (product: any) => void;
+  product?: any;
 }
 
 const SaveProductButton: React.FC<LikeButtonProps> = ({
-  productId,
-  onToggleSave,
-  initialIsSaved
-  
+  onToggle,
+  initialIsSaved,
+  product,
 }) => {
-  const {  setIsSaved, savedProducts } = useMarketContext();
+  const { setIsSaved, savedProducts, handleToggleSave } = useMarketContext();
 
-  const handleToggleSave = async (
+  const handleToggle = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): Promise<void> => {
     event.preventDefault();
-    onToggleSave(productId);
+    handleToggleSave(product);
   };
 
   useEffect(() => {
-    const isProductSaved = savedProducts?.some((product: any) => product.id === productId);
+    const isProductSaved = savedProducts?.some(
+      (product: any) => product?.id === product?.id
+    );
     setIsSaved(isProductSaved);
-  }, [productId, savedProducts, setIsSaved]);
+  }, [product, savedProducts, setIsSaved]);
 
   return (
     <div className="flex flex-col items-center gap-2">
       <button
-        onClick={(e) => handleToggleSave(e)}
+        onClick={(e) => handleToggle(e)}
         className="flex items-center focus:outline-none transition-opacity disabled:opacity-50"
         aria-label={initialIsSaved ? "Unsave product" : "Save post"}
       >

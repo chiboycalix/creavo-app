@@ -4,7 +4,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { GraduationCap, Grip, X, ChartLine, LayoutDashboard,CalendarDays, Video  } from "lucide-react";
+import {
+  GraduationCap,
+  Grip,
+  X,
+  ChartLine,
+  LayoutDashboard,
+  CalendarDays,
+  Video,
+} from "lucide-react";
 import Item from "./Item";
 import Image from "next/image";
 
@@ -30,26 +38,30 @@ const QuickActions = () => {
               link="/studio/course"
               title="Create Course"
               description="Build and customize your online course with ease. Upload content, set pricing, and engage with learners."
-              icon={ <Image
-                src="/assets/createsvg.svg"
-                width={70}
-                height={70}
-                alt={"ShortCourse"}
-                className='rounded-full'
-              />}
+              icon={
+                <Image
+                  src="/assets/createsvg.svg"
+                  width={70}
+                  height={70}
+                  alt={"ShortCourse"}
+                  className="rounded-full"
+                />
+              }
               className="basis-1/2 "
             />
             <Item
-              link="/market/create-listing"
+              link="#"
               title="Create Listing"
               description="Showcase your products or services in a few simple steps. Reach potential buyers effortlessly."
-              icon={<Image
-                src="/assets/createsvg2.svg"
-                width={70}
-                height={70}
-                alt={"ShortCourse"}
-                className='rounded-full'
-              />}
+              icon={
+                <Image
+                  src="/assets/createsvg2.svg"
+                  width={70}
+                  height={70}
+                  alt={"ShortCourse"}
+                  className="rounded-full"
+                />
+              }
               className="flex-1"
             />
           </div>

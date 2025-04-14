@@ -111,7 +111,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <SaveProductButton
           productId={course?.id}
           initialIsSaved={isSaved}
-          onToggleSave={() => handleToggleSave(course)}
+          onToggle={() => handleToggleSave(course)}
         />
       </div>
     </Link>

@@ -29,7 +29,14 @@ export const ROUTES = {
     LEAVE_MEETING: "/studio/event/meeting/leave-meeting",
   },
 
-  MARKETPLACE: "/market",
+  MARKET :{
+    EXPLORE: "/market",
+    SAVED: "/market/saved",
+    YOUR_LISTINGS: "/market/your-listings",
+    PRODUCT: (id: any) =>  `/market/product/${id}`,
+    SELLER_DASHBOARD: "/market/seller-dashboard",
+  },
+
 
   CLASSROOM: {
     OVERVIEW: "/classroom/overview",

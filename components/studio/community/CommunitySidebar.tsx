@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
 export default function CommunitySidebar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
   const { data: communityData, isFetching } = useListCommunities();
 
   const community = communityData?.data?.communities[0]
@@ -50,7 +50,6 @@ export default function CommunitySidebar() {
                 <div className='flex-1 cursor-pointer'>
                   <CreateSpaceDialog
                     communityId={community?.id}
-
                   />
                 </div>
               </div>

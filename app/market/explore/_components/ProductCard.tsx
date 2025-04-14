@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import SaveProductButton from "@/components/marketplace/SaveProductButton";
 import { useMarketContext } from "@/context/MarketContext";
 import Link from "next/link";
+import { ROUTES } from "@/constants/routes";
 
 interface Product {
   id: any;
@@ -54,7 +55,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <Link
-      href={`/market/product/${product?.id}`}
+      href={ROUTES.MARKET.PRODUCT(product?.id)}
       key={product?.id}
       className="relative flex flex-col items-center gap-3 bg-white rounded-lg border border-gray-200 shadow-sm transition-transform transform hover:scale-105 hover:shadow-lg w-[calc(25%-16px)] min-w-[200px] max-w-[300px]"
     >
@@ -102,7 +103,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"
               />
             </svg>
-            {product.rating > 0 ? (
+            {product?.rating > 0 ? (
               <span>{product?.rating}</span>
             ) : (
               <span>No rating</span>
@@ -125,9 +126,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* Save Button */}
       <div className="absolute bg-white bg-opacity-90 top-2 right-2 rounded-full p-1 shadow-md">
         <SaveProductButton
-          productId={product?.id}
+          product={product}
           initialIsSaved={isSaved}
-          onToggleSave={() => handleToggleSave(product as any)}
+          onToggle={() => handleToggleSave(product as any)}
         />
       </div>
     </Link>

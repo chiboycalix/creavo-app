@@ -1,12 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMarketContext } from "@/context/MarketContext";
-import { EllipsisVerticalIcon, StarIcon } from "lucide-react";
+import {
+  EllipsisVerticalIcon,
+  EyeIcon,
+  SquarePenIcon,
+  StarIcon,
+  TrashIcon,
+} from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 const SellerDashboard = () => {
-  const { listedCourses, isSaved, handleToggleSave } = useMarketContext();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { listedCourses } = useMarketContext();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  console.log("listedCourses", listedCourses);
   const listingsSection = [
     {
       title: "Total Listings",
@@ -17,6 +25,40 @@ const SellerDashboard = () => {
       value: listedCourses?.length,
     },
   ];
+
+  const menuOptions = [
+    {
+      title: "View",
+      icon: <EyeIcon />,
+    },
+    {
+      title: "Edit",
+      icon: <SquarePenIcon />,
+    },
+    {
+      title: "Delete",
+      icon: <TrashIcon />,
+    },
+  ];
+
+  const handleMenuOpen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMenuOpen((prev) => !prev);
+  };
+
+  // 👇 Detect clicks outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-4 pt-3">
@@ -45,7 +87,7 @@ const SellerDashboard = () => {
       <div className="">
         <h1 className="p-3 font-bold">Your Listings</h1>
         <div className="flex justify-start w-full p-3 gap-3">
-          {listingsSection.map((item, index) => (
+          {listingsSection?.map((item, index) => (
             <div
               key={index}
               className=" bg-white flex flex-col p-4  border-2 border-[#D9DEF1] rounded-md gap-4 w-1/3"
@@ -58,37 +100,80 @@ const SellerDashboard = () => {
       </div>
 
       <div>
-        {listedCourses?.map((item: any, index: any) => (
-          <div
-            key={index}
-            className="flex h-auto gap-10 bg-white p-4 shadow-md rounded-lg hover:border border-primary-100"
-          >
-            <div className="w-1/4">
-              <img src={item?.promotionalUrl} alt="img" />
-            </div>
-            <div className="flex flex-col justify-between gap-5">
-              <h2 className="font-bold">{item?.title}</h2>
-              <p>{item?.description}</p>
-              <div className="flex gap-5 justify-between items-center">
-                <div className="flex gap-2">
-                  <div className="border-r-2 pr-3 font-bold text-[#00B5FF]">Active</div>
-                  <div>0 Clicks</div>
+        {listedCourses?.length > 0 ? (
+          listedCourses?.map((item: any, index: any) => {
+            const isVideo = item?.promotionalUrl?.endsWith(".mp4") ?? false;
+            return (
+              <div
+                key={index}
+                className="flex h-auto gap-10 bg-white p-4 shadow-md rounded-lg hover:border border-primary-100"
+              >
+                <div className="w-1/4">
+                  {isVideo ? (
+                    <video
+                      src={item?.promotionalUrl}
+                      autoPlay
+                      loop
+                      muted
+                      className="rounded-md"
+                    />
+                  ) : (
+                    <img
+                      src={item?.promotionalUrl}
+                      alt="img"
+                      className="rounded-md"
+                    />
+                  )}
                 </div>
-                <div className="bg-[#DFF8F6] px-2 py-1 rounded-md shadow-md">
-                  ${item?.amount}
+                <div className="flex flex-col justify-between gap-5">
+                  <h2 className="font-bold">{item?.title}</h2>
+                  <p>{item?.description}</p>
+                  <div className="flex gap-5 justify-between items-center">
+                    <div className="flex gap-2">
+                      <div className="border-r-2 pr-3 font-bold text-[#00B5FF]">
+                        Active
+                      </div>
+                      <div>0 Clicks</div>
+                    </div>
+                    <div className="bg-[#DFF8F6] px-2 py-1 rounded-md shadow-md">
+                      {item?.currency}{item?.amount}
+                    </div>
+                  </div>
+                  <div className="flex gap-3 items-center">
+                    <button className="w-3/4 bg-primary-700 text-white rounded-md h-10">
+                      Share
+                    </button>
+                    <div className="relative">
+                      <EllipsisVerticalIcon
+                        onClick={(e) => handleMenuOpen(e)}
+                      />
+                      <AnimatePresence>
+                        {menuOpen && (
+                          <div
+                            ref={menuRef}
+                            className="absolute flex flex-col gap-3 left-0 bg-white shadow-md rounded-md p-2 w-40 z-10"
+                          >
+                            {menuOptions?.map((option, index) => (
+                              <button
+                                key={index}
+                                className="flex cursor-pointer h-5 gap-2 items-center hover:bg-blue-100 p-2 rounded-md"
+                              >
+                                {option.icon}
+                                <span>{option.title}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-3 items-center">
-                <button className="w-3/4 bg-primary-700 text-white rounded-md h-10">
-                  Share
-                </button>
-                <div>
-                  <EllipsisVerticalIcon />
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+            );
+          })
+        ) : (
+          <div>You have not listed any Courses to the Marketplace </div>
+        )}
       </div>
     </div>
   );

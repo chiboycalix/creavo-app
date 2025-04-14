@@ -36,6 +36,7 @@ export default function VideoInterface({
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [handleSelectMicrophone, setHandleSelectMicrophone] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [timeOutWarning, setTimeOutWarning] = useState(false);
 
   const {
     isMicrophoneEnabled,
@@ -50,6 +51,9 @@ export default function VideoInterface({
     joinMeetingRoom,
     isWaiting,
     setIsWaiting,
+    userIsHost,
+    meetingRoomData,
+    remoteParticipants,
   } = useVideoConferencing();
   const ws = useWebSocket();
   const wsRef = useRef(ws);
@@ -103,7 +107,9 @@ export default function VideoInterface({
 
                 <div className="bg-red-500 text-white px-3 py-2 rounded-full mt-4 text-sm flex items-center gap-2">
                   <span className="inline-block w-3 h-3 rounded-full bg-white"></span>
-                  <p>LIVE {allowMicrophoneAndCamera ? "Conferencing" : "Stream"}</p>
+                  <p>
+                    LIVE {allowMicrophoneAndCamera ? "Conferencing" : "Stream"}
+                  </p>
                 </div>
 
                 {/* Video Preview Container */}
@@ -156,7 +162,7 @@ export default function VideoInterface({
                             {handleSelectMicrophone &&
                               localUserTrack?.audioTrack && (
                                 <MicSelect
-                                  audioTrack={localUserTrack.audioTrack}
+                                  audioTrack={localUserTrack?.audioTrack}
                                   setHandleSelectMicrophone={
                                     setHandleSelectMicrophone
                                   }
@@ -204,6 +210,7 @@ export default function VideoInterface({
                         onChange={(e) => {}}
                       />
                     </div>
+
                     <div className="sm:flex-1 w-full">
                       {isWaiting && <LoadingSpinner />}
 
@@ -218,6 +225,26 @@ export default function VideoInterface({
                       )}
                     </div>
                   </div>
+
+                  {isWaiting && !userIsHost && (
+                    <div className=" w-full flex justify-center mt-3">
+                      <p className="text-sm ">
+                        Please hold on, someone will let you in the call
+                      </p>
+                    </div>
+                  )}
+
+                  {!isWaiting && !userIsHost && (
+                    <div className=" w-full flex justify-center mt-3">
+                      <p className="text-sm ">You can now join this call</p>
+                    </div>
+                  )}
+
+                  {!meetingRoomData?.hasStarted  && (
+                    <div className=" w-full flex justify-center mt-3">
+                      <p className="text-sm ">Meeting has not started ...</p>
+                    </div>
+                  )}
                 </div>
 
                 <SettingsModal
@@ -228,6 +255,11 @@ export default function VideoInterface({
             </div>
           )}
         </>
+      )}
+      {timeOutWarning && (
+        <div className="w-full h-64 bg-blue-300 text-black">
+          There is no other perosn here, Do you want to leave the call?
+        </div>
       )}
     </div>
   );

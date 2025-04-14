@@ -33,6 +33,7 @@ import { RiHome8Fill } from "react-icons/ri";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { cn } from "@/lib/utils";
 import Footer from "./includes/Footer";
+import { ROUTES } from "@/constants/routes";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -113,12 +114,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         label: "Marketplace",
         icon: Store,
         navItems: [
-          { title: "Explore", href: "/market", icon: CompassIcon },
-          { title: "Saved", href: "/market/saved", icon: Bookmark },
+          { title: "Explore", href: ROUTES?.MARKET.EXPLORE, icon: CompassIcon },
+          { title: "Saved", href: ROUTES?.MARKET.SAVED, icon: Bookmark },
           { title: "Notifications", href: "/market/notifications", icon: BellIcon },
         ],
         dashboardItems: [
-          { title: "Seller dashboard", href: "/market/seller-dashboard", icon: LayoutDashboardIcon },
+          { title: "Seller dashboard", href: ROUTES?.MARKET.SELLER_DASHBOARD, icon: LayoutDashboardIcon },
         ],
       },
     ],

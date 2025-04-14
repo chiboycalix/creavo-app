@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from '@/components/Input'
-import { FormEvent, useState } from "react"
+import { FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
 import { createCommunityService } from "@/services/community.service"
@@ -19,7 +19,6 @@ import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook"
 import { useCreateCommunityValidator } from "@/helpers/validators/useCreateCommunity.validator"
 import { CreateCommunityForm } from "@/types"
 import { resetCreateCommunityForm, updatCreateCommunityForm } from "@/redux/slices/community.slice"
-import { generalHelpers } from "@/helpers"
 
 const CreateCommunityDialog = () => {
   const router = useRouter()
@@ -29,12 +28,11 @@ const CreateCommunityDialog = () => {
   const { validate, errors, validateField } = useCreateCommunityValidator({ store: createCommunityStateValues });
   const updateCreateCommunity = (payload: Partial<CreateCommunityForm>) => dispatch(updatCreateCommunityForm(payload));
 
-
   const { mutate: handleCreateCommunity, isPending: isCreatingCommunity } = useMutation({
     mutationFn: (payload: any) => createCommunityService(payload),
     onSuccess: async (data) => {
       toast.success("Community created successfully")
-      router.push(`/studio/community/${generalHelpers.convertToSlug(createCommunityStateValues?.name)}`)
+      router.push(`/studio/community/${data?.id}`)
       dispatch(resetCreateCommunityForm())
     },
     onError: (error: any) => {

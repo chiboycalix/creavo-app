@@ -1,5 +1,5 @@
 "use client"
-import CommunitySidebar from '@/components/studio/community/SideBar';
+import CommunitySidebar from '@/components/studio/community/CommunitySidebar';
 import { Card } from '@/components/ui/card';
 import type { ReactNode } from 'react';
 
