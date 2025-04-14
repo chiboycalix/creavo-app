@@ -94,32 +94,49 @@ export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
               <div className="border-b mx-3 my-6" />
               <div className="mt-4 px-3 text-[11px] text-gray-500">
                 <ul className="flex flex-wrap gap-x-5 items-start text-gray-600 gap-y-3 my-2.5">
+                  <Link href="/company">
                   <li className="hover:font-medium cursor-pointer transition-all">
                     Company
                   </li>
+                  </Link  >
+                  <Link href="/about">
                   <li className="hover:font-medium cursor-pointer transition-all">
                     About
                   </li>
+                  </Link>
+                  <Link href="/contact">
                   <li className="hover:font-medium cursor-pointer transition-all">
                     Contact
                   </li>
+                  </Link>
                 </ul>
                 <ul className="flex flex-wrap gap-x-5 items-start text-gray-600 gap-y-3 my-2.5">
+                <Link href="/help">
                   <li className="hover:font-medium cursor-pointer transition-all">
                     Help
                   </li>
+                  </Link>
+                  <Link href="/safety">
                   <li className="hover:font-medium cursor-pointer transition-all">
                     Safety
                   </li>
+                  </Link>
+
+                  <Link href="/privacy">
                   <li className="hover:font-medium cursor-pointer transition-all">
                     Privacy Center
                   </li>
+                  </Link>
+                  <Link href="/terms-policies">
                   <li className="text-xs hover:font-medium cursor-pointer transition-all">
                     Terms & Policies
                   </li>
+                  </Link>
+                  <Link href="/community-guidelines">
                   <li className="text-xs hover:font-medium cursor-pointer transition-all">
                     Community Guidelines
                   </li>
+                  </Link>
                 </ul>
                 <p className="mt-2">© 2025 CREVOE</p>
               </div>
