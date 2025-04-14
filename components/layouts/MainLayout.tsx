@@ -9,6 +9,7 @@ import { NavItem, HeaderButton } from "@/types/navigation";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
+import SimpleLayout from "./includes/SimpleLayout";
 import {
   Video,
   User,
@@ -168,7 +169,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const useMainLayout = shouldUseMainLayout(pathname || "");
 
   if (!useMainLayout) {
-    return <div>{children}</div>;
+    return( <SimpleLayout>{children} </SimpleLayout> )
   }
 
   return (
