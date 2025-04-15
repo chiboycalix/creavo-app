@@ -35,3 +35,16 @@ export const updateQuizQuestionService = async (payload: any) => {
     throw error;
   }
 };
+
+
+export const addQuestionToQuizService = async (quizId: string | number, payload: any) => {
+  try {
+    const { data } = await apiClient.post(`/quizzes/${quizId}/add-quiz-question`, payload);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
