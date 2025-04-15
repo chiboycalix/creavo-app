@@ -62,7 +62,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           { title: "Following", href: "/socials/following", icon: UserPlusIcon },
           { title: "Upload Post", href: "/socials/uploads", icon: PlusSquareIcon },
           { title: "Watchlist", href: "/socials/watchlist", icon: TvMinimalPlay },
-          { title: "Community", href: "/socials/community", icon: Users2 },
+          // { title: "Community", href: "/socials/community", icon: Users2 },
           {
             title: "Profile",
             href: `/socials/profile`,
@@ -170,7 +170,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const useMainLayout = shouldUseMainLayout(pathname || "");
 
   if (!useMainLayout) {
-    return( <SimpleLayout>{children} </SimpleLayout> )
+    return (<SimpleLayout>{children} </SimpleLayout>)
   }
 
   return (
