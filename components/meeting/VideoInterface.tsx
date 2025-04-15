@@ -211,7 +211,7 @@ export default function VideoInterface({
                       />
                     </div>
 
-                    <div className="sm:flex-1 w-full">
+                    {/* <div className="sm:flex-1 w-full">
                       {isWaiting && <LoadingSpinner />}
 
                       {!isWaiting && (
@@ -223,10 +223,23 @@ export default function VideoInterface({
                           Join
                         </Button>
                       )}
+                    </div> */}
+                    <div className="sm:flex-1 w-full">
+                      {isWaiting ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <Button
+                          onClick={handleJoinMeeting}
+                          className="bg-primary hover:bg-primary-700 w-full py-2"
+                          disabled={isLoading}
+                        >
+                          Join
+                        </Button>
+                      )}
                     </div>
                   </div>
 
-                  {isWaiting && !userIsHost && (
+                  {/* {isWaiting && !userIsHost && (
                     <div className=" w-full flex justify-center mt-3">
                       <p className="text-sm ">
                         Please hold on, someone will let you in the call
@@ -243,6 +256,21 @@ export default function VideoInterface({
                   {!meetingRoomData?.hasStarted  && (
                     <div className=" w-full flex justify-center mt-3">
                       <p className="text-sm ">Meeting has not started ...</p>
+                    </div>
+                  )} */}
+                  {!userIsHost && (
+                    <div className="w-full flex justify-center mt-3">
+                      <p className="text-sm">
+                        {isWaiting
+                          ? "Please hold on, someone will let you in the call"
+                          : "You can now join this call"}
+                      </p>
+                    </div>
+                  )}
+
+                  {meetingRoomData && !meetingRoomData?.hasStarted && !userIsHost && (
+                    <div className="w-full flex justify-center mt-3">
+                      <p className="text-sm">Meeting has not started ...</p>
                     </div>
                   )}
                 </div>
