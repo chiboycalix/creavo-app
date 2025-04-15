@@ -61,6 +61,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           { title: "Following", href: "/socials/following", icon: UserPlusIcon },
           { title: "Upload Post", href: "/socials/uploads", icon: PlusSquareIcon },
           { title: "Watchlist", href: "/socials/watchlist", icon: TvMinimalPlay },
+          { title: "Community", href: "/socials/community", icon: Users2 },
           {
             title: "Profile",
             href: `/socials/profile`,
@@ -102,7 +103,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               { title: "Overview", href: "/studio/analytics/overview" },
               { title: "Sales Metrics", href: "/studio/analytics/sales-metrics" },
               { title: "Engagement Metrics", href: "/studio/analytics/engagement-metrics" },
-              { title: "Revenue and ROI", href: "/studio/analytics/revenue-and-ROI" },
+              { title: "Revenue and ROI", href: "/studio/analytics/revenue-and-roi" },
               { title: "Feedback", href: "/studio/analytics/feedback" },
             ],
           },

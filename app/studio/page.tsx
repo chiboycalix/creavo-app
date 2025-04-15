@@ -160,7 +160,6 @@ const StudioDashboard = () => {
     "23",
   ];
 
-
   const transformToChartData = (data: number[], labels: string[]) =>
     data.map((value, index) => ({ x: Number(labels[index]), value }));
 

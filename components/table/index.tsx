@@ -19,6 +19,7 @@ type TableProps = {
   setCurrentPage: (currentPage: number) => void;
   setRowsPerPage: (rowsPerPage: number) => void;
   renderEmptyRecords: any;
+  title?: string;
 };
 
 type SortConfig = {
@@ -41,6 +42,7 @@ const DynamicTable = ({
   setRowsPerPage,
   rowsPerPage,
   currentPage,
+  title = "Trainee"
 }: TableProps) => {
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: "",
@@ -78,28 +80,26 @@ const DynamicTable = ({
   return (
     <Card className="w-full border-none">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-base font-normal">Trainee</CardTitle>
-        <p className="text-sm text-gray-500">See all</p>
+        <CardTitle className="text-base font-normal">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="max-w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 bg-white">
           <div className="w-full">
-            <Table>
+            <Table className="">
               <TableHeader>
                 <TableRow className="bg-primary-50">
                   {columns.map((column, index) => (
                     <TableHead
                       key={index}
-                      className={`text-black ${
-                        column.sortable
-                          ? "cursor-pointer hover:bg-gray-100"
-                          : ""
-                      }`}
+                      className={`text-black ${column.sortable
+                        ? "cursor-pointer hover:bg-gray-100"
+                        : ""
+                        }`}
                       onClick={() =>
                         column.sortable && requestSort(column.accessorKey)
                       }
                     >
-                      <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-2">
                         {column.header}
                         {column.sortable && (
                           <ArrowUpDown
@@ -111,13 +111,13 @@ const DynamicTable = ({
                             }
                           />
                         )}
-                      </div>
+                      </span>
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               {currentRecords.length === 0 ? (
-                renderEmptyRecords
+                <span className="items-center">{renderEmptyRecords}</span>
               ) : (
                 <TableBody className="bg-white w-full mx-auto">
                   {currentRecords.map((row, index) => (

@@ -3,24 +3,25 @@ import ButtonLoader from '@/components/ButtonLoader';
 import { Input } from '@/components/Input'
 import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button';
-import { createPostService, CreatePostsPayload } from '@/services/community.service';
+import { PostMessageReplyPayload, postMessageReplyService } from '@/services/community.service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { spaceId: string, communityId: string, setIsInputDialogOpen: any }) => {
+const CreateMessageReply = ({ spaceId, communityId, setIsInputDialogOpen, mId }: { spaceId: string, communityId: string, setIsInputDialogOpen: any, mId: string }) => {
   const maxFiles = 1;
   const queryClient = useQueryClient();
   const [post, setPost] = useState("")
   const [postImage, setPostImage] = useState("")
 
-  const { mutate: handleCreatePost, isPending: isCreatingPost } = useMutation({
-    mutationFn: (payload: CreatePostsPayload) => {
-      return createPostService(payload)
+  const { mutate: handleReplyMessage, isPending: isCreatingPost } = useMutation({
+    mutationFn: (payload: PostMessageReplyPayload) => {
+      return postMessageReplyService(payload)
     },
+
     onSuccess: async (data) => {
-      toast.success("Message sent successfully")
+      toast.success("Reply sent successfully")
       setIsInputDialogOpen(false)
-      await queryClient.invalidateQueries({ queryKey: ["listMessages"] });
+      await queryClient.invalidateQueries({ queryKey: ["listMessageReplies"] });
     },
     onError: (error: any) => {
       toast.error(error?.data[0] || "Something went wrong, contact admin")
@@ -29,11 +30,12 @@ const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { s
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    handleCreatePost({
+    handleReplyMessage({
       text: post,
       imageUrl: postImage,
       spaceId,
-      communityId
+      communityId,
+      tmid: mId
     })
   }
 
@@ -68,7 +70,7 @@ const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { s
 
       <div className='w-full mt-12'>
         <Button
-          disabled={isCreatingPost || !post}
+          disabled={isCreatingPost || !post || !postImage}
           className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
         >
           <ButtonLoader
@@ -81,4 +83,4 @@ const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { s
   )
 }
 
-export default CreateCommunityPost
+export default CreateMessageReply

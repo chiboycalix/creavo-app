@@ -33,6 +33,15 @@ export type CreatePostsPayload = {
   spaceId: string;
   communityId: string;
 };
+
+export type PostMessageReplyPayload = {
+  text: string;
+  imageUrl?: string;
+  spaceId: string;
+  communityId: string;
+  tmid: string;
+};
+
 export type EditPostsPayload = {
   text: string;
   imageUrl?: string;
@@ -45,6 +54,12 @@ export type RemoveMemberFromSpacePayload = {
   communityId: string;
   spaceId: string;
   members: string[];
+};
+
+export type ListMessageReplyPayload = {
+  communityId: string;
+  spaceId: string;
+  messageId: string;
 };
 
 export const createCommunityService = async (payload: any) => {
@@ -194,5 +209,54 @@ export const removeMemberFromSpaceService = async ({
     return response;
   } catch (error: any) {
     return Promise.reject(error?.response?.data || "An error occurred");
+  }
+};
+
+export const listMessageRepliesService = async ({
+  communityId,
+  spaceId,
+  messageId,
+}: ListMessageReplyPayload) => {
+  try {
+    const response = await apiClient.get(
+      `/communities/${communityId}/spaces/${spaceId}/messages/${messageId}`
+    );
+    return response;
+  } catch (error: any) {
+    return Promise.reject(error?.response?.data || "An error occurred");
+  }
+};
+
+export const postMessageReplyService = async (
+  payload: PostMessageReplyPayload
+) => {
+  const { communityId, spaceId, ...rest } = payload;
+  try {
+    const { data } = await apiClient.post(
+      `/communities/${communityId}/spaces/${spaceId}/messages`,
+      {
+        ...rest,
+      }
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getSpaceDetailsService = async ({
+  communityId,
+  spaceId,
+}: {
+  communityId: string;
+  spaceId: string;
+}) => {
+  try {
+    const { data } = await apiClient.get(
+      `/communities/${communityId}/spaces/${spaceId}`
+    );
+    return data;
+  } catch (error) {
+    throw error;
   }
 };

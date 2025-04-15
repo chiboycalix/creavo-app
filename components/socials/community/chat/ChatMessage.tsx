@@ -199,7 +199,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             <div className="flex mt-3 gap-2">
               <Link
                 href={{
-                  pathname: `/studio/community/${communityId}/${spaceId}/${message?.id}/replies`,
+                  pathname: `/socials/community/${communityId}/${spaceId}/${message?.id}/replies`,
                   query: {
                     mId: message?.mId,
                   },
