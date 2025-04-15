@@ -14,6 +14,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import PageTitle from "@/components/PageTitle";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Joyride, { CallBackProps, } from "react-joyride";
+import CustomTooltip from "@/components/socials/tour/custom-tooltip";
+import { studioTourSteps } from "@/tour/studioTour";
 
 const overviewData = [
   {
@@ -206,6 +209,35 @@ const StudioDashboard = () => {
       },
     },
   ] as any;
+  const [run, setRun] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+
+  useEffect(() => {
+    // Small delay to ensure DOM elements are mounted
+    const timer = setTimeout(() => {
+      const seenTour = localStorage.getItem("socialsTourDone");
+      if (!seenTour) {
+        setRun(true);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleTourCallback = (data: CallBackProps) => {
+    const { status, index, type } = data;
+
+    if (["finished", "skipped"].includes(status)) {
+      setRun(false);
+      localStorage.setItem("socialsTourDone", "true");
+    } else {
+      // Only update step index on actual step changes
+      if (type === "step:after") {
+        setStepIndex(index + 1);
+      }
+    }
+  };
+
 
   return (
     <ProtectedRoute
@@ -213,6 +245,27 @@ const StudioDashboard = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
+         <Joyride
+        steps={studioTourSteps}
+        run={run}
+        stepIndex={stepIndex}
+        continuous
+        scrollToFirstStep
+        showProgress
+        showSkipButton={false}
+        disableScrolling={false}
+        disableOverlayClose
+        spotlightClicks
+        callback={handleTourCallback}
+        tooltipComponent={CustomTooltip}
+        styles={{
+          options: {
+            primaryColor: "#0b66c3",
+            zIndex: 10000,
+            overlayColor: "rgba(0, 0, 0, 0.5)",
+          }
+        }}
+      />
       <div className="w-full">
         <div className="w-full flex items-center justify-between">
           <PageTitle>
