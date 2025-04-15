@@ -14,7 +14,6 @@ export default function ExplorePage() {
   const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
-    // Small delay to ensure DOM elements are mounted
     const timer = setTimeout(() => {
       const seenTour = localStorage.getItem("socialsTourDone");
       if (!seenTour) {
@@ -32,7 +31,6 @@ export default function ExplorePage() {
       setRun(false);
       localStorage.setItem("socialsTourDone", "true");
     } else {
-      // Only update step index on actual step changes
       if (type === "step:after") {
         setStepIndex(index + 1);
       }
