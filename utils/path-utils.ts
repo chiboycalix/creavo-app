@@ -29,6 +29,8 @@ export const LAYOUT_PATHS = [
   "/socials/uploads",
   "/socials/edit-post",
   "/socials/edit-post/?*",
+  "/socials/community",
+  "/socials/community/*",
 
   "/studio",
   "/studio/course",

@@ -11,6 +11,7 @@ export interface Reaction {
 
 export interface Message {
   id: string;
+  mId: string;
   content: string;
   image?: string | null;
   timestamp: string;
