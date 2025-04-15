@@ -69,16 +69,21 @@ export default function VideoInterface({
     }
   };
 
+  // useEffect(() => {
+  //   setChannelName(channelName);
+  //   setUsername(currentUser.username);
+  // }, [
+  //   channelName,
+  //   setChannelName,
+  //   username,
+  //   setUsername,
+  //   currentUser.username,
+  // ]);
+
   useEffect(() => {
     setChannelName(channelName);
     setUsername(currentUser.username);
-  }, [
-    channelName,
-    setChannelName,
-    username,
-    setUsername,
-    currentUser.username,
-  ]);
+  }, [channelName, currentUser.username]);
 
   return (
     <div>
@@ -262,17 +267,19 @@ export default function VideoInterface({
                     <div className="w-full flex justify-center mt-3">
                       <p className="text-sm">
                         {isWaiting
-                          ? "Please hold on, someone will let you in the call"
+                          ? "Please hold on"
                           : "You can now join this call"}
                       </p>
                     </div>
                   )}
 
-                  {meetingRoomData && !meetingRoomData?.hasStarted && !userIsHost && (
-                    <div className="w-full flex justify-center mt-3">
-                      <p className="text-sm">Meeting has not started ...</p>
-                    </div>
-                  )}
+                  {meetingRoomData &&
+                    !meetingRoomData?.hasStarted &&
+                    !userIsHost && (
+                      <div className="w-full flex justify-center mt-3">
+                        <p className="text-sm">Meeting has not started ...</p>
+                      </div>
+                    )}
                 </div>
 
                 <SettingsModal
