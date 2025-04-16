@@ -2,18 +2,23 @@ import { X } from "lucide-react";
 
 export const UserBadge = ({
   label,
-  onRemove
+  onRemove,
+  canRemove = true
 }: {
   label: string;
-  onRemove: () => void;
+  canRemove?: boolean;
+  onRemove?: () => void;
 }) => (
   <div className="flex items-center gap-1 bg-primary-100 text-primary-900 px-2 py-1 rounded-full text-sm">
     <span>{label}</span>
-    <button
-      onClick={onRemove}
-      className="hover:bg-primary-200 rounded-full p-0.5"
-    >
-      <X className="w-3 h-3" />
-    </button>
+    {
+      canRemove && <button
+        onClick={onRemove}
+        className="hover:bg-primary-200 rounded-full p-0.5"
+      >
+        <X className="w-3 h-3" />
+      </button>
+    }
+
   </div>
 );

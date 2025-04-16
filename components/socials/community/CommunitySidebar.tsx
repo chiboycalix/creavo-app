@@ -23,6 +23,7 @@ export default function CommunitySidebar() {
   const { data } = useListSpaces(community && community?.id);
 
   const pathname = usePathname();
+  console.log(data, "datadata")
 
   return (
     <Card className='rounded-md h-[87vh] bg-white'>
@@ -54,7 +55,7 @@ export default function CommunitySidebar() {
                 </div>
               </div>
               <CollapsibleContent className="py-2">
-                {data?.data?.spaces.map((space: any) => {
+                {data?.data?.spaces?.map((space: any) => {
                   const isActive = pathname === `/socials/community/${community?.id}/${space?.id}`;
                   return (
                     <Link

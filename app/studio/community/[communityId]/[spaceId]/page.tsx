@@ -1,12 +1,13 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserAvatarStack from '@/components/studio/community/UserAvatarStack';
 import UserAvatarStackSkeleton from '@/components/sketetons/UserAvatarStackSkeleton';
+import SpaceSettings from '@/components/studio/community/SpaceSettings';
 import Chat from '@/components/studio/community/chat/Chat';
 import ButtonLoader from '@/components/ButtonLoader';
 import { Button } from '@/components/ui/button'
-import { Check, Loader2, Plus, Settings } from 'lucide-react'
+import { Check, Loader, Plus, Settings } from 'lucide-react'
 import { useParams } from 'next/navigation';
 import { useListCommunities } from '@/hooks/communities/useListCommunities';
 import { useListSpaces } from '@/hooks/communities/useListSpaces';
@@ -15,15 +16,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { UserBadge } from '@/components/meeting/InvitePeople/UserBadge';
 import { useFetchUserByUsername } from '@/hooks/profile/useFetchUserByUsername';
 import { SearchInput } from '@/components/Input/SearchInput';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addMembersManuallyToSpaceService, AddMemberToSpacePayload } from '@/services/community.service';
 import { toast } from 'sonner';
 import { useListSpaceMembers } from '@/hooks/communities/useListSpaceMembers';
-import SpaceSettings from '@/components/studio/community/SpaceSettings';
 
 const Space = () => {
   const { data: communityData, isFetching: isFetchingCommunity } = useListCommunities();
   const community = communityData?.data?.communities[0];
+  const queryClient = useQueryClient();
   const { data } = useListSpaces(community && community?.id);
   const params = useParams();
   const spaceId = params?.spaceId as string;
@@ -31,11 +32,10 @@ const Space = () => {
   const [isManualDialogOpen, setIsManualDialogOpen] = useState(false);
   const [isCourseDialogOpen, setIsCourseDialogOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [invitedUsers, setInvitedUsers] = useState<any[]>([]);
   const [showSpaceSettingsCard, setShowSpaceSettingsCard] = useState(false);
   const [spaceSettingsAnchorRect, setSpaceSettingsAnchorRect] = useState<DOMRect | null>(null);
 
-  const currentSpace = data?.data?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0];
+  const currentSpace = data?.data?.communities[0]?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0];
 
   const { data: userData, isFetching: userDataLoading } = useFetchUserByUsername(userEmail || undefined);
 
@@ -44,24 +44,16 @@ const Space = () => {
   const { mutate: handleAddMemberManually, isPending: isAddingMemberMannually } = useMutation({
     mutationFn: (payload: AddMemberToSpacePayload) => addMembersManuallyToSpaceService(payload),
     onSuccess: async (data) => {
+      setUserEmail("")
       toast.success("Members added successfully")
+      setAddMember(false)
+      await queryClient.invalidateQueries({ queryKey: ["useListSpaces", community && community?.id], exact: true, });
     },
     onError: (error: any) => {
-      toast.error(error?.data[0] || "Error adding member(s) to space")
+      const errorMessage = userData?.data?.length < 1 ? "This user does not exist" : error?.data[0]
+      toast.error(errorMessage || "Error adding member(s) to space")
     },
   });
-
-  useEffect(() => {
-    if (!userDataLoading && userData?.data?.length > 0 && userEmail) {
-      const newUsers = userData.data.filter((user: any) =>
-        !invitedUsers.some(invited => invited.email === user.email)
-      );
-      if (newUsers.length > 0) {
-        setInvitedUsers(prev => [...prev, ...newUsers]);
-        setUserEmail("");
-      }
-    }
-  }, [userData, userDataLoading, userEmail, invitedUsers]);
 
   const handleAddMember = () => {
     setAddMember(!addMember);
@@ -82,7 +74,7 @@ const Space = () => {
     await handleAddMemberManually({
       communityId: community && community?.id,
       spaceId: currentSpace?.id,
-      members: invitedUsers?.map((invitedUser) => invitedUser?.username)
+      members: userData?.data?.map((invitedUser: any) => invitedUser?.username)
     })
   }
 
@@ -212,34 +204,31 @@ const Space = () => {
                       placeholder='johndoe@creveo'
                       value={userEmail}
                       onChange={(e) => setUserEmail(e.target.value)}
-                      rightIcon={userDataLoading ? <Loader2 className='animate-spin text-primary-600' /> : null}
                     />
                   </div>
-                  {invitedUsers.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {invitedUsers.map((user: any, index: number) => (
-                        <UserBadge
-                          key={index}
-                          label={user?.email}
-                          onRemove={() => {
-                            setInvitedUsers(prev =>
-                              prev.filter((_, i) => i !== index)
-                            );
-                          }}
-                        />
-                      ))}
+                  {
+                    userDataLoading ? <div className='w-full flex items-center justify-center text-center mt-2'>
+                      <Loader className='animate-spin text-primary-600' />
+                    </div> : null
+                  }
+                  {
+                    userData?.data?.length > 0 && <div className='mt-4'>
+                      <UserBadge
+                        label={userEmail}
+                        canRemove={false}
+                      />
                     </div>
-                  )}
+                  }
+
                   <div className='w-full mt-4'>
                     <Button className='w-full' disabled={isAddingMemberMannually}>
-                      <ButtonLoader isLoading={isAddingMemberMannually} caption={`Add ${invitedUsers.length > 0 ? `(${invitedUsers.length})` : ''}`} />
+                      <ButtonLoader isLoading={isAddingMemberMannually} caption={`Add`} />
                     </Button>
                   </div>
                 </form>
               </DialogContent>
             </Dialog>
 
-            {/* Link Course Dialog */}
             <Dialog open={isCourseDialogOpen} onOpenChange={setIsCourseDialogOpen}>
               <DialogContent className="max-w-xl">
                 <DialogHeader>

@@ -2,11 +2,11 @@ import Cookies from "js-cookie";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { baseUrl } from "@/utils/constant";
 
-export function useListSpaces(communityId: string) {
+export function useListMemberCommunities(userId: string) {
   return useQuery({
-    queryKey: ["useListSpaces", communityId],
+    queryKey: ["useListMemberCommunities", userId],
     queryFn: async () => {
-      const response = await fetch(`${baseUrl}/users/${communityId}/spaces`, {
+      const response = await fetch(`${baseUrl}/users/${userId}/spaces`, {
         headers: {
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
         },
