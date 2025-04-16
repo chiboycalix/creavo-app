@@ -78,7 +78,7 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
     e: React.MouseEvent<HTMLButtonElement>
   ): Promise<void> => {
     e.preventDefault();
-    await router.push("/socials/profile")
+    await router.push("/socials/profile");
 
     if (setOpenSettingsModal) await setOpenSettingsModal?.(true);
   };
@@ -92,26 +92,27 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
 
   return (
     <header
-      className={`bg-white fixed top-0 right-0 z-[100] shadow-md md:shadow-none ${isCommunityRoute ? "left-16" : "left-0 md:left-72"
-        }`}
+      className={`bg-white fixed top-0 right-0 z-[100] shadow-md md:shadow-none ${
+        isCommunityRoute ? "left-16" : "left-0 md:left-72"
+      }`}
     >
       <div className="pr-4 sm:pr-6 lg:pr-6 w-full">
         <div className="flex h-20 justify-between items-center w-full gap-4">
           {/* Left Section with Menu Toggle and Search */}
           <div className="flex items-center space-x-4 basis-4/12">
             <div className="md:hidden p-2 rounded-lg text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-1">
-              <button
-                onClick={toggle}
-
-                aria-label="Toggle menu"
-              >
+              <button onClick={toggle} aria-label="Toggle menu">
                 {isOpen ? (
                   <X className="h-5 w-5" />
                 ) : (
                   <Menu className="h-5 w-5 inline-block" />
                 )}
               </button>
-              <img src="/assets/crevoe.svg" alt="" className="inline-block -mt-2" />
+              <img
+                src="/assets/crevoe.svg"
+                alt=""
+                className="inline-block -mt-2"
+              />
             </div>
 
             {/* Search - Hidden on Mobile */}
@@ -136,18 +137,21 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                   className={`p-2 sm:px-3 lg:px-4 lg:py-2 rounded-lg transition-all flex flex-col items-center space-x-2 space-y-0`}
                 >
                   <div
-                    className={`px-6 rounded-full py-1.5 ${isActive ? "bg-primary-700" : "bg-gray-100"
-                      }`}
+                    className={`px-6 rounded-full py-1.5 ${
+                      isActive ? "bg-primary-700" : "bg-gray-100"
+                    }`}
                   >
                     <Icon
                       size={20}
-                      className={`${isActive ? "text-white" : "text-gray-500"
-                        } transition-colors`}
+                      className={`${
+                        isActive ? "text-white" : "text-gray-500"
+                      } transition-colors`}
                     />
                   </div>
                   <span
-                    className={`${isActive ? "text-primary-500" : "text-gray-700"
-                      } text-sm hidden lg:inline transition-colors`}
+                    className={`${
+                      isActive ? "text-primary-500" : "text-gray-700"
+                    } text-sm hidden lg:inline transition-colors`}
                   >
                     {button.label}
                   </span>
@@ -170,7 +174,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
             {isAuthenticated ? (
               <>
                 {/* Notification Button */}
-                <NotificationsPopover />
+                <div id="notification-step-anchor">
+                  <NotificationsPopover />
+                </div>
 
                 <QuickActions />
 
@@ -208,8 +214,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                           {({ active }) => (
                             <Link
                               href={"/socials/profile"}
-                              className={`${active ? "bg-gray-50" : ""
-                                } flex items-center px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <FaUser className="mr-3 h-4 w-4 text-gray-500" />
                               View Profile
@@ -220,8 +227,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                           {({ active }) => (
                             <Link
                               href={"/socials/profile?tab=saved videos"}
-                              className={`${active ? "bg-gray-50" : ""
-                                } flex items-center px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <FaBookmark className="mr-3 h-4 w-4 text-gray-500" />
                               Saved
@@ -231,8 +239,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                         <MenuItem>
                           {({ active }) => (
                             <div
-                              className={`${active ? "bg-gray-50" : ""
-                                } flex items-center justify-between px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center justify-between px-4 py-2 text-sm text-gray-700`}
                             >
                               <div className="flex items-center">
                                 <FaMoon className="mr-3 h-4 w-4 text-gray-500" />
@@ -241,12 +250,14 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                               <Switch
                                 checked={darkMode}
                                 onChange={setDarkMode}
-                                className={`${darkMode ? "bg-primary-600" : "bg-gray-200"
-                                  } relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none`}
+                                className={`${
+                                  darkMode ? "bg-primary-600" : "bg-gray-200"
+                                } relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none`}
                               >
                                 <span
-                                  className={`${darkMode ? "translate-x-5" : "translate-x-1"
-                                    } inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
+                                  className={`${
+                                    darkMode ? "translate-x-5" : "translate-x-1"
+                                  } inline-block h-3 w-3 transform rounded-full bg-white transition-transform`}
                                 />
                               </Switch>
                             </div>
@@ -260,8 +271,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                               onClick={(e) => {
                                 handleOpenSettingsModal(e);
                               }}
-                              className={`${active ? "bg-gray-50" : ""
-                                } flex items-center px-4 py-2 text-sm text-gray-700 w-full`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center px-4 py-2 text-sm text-gray-700 w-full`}
                             >
                               <span className="flex  items-center mr-3 h-4 w-4 text-gray-500items-center">
                                 <SettingsIcon />
@@ -274,8 +286,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                           {({ active }) => (
                             <Link
                               href="#"
-                              className={`${active ? "bg-gray-50" : ""
-                                } flex items-center px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <span className="mr-3 h-4 w-4 text-gray-500">
                                 📱
@@ -291,8 +304,9 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
                                 await signOut();
                                 router.push("/auth?tab=signin");
                               }}
-                              className={`${active ? "bg-gray-50" : ""
-                                } flex w-full items-center px-4 py-2 text-sm text-gray-700`}
+                              className={`${
+                                active ? "bg-gray-50" : ""
+                              } flex w-full items-center px-4 py-2 text-sm text-gray-700`}
                             >
                               <FaSignOutAlt className="mr-3 h-4 w-4 text-gray-500" />
                               Sign Out

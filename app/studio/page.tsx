@@ -14,6 +14,12 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import PageTitle from "@/components/PageTitle";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { TourProvider } from "@/context/TourContext"
+import Tour from "@/components/socials/tour/tour"
+import { socialsTourSteps } from "@/tour/socialTour"
+import { studioTourSteps } from "@/tour/studioTour";
+import TourButton from "@/components/socials/tour/tour-button"
+
 
 const overviewData = [
   {
@@ -205,6 +211,26 @@ const StudioDashboard = () => {
       },
     },
   ] as any;
+  const [run, setRun] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+
+  useEffect(() => {
+    // Small delay to ensure DOM elements are mounted
+    const timer = setTimeout(() => {
+      const seenTour = localStorage.getItem("socialsTourDone");
+      if (!seenTour) {
+        setRun(true);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+  const handleTourComplete = () => {
+    console.log("Tour completed!")
+    
+  }
+ 
+
 
   return (
     <ProtectedRoute
@@ -212,6 +238,15 @@ const StudioDashboard = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
+       <TourProvider
+      steps={studioTourSteps}
+      tourKey="studioTourProgress"
+      autoStart={true}
+      startDelay={1000}
+      onComplete={handleTourComplete}
+    >
+        <Tour />
+
       <div className="w-full">
         <div className="w-full flex items-center justify-between">
           <PageTitle>
@@ -280,6 +315,7 @@ const StudioDashboard = () => {
           />
         </div>
       </div>
+      </TourProvider>
     </ProtectedRoute>
   );
 };

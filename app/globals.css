@@ -72,3 +72,11 @@ input[type="number"] {
     background-size: 100% 100%;
   }
 }
+
+
+/* globals.css or similar */
+
+.__floater__tooltip,
+.react-joyride__spotlight {
+  transition: all 0.2s ease-in-out !important;
+}

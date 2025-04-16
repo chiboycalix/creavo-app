@@ -19,7 +19,6 @@ import MainLayout from "@/components/layouts/MainLayout";
 import NextTopLoader from 'nextjs-toploader';
 import GoogleProviderWrapper from "@/context/GoogleProviderWrapper";
 import { ReplyProvider } from "@/context/ReplyContext";
-
 const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
