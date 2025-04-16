@@ -25,7 +25,7 @@ export default function ExplorePage() {
     >
       <CommentProvider posts={data?.pages[0]}>
         <Tour />
-        <TourButton/>
+        {/* <TourButton/> */}
         <SocialFeed initialPosts={data?.pages[0]} isFetcingPosts={isFetching} />
       </CommentProvider>
     </TourProvider>
