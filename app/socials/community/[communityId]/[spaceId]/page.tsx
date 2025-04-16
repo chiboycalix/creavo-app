@@ -1,9 +1,9 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute';
-import UserAvatarStack from '@/components/studio/community/UserAvatarStack';
+import UserAvatarStack from '@/components/socials/community/UserAvatarStack';
 import UserAvatarStackSkeleton from '@/components/sketetons/UserAvatarStackSkeleton';
-import Chat from '@/components/studio/community/chat/Chat';
+import Chat from '@/components/socials/community/chat/Chat';
 import ButtonLoader from '@/components/ButtonLoader';
 import { Button } from '@/components/ui/button'
 import { Check, Loader2, Plus, Settings } from 'lucide-react'
@@ -19,7 +19,7 @@ import { useMutation } from '@tanstack/react-query';
 import { addMembersManuallyToSpaceService, AddMemberToSpacePayload } from '@/services/community.service';
 import { toast } from 'sonner';
 import { useListSpaceMembers } from '@/hooks/communities/useListSpaceMembers';
-import SpaceSettings from '@/components/studio/community/SpaceSettings';
+import SpaceSettings from '@/components/socials/community/SpaceSettings';
 
 const Space = () => {
   const { data: communityData, isFetching: isFetchingCommunity } = useListCommunities();

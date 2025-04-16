@@ -18,6 +18,7 @@ import "./globals.css";
 import MainLayout from "@/components/layouts/MainLayout";
 import NextTopLoader from 'nextjs-toploader';
 import GoogleProviderWrapper from "@/context/GoogleProviderWrapper";
+import { ReplyProvider } from "@/context/ReplyContext";
 const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
@@ -38,34 +39,36 @@ export default function RootLayout({
       <body className={manrope.className}>
         <Suspense fallback={<RouterSpinner />}>
           {/* <NetworkStatusWrapper> */}
-            <ReactQueryProvider>
-              <ReduxProvider>
-                <AuthProvider>
-                  <GoogleProviderWrapper>
+          <ReactQueryProvider>
+            <ReduxProvider>
+              <AuthProvider>
+                <GoogleProviderWrapper>
                   <MarketProvider>
                     <SettingsProvider>
                       <WebSocketProvider>
                         <MainLayout>
                           <ToastProvider>
                             <PostProvider>
-                              <VideoConferencingProvider>
-                                <VideoPlaybackProvider>
-                                  <NextTopLoader
-                                  />
-                                  {children}
-                                </VideoPlaybackProvider>
-                                <Toaster richColors expand />
-                              </VideoConferencingProvider>
+                              <ReplyProvider>
+                                <VideoConferencingProvider>
+                                  <VideoPlaybackProvider>
+                                    <NextTopLoader
+                                    />
+                                    {children}
+                                  </VideoPlaybackProvider>
+                                  <Toaster richColors expand />
+                                </VideoConferencingProvider>
+                              </ReplyProvider>
                             </PostProvider>
                           </ToastProvider>
                         </MainLayout>
                       </WebSocketProvider>
                     </SettingsProvider>
                   </MarketProvider>
-                  </GoogleProviderWrapper>
-                </AuthProvider>
-              </ReduxProvider>
-            </ReactQueryProvider>
+                </GoogleProviderWrapper>
+              </AuthProvider>
+            </ReduxProvider>
+          </ReactQueryProvider>
           {/* </NetworkStatusWrapper> */}
         </Suspense>
       </body>

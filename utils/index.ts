@@ -188,6 +188,7 @@ export const transformAndGroupMessages = (
       transformedMessages.push({
         id: `date-${date}`,
         content: "",
+        mId: "",
         timestamp: date,
         user: { name: "", avatar: "" },
         reactions: { likes: 0, loves: 0 },
@@ -204,6 +205,7 @@ export const transformAndGroupMessages = (
         .forEach((msg) => {
           transformedMessages.push({
             id: msg._id,
+            mId: msg.mId,
             content: msg.text,
             image: msg.imageUrl,
             timestamp: new Date(msg.date).toLocaleTimeString("en-US", {

@@ -3,22 +3,29 @@ import ButtonLoader from '@/components/ButtonLoader';
 import { Input } from '@/components/Input'
 import { UploadInput } from '@/components/Input/UploadInput'
 import { Button } from '@/components/ui/button';
-import { createPostService, CreatePostsPayload } from '@/services/community.service';
+import { editPostService, EditPostsPayload } from '@/services/community.service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { spaceId: string, communityId: string, setIsInputDialogOpen: any }) => {
+type EditCommunityPostProps = {
+  spaceId: string,
+  communityId: string,
+  setIsInputDialogOpen: any;
+  message: any;
+}
+
+const EditCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen, message }: EditCommunityPostProps) => {
   const maxFiles = 1;
   const queryClient = useQueryClient();
   const [post, setPost] = useState("")
   const [postImage, setPostImage] = useState("")
 
-  const { mutate: handleCreatePost, isPending: isCreatingPost } = useMutation({
-    mutationFn: (payload: CreatePostsPayload) => {
-      return createPostService(payload)
+  const { mutate: handleEditPost, isPending: isEditingPost } = useMutation({
+    mutationFn: (payload: EditPostsPayload) => {
+      return editPostService(payload)
     },
     onSuccess: async (data) => {
-      toast.success("Message sent successfully")
+      toast.success("Message updated successfully")
       setIsInputDialogOpen(false)
       await queryClient.invalidateQueries({ queryKey: ["listMessages"] });
     },
@@ -29,11 +36,12 @@ const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { s
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    handleCreatePost({
-      text: post,
-      imageUrl: postImage,
+    handleEditPost({
+      text: post || message?.content,
+      imageUrl: postImage || message?.image,
       spaceId,
-      communityId
+      communityId,
+      messageId: message?.id,
     })
   }
 
@@ -45,7 +53,7 @@ const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { s
           label="Post header"
           maxLength={54}
           placeholder="Enter post text"
-          value={post}
+          value={post || message?.content}
           onChange={(e) => {
             setPost(e.target.value)
           }}
@@ -68,11 +76,11 @@ const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { s
 
       <div className='w-full mt-12'>
         <Button
-          disabled={isCreatingPost || !post}
+          disabled={isEditingPost}
           className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
         >
           <ButtonLoader
-            isLoading={isCreatingPost}
+            isLoading={isEditingPost}
             caption="Post"
           />
         </Button>
@@ -81,4 +89,4 @@ const CreateCommunityPost = ({ spaceId, communityId, setIsInputDialogOpen }: { s
   )
 }
 
-export default CreateCommunityPost
+export default EditCommunityPost

@@ -6,8 +6,6 @@ export function useListSpaceMembers(
   communityId: string | undefined,
   spaceId: string | undefined
 ) {
-  const token = Cookies.get("accessToken");
-  console.log({ token });
   return useQuery({
     queryKey: ["spaceId-communityId", communityId, spaceId],
     queryFn: async () => {

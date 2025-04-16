@@ -553,9 +553,9 @@ export function VideoConferencingProvider({
         channel: client[1].channelName,
       }));
 
-      setMeetingRoomData(meeting);
-      setUsername(currentUser?.username);
-      setIsWaiting(false);
+      await setMeetingRoomData(meeting);
+      await setUsername(currentUser?.username);
+      await setIsWaiting(false);
     } catch (error) {
       console.log("lobby, Error fetching Agora data:", error);
     }
