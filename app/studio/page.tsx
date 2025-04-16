@@ -14,9 +14,12 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import PageTitle from "@/components/PageTitle";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Joyride, { CallBackProps, } from "react-joyride";
-import CustomTooltip from "@/components/socials/tour/custom-tooltip";
+import { TourProvider } from "@/context/TourContext"
+import Tour from "@/components/socials/tour/tour"
+import { socialsTourSteps } from "@/tour/socialTour"
 import { studioTourSteps } from "@/tour/studioTour";
+import TourButton from "@/components/socials/tour/tour-button"
+
 
 const overviewData = [
   {
@@ -223,20 +226,11 @@ const StudioDashboard = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  const handleTourCallback = (data: CallBackProps) => {
-    const { status, index, type } = data;
-
-    if (["finished", "skipped"].includes(status)) {
-      setRun(false);
-      localStorage.setItem("socialsTourDone", "true");
-    } else {
-      // Only update step index on actual step changes
-      if (type === "step:after") {
-        setStepIndex(index + 1);
-      }
-    }
-  };
+  const handleTourComplete = () => {
+    console.log("Tour completed!")
+    
+  }
+ 
 
 
   return (
@@ -245,27 +239,15 @@ const StudioDashboard = () => {
       requireVerification={true}
       requireProfileSetup={false}
     >
-         <Joyride
-        steps={studioTourSteps}
-        run={run}
-        stepIndex={stepIndex}
-        continuous
-        scrollToFirstStep
-        showProgress
-        showSkipButton={false}
-        disableScrolling={false}
-        disableOverlayClose
-        spotlightClicks
-        callback={handleTourCallback}
-        tooltipComponent={CustomTooltip}
-        styles={{
-          options: {
-            primaryColor: "#0b66c3",
-            zIndex: 10000,
-            overlayColor: "rgba(0, 0, 0, 0.5)",
-          }
-        }}
-      />
+       <TourProvider
+      steps={studioTourSteps}
+      tourKey="studioTourProgress"
+      autoStart={true}
+      startDelay={1000}
+      onComplete={handleTourComplete}
+    >
+        <Tour />
+
       <div className="w-full">
         <div className="w-full flex items-center justify-between">
           <PageTitle>
@@ -334,6 +316,7 @@ const StudioDashboard = () => {
           />
         </div>
       </div>
+      </TourProvider>
     </ProtectedRoute>
   );
 };

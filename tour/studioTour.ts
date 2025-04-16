@@ -1,6 +1,6 @@
-import { Step } from "react-joyride";
+import type { TourStep } from "@/context/TourContext"
 
-export const studioTourSteps: Step[] = [
+export const studioTourSteps:  TourStep[] = [
     {
       target: ".tour-studio-dashboard",
       content: "Your central hub for managing your courses and engaging with learners.",
@@ -11,7 +11,6 @@ export const studioTourSteps: Step[] = [
       target: ".tour-studio-create",
       content: "Share your expertise and build your own engaging learning experiences.",
     placement: "right",
-
     },
     {
       target: ".tour-studio-manage",

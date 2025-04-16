@@ -86,6 +86,11 @@ export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
                   "/studio/meeting": "tour-studio-meeting",
                   "/studio/community": "tour-studio-community",
                   "/studio/analytics": "tour-studio-analytics",
+                  //market place route
+                  "/market": "tour-market",
+                  "/market/saved": "tour-market-saved",
+                  "/market/notifications": "tour-market-notifications",
+                  // "/market/seller-dashboard":"tour-market-seller-dashboard",
                 };
 
                 const className = tourClassMap[item.href] || "";
@@ -107,7 +112,7 @@ export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
                     Your Account
                   </div>
                   {dashboardItems?.map((item, index) => (
-                    <li key={index}>
+                    <li id="tour-market-seller-dashboard" key={index}>
                       <NavItemComponent
                         item={item}
                         pathname={pathname}
