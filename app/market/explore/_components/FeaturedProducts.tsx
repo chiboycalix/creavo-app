@@ -76,25 +76,34 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
       {productCategories.map((tab) => (
         <TabsContent key={tab.category} value={tab.category}>
           <div className="flex flex-wrap gap-4 ">
-            {products
-              ?.filter(
-                (product: any) =>
-                  tab.category === "All" || product.category === tab.category
-              )
-              .map((product: any) => {
-                const isProductSaved = savedProducts?.some(
-                  (savedProduct: any) => savedProduct?.id === product?.id
-                );
+            {products.length > 0 ? (
+              products
+                ?.filter(
+                  (product: any) =>
+                    tab.category === "All" || product.category === tab.category
+                )
+                .map((product: any) => {
+                  const isProductSaved = savedProducts?.some(
+                    (savedProduct: any) => savedProduct?.id === product?.id
+                  );
 
-                return (
-                  <ProductCard
-                    key={product?.id}
-                    product={product}
-                    isSaved={isProductSaved}
-                    handleToggleSave={handleToggleSave}
-                  />
-                );
-              })}
+                  return (
+                    <ProductCard
+                      key={product?.id}
+                      product={product}
+                      isSaved={isProductSaved}
+                      handleToggleSave={handleToggleSave}
+                    />
+                  );
+                })
+            ) : (
+              <div className="w-full flex flex-col items-center justify-center gap-3">
+                <h3 className="font-semibold">
+                  There are no products listed in the marketplace at the moment
+                </h3>
+                <p>Please check back later</p>
+              </div>
+            )}
           </div>
         </TabsContent>
       ))}

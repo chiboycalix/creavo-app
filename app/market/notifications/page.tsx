@@ -1,7 +1,7 @@
 const MarketPlaceNotifications = () => {
     return ( 
-        <div>
-            <h1>MarketPlaceNotifications</h1>
+        <div className="flex justify-center items-center text-center">
+            <h1 className="text-gray-600 text-lg">You have no notifications at the moment.</h1>
         </div>
      );
 }
