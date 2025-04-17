@@ -11,7 +11,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = Cookies.get("accessToken");
+    const token = Cookies?.get("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,7 +28,7 @@ apiClient.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          Cookies.remove("accessToken");
+          Cookies?.remove("accessToken");
           break;
         case 403:
           console.log("Forbidden access:", error.response.data);

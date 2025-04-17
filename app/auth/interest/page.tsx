@@ -102,7 +102,7 @@ export default function TopicSelection() {
   return (
     <>
       <div className="h-screen flex flex-col items-center w-full">
-        <div className="w-full px-8 py-24">
+        <div className="w-[80%] px-8 py-24">
           <h2 className="text-2xl font-semibold mb-3 text-center">Almost done!</h2>
           <p className="mb-3 text-gray-600 text-sm text-center">
             Select topics of your interest to personalize your experience.

@@ -2,12 +2,7 @@
 import Cookies from "js-cookie";
 import ButtonLoader from "@/components/ButtonLoader";
 import Link from "next/link";
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  FormEvent,
-} from "react";
+import React, { useState, useRef, useEffect, FormEvent } from "react";
 import Socket from "@/components/Socket";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -26,7 +21,9 @@ import Avatar from "@/components/Avatar";
 const ProfileSetup = () => {
   const { getAuth, currentUser } = useAuth();
   const user = currentUser;
-  const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(
+    currentUser?.id
+  );
   const router = useRouter();
   const [firstName, setFirstName] = useState<string>(
     profileData?.data?.profile?.firstName || ""
@@ -42,6 +39,8 @@ const ProfileSetup = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { showToast } = useToast();
 
+  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
+
   useEffect(() => {
     if (!getAuth()) router.push("/auth");
   }, [getAuth, router, user]);
@@ -54,7 +53,9 @@ const ProfileSetup = () => {
     e.preventDefault();
     setLoading(true);
 
-    const avatarUrl = selectedImage ? await uploadImageToCloudinary(selectedImage) : undefined;
+    const avatarUrl = selectedImage
+      ? await uploadImageToCloudinary(selectedImage)
+      : undefined;
 
     const requestPayload = {
       firstName,
@@ -64,23 +65,26 @@ const ProfileSetup = () => {
       avatar: avatarUrl || profileData?.data?.profile?.avatar,
     };
 
+    const accessToken: any = Cookies.get("accessToken");
+
     try {
-      await updateProfileService(requestPayload)
-      setLoading(false);
-
-      showToast(
-        'success',
-        "Profile Setup",
-        "Profile updated successfully!"
-      );
-      router.push(ROUTES.SELECT_INTERESTS);
+      // await updateProfileService(requestPayload, accessToken);
+      const response = await fetch(`${baseUrl}/profiles`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestPayload),
+      });
+      await response.json();
+      if (!response.ok) {
+        showToast("success", "Profile Setup", "Profile updated successfully!");
+        router.push(ROUTES.SELECT_INTERESTS);
+      }
     } catch (error) {
-      showToast(
-        'error',
-        "Profile Setup",
-        "Failed to update profile"
-      );
-
+      showToast("error", "Profile Setup", "Failed to update profile");
+    } finally {
       setLoading(false);
     }
   };
@@ -92,7 +96,6 @@ const ProfileSetup = () => {
       setImagePreview(URL.createObjectURL(file));
     }
   };
-
 
   return (
     <>
@@ -107,10 +110,15 @@ const ProfileSetup = () => {
                 Avatar
               </label>
               <div className="flex items-center gap-3 py-3">
-                <Avatar
+                {/* <Avatar
                   profileLoading={profileLoading}
                   profileData={profileData}
                   className="border-2 border-primary-500"
+                /> */}
+                <img
+                  src={imagePreview || defaultAvatar}
+                  alt="User Avatar"
+                  className={`rounded-full object-cover w-12 `}
                 />
                 <input
                   type="file"
@@ -145,7 +153,6 @@ const ProfileSetup = () => {
                 onChange={(e) => setFirstName(e.target.value)}
                 className="w-full bg-white"
               />
-
             </div>
 
             <div className="mb-3">
@@ -170,9 +177,7 @@ const ProfileSetup = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full bg-white"
               />
-
             </div>
-
 
             {/* Bio Field */}
             <div className="mb-3">
@@ -184,22 +189,19 @@ const ProfileSetup = () => {
                 placeholder="Short bio"
                 className="w-full resize-none bg-white"
               />
-
             </div>
 
             {/* Submit and Skip Buttons */}
             <div className="flex flex-col items-center mt-4">
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full"
-              >
-                <ButtonLoader
-                  isLoading={loading}
-                  caption="Save and Continue"
-                />
+              <Button type="submit" disabled={loading} className="w-full">
+                <ButtonLoader isLoading={loading} caption="Save and Continue" />
               </Button>
-              <Button type="button" variant={"outline"} className="w-full mt-3 border border-primary-100" onClick={() => router.push(ROUTES.SELECT_INTERESTS)}>
+              <Button
+                type="button"
+                variant={"outline"}
+                className="w-full mt-3 border border-primary-100"
+                onClick={() => router.push(ROUTES.SELECT_INTERESTS)}
+              >
                 Skip to do these later
               </Button>{" "}
             </div>
@@ -207,8 +209,8 @@ const ProfileSetup = () => {
 
           {/* Skip Info */}
           <p className="w-full text-gray-500 text-xs mt-2 text-center mb-6">
-            You can skip this process now and complete your profile setup
-            later in the profile settings.
+            You can skip this process now and complete your profile setup later
+            in the profile settings.
           </p>
         </div>
       </div>

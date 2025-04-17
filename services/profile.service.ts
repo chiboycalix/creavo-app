@@ -9,14 +9,20 @@ export interface BookmarkItem {
   userId: number;
 }
 
-export const updateProfileService = async (payload: any) => {
+export const updateProfileService = async (payload: any, token: string) => {
   try {
-    const { data } = await apiClient.put("/profiles", {
-      ...payload,
-    });
+    const { data } = await apiClient.put(
+      "/profiles",
+      { ...payload },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return data;
   } catch (error) {
-    console.error("Error toggling bookmark:", error);
+    console.error("Error updating profile:", error);
     throw error;
   }
 };
