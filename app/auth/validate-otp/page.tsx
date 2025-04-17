@@ -32,13 +32,15 @@ export default function OtpContent() {
         token: otp
       })) as any;
 
+      console.log("data", data);
+
       if (data.code === 200) {
         showToast(
           'success',
           "Validate OTP",
           data.message
         );
-        setAuth(true, data.data, data.data.token);
+        setAuth(true, data?.data, data?.data?.token?.token);
         router.push(`/auth/welcome?email=${email}`);
       } else {
         showToast(

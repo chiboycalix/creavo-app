@@ -7,6 +7,7 @@ import { baseUrl } from "@/utils/constant";
 import { LockIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/context/ToastContext";
+import Cookies from "js-cookie";
 
 const MIN_PASSWORD_LENGTH = 8
 
@@ -17,6 +18,8 @@ const PasswordUpdate = () => {
   const tempToken = queryParams.get("otp");
   const router = useRouter();
   const { showToast } = useToast();
+
+  console.log("tempToken", tempToken);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

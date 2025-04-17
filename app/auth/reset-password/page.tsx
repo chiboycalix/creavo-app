@@ -85,7 +85,7 @@ const ResetPassword: React.FC = () => {
       const data = await response.json();
       if (response.ok) {
         setAlert(data.message);
-        router.push(`/auth/password-update/?otp=${data.data.token}`);
+        router.push(`/auth/password-update/?otp=${data.data.token.token}`);
       } else {
         setAlert(data.message);
       }
@@ -108,6 +108,7 @@ const ResetPassword: React.FC = () => {
         }),
       });
       const data = await response.json();
+      console.log("here", data);
       if (response.ok) {
         setAlert(data.message);
       } else {

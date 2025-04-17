@@ -140,6 +140,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem("currentUser");
     Cookies.remove("accessToken", { path: '/' });
     Cookies.remove("isAuthenticated", { path: '/' });
+    Cookies.remove("currentUser", { path: '/' });
+
     setAuth(false, null);
   };
   const updateUserProfile = (updatedUserData: Partial<UserType>): void => {
