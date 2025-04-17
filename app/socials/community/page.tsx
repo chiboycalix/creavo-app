@@ -1,68 +1,28 @@
 "use client";
-import PageTitle from "@/components/PageTitle";
 import React, { useEffect } from "react";
 import CommunityPageSkeleton from "@/components/sketetons/CommunityPageSkeleton";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import CreateCommunityDialog from "@/components/socials/community/CreateCommunityDialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useListCommunities } from "@/hooks/communities/useListCommunities";
 import { useRouter } from "next/navigation";
+import { useListMemberCommunities } from "@/hooks/communities/useListMemberCommunities";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useAuth } from "@/context/AuthContext";
 
 const Community = () => {
-  const { data: communityData, isFetching } = useListCommunities();
   const router = useRouter();
-
-  const community = communityData?.data?.communities[0];
+  const { loading, currentUser } = useAuth();
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser && currentUser?.id);
+  const { data: communities, isLoading: isFetchingCommunity } = useListMemberCommunities(profileData && profileData?.data?.id)
 
   useEffect(() => {
-    if (!isFetching && community) {
-      router.push(`/socials/community/${community?.id}`);
+    if (!isFetchingCommunity && communities?.data?.communities?.length > 0) {
+      router.push(`/socials/community/${communities?.data?.communities[0]?.id}/${communities?.data?.communities[0]?.spaces[0]?.id}`);
     }
-  }, [isFetching, community, router]);
+  }, [communities?.data?.communities, isFetchingCommunity, router]);
 
-  if (isFetching) {
+  if (isFetchingCommunity || profileLoading || loading) {
     return <CommunityPageSkeleton />;
   }
 
-  if (!community) {
-    return (
-      <ProtectedRoute
-        requireAuth={true}
-        requireVerification={true}
-        requireProfileSetup={false}
-      >
-        <div className="h-[70vh]">
-          <PageTitle>Community</PageTitle>
-
-          <Card className="mt-40 w-[70%] mx-auto border-none">
-            <CardHeader>
-              <CardTitle className="text-center flex flex-col items-center justify-center">
-                <img src="/assets/community.svg" alt="Community illustration" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center">
-              <p className="w-[40%] text-center text-lg">
-                Oops, looks like you don’t have a community yet!
-              </p>
-
-              <div className="flex justify-between items-center gap-4 mt-8 bg-primary-50 p-4 rounded-xl">
-                <div className="basis-8/12">
-                  <p className="text-sm">
-                    No worries—now’s your chance to start something amazing! Build your own space,
-                    spark great conversations, and connect with like-minded learners. 🚀✨
-                  </p>
-                </div>
-                <div className="flex-1">
-                  <CreateCommunityDialog />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </ProtectedRoute>
-    );
-  }
-  return <CommunityPageSkeleton />;
+  return <CommunityPageSkeleton />
 };
 
 export default Community;

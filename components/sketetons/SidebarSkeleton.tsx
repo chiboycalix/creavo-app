@@ -5,9 +5,9 @@ export default function SidebarSkeleton() {
     <aside className="bg-white w-64 min-h-screen fixed top-0 left-0 bottom-0 z-50 flex flex-col">
       <nav className="px-4">
         {/* Logo Skeleton */}
-        <div className="mb-6">
+        <div className="my-6">
           <div className="flex justify-start">
-            <div className="w-36 h-12 bg-gray-300 rounded-lg animate-pulse"></div>
+            <div className="w-full h-12 bg-gray-300 rounded-lg animate-pulse"></div>
           </div>
         </div>
 

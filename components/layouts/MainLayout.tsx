@@ -1,15 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useState, useEffect } from "react";
 import SidebarSkeleton from "../sketetons/SidebarSkeleton";
 import Header from "./includes/Header";
 import Sidebar from "./includes/Sidebar";
 import CustomImageIcon from "../CustomImageIcon";
+import SimpleLayout from "./includes/SimpleLayout";
 import { NavItem, HeaderButton } from "@/types/navigation";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
-import SimpleLayout from "./includes/SimpleLayout";
 import {
   Video,
   User,
@@ -34,12 +33,14 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { cn } from "@/lib/utils";
 import Footer from "./includes/Footer";
 import { ROUTES } from "@/constants/routes";
+import { useListMemberCommunities } from "@/hooks/communities/useListMemberCommunities";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { loading, currentUser } = useAuth();
-  const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
+  const { data: communities, isLoading: isFetchingCommunity } = useListMemberCommunities(profileData && profileData?.data?.id)
 
   useEffect(() => {
     const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
@@ -62,7 +63,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           { title: "Following", href: "/socials/following", icon: UserPlusIcon },
           { title: "Upload Post", href: "/socials/uploads", icon: PlusSquareIcon },
           { title: "Watchlist", href: "/socials/watchlist", icon: TvMinimalPlay },
-          // { title: "Community", href: "/socials/community", icon: Users2 },
+          // ...(communities && communities?.data?.communities?.length > 0
+          //   ? [{ title: "Community", href: "/socials/community", icon: Users2 }]
+          //   : []),
           {
             title: "Profile",
             href: `/socials/profile`,
@@ -124,7 +127,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         ],
       },
     ],
-    [avatarUrl]
+    [avatarUrl, communities]
   );
 
   const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(headerButtons[0].navItems);
@@ -177,7 +180,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <SidebarProvider>
       <div className="flex flex-col min-h-screen bg-gray-50">
         <aside className="fixed left-0 top-0 h-full z-50">
-          {loading ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} dashboardItems={currentDashboardItems} />}
+          {loading || isFetchingCommunity ? <SidebarSkeleton /> : <Sidebar navItems={currentNavItems} dashboardItems={currentDashboardItems} />}
         </aside>
 
         <div className={`flex-1 ${isCommunityRoute ? "lg:ml-16" : "lg:ml-72"} flex flex-col relative`}>
@@ -202,7 +205,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </div>
           </main>
 
-          {/* Fixed Footer visible only on mobile */}
           <footer className="fixed bottom-0 left-0 right-0 z-20 block md:hidden">
             <Footer
               onButtonClick={setCurrentNavItems}
