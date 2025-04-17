@@ -96,7 +96,7 @@ const TourTooltip: React.FC<TourTooltipProps> = ({
 
         <button
           onClick={onNext}
-          className={`px-6 py-2 rounded-md  bg-[#0b66c3] hover:bg-[#0a5cb0] text-white font-medium`}
+          className={`px-6 py-2 rounded-md  bg-primary hover:bg-primary-600 text-white font-medium`}
           aria-label={isLastStep ? "Complete tour" : "Next step"}
         >
           {isLastStep ? "Done" : "Next"}
