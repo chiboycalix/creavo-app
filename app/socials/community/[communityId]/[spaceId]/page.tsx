@@ -8,8 +8,6 @@ import ButtonLoader from '@/components/ButtonLoader';
 import { Button } from '@/components/ui/button'
 import { Check, Loader2, Plus, Settings } from 'lucide-react'
 import { useParams } from 'next/navigation';
-import { useListCommunities } from '@/hooks/communities/useListCommunities';
-import { useListSpaces } from '@/hooks/communities/useListSpaces';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { UserBadge } from '@/components/meeting/InvitePeople/UserBadge';
@@ -20,11 +18,11 @@ import { addMembersManuallyToSpaceService, AddMemberToSpacePayload } from '@/ser
 import { toast } from 'sonner';
 import { useListSpaceMembers } from '@/hooks/communities/useListSpaceMembers';
 import SpaceSettings from '@/components/socials/community/SpaceSettings';
+import { useListMemberCommunities } from '@/hooks/communities/useListMemberCommunities';
 
 const Space = () => {
-  const { data: communityData, isFetching: isFetchingCommunity } = useListCommunities();
-  const community = communityData?.data?.communities[0];
-  const { data } = useListSpaces(community && community?.id);
+  const { data: communities, isFetching: isFetchingCommunity } = useListMemberCommunities("45")
+  const community = communities?.data?.communities[0];
   const params = useParams();
   const spaceId = params?.spaceId as string;
   const [addMember, setAddMember] = useState(false);
@@ -34,8 +32,7 @@ const Space = () => {
   const [invitedUsers, setInvitedUsers] = useState<any[]>([]);
   const [showSpaceSettingsCard, setShowSpaceSettingsCard] = useState(false);
   const [spaceSettingsAnchorRect, setSpaceSettingsAnchorRect] = useState<DOMRect | null>(null);
-
-  const currentSpace = data?.data?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0];
+  const currentSpace = communities?.data?.communities[0]?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0];
 
   const { data: userData, isFetching: userDataLoading } = useFetchUserByUsername(userEmail || undefined);
 

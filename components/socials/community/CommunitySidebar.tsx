@@ -1,34 +1,29 @@
 "use client"
 import Link from 'next/link';
-import { Card } from '@/components/ui/card';
 import CreateSpaceDialog from './CreateSpaceDialog';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import { ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { Card } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from 'react';
-import { useListCommunities } from '@/hooks/communities/useListCommunities';
 import { CommunitySidebarSkeleton } from '@/components/sketetons/CommunitySidebarSkeleton';
-import { useListSpaces } from '@/hooks/communities/useListSpaces';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { useListMemberCommunities } from '@/hooks/communities/useListMemberCommunities';
+import { useAuth } from '@/context/AuthContext';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 export default function CommunitySidebar() {
   const [isOpen, setIsOpen] = useState(true)
-  const { data: communityData, isFetching } = useListCommunities();
-
-  const community = communityData?.data?.communities[0]
-  const { data } = useListSpaces(community && community?.id);
-
+  const { loading, currentUser } = useAuth();
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser && currentUser?.id);
+  const { data: communities, isLoading: isFetchingCommunity } = useListMemberCommunities(profileData && profileData?.data?.id)
+  const community = communities?.data?.communities[0]
   const pathname = usePathname();
-  console.log(data, "datadata")
 
   return (
     <Card className='rounded-md h-[87vh] bg-white'>
       {
-        isFetching ? <CommunitySidebarSkeleton /> : <div className="w-64 p-4">
+        isFetchingCommunity || loading || profileLoading ? <CommunitySidebarSkeleton /> : <div className="w-64 p-4">
           <div className="flex items-center space-x-2 pt-2 pb-4 mb-6 border-b">
             <img src={community?.logo || "/assets/community.svg"} alt="Community Avatar" className="rounded-full h-10 w-10 object-cover" />
             <span className="text-sm font-semibold">{community?.name}</span>
@@ -55,7 +50,7 @@ export default function CommunitySidebar() {
                 </div>
               </div>
               <CollapsibleContent className="py-2">
-                {data?.data?.spaces?.map((space: any) => {
+                {community?.spaces?.map((space: any) => {
                   const isActive = pathname === `/socials/community/${community?.id}/${space?.id}`;
                   return (
                     <Link

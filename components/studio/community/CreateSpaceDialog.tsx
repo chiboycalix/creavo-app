@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/Input";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSpaceService, SpacePayload } from "@/services/community.service";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook";
@@ -23,6 +23,7 @@ import { Plus } from "lucide-react";
 
 const CreateSpaceDialog = ({ communityId }: { communityId: string }) => {
   const maxFiles = 1;
+  const queryClient = useQueryClient();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState(false);
@@ -35,8 +36,8 @@ const CreateSpaceDialog = ({ communityId }: { communityId: string }) => {
       return createSpaceService(payload);
     },
     onSuccess: async (data) => {
-      console.log({ data });
-      toast.success("Space created successfully");
+      toast.success("Space created successfully")
+      queryClient.invalidateQueries({ queryKey: ["useListMemberCommunities"] });
       setIsOpen(false);
       router.push(`/studio/community/${communityId}/${data?.id}`);
       dispatch(resetCreateSpaceForm());

@@ -6,7 +6,7 @@ export function useListSpaces(communityId: string) {
   return useQuery({
     queryKey: ["useListSpaces", communityId],
     queryFn: async () => {
-      const response = await fetch(`${baseUrl}/users/${communityId}/spaces`, {
+      const response = await fetch(`${baseUrl}/users/${4}/spaces`, {
         headers: {
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
         },

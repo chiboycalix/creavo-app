@@ -2,7 +2,6 @@
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function SpacePage() {
-
   return (
     <ProtectedRoute
       requireAuth={true}

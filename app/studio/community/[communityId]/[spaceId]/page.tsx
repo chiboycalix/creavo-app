@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Check, Loader, Plus, Settings } from 'lucide-react'
 import { useParams } from 'next/navigation';
 import { useListCommunities } from '@/hooks/communities/useListCommunities';
-import { useListSpaces } from '@/hooks/communities/useListSpaces';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { UserBadge } from '@/components/meeting/InvitePeople/UserBadge';
@@ -20,12 +19,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addMembersManuallyToSpaceService, AddMemberToSpacePayload } from '@/services/community.service';
 import { toast } from 'sonner';
 import { useListSpaceMembers } from '@/hooks/communities/useListSpaceMembers';
+import { useAuth } from '@/context/AuthContext';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useListMemberCommunities } from '@/hooks/communities/useListMemberCommunities';
 
 const Space = () => {
   const { data: communityData, isFetching: isFetchingCommunity } = useListCommunities();
   const community = communityData?.data?.communities[0];
   const queryClient = useQueryClient();
-  const { data } = useListSpaces(community && community?.id);
   const params = useParams();
   const spaceId = params?.spaceId as string;
   const [addMember, setAddMember] = useState(false);
@@ -34,8 +35,11 @@ const Space = () => {
   const [userEmail, setUserEmail] = useState("");
   const [showSpaceSettingsCard, setShowSpaceSettingsCard] = useState(false);
   const [spaceSettingsAnchorRect, setSpaceSettingsAnchorRect] = useState<DOMRect | null>(null);
+  const { loading, currentUser } = useAuth();
+  const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser && currentUser?.id);
+  const { data: communities, isLoading: isFetchingCommunities } = useListMemberCommunities(profileData && profileData?.data?.id)
 
-  const currentSpace = data?.data?.communities[0]?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0];
+  const currentSpace = communities?.data?.communities[0]?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0];
 
   const { data: userData, isFetching: userDataLoading } = useFetchUserByUsername(userEmail || undefined);
 
@@ -47,7 +51,8 @@ const Space = () => {
       setUserEmail("")
       toast.success("Members added successfully")
       setAddMember(false)
-      await queryClient.invalidateQueries({ queryKey: ["useListSpaces", community && community?.id], exact: true, });
+      await queryClient.invalidateQueries({ queryKey: ["useListMemberCommunities"] });
+      await queryClient.invalidateQueries({ queryKey: ["spaceId-communityId"] });
     },
     onError: (error: any) => {
       const errorMessage = userData?.data?.length < 1 ? "This user does not exist" : error?.data[0]

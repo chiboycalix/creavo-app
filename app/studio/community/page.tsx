@@ -12,6 +12,8 @@ const Community = () => {
   const { data: communityData, isFetching } = useListCommunities();
   const router = useRouter();
 
+  console.log({ communityData })
+
   const community = communityData?.data?.communities[0];
 
   useEffect(() => {
