@@ -73,7 +73,14 @@ export default function SimpleLayout({
                       About Us
                     </Link>
                   </li>
-                  
+                  <li>
+                    <Link
+                      href="/terms-condition"
+                      className="text-gray-700 hover:text-gray-900"
+                    >
+                      Terms and Condition
+                    </Link>
+                  </li>
                   <li>
                     <Link
                       href="/terms-policies"
@@ -163,7 +170,7 @@ export default function SimpleLayout({
                 </li>
                 <li>
                   <Link
-                    href="/terms"
+                    href="/terms-condition"
                     className="text-sm text-gray-300 hover:text-white"
                   >
                     Terms and Conditions
@@ -173,7 +180,14 @@ export default function SimpleLayout({
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-medium">Terms and Policies</h3>
+              <h3 className="font-medium">
+              <Link
+                    href="/terms-policies"
+                    className="text-sm text-gray-300 hover:text-white"
+                  >
+                Terms and Policies
+                </Link>
+                </h3>
               <ul className="space-y-2">
                 <li>
                   <Link
