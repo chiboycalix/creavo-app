@@ -78,7 +78,7 @@ const ProfileSetup = () => {
         body: JSON.stringify(requestPayload),
       });
       await response.json();
-      if (!response.ok) {
+      if (response.ok) {
         showToast("success", "Profile Setup", "Profile updated successfully!");
         router.push(ROUTES.SELECT_INTERESTS);
       }
