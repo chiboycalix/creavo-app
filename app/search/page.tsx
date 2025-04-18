@@ -73,71 +73,74 @@ export default function SearchResults() {
     { id: "courses", label: "Courses" },
   ];
 
-  useEffect(() => {
-    const fetchSearchResults = async () => {
-      if (!query) return;
+ const [lastQuery, setLastQuery] = useState<string>("");
 
-      setIsLoading(true);
-      setError(null);
+useEffect(() => {
+  const fetchSearchResults = async () => {
+    if (!query) return;
 
-      try {
-        const token = Cookies.get("token");
+    setIsLoading(true);
+    setError(null);
 
-        const response = await fetch(
-          `${baseUrl}/search/?search_query=${encodeURIComponent(query)}`,
-          {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : "",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+    try {
+      const token = Cookies.get("token");
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch search results");
+      const response = await fetch(
+        `${baseUrl}/search/?search_query=${encodeURIComponent(query)}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
         }
+      );
 
-        const data: ApiResponse = await response.json();
+      if (!response.ok) throw new Error("Failed to fetch search results");
 
-        // Categorize results by type
-        const accounts: SearchResultItem[] = [];
-        const posts: SearchResultItem[] = [];
-        const courses: SearchResultItem[] = [];
+      const data: ApiResponse = await response.json();
 
-        data.data.results.forEach((item) => {
-          if (item.data.type === "post") {
-            posts.push(item);
-          } else if (item.data.type === "course") {
-            courses.push(item);
-          } else if (item.data.type === "user") {
-            accounts.push(item);
-          }
-        });
+      const accounts: SearchResultItem[] = [];
+      const posts: SearchResultItem[] = [];
+      const courses: SearchResultItem[] = [];
 
-        setResults({
-          accounts,
-          posts,
-          courses,
-        });
+      data.data.results.forEach((item) => {
+        if (item.data.type === "post") posts.push(item);
+        else if (item.data.type === "course") courses.push(item);
+        else if (item.data.type === "user") accounts.push(item);
+      });
 
-        // Set active tab based on which has results
-        if (activeContentTab === "post" && posts.length === 0) {
-          if (courses.length > 0) {
-            setActiveContentTab("courses");
-          } else if (accounts.length > 0) {
-            setActiveContentTab("account");
-          }
+      setResults({ accounts, posts, courses });
+
+      // ⚡️ Decide whether to switch tabs
+      const currentTabHasContent =
+        (activeContentTab === "account" && accounts.length > 0) ||
+        (activeContentTab === "post" && posts.length > 0) ||
+        (activeContentTab === "courses" && courses.length > 0);
+
+      const isNewQuery = query !== lastQuery;
+
+      if (isNewQuery && !currentTabHasContent) {
+        if (posts.length > 0) {
+          setActiveContentTab("post");
+        } else if (courses.length > 0) {
+          setActiveContentTab("courses");
+        } else if (accounts.length > 0) {
+          setActiveContentTab("account");
         }
-      } catch (err) {
-        console.error("Search error:", err);
-        setError("An error occurred while fetching search results");
-      } finally {
-        setIsLoading(false);
       }
-    };
 
-    fetchSearchResults();
-  }, [query, activeContentTab]);
+      setLastQuery(query); // update query after handling tab logic
+    } catch (err) {
+      console.error("Search error:", err);
+      setError("An error occurred while fetching search results");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchSearchResults();
+}, [query]);
+
 
   const renderContent = () => {
     if (isLoading) {
