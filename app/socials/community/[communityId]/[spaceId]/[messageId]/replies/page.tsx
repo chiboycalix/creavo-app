@@ -35,7 +35,6 @@ const RepliesPage = () => {
     retry: 0,
     retryDelay: 0,
   })
-  console.log({ spaceDetails });
 
   const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 

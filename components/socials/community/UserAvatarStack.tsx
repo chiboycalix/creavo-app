@@ -8,7 +8,7 @@ import {
   useMotionValue,
   useSpring,
 } from "motion/react";
-import { Check, Plus } from "lucide-react";
+import { Check } from "lucide-react";
 
 const UserAvatarStack = ({
   items,
@@ -106,10 +106,7 @@ const UserAvatarStack = ({
         </div>
       ))}
 
-      <div className="relative -mr-4 flex items-center">
-        <div onClick={handleAddMember} className="cursor-pointer relative h-9 w-9 rounded-full bg-primary-600 border-2 border-white flex items-center justify-center">
-          <Plus className="h-5 w-5 text-white" />
-        </div>
+      <div className="relative flex items-center mr-2">
         <AnimatePresence>
           {addMember && (
             <motion.div

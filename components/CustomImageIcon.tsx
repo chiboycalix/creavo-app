@@ -6,14 +6,13 @@ interface CustomImageIconProps extends HTMLAttributes<HTMLImageElement> {
   alt: string;
 }
 
-const CustomImageIcon = ({ imageUrl, className, alt, ...props }: CustomImageIconProps) => {
+const CustomImageIcon = ({ imageUrl, className, alt }: CustomImageIconProps) => {
   return (
     <img
       src={imageUrl}
       alt="Custom Icon"
-      className={cn("w-6 h-6 rounded-full", className)}
+      className={cn("w-6 h-6 rounded-full")}
       loading="lazy"
-      {...props}
     />
   );
 };

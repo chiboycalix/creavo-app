@@ -10,6 +10,11 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import {
   Video,
   User,
   Compass,
@@ -26,6 +31,7 @@ import {
   Bookmark,
   BoxesIcon,
   Users2,
+  User2,
 } from "lucide-react";
 import { shouldUseMainLayout } from "@/utils/path-utils";
 import { RiHome8Fill } from "react-icons/ri";
@@ -38,12 +44,12 @@ import { useListMemberCommunities } from "@/hooks/communities/useListMemberCommu
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { loading, currentUser } = useAuth();
-  const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
   const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
   const { data: communities, isLoading: isFetchingCommunity } = useListMemberCommunities(profileData && profileData?.data?.id)
 
+  const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
   useEffect(() => {
-    const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
+    const communityRoutePattern = /^\/(studio|socials)\/community\/[^/]+(\/[^/]+)?$/;
     setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
@@ -63,18 +69,22 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           { title: "Following", href: "/socials/following", icon: UserPlusIcon },
           { title: "Upload Post", href: "/socials/uploads", icon: PlusSquareIcon },
           { title: "Watchlist", href: "/socials/watchlist", icon: TvMinimalPlay },
-          // ...(communities && communities?.data?.communities?.length > 0
-          //   ? [{ title: "Community", href: "/socials/community", icon: Users2 }]
-          //   : []),
+          ...(communities && communities?.data?.communities?.length > 0
+            ? [{ title: "Community", href: "/socials/community", icon: Users2 }]
+            : []),
           {
             title: "Profile",
             href: `/socials/profile`,
             icon: (
-              <CustomImageIcon
-                imageUrl={avatarUrl}
-                className="rounded-full w-6 h-6"
-                alt="Profile Avatar"
-              />
+              isCommunityRoute ? <Avatar className="flex items-center justify-center rounded-full">
+                <AvatarImage src={avatarUrl} alt="@shadcn" className="p-2 rounded-full" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar> :
+                <CustomImageIcon
+                  imageUrl={avatarUrl}
+                  className={cn("")}
+                  alt="Profile Avatar"
+                />
             ),
           },
         ],
@@ -127,7 +137,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         ],
       },
     ],
-    [avatarUrl, communities]
+    [avatarUrl, communities, isCommunityRoute]
   );
 
   const [currentNavItems, setCurrentNavItems] = useState<NavItem[]>(headerButtons[0].navItems);

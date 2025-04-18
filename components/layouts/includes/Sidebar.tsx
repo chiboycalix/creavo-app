@@ -21,7 +21,7 @@ export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
   const [isCommunityRoute, setIsCommunityRoute] = useState<boolean>(false);
 
   useEffect(() => {
-    const communityRoutePattern = /^\/studio\/community\/[^/]+(\/[^/]+)?$/;
+    const communityRoutePattern = /^\/(studio|socials)\/community\/[^/]+(\/[^/]+)?$/;
     setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
@@ -42,9 +42,8 @@ export default function Sidebar({ navItems, dashboardItems }: SidebarProps) {
       <aside
         className={`bg-white min-h-screen fixed top-0 left-0 bottom-0 z-50
         transform transition-transform duration-300 ease-in-out flex flex-col
-        md:translate-x-0 ${isCommunityRoute ? "w-16" : "w-72"} ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        md:translate-x-0 ${isCommunityRoute ? "w-16" : "w-72"} ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <nav className="px-4 flex flex-col h-full">
           <ul className="flex-1">

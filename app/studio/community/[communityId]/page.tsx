@@ -1,7 +1,7 @@
 "use client"
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function SpacePage() {
+export default function CommunityIdPage() {
 
   return (
     <ProtectedRoute

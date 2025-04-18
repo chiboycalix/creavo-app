@@ -1,7 +1,7 @@
-"use client"
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from '@/components/ProtectedRoute'
+import React from 'react'
 
-export default function SpacePage() {
+const CommunityIdPage = () => {
   return (
     <ProtectedRoute
       requireAuth={true}
@@ -15,5 +15,7 @@ export default function SpacePage() {
         </div>
       </div>
     </ProtectedRoute>
-  );
+  )
 }
+
+export default CommunityIdPage

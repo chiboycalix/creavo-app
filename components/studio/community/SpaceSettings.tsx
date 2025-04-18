@@ -1,14 +1,14 @@
 "use client";
 import React, { useState } from "react";
+import FollowerSkeleton from "@/components/sketetons/FollowerSkeleton";
+import EditSpace from "./EditSpace";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Edit, Trash2, X } from "lucide-react";
 import { SearchInput } from "@/components/Input/SearchInput";
-import FollowerSkeleton from "@/components/sketetons/FollowerSkeleton";
 import { Button } from "@/components/ui/button";
 import { Collapsible } from "@radix-ui/react-collapsible";
 import { CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import EditSpace from "./EditSpace";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RemoveMemberFromSpacePayload, removeMemberFromSpaceService } from "@/services/community.service";
 import { toast } from "sonner";
@@ -64,7 +64,6 @@ const SpaceSettings = ({
     },
   });
 
-  console.log({ members })
   const handleRemoveMember = async (member: any) => {
     await handleRemoveMemberFomSpace({
       communityId: currentSpace?.communityId,
