@@ -97,7 +97,7 @@ const Space = () => {
     setSpaceSettingsAnchorRect(buttonRect);
     setShowSpaceSettingsCard(true);
   };
-  console.log(currentSpace, "currentSpacecurrentSpace")
+
   return (
     <ProtectedRoute
       requireAuth={true}
