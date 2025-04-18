@@ -140,7 +140,7 @@ export default function AuthLayout({
         </div>
       )}
 
-      <Card className="border-none flex-1 px-6 py-8 md:px-20 md:py-12 flex flex-col rounded-3xl justify-center">
+      <Card className={`border-none flex-1 px-6 py-8 md:px-20 md:py-12 flex flex-col rounded-3xl justify-center ${isInterestPage && `bg-transparent`}`}>
         <div className="flex flex-col justify-center items-center mb-6">
           {!(isInterestPage || isSetupPage) && (
             <HeaderImage src={CrevoeLogo} />

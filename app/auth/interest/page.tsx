@@ -101,8 +101,8 @@ export default function TopicSelection() {
 
   return (
     <>
-      <div className="h-screen flex flex-col items-center w-full">
-        <div className="w-[80%] px-8 py-24">
+      {/* <div className="flex flex-col items-center justify-center w-full bg-red-400"> */}
+        <div className=" flex flex-col m-auto w-[50%] px-8 py-20 bg-[#FEFEFE] shadow-sm rounded-2xl">
           <h2 className="text-2xl font-semibold mb-3 text-center">Almost done!</h2>
           <p className="mb-3 text-gray-600 text-sm text-center">
             Select topics of your interest to personalize your experience.
@@ -155,7 +155,7 @@ export default function TopicSelection() {
             settings.
           </p>
         </div>
-      </div>
+      {/* </div> */}
     </>
   );
 }
