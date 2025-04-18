@@ -23,12 +23,6 @@ const Reply = ({ communityId, spaceId, messageId, mId }: ReplyProps) => {
       return data;
     },
     enabled: !!communityId && !!spaceId && !!messageId,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchInterval: 0,
-    refetchIntervalInBackground: false,
-    retry: 0,
-    retryDelay: 0,
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });

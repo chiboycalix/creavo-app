@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/Input'
 import { FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createCommunityService } from "@/services/community.service"
 import { toast } from "sonner"
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore.hook"
@@ -23,6 +23,7 @@ import { resetCreateCommunityForm, updatCreateCommunityForm } from "@/redux/slic
 const CreateCommunityDialog = () => {
   const router = useRouter()
   const maxFiles = 1;
+  const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const { createCommunityForm: createCommunityStateValues } = useAppSelector((store) => store.communityStore);
   const { validate, errors, validateField } = useCreateCommunityValidator({ store: createCommunityStateValues });
@@ -32,6 +33,8 @@ const CreateCommunityDialog = () => {
     mutationFn: (payload: any) => createCommunityService(payload),
     onSuccess: async (data) => {
       toast.success("Community created successfully")
+      await queryClient.invalidateQueries({ queryKey: ["useListMemberCommunities"] });
+      await queryClient.invalidateQueries({ queryKey: ["listCommunities"] });
       router.push(`/studio/community/${data?.id}`)
       dispatch(resetCreateCommunityForm())
     },

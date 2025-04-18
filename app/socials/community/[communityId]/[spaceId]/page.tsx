@@ -1,47 +1,26 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserAvatarStack from '@/components/socials/community/UserAvatarStack';
 import UserAvatarStackSkeleton from '@/components/sketetons/UserAvatarStackSkeleton';
 import Chat from '@/components/socials/community/chat/Chat';
-import { Settings } from 'lucide-react'
 import { useParams } from 'next/navigation';
-import { useFetchUserByUsername } from '@/hooks/profile/useFetchUserByUsername';
 import { useListSpaceMembers } from '@/hooks/communities/useListSpaceMembers';
-import SpaceSettings from '@/components/socials/community/SpaceSettings';
-import { useListMemberCommunities } from '@/hooks/communities/useListMemberCommunities';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useListMemberCommunities } from '@/hooks/communities/useListMemberCommunities';
 
 const Space = () => {
+  const params = useParams();
+  const communityId = params?.communityId as string;
+  const spaceId = params?.spaceId as string;
   const { loading, currentUser } = useAuth();
   const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser && currentUser?.id);
   const { data: communities, isLoading: isFetchingCommunities } = useListMemberCommunities(profileData && profileData?.data?.id)
-  const community = communities && communities?.data?.communities[0];
-  const params = useParams();
-  const spaceId = params?.spaceId as string;
-  const [userEmail, setUserEmail] = useState("");
-  const [invitedUsers, setInvitedUsers] = useState<any[]>([]);
-  const [showSpaceSettingsCard, setShowSpaceSettingsCard] = useState(false);
-  const [spaceSettingsAnchorRect, setSpaceSettingsAnchorRect] = useState<DOMRect | null>(null);
 
   const currentSpace = communities?.data?.communities[0]?.spaces?.filter((space: any) => Number(space?.id) === Number(spaceId))[0];
 
-  const { data: userData, isFetching: userDataLoading } = useFetchUserByUsername(userEmail || undefined);
-
-  const { data: spaceMembers, isFetching: isFetchingSpaceMembers } = useListSpaceMembers(community && community?.id, currentSpace?.id);
-
-  useEffect(() => {
-    if (!userDataLoading && userData?.data?.length > 0 && userEmail) {
-      const newUsers = userData.data.filter((user: any) =>
-        !invitedUsers.some(invited => invited.email === user.email)
-      );
-      if (newUsers.length > 0) {
-        setInvitedUsers(prev => [...prev, ...newUsers]);
-        setUserEmail("");
-      }
-    }
-  }, [userData, userDataLoading, userEmail, invitedUsers]);
+  const { data: spaceMembers, isFetching: isFetchingSpaceMembers } = useListSpaceMembers(communityId, currentSpace?.id);
 
   const members = spaceMembers?.data?.members?.map((member: any) => {
     return {
@@ -52,57 +31,45 @@ const Space = () => {
     }
   })
 
-  const handleSpaceSettingsClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const buttonRect = event.currentTarget.getBoundingClientRect();
-    setSpaceSettingsAnchorRect(buttonRect);
-    setShowSpaceSettingsCard(true);
-  };
-
   return (
     <ProtectedRoute
       requireAuth={true}
       requireVerification={true}
       requireProfileSetup={false}
     >
-      <div className="w-full h-[87vh] relative">
+      <div className="w-full h-[85vh] relative">
         <div className="border-b p-4 shadow-md shadow-primary-50 flex justify-between items-center">
-          <div>
-            <p className="font-semibold text-sm">{currentSpace?.displayName}</p>
-            <p className="text-xs">{currentSpace?.description}</p>
+          <div className='flex items-center gap-2'>
+            <div>
+              <img src={currentSpace?.logo} alt="" className='w-8 h-8 rounded-md' />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">{currentSpace?.displayName}</p>
+              <p className="text-xs">{currentSpace?.description}</p>
+            </div>
           </div>
           <div className="flex gap-8 items-center">
             {
-              isFetchingSpaceMembers || isFetchingCommunities ?
+              isFetchingSpaceMembers || loading || profileLoading || isFetchingCommunities ?
                 <UserAvatarStackSkeleton maxVisible={5} itemCount={5} /> :
                 <UserAvatarStack
                   items={members || []} maxVisible={5}
                 />
             }
-            <div className='flex items-center gap-2'>
-              <span className="bg-gray-100 p-1 rounded-full cursor-pointer" onClick={handleSpaceSettingsClick}>
-                <Settings className="cursor-pointer" />
-              </span>
-
-              {showSpaceSettingsCard && currentSpace && (
-                <SpaceSettings
-                  isOpen={showSpaceSettingsCard}
-                  onClose={() => setShowSpaceSettingsCard(false)}
-                  anchorRect={spaceSettingsAnchorRect}
-                  currentSpace={currentSpace}
-                  communityId={community && community?.id}
-                  members={members}
-                  isFetchingSpaceMembers={isFetchingSpaceMembers}
-                />
-              )}
-            </div>
           </div>
         </div>
 
         <div className='max-h-[87vh] flex flex-col justify-between'>
           <div>
+            {
+              members?.length < 0 && <div className="p-4 py-10 bg-gray-100 w-[50%] mx-auto mt-20 rounded-md flex items-center flex-col">
+                <p>Looks like you&apos;re leading the way</p>
+                <p>Start a discussion by creating a new post</p>
+              </div>
+            }
             <Chat
               spaceId={spaceId}
-              communityId={community && community?.id}
+              communityId={communityId}
             />
           </div>
         </div>

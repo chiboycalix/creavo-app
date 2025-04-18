@@ -1,7 +1,6 @@
 import React from "react";
 import ChatMessage from "./ChatMessage";
 import { Message } from "@/types/chat";
-import ChatMessageSkeleton from "@/components/sketetons/ChatMessageSkeleton";
 
 interface ChatFeedProps {
   messages: Message[];

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { NavItem } from '@/types/navigation';
+import { cn } from '@/lib/utils';
 
 export const NavItemComponent = ({
   item,
   pathname,
   level = 0,
-  showText = true, // New prop to control text visibility
+  showText = true,
 }: {
   item: NavItem;
   pathname: string;
@@ -30,13 +31,13 @@ export const NavItemComponent = ({
               setIsExpanded(!isExpanded);
             }
           }}
-          className={`group flex items-center justify-between
+          className={cn(`group flex items-center justify-between
             px-4 mb-2 py-2 rounded-lg hover:bg-primary-500
-            hover:text-white transition-colors ${isActive ? "bg-primary-700" : ""}`}
+            hover:text-white transition-colors ${isActive ? "bg-primary-700" : ""}`, !showText && "justify-center items-center text-center")}
           style={{ paddingLeft: showText ? `${level * 12 + 16}px` : `${level * 12 + 8}px` }}
         >
-          <div className="flex items-center">
-            <div className={showText ? "mr-3" : "mr-0"}>
+          <div className="flex items-center justify-center">
+            <div className={showText ? "mr-3" : "mr-0 flex items-center justify-center"}>
               {React.isValidElement(Icon) ? (
                 React.cloneElement(Icon as React.ReactElement<any>, {
                   className: `${isActive ? "text-white" : "text-gray-500 group-hover:text-white"}`,

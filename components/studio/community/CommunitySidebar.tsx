@@ -28,7 +28,7 @@ export default function CommunitySidebar() {
   const pathname = usePathname();
 
   return (
-    <Card className='rounded-md h-[87vh] bg-white'>
+    <Card className='rounded-md h-[87vh] bg-white p-4'>
       {
         isFetching || isFetchingCommunity || profileLoading || loading ? <CommunitySidebarSkeleton /> : <div className="w-64 p-4">
           <div className="flex items-center space-x-2 pt-2 pb-4 mb-6 border-b">
