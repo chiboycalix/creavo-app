@@ -39,9 +39,14 @@ const Space = () => {
     >
       <div className="w-full h-[85vh] relative">
         <div className="border-b p-4 shadow-md shadow-primary-50 flex justify-between items-center">
-          <div>
-            <p className="font-semibold text-sm">{currentSpace?.displayName}</p>
-            <p className="text-xs">{currentSpace?.description}</p>
+          <div className='flex items-center gap-2'>
+            <div>
+              <img src={currentSpace?.logo} alt="" className='w-8 h-8 rounded-md' />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">{currentSpace?.displayName}</p>
+              <p className="text-xs">{currentSpace?.description}</p>
+            </div>
           </div>
           <div className="flex gap-8 items-center">
             {

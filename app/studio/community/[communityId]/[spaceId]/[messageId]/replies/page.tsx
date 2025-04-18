@@ -15,6 +15,7 @@ const RepliesPage = () => {
   const messageId = params.messageId as string;
   const communityId = params.communityId as string;
   const mId = searchParams.get("mId") as string;
+  const messageText = searchParams.get("text") as string;
   const { currentUser } = useAuth();
   const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
 
@@ -51,7 +52,7 @@ const RepliesPage = () => {
         <img src={avatarUrl} alt="avatarUrl" className="w-10 h-10 rounded-full" />
         <div className="flex flex-col ml-2">
           <h2 className="text-sm font-semibold">Replies</h2>
-          <p className="text-xs">nonoossusushsh</p>
+          <p className="text-xs">{messageText}</p>
         </div>
 
       </div>

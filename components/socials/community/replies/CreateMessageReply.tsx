@@ -70,7 +70,7 @@ const CreateMessageReply = ({ spaceId, communityId, setIsInputDialogOpen, mId }:
 
       <div className='w-full mt-12'>
         <Button
-          disabled={isCreatingPost || !post || !postImage}
+          disabled={isCreatingPost || !post}
           className="bg-primary h-[50px] border-0 p-2.5 text-sm cursor-pointer rounded-lg text-white w-full font-medium leading-6"
         >
           <ButtonLoader

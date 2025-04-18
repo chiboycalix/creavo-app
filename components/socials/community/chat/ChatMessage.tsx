@@ -73,6 +73,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   pathname: `/socials/community/${communityId}/${spaceId}/${message?.id}/replies`,
                   query: {
                     mId: message?.mId,
+                    text: message?.content
                   },
                 }}
                 passHref
