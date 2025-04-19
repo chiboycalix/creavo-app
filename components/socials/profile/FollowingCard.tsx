@@ -7,6 +7,7 @@ import { SearchInput } from "@/components/Input/SearchInput";
 import { useInView } from "react-intersection-observer";
 import { useFetchFollowing } from "@/hooks/profile/useFetchFollowing";
 import Link from "next/link";
+import { DEFAULT_AVATAR } from "@/constants";
 
 type FollowersProps = {
   isOpen: boolean;
@@ -22,7 +23,7 @@ interface Follower {
   userId: number;
   username: string;
   email: string;
-  firstName: string;
+  firstname: string;
   lastName: string;
   avatar: string;
 }
@@ -103,28 +104,18 @@ const FollowingCard = ({
                           key={follower.id}
                           className="flex items-center gap-2 mb-4"
                         >
-                          {follower.avatar ? (
-                            <img
-                              src={follower.avatar}
-                              alt={`${follower.username}'s avatar`}
-                              style={{
-                                width: "30px",
-                                height: "30px",
-                                borderRadius: "50%",
-                              }}
-                            />
-                          ) : (
-                            <div className="w-7 h-7 rounded-full object-cover font-bold border inline-flex justify-center items-center text-center p-1">
-                              {(follower?.firstName &&
-                                follower?.firstName[0]) ||
-                                ("" + follower?.lastName &&
-                                  follower?.lastName[0]) ||
-                                ""}{" "}
-                            </div>
-                          )}
+                          <img
+                            src={follower.avatar || DEFAULT_AVATAR}
+                            alt={`${follower.username}'s avatar`}
+                            style={{
+                              width: "30px",
+                              height: "30px",
+                              borderRadius: "50%",
+                            }}
+                          />
                           <div className="flex flex-col">
                             <span className="text-sm inline-block">
-                              {follower.firstName} {follower.lastName}
+                              {follower.firstname} {follower.lastName}
                             </span>
                             <span className="text-xs inline-block">
                               @{follower.username}
@@ -142,8 +133,8 @@ const FollowingCard = ({
                 {isFetchingNextPage
                   ? "Loading more..."
                   : hasNextPage
-                  ? "Load More"
-                  : "No more following"}
+                    ? "Load More"
+                    : "No more following"}
               </div>
             )}
           </motion.div>

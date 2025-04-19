@@ -70,7 +70,7 @@ const CommentItem = ({
   const [commentReply, setCommentReply] = useState("");
   const ws = useWebSocket();
   const isCommentInputVisible = activeCommentId === comment.id;
-  const { data: replies, isFetching: isFetchingCommentReplies } = useFetchCommentReplies(post?.data?.id, comment?.id);
+  const { data: replies, isFetching: isFetchingCommentReplies, isPending, isLoading } = useFetchCommentReplies(post?.data?.id, comment?.id);
   const queryClient = useQueryClient();
 
   const { mutate: handleDeleteComment } = useMutation({
@@ -84,16 +84,9 @@ const CommentItem = ({
   const { mutate: handleReplyComment, isPending: isReplyingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => replyCommentService(payload),
     async onSuccess(data) {
-      if (ws && ws.connected && currentUser?.id !== data.userId) {
-        const request = {
-          userId: data.userId,
-          notificationId: data?.id,
-        };
-        ws.emit("comment", request);
-      }
-      await queryClient.invalidateQueries({ queryKey: ["post-comments", activePostId] });
-      await queryClient.invalidateQueries({ queryKey: ["comments-Reply", activePostId, comment?.id] });
-      await queryClient.invalidateQueries({ queryKey: ["single-post", activePostId] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchComments", activePostId] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchCommentReplies", activePostId, comment?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchPost", activePostId] });
     },
   });
 
@@ -295,7 +288,7 @@ const CommentItem = ({
       <AnimatePresence>
         {depth < maxDepth && (
           <>
-            {isFetchingCommentReplies ? (
+            {isFetchingCommentReplies && isPending && isLoading ? (
               <div className="pl-12 mt-2">
                 <SkeletonLoader />
               </div>

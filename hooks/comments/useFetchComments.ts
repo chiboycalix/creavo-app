@@ -4,7 +4,7 @@ import { baseUrl } from "@/utils/constant";
 
 export function useFetchComments(postId: number | undefined) {
   return useQuery({
-    queryKey: ["post-comments", postId],
+    queryKey: ["useFetchComments", postId],
     queryFn: async () => {
       if (!postId) throw new Error("Post ID is required");
       const response = await fetch(

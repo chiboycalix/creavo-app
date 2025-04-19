@@ -9,22 +9,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
 import { CommentPayload } from "@/types";
-import { useWebSocket } from "@/context/WebSocket";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { DEFAULT_AVATAR } from "@/constants";
 
 export function Comments({ postId }: { postId: number; }) {
-  const { data: comments, isFetching: isFetchingComments } = useFetchComments(postId);
+  const { data: comments, isFetching: isFetchingComments, isPending, isLoading } = useFetchComments(postId);
   const { getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
   const [comment, setComment] = useState("");
-  const ws = useWebSocket();
   const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
   const queryClient = useQueryClient();
-  const {
-    data: profileData,
-    isLoading: profileLoading,
-  } = useUserProfile(currentUser?.id);
+  const { data: profileData } = useUserProfile(currentUser?.id);
 
   const handleToggleCommentInput = (commentId: string) => {
     setActiveCommentId((prev) => (prev === commentId ? null : commentId));
@@ -34,18 +29,9 @@ export function Comments({ postId }: { postId: number; }) {
     mutationFn: (payload: CommentPayload) => addCommentService(payload),
     async onSuccess(data) {
       setComment("");
-      if (ws && ws.connected && currentUser?.id !== data.userId) {
-        const request = {
-          userId: data.userId,
-          notificationId: data?.id,
-        };
-        ws.emit("comment", request);
-        await queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
-        await queryClient.invalidateQueries({ queryKey: ["comments-Reply", postId, activeCommentId] });
-        await queryClient.invalidateQueries({ queryKey: ["single-post", postId] });
-      } else {
-        console.log("Failed to emit comment event", data?.id);
-      }
+      await queryClient.invalidateQueries({ queryKey: ["useFetchComments", postId] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchCommentReplies", postId, activeCommentId] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchPost", postId] });
     },
   });
 
@@ -56,15 +42,12 @@ export function Comments({ postId }: { postId: number; }) {
     });
   };
 
-  // Determine the avatar URL to use
-  const urlAvatar = profileLoading
-    ? DEFAULT_AVATAR // Show default while loading
-    : profileData?.data?.profile?.avatar || DEFAULT_AVATAR;
+  const urlAvatar = profileData?.data?.profile?.avatar || DEFAULT_AVATAR;
 
   return (
     <div className="relative h-full w-full">
       <div className="">
-        {isFetchingComments ? (
+        {isFetchingComments && isPending && isLoading ? (
           <CommentSectionSkeleton />
         ) : comments?.data?.comments?.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 text-gray-500">

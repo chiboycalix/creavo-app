@@ -7,6 +7,7 @@ import { useFetchFollowers } from "@/hooks/profile/useFetchFollowers";
 import { useInView } from "react-intersection-observer";
 import FollowerSkeleton from "@/components/sketetons/FollowerSkeleton";
 import Link from "next/link";
+import { DEFAULT_AVATAR } from "@/constants";
 
 type FollowersProps = {
   isOpen: boolean;
@@ -22,7 +23,7 @@ interface Follower {
   userId: number;
   username: string;
   email: string;
-  firstName: string;
+  firstname: string;
   lastName: string;
   avatar: string;
 }
@@ -94,47 +95,42 @@ const FollowersCard = ({
               {isLoading || isFetchingNextPage ? (
                 <FollowerSkeleton count={data?.pages[0].followers.length} />
               ) : (
-                data?.pages.map((page, i) => (
-                  <div key={i}>
-                    {page.followers.map((follower: Follower) => (
-                      <Link key={i} href={`/socials/profile/${follower.userId}`}>
-                        <div
-                          key={follower.id}
-                          className="flex items-center gap-2 mb-4"
-                        >
-                          {follower.avatar ? (
-                            <img
-                              src={follower.avatar}
-                              alt={`${follower.username}'s avatar`}
-                              style={{
-                                width: "30px",
-                                height: "30px",
-                                borderRadius: "50%",
-                              }}
-                            />
-                          ) : (
-                            <div className="w-7 h-7 rounded-full object-cover font-bold border inline-flex justify-center items-center text-center p-1">
-                              {(follower?.firstName &&
-                                follower?.firstName[0]) ||
-                                ("" + follower?.lastName &&
-                                  follower?.lastName[0]) ||
-                                ""}{" "}
-                            </div>
-                          )}
+                data?.pages.map((page, i) => {
+                  return (
+                    <div key={i}>
+                      {page.followers.map((follower: Follower) => {
+                        console.log({ follower })
+                        return (
+                          <Link key={i} href={`/socials/profile/${follower.userId}`}>
+                            <div
+                              key={follower.id}
+                              className="flex items-center gap-2 mb-4"
+                            >
+                              <img
+                                src={follower.avatar || DEFAULT_AVATAR}
+                                alt={`${follower.username}'s avatar`}
+                                style={{
+                                  width: "30px",
+                                  height: "30px",
+                                  borderRadius: "50%",
+                                }}
+                              />
 
-                          <div className="flex flex-col">
-                            <span className="text-sm inline-block">
-                              {follower.firstName} {follower.lastName}
-                            </span>
-                            <span className="text-xs inline-block">
-                              @{follower.username}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                ))
+                              <div className="flex flex-col">
+                                <span className="text-sm inline-block">
+                                  {follower?.firstname} {follower?.lastName}
+                                </span>
+                                <span className="text-xs inline-block">
+                                  @{follower.username}
+                                </span>
+                              </div>
+                            </div>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )
+                })
               )}
             </div>
             {!isLoading && (

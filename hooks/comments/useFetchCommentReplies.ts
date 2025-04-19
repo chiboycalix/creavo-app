@@ -7,7 +7,7 @@ export function useFetchCommentReplies(
   commentId: string | undefined
 ) {
   return useQuery({
-    queryKey: ["comments-Reply", postId, commentId],
+    queryKey: ["useFetchCommentReplies", postId, commentId],
     queryFn: async () => {
       if (!postId) throw new Error("postId and commentId is required");
       const response = await fetch(
