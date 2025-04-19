@@ -2,7 +2,7 @@
 import ButtonLoader from "@/components/ButtonLoader";
 import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Spinner from "@/components/Spinner";
-import UploadMedia from "./UploadMedia";
+import UploadMedia from "../UploadMedia";
 import { Clipboard, GripVertical, PenBox, Plus, Trash, Video } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
