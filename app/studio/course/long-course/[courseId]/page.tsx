@@ -2,7 +2,7 @@
 import React from 'react'
 import CustomTab from '@/components/CustomTab';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Content from '@/components/studio/course/long-course/Content';
+import Content from '@/components/studio/course/long-course/content';
 import Quiz from '@/components/studio/course/long-course/quiz';
 import Publish from '@/components/studio/course/long-course/Publish';
 import { useParams, useSearchParams } from 'next/navigation';

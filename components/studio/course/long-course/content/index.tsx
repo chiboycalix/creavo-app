@@ -2,7 +2,7 @@
 import ButtonLoader from "@/components/ButtonLoader";
 import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Spinner from "@/components/Spinner";
-import UploadMedia from "./UploadMedia";
+import UploadMedia from "../UploadMedia";
 import { Clipboard, GripVertical, PenBox, Plus, Trash, Video } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,11 +49,6 @@ const Content = ({ courseId: id }: any) => {
     enabled: !!id && !!courseData?.data?.course?.id && !!selectedModuleData?.id,
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
-    retry: 1,
-    retryDelay: 1000,
-    refetchInterval: 0,
-    refetchIntervalInBackground: true,
-    refetchOnMount: true,
   });
 
   const { mutate: handleAddModule, isPending: isAddingModule } = useMutation({
@@ -65,33 +60,9 @@ const Content = ({ courseId: id }: any) => {
       setSelectedModule(newModule);
       dispatch(updateSelectedModuleData(newModule));
       refetch()
-      queryClient.setQueryData(
-        ["useFetchCourseData", courseId || courseData?.data?.course?.id],
-        (oldData: any) => {
-          if (!oldData?.data?.course) return oldData;
-          return {
-            ...oldData,
-            data: {
-              ...oldData.data,
-              course: {
-                ...oldData.data.course,
-                modules: [...oldData.data.course.modules, newModule],
-              },
-            },
-          };
-        }
-      );
-
-      queryClient.setQueryData(
-        ["courseModulesData", newModule.id],
-        (oldData: any) => ({
-          ...oldData,
-          module: newModule,
-        })
-      );
 
       queryClient.invalidateQueries({
-        queryKey: ["useFetchCourseData", courseId || courseData?.data?.course?.id],
+        queryKey: ["useFetchCourseData", courseId],
         exact: true,
       });
       queryClient.invalidateQueries({
@@ -325,7 +296,7 @@ const Content = ({ courseId: id }: any) => {
     <div className="flex gap-4 w-full">
       <Card className="basis-4/12 border-none px-1">
         <CardHeader>
-          <CardContent className="px-0 min-h-[58vh]">
+          <CardContent className="px-0 max-h-[58vh] overflow-y-auto no-scrollbar">
             <aside className="h-full space-y-2">{renderModulesList}</aside>
           </CardContent>
           <CardFooter className="px-0 py-0 border-t">
@@ -337,7 +308,7 @@ const Content = ({ courseId: id }: any) => {
       </Card>
       <Card className="flex-1 border-none px-0 py-0">
         <CardHeader>
-          <CardContent className="px-0 py-0">{renderContentArea}</CardContent>
+          <CardContent className="px-0 py-0 max-h-[65vh] overflow-y-auto custom-scrollbar">{renderContentArea}</CardContent>
         </CardHeader>
       </Card>
     </div>

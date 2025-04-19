@@ -15,53 +15,7 @@ import { useCreateCourseFormValidator } from '@/helpers/validators/useCreateCour
 import { useToast } from "@/context/ToastContext";
 import { TagsInput } from '@/components/Input/TagsInput';
 import { Checkbox } from '@/components/ui/check-box';
-
-const currencies = [
-  {
-    label: 'USD',
-    value: 'USD',
-  },
-  {
-    label: 'EUR',
-    value: 'EUR',
-  },
-  {
-    label: 'GBP',
-    value: 'GBP',
-  },
-  {
-    label: 'JPY',
-    value: 'JPY',
-  },
-  {
-    label: 'CAD',
-    value: 'CAD',
-  },
-  {
-    label: 'AUD',
-    value: 'AUD',
-  },
-  {
-    label: 'CHF',
-    value: 'CHF',
-  },
-  {
-    label: 'CNY',
-    value: 'CNY',
-  },
-  {
-    label: 'SEK',
-    value: 'SEK',
-  },
-  {
-    label: 'NZD',
-    value: 'NZD',
-  },
-  {
-    label: 'NGN',
-    value: 'NGN',
-  },
-];
+import { CURRENCIES } from '@/constants';
 
 const CreateLongCourse = () => {
   const router = useRouter()
@@ -201,7 +155,7 @@ const CreateLongCourse = () => {
                   label="Currency"
                   variant='select'
                   placeholder='Select currency'
-                  options={currencies}
+                  options={CURRENCIES}
                   value={createCourseStateValues?.currency}
                   className='w-full'
                   onSelect={(value) => {
