@@ -73,8 +73,11 @@ const CommentItem = ({
     mutationFn: (payload: DeleteCommentPayload) => deleteCommentService(payload),
     onSuccess: async () => {
       toast.success("Comment deleted successfully");
+      await queryClient.invalidateQueries({ queryKey: ["useFetchComments", activePostId] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchCommentReplies", activePostId, comment?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchPost", activePostId] });
     },
-    onError: () => { },
+    onError: () => { }
   });
 
   const { mutate: handleReplyComment, isPending: isReplyingComment } = useMutation({
