@@ -17,6 +17,7 @@ import { uploadImageToCloudinary } from "@/utils";
 import { useToast } from "@/context/ToastContext";
 import { updateProfileService } from "@/services/profile.service";
 import Avatar from "@/components/Avatar";
+import { DEFAULT_AVATAR } from "@/constants";
 
 const ProfileSetup = () => {
   const { getAuth, currentUser } = useAuth();
@@ -38,8 +39,6 @@ const ProfileSetup = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { showToast } = useToast();
-
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 
   useEffect(() => {
     if (!getAuth()) router.push("/auth");
@@ -116,7 +115,7 @@ const ProfileSetup = () => {
                   className="border-2 border-primary-500"
                 /> */}
                 <img
-                  src={imagePreview || defaultAvatar}
+                  src={imagePreview || DEFAULT_AVATAR}
                   alt="User Avatar"
                   className={`rounded-full object-cover w-12 `}
                 />

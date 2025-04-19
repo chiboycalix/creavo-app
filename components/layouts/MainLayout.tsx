@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 import Footer from "./includes/Footer";
 import { ROUTES } from "@/constants/routes";
 import { useListMemberCommunities } from "@/hooks/communities/useListMemberCommunities";
+import { DEFAULT_AVATAR } from "@/constants";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -53,10 +54,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     setIsCommunityRoute(communityRoutePattern.test(window.location.pathname));
   }, [pathname]);
 
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = profileLoading
-    ? defaultAvatar
-    : profileData?.data?.profile?.avatar || defaultAvatar;
+    ? DEFAULT_AVATAR
+    : profileData?.data?.profile?.avatar || DEFAULT_AVATAR;
 
   const headerButtons: HeaderButton[] = React.useMemo(
     () => [

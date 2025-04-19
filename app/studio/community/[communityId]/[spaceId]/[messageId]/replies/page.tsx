@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useQuery } from "@tanstack/react-query";
 import { getSpaceDetailsService } from "@/services/community.service";
+import { DEFAULT_AVATAR } from "@/constants";
 
 const RepliesPage = () => {
   const router = useRouter();
@@ -38,12 +39,10 @@ const RepliesPage = () => {
   })
   console.log({ spaceDetails });
 
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
-
   // Determine the avatar URL to use
   const avatarUrl = profileLoading
-    ? defaultAvatar // Show default while loading
-    : spaceDetails?.space?.logo || defaultAvatar;
+    ? DEFAULT_AVATAR // Show default while loading
+    : spaceDetails?.space?.logo || DEFAULT_AVATAR;
 
   return (
     <div className="w-full h-[87vh] relative">

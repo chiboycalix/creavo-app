@@ -4,28 +4,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/Input";
 import { useFetchComments } from "@/hooks/comments/useFetchComments";
-import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
 import { useAuth } from "@/context/AuthContext";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
 import { CommentPayload } from "@/types";
-import { useWebSocket } from "@/context/WebSocket";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { DEFAULT_AVATAR } from "@/constants";
 
 export function Comments({ postId }: { postId: number; }) {
-  const { data: comments, isPending: isFetchingComments } = useFetchComments(postId);
+  const { data: comments, isFetching: isFetchingComments, isPending, isLoading } = useFetchComments(postId);
   const { getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
   const [comment, setComment] = useState("");
-  const ws = useWebSocket();
   const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
-
-  const {
-    data: profileData,
-    isLoading: profileLoading,
-    error: profileError
-  } = useUserProfile(currentUser?.id);
+  const queryClient = useQueryClient();
+  const { data: profileData } = useUserProfile(currentUser?.id);
 
   const handleToggleCommentInput = (commentId: string) => {
     setActiveCommentId((prev) => (prev === commentId ? null : commentId));
@@ -33,17 +27,11 @@ export function Comments({ postId }: { postId: number; }) {
 
   const { mutate: handleAddComment, isPending: isAddingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => addCommentService(payload),
-    onSuccess(data) {
+    async onSuccess(data) {
       setComment("");
-      if (ws && ws.connected && currentUser?.id !== data.userId) {
-        const request = {
-          userId: data.userId,
-          notificationId: data?.id,
-        };
-        ws.emit("comment", request);
-      } else {
-        console.log("Failed to emit like event", data?.id);
-      }
+      await queryClient.invalidateQueries({ queryKey: ["useFetchComments", postId] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchCommentReplies", postId, activeCommentId] });
+      await queryClient.invalidateQueries({ queryKey: ["useFetchPost", postId] });
     },
   });
 
@@ -53,17 +41,13 @@ export function Comments({ postId }: { postId: number; }) {
       postId
     });
   };
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 
-  // Determine the avatar URL to use
-  const urlAvatar = profileLoading
-    ? defaultAvatar // Show default while loading
-    : profileData?.data?.profile?.avatar || defaultAvatar;
+  const urlAvatar = profileData?.data?.profile?.avatar || DEFAULT_AVATAR;
 
   return (
     <div className="relative h-full w-full">
       <div className="">
-        {isFetchingComments ? (
+        {isFetchingComments && isPending && isLoading ? (
           <CommentSectionSkeleton />
         ) : comments?.data?.comments?.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 text-gray-500">

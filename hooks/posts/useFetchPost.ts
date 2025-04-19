@@ -4,7 +4,7 @@ import { baseUrl } from "@/utils/constant";
 
 export function useFetchPost(postId: string | undefined) {
   return useQuery({
-    queryKey: ["single-post", postId],
+    queryKey: ["useFetchPost", postId],
     queryFn: async () => {
       if (!postId) throw new Error("Post ID is required");
       const response = await fetch(`${baseUrl}/posts/${postId}`, {
@@ -14,7 +14,6 @@ export function useFetchPost(postId: string | undefined) {
       });
       return response.json();
     },
-    refetchInterval: 500,
     enabled: !!postId,
     placeholderData: keepPreviousData,
   });

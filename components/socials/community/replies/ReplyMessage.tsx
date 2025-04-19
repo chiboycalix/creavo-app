@@ -1,3 +1,4 @@
+import { DEFAULT_AVATAR } from '@/constants';
 import React from 'react';
 interface Reply {
   _id: string;
@@ -38,8 +39,7 @@ const ReplyMessage = ({ reply }: ReplyMessageProps) => {
   };
 
   const userName = `${reply?.firstName} ${reply?.lastName}`;
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
-  const avatarUrl = reply?.avatar || defaultAvatar
+  const avatarUrl = reply?.avatar || DEFAULT_AVATAR
 
   return (
     <div className="flex items-end space-x-3 py-2 animate-fade-in">

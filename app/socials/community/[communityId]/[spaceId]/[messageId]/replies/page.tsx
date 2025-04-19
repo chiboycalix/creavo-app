@@ -4,6 +4,7 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getSpaceDetailsService } from "@/services/community.service";
+import { DEFAULT_AVATAR } from "@/constants";
 
 const RepliesPage = () => {
   const router = useRouter();
@@ -27,11 +28,8 @@ const RepliesPage = () => {
     enabled: !!communityId && !!spaceId && !!messageId,
   })
 
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 
-  const avatarUrl = isFetchingSpaceDetails
-    ? defaultAvatar
-    : spaceDetails?.space?.logo || defaultAvatar;
+  const avatarUrl = spaceDetails?.space?.logo || DEFAULT_AVATAR
 
   return (
     <div className="w-full h-[87vh] relative">

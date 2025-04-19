@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import ProfileSettings from "./SettingsPage";
 import { useSettings } from "@/context/SettingsContext";
+import { DEFAULT_AVATAR } from "@/constants";
 
 interface Profile {
   firstName: string;
@@ -79,7 +80,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const handleCloseEditUserProfileModal = () => {
     setIsOpen(false);
   };
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
+
   return (
     <div className="flex flex-col items-center w-full p-4 relative">
       <Image
@@ -88,7 +89,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         className="w-24 h-24 rounded-full bg-gray-400 object-cover"
         src={
           userProfile?.profile?.avatar ||
-          defaultAvatar
+          DEFAULT_AVATAR
         }
         alt={`${userProfile?.username || "User"}'s profile avatar`}
       />

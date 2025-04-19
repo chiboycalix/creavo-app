@@ -91,16 +91,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       if (!response.ok) throw new Error("Failed to follow the user")
       const result = await response.json()
 
-      if (ws && ws.connected) {
-        const request = {
-          userId: followedId,
-          notificationId: result?.data?.id,
-        }
-        ws.emit("follow", request)
-      } else {
-        console.log("Failed to follow user", followedId)
-      }
-
       return result
     },
     onMutate: async () => {
@@ -156,7 +146,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     },
     onSuccess: () => {
       const followedIdStr = String(followedId)
-      // Invalidate queries to refetch fresh data
       queryClient.invalidateQueries({ queryKey: ["user-followers", followedIdStr] })
       queryClient.invalidateQueries({ queryKey: ["infinite-posts"] })
       queryClient.invalidateQueries({ queryKey: ["user", followedIdStr] })
@@ -197,7 +186,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       await queryClient.cancelQueries({ queryKey: ["user-followers"] })
       await queryClient.cancelQueries({ queryKey: ["infinite-posts"] })
 
-      // Optimistically update followers data
       const previousFollowersData = queryClient.getQueryData(["user-followers", followedIdStr])
       queryClient.setQueryData(["user-followers", followedIdStr], (oldData: any) => {
         if (!oldData?.pages) return oldData
@@ -210,7 +198,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
         return { ...oldData, pages: updatedPages }
       })
 
-      // Optimistically update posts data
       const previousPostsData = queryClient.getQueryData(["infinite-posts"])
       queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
         if (!oldData?.pages) return oldData
@@ -221,7 +208,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
         return { ...oldData, pages: updatedPages }
       })
 
-      // Update user profile data if it exists
       const previousUserData = queryClient.getQueryData(["user", followedIdStr])
       if (previousUserData) {
         queryClient.setQueryData(["user", followedIdStr], (oldData: any) => {
@@ -233,16 +219,11 @@ const FollowButton: React.FC<FollowButtonProps> = ({
           }
         })
       }
-
-      // Update local state immediately
       setIsFollowing(false)
 
       return { previousFollowersData, previousPostsData, previousUserData, followedIdStr }
     },
     onError: (err, _, context) => {
-      console.error("Unfollow error:", err)
-
-      // Revert on error
       if (context?.previousFollowersData) {
         queryClient.setQueryData(["user-followers", context.followedIdStr], context.previousFollowersData)
       }
@@ -258,15 +239,10 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       setIsFollowing(initialFollowStatus)
     },
     onSuccess: () => {
-      console.log("Unfollow successful")
       const followedIdStr = String(followedId)
-
-      // Invalidate queries to refetch fresh data
       queryClient.invalidateQueries({ queryKey: ["user-followers", followedIdStr] })
       queryClient.invalidateQueries({ queryKey: ["infinite-posts"] })
       queryClient.invalidateQueries({ queryKey: ["user", followedIdStr] })
-
-      // Ensure state is updated after success
       setIsFollowing(false)
     },
   })

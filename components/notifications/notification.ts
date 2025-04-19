@@ -1,6 +1,6 @@
+import { DEFAULT_AVATAR } from "@/constants";
 import { formatDistanceToNow, parseISO } from "date-fns";
 
-// Function to categorize a notification based on its timestamp
 const categorizeNotification = (
   createdAt: string
 ): { category: "today" | "thisWeek" | "thisMonth"; time: string } => {
@@ -39,8 +39,12 @@ export const transformNotifications = (notifications: any[]) => {
   );
 
   sortedNotifications?.forEach((notification: any) => {
-    if (!notification?.data) return;
-
+    if (
+      !notification ||
+      !notification?.data ||
+      notification?.type === "unknown"
+    )
+      return;
     const { id, event, createdAt, content, firstName, lastName, avatar } =
       notification.data;
 
@@ -61,11 +65,9 @@ export const transformNotifications = (notifications: any[]) => {
     }
 
     const formattedNotification = {
-      id: id.toString(),
-      userImage: avatar || "/assets/Pupil.png",
-      userName: `${firstName || ""} ${
-        lastName || ""
-      }`.trim(),
+      id: id?.toString(),
+      userImage: avatar || DEFAULT_AVATAR,
+      userName: `${firstName || ""} ${lastName || ""}`.trim(),
       action,
       timestamp: time,
       ...(isFollowing !== undefined ? { isFollowing } : {}),

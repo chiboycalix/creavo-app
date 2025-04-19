@@ -10,6 +10,7 @@ import { Input } from "@/components/Input";
 import { TextareaInput } from "@/components/Input/TextareaInput";
 import { toast } from "sonner";
 import { uploadImageToCloudinary } from "@/utils";
+import { DEFAULT_AVATAR } from "@/constants";
 
 interface UserProfile {
   id: number;
@@ -141,7 +142,6 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
       toast.error(error?.data[0])
     }
   };
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 
   return (
     <AnimatePresence>
@@ -153,7 +153,7 @@ const EditUserProfileModal: React.FC<EditUserInputModalProps> = ({
                 src={
                   imagePreview ||
                   user?.profile.avatar ||
-                  defaultAvatar
+                  DEFAULT_AVATAR
                 }
                 alt="Profile Preview"
                 className="rounded-full object-cover w-12 h-12"

@@ -40,13 +40,6 @@ export const useFetchInfinitePosts = (options = {}) => {
     },
     initialPageParam: 1,
     ...options,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
     staleTime: 5 * 60 * 1000,
-    retry: 1,
-    retryDelay: 1000,
-    // refetchInterval: 0,
-    refetchIntervalInBackground: false,
-    refetchOnMount: true,
   });
 };

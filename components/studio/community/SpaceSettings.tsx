@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RemoveMemberFromSpacePayload, removeMemberFromSpaceService } from "@/services/community.service";
 import { toast } from "sonner";
+import { DEFAULT_AVATAR } from "@/constants";
 
 type SpaceSettingsProps = {
   isOpen: boolean;
@@ -40,8 +41,7 @@ const SpaceSettings = ({
     right: 0,
   };
 
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
-  const avatarUrl = currentSpace?.logo || defaultAvatar;
+  const avatarUrl = currentSpace?.logo || DEFAULT_AVATAR;
   const [isOpenMembers, setIsOpenMembers] = useState(true)
   const [isOpenAccessControl, setIsOpenAccessControl] = useState(true)
 
@@ -150,7 +150,7 @@ const SpaceSettings = ({
                           <div key={member.id} className="flex group items-start justify-between">
                             <div className="flex items-center gap-2 mb-4 cursor-pointer">
                               <img
-                                src={member.avatar || defaultAvatar}
+                                src={member.avatar || DEFAULT_AVATAR}
                                 alt={`${member.username}'s avatar`}
                                 style={{
                                   width: "30px",
