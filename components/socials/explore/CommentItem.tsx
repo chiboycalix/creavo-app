@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useAuth } from "@/context/AuthContext";
 import { useComments } from "@/context/CommentsContext";
 import { useFetchPost } from "@/hooks/posts/useFetchPost";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeleteCommentPayload, deleteCommentService, replyCommentService } from "@/services/comment.service";
 import { toast } from "sonner";
 import { CommentPayload } from "@/types";
@@ -15,6 +15,7 @@ import { useWebSocket } from "@/context/WebSocket";
 import { Input } from "@/components/Input";
 import { useFetchCommentReplies } from "@/hooks/comments/useFetchCommentReplies";
 import { formatCommentDate } from "@/utils";
+import { DEFAULT_AVATAR } from "@/constants";
 
 interface User {
   id: string;
@@ -41,6 +42,17 @@ interface CommentItemProps {
   onToggleCommentInput: (commentId: string) => void;
 }
 
+const SkeletonLoader = () => (
+  <div className="flex items-start gap-3 animate-pulse">
+    <div className="w-10 h-10 rounded-full bg-gray-200" />
+    <div className="flex-1 space-y-2">
+      <div className="h-4 bg-gray-200 rounded w-1/4" />
+      <div className="h-4 bg-gray-200 rounded w-3/4" />
+      <div className="h-3 bg-gray-200 rounded w-1/6" />
+    </div>
+  </div>
+);
+
 const CommentItem = ({
   comment,
   depth = 0,
@@ -58,7 +70,8 @@ const CommentItem = ({
   const [commentReply, setCommentReply] = useState("");
   const ws = useWebSocket();
   const isCommentInputVisible = activeCommentId === comment.id;
-  const { data: replies } = useFetchCommentReplies(post?.data?.id, comment?.id);
+  const { data: replies, isFetching: isFetchingCommentReplies } = useFetchCommentReplies(post?.data?.id, comment?.id);
+  const queryClient = useQueryClient();
 
   const { mutate: handleDeleteComment } = useMutation({
     mutationFn: (payload: DeleteCommentPayload) => deleteCommentService(payload),
@@ -70,7 +83,7 @@ const CommentItem = ({
 
   const { mutate: handleReplyComment, isPending: isReplyingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => replyCommentService(payload),
-    onSuccess(data) {
+    async onSuccess(data) {
       if (ws && ws.connected && currentUser?.id !== data.userId) {
         const request = {
           userId: data.userId,
@@ -78,6 +91,9 @@ const CommentItem = ({
         };
         ws.emit("comment", request);
       }
+      await queryClient.invalidateQueries({ queryKey: ["post-comments", activePostId] });
+      await queryClient.invalidateQueries({ queryKey: ["comments-Reply", activePostId, comment?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["single-post", activePostId] });
     },
   });
 
@@ -137,7 +153,7 @@ const CommentItem = ({
       >
         <motion.img
           whileHover={{ scale: 1.05 }}
-          src={comment._user?.avatar}
+          src={comment._user?.avatar || DEFAULT_AVATAR}
           alt={comment._user.firstName}
           className="w-10 h-10 rounded-full flex-shrink-0"
         />
@@ -277,24 +293,31 @@ const CommentItem = ({
 
       {/* Animated replies */}
       <AnimatePresence>
-        {depth < maxDepth && replies?.data?.comments?.length > 0 && (
-          replies?.data?.comments?.map((reply: any) => {
-            return (
-              <CommentItem
-                key={reply?.id}
-                comment={{
-                  id: reply?.id?.toString(),
-                  _user: reply?._user,
-                  body: reply?.body,
-                  createdAt: reply?.createdAt,
-                  likes: reply?.likesCount,
-                }}
-                depth={depth + 1}
-                activeCommentId={activeCommentId}
-                onToggleCommentInput={onToggleCommentInput}
-              />
-            )
-          })
+        {depth < maxDepth && (
+          <>
+            {isFetchingCommentReplies ? (
+              <div className="pl-12 mt-2">
+                <SkeletonLoader />
+              </div>
+            ) : (
+              replies?.data?.comments?.length > 0 &&
+              replies?.data?.comments?.map((reply: any) => (
+                <CommentItem
+                  key={reply?.id}
+                  comment={{
+                    id: reply?.id?.toString(),
+                    _user: reply?._user,
+                    body: reply?.body,
+                    createdAt: reply?.createdAt,
+                    likes: reply?.likesCount,
+                  }}
+                  depth={depth + 1}
+                  activeCommentId={activeCommentId}
+                  onToggleCommentInput={onToggleCommentInput}
+                />
+              ))
+            )}
+          </>
         )}
       </AnimatePresence>
     </motion.div>

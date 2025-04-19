@@ -20,8 +20,8 @@ export function useFetchCommentReplies(
       );
       return response.json();
     },
-    refetchInterval: 500,
     placeholderData: keepPreviousData,
-    enabled: !!postId,
+    enabled: !!postId || !!commentId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

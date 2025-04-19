@@ -14,7 +14,6 @@ export function useFetchPost(postId: string | undefined) {
       });
       return response.json();
     },
-    refetchInterval: 500,
     enabled: !!postId,
     placeholderData: keepPreviousData,
   });

@@ -17,8 +17,8 @@ export function useFetchComments(postId: number | undefined) {
       );
       return response.json();
     },
-    refetchInterval: 500,
     placeholderData: keepPreviousData,
     enabled: !!postId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

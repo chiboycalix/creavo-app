@@ -4,9 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/Input";
 import { useFetchComments } from "@/hooks/comments/useFetchComments";
-import { Avatar, AvatarImage, AvatarFallback } from "../../ui/avatar";
 import { useAuth } from "@/context/AuthContext";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { addCommentService } from "@/services/comment.service";
 import { CommentPayload } from "@/types";
@@ -15,17 +14,16 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { DEFAULT_AVATAR } from "@/constants";
 
 export function Comments({ postId }: { postId: number; }) {
-  const { data: comments, isPending: isFetchingComments } = useFetchComments(postId);
+  const { data: comments, isFetching: isFetchingComments } = useFetchComments(postId);
   const { getCurrentUser } = useAuth();
   const currentUser = getCurrentUser();
   const [comment, setComment] = useState("");
   const ws = useWebSocket();
   const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
-
+  const queryClient = useQueryClient();
   const {
     data: profileData,
     isLoading: profileLoading,
-    error: profileError
   } = useUserProfile(currentUser?.id);
 
   const handleToggleCommentInput = (commentId: string) => {
@@ -34,7 +32,7 @@ export function Comments({ postId }: { postId: number; }) {
 
   const { mutate: handleAddComment, isPending: isAddingComment } = useMutation({
     mutationFn: (payload: CommentPayload) => addCommentService(payload),
-    onSuccess(data) {
+    async onSuccess(data) {
       setComment("");
       if (ws && ws.connected && currentUser?.id !== data.userId) {
         const request = {
@@ -42,8 +40,11 @@ export function Comments({ postId }: { postId: number; }) {
           notificationId: data?.id,
         };
         ws.emit("comment", request);
+        await queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
+        await queryClient.invalidateQueries({ queryKey: ["comments-Reply", postId, activeCommentId] });
+        await queryClient.invalidateQueries({ queryKey: ["single-post", postId] });
       } else {
-        console.log("Failed to emit like event", data?.id);
+        console.log("Failed to emit comment event", data?.id);
       }
     },
   });
