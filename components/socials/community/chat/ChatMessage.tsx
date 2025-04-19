@@ -5,6 +5,7 @@ import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { DEFAULT_AVATAR } from "@/constants";
 interface ChatMessageProps {
   message: Message;
   communityId?: string;
@@ -19,10 +20,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   const { currentUser } = useAuth();
   const { data: profileData, isLoading: profileLoading } = useUserProfile(currentUser?.id);
 
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = profileLoading
-    ? defaultAvatar
-    : profileData?.data?.profile?.avatar || defaultAvatar;
+    ? DEFAULT_AVATAR
+    : profileData?.data?.profile?.avatar || DEFAULT_AVATAR;
 
   return (
     <div className="animate-fade-in">

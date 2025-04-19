@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { formatCommentDate } from "@/utils";
 import Link from "next/link";
+import { DEFAULT_AVATAR } from "@/constants";
 
 const BookmarkButton = dynamic(() => import("./BookmarkButton"), {
   ssr: false,
@@ -116,7 +117,6 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
   const handleNavigateToCourse = (id: any) => {
     router.push(`/market/product/${id}`);
   };
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 
   return (
     <div
@@ -140,7 +140,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
           <div className="absolute right-4 bottom-10 flex flex-col gap-1 lg:hidden">
             <FollowButton
               followedId={post?.userId}
-              avatar={post?.avatar || defaultAvatar}
+              avatar={post?.avatar || DEFAULT_AVATAR}
               initialFollowStatus={post?.followed}
               isMyPost={Number(post.userId) === currentUserId}
               userInitial={`${post?.firstName[0] + post?.lastName[0]}`}
@@ -225,7 +225,7 @@ export default function SocialPost({ post, ref }: { post: any; ref: any }) {
         <div className="flex flex-col gap-4 mt-auto">
           <FollowButton
             followedId={post?.userId}
-            avatar={post?.avatar || defaultAvatar}
+            avatar={post?.avatar || DEFAULT_AVATAR}
             initialFollowStatus={post?.followed}
             isMyPost={Number(post.userId) === currentUserId}
             userInitial={`${post?.firstName[0] + post?.lastName[0]}`}

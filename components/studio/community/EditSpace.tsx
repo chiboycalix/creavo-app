@@ -10,6 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { EditSpacePayload, editSpaceService } from "@/services/community.service";
 import { uploadImageToCloudinary } from "@/utils";
+import { DEFAULT_AVATAR } from "@/constants";
 
 type EditSpaceProps = {
   isOpen: boolean;
@@ -34,8 +35,6 @@ const EditSpace = ({
     top: 2,
     right: 0,
   };
-
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -119,7 +118,7 @@ const EditSpace = ({
                     src={
                       imagePreview ||
                       currentSpace?.logo ||
-                      defaultAvatar
+                      DEFAULT_AVATAR
                     }
                     alt="Profile Preview"
                     className="rounded-full object-cover w-12 h-12"

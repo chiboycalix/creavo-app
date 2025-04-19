@@ -58,7 +58,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["infinite-posts"] });
-
       const previousData = queryClient.getQueryData(["infinite-posts"]);
       queryClient.setQueryData(["infinite-posts"], (oldData: any) => {
         if (!oldData?.pages) return oldData;
@@ -154,10 +153,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       >
         <Heart
           className={`w-8 h-8 transition-colors duration-200 
-            ${
-              isLiked
-                ? "fill-red-500 stroke-red-500"
-                : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
+            ${isLiked
+              ? "fill-red-500 stroke-red-500"
+              : "md:hover:stroke-red-500 stroke-white fill-white md:fill-gray-400 md:hover:fill-red-500"
             }`}
         />
       </button>

@@ -72,8 +72,8 @@ const NotificationsPopover = () => {
 
   // Handle WebSocket notifications
   const handleNotification = (newNotification: any) => {
+    console.log({ newNotification })
     const formattedNotification = normalizeNotification(newNotification);
-
     setNotifications((prevNotifications) => {
       if (!Array.isArray(prevNotifications)) return [formattedNotification];
 
@@ -81,8 +81,8 @@ const NotificationsPopover = () => {
         (n) => n.data.id === formattedNotification.data.id
       );
       if (exists) return prevNotifications;
-
       setHasUnreadNotifications(true);
+
       return [formattedNotification, ...prevNotifications];
     });
   };
@@ -94,7 +94,7 @@ const NotificationsPopover = () => {
 
     return () => {
       if (ws) {
-        ws.off("notification", handleNotification);
+        // ws.off("notification", handleNotification);
       }
     };
   }, [ws]);
@@ -102,7 +102,12 @@ const NotificationsPopover = () => {
   const groupedNotifications = transformNotifications(notifications);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={() => {
+      setOpen((prev) => !prev);
+      if (hasUnreadNotifications) {
+        setHasUnreadNotifications(false);
+      }
+    }}>
       <PopoverTrigger asChild>
         <button className="relative p-2 rounded-full hover:bg-gray-100">
           <Bell className="h-6 w-6 text-gray-500" />

@@ -35,6 +35,7 @@ import SearchInput from "@/components/search/search-input";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useSettings } from "@/context/SettingsContext";
 import ProfileSettings from "@/app/socials/profile/_components/SettingsPage";
+import { DEFAULT_AVATAR } from "@/constants";
 
 interface HeaderProps {
   onButtonClick: (navItems: NavItem[]) => void;
@@ -83,12 +84,10 @@ export default function Header({ onButtonClick, headerButtons }: HeaderProps) {
     if (setOpenSettingsModal) await setOpenSettingsModal?.(true);
   };
 
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
-
   // Determine the avatar URL to use
   const avatarUrl = profileLoading
-    ? defaultAvatar // Show default while loading
-    : profileData?.data?.profile?.avatar || defaultAvatar;
+    ? DEFAULT_AVATAR // Show default while loading
+    : profileData?.data?.profile?.avatar || DEFAULT_AVATAR;
 
   return (
     <header

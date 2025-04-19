@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import Link from "next/link"; // Import next/link
+import { DEFAULT_AVATAR } from "@/constants";
 
 interface ChatMessageProps {
   message: Message;
@@ -66,10 +67,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     setIsInputDialogOpen(true);
   };
 
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = profileLoading
-    ? defaultAvatar
-    : profileData?.data?.profile?.avatar || defaultAvatar;
+    ? DEFAULT_AVATAR
+    : profileData?.data?.profile?.avatar || DEFAULT_AVATAR;
 
   const { mutate: handleDeleteMessage, isPending: isDeletingMessage } =
     useMutation({

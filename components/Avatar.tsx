@@ -1,3 +1,4 @@
+import { DEFAULT_AVATAR } from '@/constants';
 import React from 'react';
 
 interface AvatarProps {
@@ -7,10 +8,9 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ profileLoading, profileData, className }) => {
-  const defaultAvatar = "https://i.postimg.cc/Bv2nscWb/icon-default-avatar.png";
   const avatarUrl = profileLoading
-    ? defaultAvatar
-    : profileData?.data?.profile?.avatar || defaultAvatar;
+    ? DEFAULT_AVATAR
+    : profileData?.data?.profile?.avatar || DEFAULT_AVATAR;
 
   return (
     <img
