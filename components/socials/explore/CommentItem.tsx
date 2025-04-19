@@ -11,19 +11,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeleteCommentPayload, deleteCommentService, replyCommentService } from "@/services/comment.service";
 import { toast } from "sonner";
 import { CommentPayload } from "@/types";
-import { useWebSocket } from "@/context/WebSocket";
 import { Input } from "@/components/Input";
 import { useFetchCommentReplies } from "@/hooks/comments/useFetchCommentReplies";
 import { formatCommentDate } from "@/utils";
 import { DEFAULT_AVATAR } from "@/constants";
-
 interface User {
   id: string;
   firstName: string;
   lastName: string;
   avatar: string;
 }
-
 interface Comment {
   id: string;
   _user: User;
@@ -68,7 +65,6 @@ const CommentItem = ({
   const isIconVisible = isHovered || isPopoverOpen;
   const { data: post } = useFetchPost(activePostId as any);
   const [commentReply, setCommentReply] = useState("");
-  const ws = useWebSocket();
   const isCommentInputVisible = activeCommentId === comment.id;
   const { data: replies, isFetching: isFetchingCommentReplies, isPending, isLoading } = useFetchCommentReplies(post?.data?.id, comment?.id);
   const queryClient = useQueryClient();
@@ -284,7 +280,6 @@ const CommentItem = ({
         )}
       </AnimatePresence>
 
-      {/* Animated replies */}
       <AnimatePresence>
         {depth < maxDepth && (
           <>
